@@ -1,0 +1,292 @@
+# Copyright (C) 2023 bPlugins LLC
+# This file is distributed under the GPLv3.
+msgid ""
+msgstr ""
+"Project-Id-Version: B Testimonials Block 1.0.0\n"
+"Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/b-testimonials-block\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"POT-Creation-Date: 2023-09-26T15:33:24+00:00\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"X-Generator: WP-CLI 2.6.0\n"
+"X-Domain: b-testimonials\n"
+
+#. Plugin Name of the plugin
+msgid "B Testimonials Block"
+msgstr ""
+
+#. Description of the plugin
+msgid "Description of the B Testimonials Block."
+msgstr ""
+
+#. Author of the plugin
+msgid "bPlugins LLC"
+msgstr ""
+
+#. Author URI of the plugin
+msgid "http://bplugins.com"
+msgstr ""
+
+#: dist/editor.js:1
+#: dist/editor.js:6446
+msgid "Default"
+msgstr ""
+
+#: dist/editor.js:1
+#: dist/editor.js:6447
+msgid "Grid-1"
+msgstr ""
+
+#: dist/editor.js:1
+#: dist/editor.js:6448
+msgid "Grid-2"
+msgstr ""
+
+#: dist/editor.js:1
+#: dist/editor.js:6449
+msgid "Grid-3"
+msgstr ""
+
+#: dist/editor.js:1
+#: dist/editor.js:6450
+msgid "Grid-4"
+msgstr ""
+
+#: dist/editor.js:1
+#: dist/editor.js:6451
+msgid "Grid-5"
+msgstr ""
+
+#: dist/editor.js:1
+#: dist/editor.js:6452
+msgid "Masonry"
+msgstr ""
+
+#: dist/editor.js:1
+#: dist/editor.js:6461
+msgid "General"
+msgstr ""
+
+#: dist/editor.js:1
+#: dist/editor.js:6462
+msgid "Style"
+msgstr ""
+
+#: dist/editor.js:1
+#: dist/editor.js:6525
+msgid "Add or Remove Items"
+msgstr ""
+
+#: dist/editor.js:1
+#: dist/editor.js:6529
+msgid "Image:"
+msgstr ""
+
+#: dist/editor.js:1
+#: dist/editor.js:6530
+msgid "Enter Image URL"
+msgstr ""
+
+#: dist/editor.js:1
+#: dist/editor.js:6532
+#: dist/editor.js:6555
+#: dist/editor.js:6607
+msgid "Name"
+msgstr ""
+
+#: dist/editor.js:1
+#: dist/editor.js:6534
+#: dist/editor.js:6557
+#: dist/editor.js:6613
+msgid "Designation"
+msgstr ""
+
+#: dist/editor.js:1
+#: dist/editor.js:6536
+msgid "Review"
+msgstr ""
+
+#: dist/editor.js:1
+#: dist/editor.js:6538
+msgid "Rating:"
+msgstr ""
+
+#: dist/editor.js:1
+#: dist/editor.js:6541
+msgid "Remove"
+msgstr ""
+
+#: dist/editor.js:1
+#: dist/editor.js:6543
+msgid "Duplicate"
+msgstr ""
+
+#: dist/editor.js:1
+#: dist/editor.js:6548
+msgid "Add New Card"
+msgstr ""
+
+#: dist/editor.js:1
+#: dist/editor.js:6552
+msgid "Elements"
+msgstr ""
+
+#: dist/editor.js:1
+#: dist/editor.js:6553
+#: dist/editor.js:6597
+msgid "Image"
+msgstr ""
+
+#: dist/editor.js:1
+#: dist/editor.js:6559
+#: dist/editor.js:6619
+msgid "Review Text"
+msgstr ""
+
+#: dist/editor.js:1
+#: dist/editor.js:6561
+msgid "Review Icon"
+msgstr ""
+
+#: dist/editor.js:1
+#: dist/editor.js:6564
+msgid "Layout"
+msgstr ""
+
+#: dist/editor.js:1
+#: dist/editor.js:6566
+msgid "Columns:"
+msgstr ""
+
+#: dist/editor.js:1
+#: dist/editor.js:6572
+msgid "Column Gap:"
+msgstr ""
+
+#: dist/editor.js:1
+#: dist/editor.js:6574
+msgid "Row Gap:"
+msgstr ""
+
+#: dist/editor.js:1
+#: dist/editor.js:6577
+msgid "Layout:"
+msgstr ""
+
+#: dist/editor.js:1
+#: dist/editor.js:6586
+msgid "Card"
+msgstr ""
+
+#: dist/editor.js:1
+#: dist/editor.js:6587
+#: dist/editor.js:6643
+msgid "Background Color"
+msgstr ""
+
+#: dist/editor.js:1
+#: dist/editor.js:6589
+#: dist/editor.js:6634
+#: dist/editor.js:6645
+msgid "Padding"
+msgstr ""
+
+#: dist/editor.js:1
+#: dist/editor.js:6591
+#: dist/editor.js:6603
+#: dist/editor.js:6636
+msgid "Border"
+msgstr ""
+
+#: dist/editor.js:1
+#: dist/editor.js:6599
+msgid "Width:"
+msgstr ""
+
+#: dist/editor.js:1
+#: dist/editor.js:6601
+msgid "Height:"
+msgstr ""
+
+#: dist/editor.js:1
+#: dist/editor.js:6608
+#: dist/editor.js:6614
+#: dist/editor.js:6620
+#: dist/editor.js:6630
+msgid "Typography"
+msgstr ""
+
+#: dist/editor.js:1
+#: dist/editor.js:6610
+#: dist/editor.js:6616
+#: dist/editor.js:6622
+msgid "Color"
+msgstr ""
+
+#: dist/editor.js:1
+#: dist/editor.js:6624
+msgid "Rating Icon Color"
+msgstr ""
+
+#: dist/editor.js:1
+#: dist/editor.js:6626
+msgid "Text length"
+msgstr ""
+
+#: dist/editor.js:1
+#: dist/editor.js:6629
+msgid "Expanded Button"
+msgstr ""
+
+#: dist/editor.js:1
+#: dist/editor.js:6632
+msgid "Colors"
+msgstr ""
+
+#: dist/editor.js:1
+#: dist/editor.js:6641
+msgid "Top"
+msgstr ""
+
+#: dist/editor.js:6910
+#: dist/script.js:399
+msgid "Enter your name"
+msgstr ""
+
+#: dist/editor.js:6917
+#: dist/script.js:406
+msgid "Enter your designation"
+msgstr ""
+
+#: dist/editor.js:6932
+#: dist/script.js:422
+msgid "Enter your review"
+msgstr ""
+
+#: block.json
+msgctxt "block title"
+msgid "Testimonials"
+msgstr ""
+
+#: block.json
+msgctxt "block description"
+msgid "Description of Testimonials."
+msgstr ""
+
+#: block.json
+msgctxt "block keyword"
+msgid "testimonials"
+msgstr ""
+
+#: block.json
+msgctxt "block keyword"
+msgid "block"
+msgstr ""
+
+#: block.json
+msgctxt "block keyword"
+msgid "rating"
+msgstr ""

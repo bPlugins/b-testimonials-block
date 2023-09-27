@@ -1,0 +1,254 @@
+{
+	"apiVersion": "1",
+	"name": "btb/b-testimonials",
+	"title": "Testimonials",
+	"description": "Description of Testimonials.",
+	"category": "widgets",
+	"keywords": [
+		"testimonials",
+		"block",
+		"rating"
+	],
+	"textdomain": "b-testimonials",
+	"attributes": {
+		"align": {
+			"type": "string",
+			"default": ""
+		},
+		"cId": {
+			"type": "string",
+			"default": ""
+		},
+		"layout": {
+			"type": "string",
+			"default": "default"
+		},
+		"columns": {
+			"type": "object",
+			"default": {
+				"desktop": 3,
+				"tablet": 2,
+				"mobile": 1
+			}
+		},
+		"columnGap": {
+			"type": "string",
+			"default": "30px"
+		},
+		"rowGap": {
+			"type": "string",
+			"default": "40px"
+		},
+		"items": {
+			"type": "array",
+			"default": [
+				{
+					"img": {
+						"url": "https://i.ibb.co/DWjhC8v/green-grass-field.jpg"
+					},
+					"name": "Md AlAmin WP",
+					"deg": "developer",
+					"reviewText": "It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. The point of using Lorem Ipsum is that it has a more-or-less normal distribution of letters, as opposed to using 'Content here, content here', making it look like readable English",
+					"rating": 4
+				}
+			]
+		},
+		"options": {
+			"type": "object",
+			"default": {
+				"img": true,
+				"name": true,
+				"deg": true,
+				"reviewText": true,
+				"icon": true
+			}
+		},
+		"background": {
+			"type": "string",
+			"default": "#0000"
+		},
+		"padding": {
+			"type": "object",
+			"default": {
+				"top": "10px",
+				"right": "15px",
+				"bottom": "10px",
+				"left": "15px"
+			}
+		},
+		"border": {
+			"type": "object",
+			"default": {
+				"width": "1px",
+				"style": "solid",
+				"color": "#0575e6",
+				"side": "all",
+				"radius": "3px"
+			}
+		},
+		"shadow": {
+			"type": "object",
+			"default": {}
+		},
+		"image": {
+			"type": "object",
+			"default": {
+				"width": 50,
+				"height": 50
+			}
+		},
+		"imgBorder": {
+			"type": "object",
+			"default": {
+				"width": "1px",
+				"style": "solid",
+				"color": "#0575e6",
+				"side": "all",
+				"radius": "50%"
+			}
+		},
+		"nameTypo": {
+			"type": "object",
+			"default": {
+				"fontSize": {
+					"desktop": 16,
+					"tablet": 16,
+					"mobile": 14
+				},
+				"fontFamily": "Open Sans",
+				"fontWeight": 700,
+				"lineHeight": "135%"
+			}
+		},
+		"nameColor": {
+			"type": "string",
+			"default": "#000"
+		},
+		"degTypo": {
+			"type": "object",
+			"default": {
+				"fontSize": {
+					"desktop": 14,
+					"tablet": 14,
+					"mobile": 14
+				},
+				"fontFamily": "Open Sans",
+				"fontWeight": 400,
+				"lineHeight": "135%"
+			}
+		},
+		"degColor": {
+			"type": "string",
+			"default": "#7B7B7B"
+		},
+		"textTypo": {
+			"type": "object",
+			"default": {
+				"fontSize": {
+					"desktop": 16,
+					"tablet": 16,
+					"mobile": 14
+				},
+				"fontWeight": 400,
+				"lineHeight": "135%"
+			}
+		},
+		"textColor": {
+			"type": "string",
+			"default": "#000"
+		},
+		"starIconColor": {
+			"type": "string",
+			"default": "#FF8C02"
+		},
+		"textLength": {
+			"type": "number",
+			"default": 120
+		},
+		"expandedTypo": {
+			"type": "object",
+			"default": {
+				"fontSize": {
+					"desktop": 14,
+					"tablet": 14,
+					"mobile": 14
+				},
+				"fontWeight": 400,
+				"lineHeight": "135%"
+			}
+		},
+		"expandedColors": {
+			"type": "object",
+			"default": {
+				"color": "#000",
+				"bg": "#fbfbfb1f"
+			}
+		},
+		"expandedPadding": {
+			"type": "object",
+			"default": {
+				"top": "2px",
+				"right": "2px",
+				"bottom": "2px",
+				"left": "2px"
+			}
+		},
+		"expandedBorder": {
+			"type": "object",
+			"default": {
+				"width": "0px",
+				"style": "solid",
+				"color": "#0575e6",
+				"side": "all",
+				"radius": "3px"
+			}
+		},
+		"grid2Bg": {
+			"type": "string",
+			"default": "#f9f8f8"
+		},
+		"grid2Padding": {
+			"type": "object",
+			"default": {
+				"top": "10px",
+				"right": "10px",
+				"bottom": "10px",
+				"left": "10px"
+			}
+		},
+		"grid2Border": {
+			"type": "object",
+			"default": {
+				"width": "0px",
+				"style": "solid",
+				"color": "#0575e6",
+				"side": "all",
+				"radius": "3px"
+			}
+		},
+		"quoteIcon": {
+			"type": "object",
+			"default": {
+				"size": 23
+			}
+		}
+	},
+	"supports": {
+		"align": [
+			"wide",
+			"full"
+		],
+		"html": false
+	},
+	"example": {
+		"attributes": {
+			"preview": true,
+			"columns": {
+				"desktop": 1,
+				"tablet": 1,
+				"mobile": 1
+			}
+		}
+	},
+	"editorScript": "file:dist/editor.js"
+}

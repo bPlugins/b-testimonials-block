@@ -50,7 +50,7 @@ class BTBTestimonials
         extract($attributes);
 
         $className = $className ?? '';
-        $btbBlockClassName = 'wp-block-btb-b-testimonials ' . $className . ' align' . $align;
+        $btbBlockClassName = 'wp-block-bptmb-b-testimonials ' . $className . ' align' . $align;
 
         wp_enqueue_style('btb-testimonials-style');
         wp_enqueue_script('btb-testimonials-script');

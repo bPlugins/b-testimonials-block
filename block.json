@@ -1,7 +1,7 @@
 {
 	"apiVersion": "1",
-	"name": "btb/b-testimonials",
-	"title": "Testimonials",
+	"name": "bptmb/b-testimonials",
+	"title": "B Testimonials Block",
 	"description": "Description of Testimonials.",
 	"category": "widgets",
 	"keywords": [
@@ -20,6 +20,10 @@
 			"default": ""
 		},
 		"layout": {
+			"type": "string",
+			"default": "default"
+		},
+		"theme": {
 			"type": "string",
 			"default": "default"
 		},
@@ -53,14 +57,17 @@
 				}
 			]
 		},
-		"options": {
+		"elements": {
 			"type": "object",
 			"default": {
 				"img": true,
 				"name": true,
 				"deg": true,
 				"reviewText": true,
-				"icon": true
+				"icon": true,
+				"expandBtn": true,
+				"expandText": "Show More",
+				"collapseText": "Show Less"
 			}
 		},
 		"background": {
@@ -165,44 +172,6 @@
 			"type": "number",
 			"default": 120
 		},
-		"expandedTypo": {
-			"type": "object",
-			"default": {
-				"fontSize": {
-					"desktop": 14,
-					"tablet": 14,
-					"mobile": 14
-				},
-				"fontWeight": 400,
-				"lineHeight": "135%"
-			}
-		},
-		"expandedColors": {
-			"type": "object",
-			"default": {
-				"color": "#000",
-				"bg": "#fbfbfb1f"
-			}
-		},
-		"expandedPadding": {
-			"type": "object",
-			"default": {
-				"top": "2px",
-				"right": "2px",
-				"bottom": "2px",
-				"left": "2px"
-			}
-		},
-		"expandedBorder": {
-			"type": "object",
-			"default": {
-				"width": "0px",
-				"style": "solid",
-				"color": "#0575e6",
-				"side": "all",
-				"radius": "3px"
-			}
-		},
 		"grid2Bg": {
 			"type": "string",
 			"default": "#f9f8f8"
@@ -230,6 +199,15 @@
 			"type": "object",
 			"default": {
 				"size": 23
+			}
+		},
+		"slider": {
+			"type": "object",
+			"default": {
+				"height": 500,
+				"autoPlay": true,
+				"mouseWheel": true,
+				"navigation": true
 			}
 		}
 	},

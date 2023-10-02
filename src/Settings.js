@@ -6,18 +6,19 @@ import { PanelBody, PanelRow, TabPanel, TextControl, SelectControl, RangeControl
 import produce from 'immer';
 
 // Settings Components
-import { Label, BColor, BDevice, BorderControl, ColorsControl, InlineDetailMediaUpload, Typography, ShadowControl } from '../../Components';
+import { Label, BColor, BDevice, BorderControl, InlineDetailMediaUpload, Typography, MultiShadowControl } from '../../Components';
 import { gearIcon } from '../../Components/utils/icons';
 import { tabController } from '../../Components/utils/functions';
 import { emUnit, perUnit, pxUnit } from '../../Components/utils/options';
-import { checkGrid } from './utils/functions';
 
-import { layoutOpt, generalStyleTabs } from './utils/options';
+import { checkTheme } from './utils/functions';
+import { layoutOpt, generalStyleTabs, themeOpt } from './utils/options';
 
 const Settings = ({ attributes, setAttributes, updateItem, activeIndex, setActiveIndex }) => {
-	const { columns, columnGap, rowGap, layout, items, options, background, padding, shadow, border, image, imgBorder, nameTypo, nameColor, degTypo, degColor, textTypo, textColor, starIconColor, textLength, expandedTypo, expandedColors, expandedPadding, expandedBorder, grid2Bg, grid2Padding } = attributes;
+	const { columns, columnGap, rowGap, layout, theme, items, elements, background, padding, shadow, border, image, imgBorder, nameTypo, nameColor, degTypo, degColor, textTypo, textColor, starIconColor, textLength, grid2Bg, grid2Padding, slider } = attributes;
 
 	const [device, setDevice] = useState('desktop');
+	const { height, autoPlay, mouseWheel, navigation } = slider;
 
 	const addItem = () => {
 		setAttributes({
@@ -87,18 +88,39 @@ const Settings = ({ attributes, setAttributes, updateItem, activeIndex, setActiv
 					</PanelBody>
 
 					<PanelBody className='bPlPanelBody' title={__('Elements', 'b-testimonials')} initialOpen={false}>
-						<ToggleControl className='mt10' label={__('Image', 'b-testimonials')} labelPosition='left' checked={options?.img} onChange={val => updateObject('options', 'img', val)} />
+						<ToggleControl className='mt10' label={__('Image', 'b-testimonials')} labelPosition='left' checked={elements?.img} onChange={val => updateObject('elements', 'img', val)} />
 
-						<ToggleControl className='mt10' label={__('Name', 'b-testimonials')} labelPosition='left' checked={options?.name} onChange={val => updateObject('options', 'name', val)} />
+						<ToggleControl className='mt10' label={__('Name', 'b-testimonials')} labelPosition='left' checked={elements?.name} onChange={val => updateObject('elements', 'name', val)} />
 
-						<ToggleControl className='mt10' label={__('Designation', 'b-testimonials')} labelPosition='left' checked={options?.deg} onChange={val => updateObject('options', 'deg', val)} />
+						<ToggleControl className='mt10' label={__('Designation', 'b-testimonials')} labelPosition='left' checked={elements?.deg} onChange={val => updateObject('elements', 'deg', val)} />
 
-						<ToggleControl className='mt10' label={__('Review Text', 'b-testimonials')} labelPosition='left' checked={options?.reviewText} onChange={val => updateObject('options', 'reviewText', val)} />
+						<ToggleControl className='mt10' label={__('Review Text', 'b-testimonials')} labelPosition='left' checked={elements?.reviewText} onChange={val => updateObject('elements', 'reviewText', val)} />
 
-						<ToggleControl className='mt10' label={__('Review Icon', 'b-testimonials')} labelPosition='left' checked={options?.icon} onChange={val => updateObject('options', 'icon', val)} />
+						<ToggleControl className='mt10' label={__('Rating', 'b-testimonials')} labelPosition='left' checked={elements?.icon} onChange={val => updateObject('elements', 'icon', val)} />
+
+						<ToggleControl className='mt10' label={__('Expanded Button', 'b-testimonials')} labelPosition='left' checked={elements?.expandBtn} onChange={val => updateObject('elements', 'expandBtn', val)} />
 					</PanelBody>
 
+					{elements?.expandBtn && <PanelBody className='bPlPanelBody' title={__('Button', 'b-testimonials')} initialOpen={false}>
+						<TextControl className='' label={__('Expand Text', 'b-testimonials')} value={elements?.expandText} onChange={val => updateObject('elements', 'expandText', val)} />
+
+						<TextControl className='' label={__('Collapse Text', 'b-testimonials')} value={elements?.collapseText} onChange={val => updateObject('elements', 'collapseText', val)} />
+					</PanelBody>}
+
+
 					<PanelBody className='bPlPanelBody' title={__('Layout', 'b-testimonials')} initialOpen={false}>
+						<PanelRow>
+							<Label className="mt0 mb0">{__('Layout:', 'b-testimonials')}</Label>
+							<SelectControl value={layout} onChange={val => setAttributes({ layout: val })} options={layoutOpt} />
+						</PanelRow>
+
+						<PanelRow>
+							<Label className="mt0 mb0">{__('Theme:', 'b-testimonials')}</Label>
+							<SelectControl value={theme} onChange={val => setAttributes({
+								theme: val, ...checkTheme(val, border)
+							})} options={themeOpt} />
+						</PanelRow>
+
 						<PanelRow>
 							<Label mt='0'>{__('Columns:', 'b-testimonials')}</Label>
 							<BDevice device={device} onChange={val => setDevice(val)} />
@@ -108,15 +130,22 @@ const Settings = ({ attributes, setAttributes, updateItem, activeIndex, setActiv
 
 						<UnitControl className='mt20' label={__('Column Gap:', 'b-testimonials')} labelPosition='left' value={columnGap} onChange={val => setAttributes({ columnGap: val })} units={[pxUnit(30), perUnit(3), emUnit(2)]} isResetValueOnUnitChange={true} />
 
-						<UnitControl className='mt20' label={__('Row Gap:', 'b-testimonials')} labelPosition='left' value={rowGap} onChange={val => setAttributes({ rowGap: val })} units={[pxUnit(40), perUnit(3), emUnit(2.5)]} isResetValueOnUnitChange={true} />
+						{layout !== "slider" && <UnitControl className='mt20' label={__('Row Gap:', 'b-testimonials')} labelPosition='left' value={rowGap} onChange={val => setAttributes({ rowGap: val })} units={[pxUnit(40), perUnit(3), emUnit(2.5)]} isResetValueOnUnitChange={true} />}
 
-						<PanelRow>
-							<Label mt='0' mb='0'>{__('Layout:', 'b-testimonials')}</Label>
-							<SelectControl value={layout} onChange={val => setAttributes({
-								layout: val, ...checkGrid(val, border),
-							})} options={layoutOpt} />
-						</PanelRow>
 					</PanelBody>
+
+					{layout === 'slider' && <PanelBody className='bPlPanelBody' title={__('Slider', 'b-testimonials')} initialOpen={false}>
+						<PanelRow>
+							<Label className="mt0 mb0">{__('Height', 'b-testimonials')}</Label>
+							<NumberControl value={height} onChange={val => updateObject('slider', 'height', val)} />
+						</PanelRow>
+
+						<ToggleControl className='mt10' label={__('AutoPlay', 'b-testimonials')} labelPosition='left' checked={autoPlay} onChange={val => updateObject('slider', 'autoPlay', val)} />
+
+						<ToggleControl className='mt10' label={__('MouseWheel', 'b-testimonials')} labelPosition='left' checked={mouseWheel} onChange={val => updateObject('slider', 'mouseWheel', val)} />
+
+						<ToggleControl className='mt10' label={__('Navigation', 'b-testimonials')} labelPosition='left' checked={navigation} onChange={val => updateObject('slider', 'navigation', val)} />
+					</PanelBody>}
 				</>}
 
 				{'style' === tab.name && <>
@@ -128,7 +157,7 @@ const Settings = ({ attributes, setAttributes, updateItem, activeIndex, setActiv
 						<BorderControl className='' label={__('Border', 'b-testimonials')} value={border}
 							onChange={(val) => setAttributes({ border: val })} />
 
-						<ShadowControl label={__('Shadow:', 'business-review')} value={shadow} onChange={val => setAttributes({ shadow: val })} />
+						<MultiShadowControl label={__('Shadow:', 'sound-cloud')} value={shadow} onChange={val => setAttributes({ shadow: val })} produce={produce} />
 					</PanelBody>
 
 					<PanelBody className='bPlPanelBody' title={__('Image', 'b-testimonials')} initialOpen={false} >
@@ -163,18 +192,7 @@ const Settings = ({ attributes, setAttributes, updateItem, activeIndex, setActiv
 						<RangeControl label={__('Text length', 'b-testimonials')} labelPosition='left' value={textLength} onChange={(val) => { setAttributes({ textLength: val }) }} min={10} max={1000} step={1} beforeIcon='grid-view' />
 					</PanelBody>
 
-					<PanelBody className='bPlPanelBody' title={__('Expanded Button', 'b-testimonials')} initialOpen={false} >
-						<Typography className='mt10' label={__('Typography', 'b-testimonials')} value={expandedTypo} onChange={val => setAttributes({ expandedTypo: val })} produce={produce} />
-
-						<ColorsControl className='mb20' label={__('Colors', 'b-testimonials')} value={expandedColors} onChange={(val) => { setAttributes({ expandedColors: val }) }} />
-
-						<BoxControl label={__('Padding', 'b-testimonials')} values={expandedPadding} onChange={val => setAttributes({ expandedPadding: val })} resetValues={{ top: 2, right: 2, bottom: 2, left: 2 }} units={[pxUnit(3), emUnit(2)]} />
-
-						<BorderControl className='' label={__('Border', 'b-testimonials')} value={expandedBorder}
-							onChange={(val) => { setAttributes({ expandedBorder: val }) }} />
-					</PanelBody>
-
-					{(layout === 'grid_2' || layout === 'masonry') &&
+					{(layout === 'theme_2' || layout === 'masonry') &&
 						<PanelBody className='bPlPanelBody' title={__('Top', 'b-testimonials')} initialOpen={false} >
 
 							<BColor className="mb10" label={__('Background Color', 'b-testimonials')} value={grid2Bg} onChange={val => setAttributes({ grid2Bg: val })} />
@@ -185,7 +203,6 @@ const Settings = ({ attributes, setAttributes, updateItem, activeIndex, setActiv
 				</>}
 			</>}</TabPanel>
 		</InspectorControls>
-
 
 		<BlockControls>
 			<ToolbarGroup className='bPlToolbar'>

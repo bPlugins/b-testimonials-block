@@ -1,9 +1,10 @@
 
 import { getBoxValue } from '../../Components/utils/functions';
-import { getBorderCSS, getColorsCSS, getShadowCSS, getTypoCSS } from '../../Components/utils/getCSS';
+import { getBorderCSS, getMultiShadowCSS, getTypoCSS } from '../../Components/utils/getCSS';
 
 const Style = ({ attributes, clientId }) => {
-	const { columnGap, rowGap, background, padding, border, shadow, image, imgBorder, nameTypo, nameColor, degTypo, degColor, textTypo, textColor, expandedTypo, expandedColors, expandedPadding, expandedBorder, grid2Bg, grid2Padding } = attributes;
+	const { columnGap, rowGap, background, padding, border, shadow, image, imgBorder, nameTypo, nameColor, degTypo, degColor, textTypo, textColor, expandedTypo, grid2Bg, grid2Padding, slider } = attributes;
+	const { height } = slider;
 
 	const mainEl = `#btbTestimonialsDir-${clientId}`;
 	return <style dangerouslySetInnerHTML={{
@@ -15,13 +16,16 @@ const Style = ({ attributes, clientId }) => {
 		${getTypoCSS(`${mainEl} .layoutSection .single .name`, nameTypo)?.styles}
 		${getTypoCSS(`${mainEl} .layoutSection .single .deg`, degTypo)?.styles}
 		${getTypoCSS(`${mainEl} .layoutSection .single .reviewText`, textTypo)?.styles}
-		${getTypoCSS(`${mainEl} .layoutSection .single .expandedBtn`, expandedTypo)?.styles}
+
+		${mainEl} .slider-layout .swiper-slide {
+			height:${height}px;
+		} 
 
 		${mainEl} .layoutSection {
 			grid-gap: ${rowGap} ${columnGap};
 		}
 
-		${mainEl} .grid_2 .single .top, ${mainEl} .masonry .single .top {
+		${mainEl} .theme_2 .single .top, ${mainEl} .masonry .single .top {
 			background:${grid2Bg};
 			padding:${getBoxValue(grid2Padding)};
 		}
@@ -30,11 +34,11 @@ const Style = ({ attributes, clientId }) => {
 			border-right: 27px solid ${grid2Bg};
 		}
 
-		${mainEl} .grid_4 .single .bottom{
+		${mainEl} .theme_4 .single .bottom{
 			border-top:${border?.width} ${border?.style} ${border?.color};
 		}
 
-		${mainEl} .grid_4 .single .info {
+		${mainEl} .theme_4 .single .info {
 			border-left: ${border?.width} ${border?.style} ${border?.color};
 		}
 
@@ -42,17 +46,13 @@ const Style = ({ attributes, clientId }) => {
 			background:${background};
 			padding:${getBoxValue(padding)};
 			${getBorderCSS(border)};
-			box-shadow: ${getShadowCSS(shadow)};
+			box-shadow: ${getMultiShadowCSS(shadow)};
 		}
 
 		${mainEl} .layoutSection .single .img {
 			width:${image?.width}px;
 			height:${image?.height}px;
 			${getBorderCSS(imgBorder)};
-		}
-
-		${mainEl} .layoutSection .single .img img{
-			border-radius:${imgBorder?.radius}
 		}
 
 		${mainEl} .layoutSection .single .name{
@@ -65,12 +65,6 @@ const Style = ({ attributes, clientId }) => {
 
 		${mainEl} .layoutSection .single .reviewText{
 			color:${textColor};
-		}
-
-		${mainEl} .layoutSection .single .expandedBtn {
-			${getColorsCSS(expandedColors)};
-			padding:${getBoxValue(expandedPadding)};
-			${getBorderCSS(expandedBorder)};
 		}
 
 	`}} />;

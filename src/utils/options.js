@@ -4,12 +4,18 @@ import { verticalLineIcon, horizontalLineIcon } from './icons';
 
 export const layoutOpt = [
 	{ label: __('Default', 'b-testimonials'), value: 'default' },
-	{ label: __('Grid-1', 'b-testimonials'), value: 'grid_1' },
-	{ label: __('Grid-2', 'b-testimonials'), value: 'grid_2' },
-	{ label: __('Grid-3', 'b-testimonials'), value: 'grid_3' },
-	{ label: __('Grid-4', 'b-testimonials'), value: 'grid_4' },
-	{ label: __('Grid-5', 'b-testimonials'), value: 'grid_5' },
-	{ label: __('Masonry', 'b-testimonials'), value: 'masonry' }
+	{ label: __('Slider', 'b-testimonials'), value: 'slider' },
+	{ label: __('Masonry', 'b-testimonials'), value: 'masonry' },
+]
+
+export const themeOpt = [
+	{ label: __('Default', 'b-testimonials'), value: 'default' },
+	{ label: __('Theme-1', 'b-testimonials'), value: 'theme_1' },
+	{ label: __('Theme-2', 'b-testimonials'), value: 'theme_2' },
+	{ label: __('Theme-3', 'b-testimonials'), value: 'theme_3' },
+	{ label: __('Theme-4', 'b-testimonials'), value: 'theme_4' },
+	{ label: __('Theme-5', 'b-testimonials'), value: 'theme_5' },
+	{ label: __('Theme-6', 'b-testimonials'), value: 'theme_6' }
 ];
 
 export const layouts = [

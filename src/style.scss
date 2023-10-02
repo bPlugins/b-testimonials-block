@@ -11,7 +11,7 @@ html {
 }
 
 // Block Directory
-.wp-block-btb-b-testimonials {
+.wp-block-bptmb-b-testimonials {
 	* {
 		box-sizing: border-box;
 	}
@@ -45,23 +45,25 @@ html {
 			display: grid;
 
 			.single {
+
+				.authorImg {
+
+					.img {
+						border-radius: 50%;
+						overflow: hidden;
+
+						img {
+							width: 100%;
+							height: 100%;
+							object-fit: fill;
+						}
+					}
+				}
+
 				.top {
 					display: flex;
 					align-items: center;
 					gap: 10px;
-
-					.authorImg {
-
-						.img {
-
-							img {
-								width: 100%;
-								height: 100%;
-								border-radius: 50%;
-								object-fit: cover;
-							}
-						}
-					}
 
 					.info {
 						flex: 1;
@@ -80,18 +82,24 @@ html {
 					}
 				}
 
-				.reviewText {}
+				.reviewText {
+					display: initial;
+				}
 
-				.expandedBtn {
-					margin-top: 10px;
+				.expandBtn {
+					margin-top: 0px;
 					display: inline-block;
 					cursor: pointer;
-					border: none;
+					font-size: 15px;
+					font-weight: bold;
+					margin-left: 5px;
 				}
 			}
 
-			&.grid_1 {
+			&.theme_1 {
 				.single {
+					display: flex;
+					flex-direction: column;
 					text-align: center;
 
 					.top {
@@ -104,6 +112,8 @@ html {
 					}
 
 					.footer {
+						margin-top: auto;
+
 						.deg {
 							position: relative;
 
@@ -124,97 +134,100 @@ html {
 				}
 			}
 
-			&.grid_2 {
-				.top {
-					position: relative;
-					margin-bottom: 15px;
-					display: inline-block;
-					width: 100%;
-
-					.icon {
-						position: absolute;
-						bottom: -22px;
-						left: 35px;
-					}
-
-					.expandedBtn {
-						border: none;
-					}
-				}
-
-				.bottom {
+			&.theme_2 {
+				.single {
 					display: flex;
-					align-items: center;
-					gap: 10px;
+					flex-direction: column;
 
-					.authorImg {
-						.img {
+					.top {
+						position: relative;
+						margin-bottom: 15px;
+						display: inline-block;
+						width: 100%;
+						flex-grow: 1;
 
-							img {
-								width: 100%;
-								height: 100%;
-								border-radius: 50%;
-								object-fit: cover;
-							}
+						.icon {
+							position: absolute;
+							bottom: -22px;
+							left: 35px;
+						}
+
+						.expandBtn {
+							border: none;
 						}
 					}
 
-					.info {
-						flex: 1;
-
-						.name {}
-
-						.deg {}
-					}
-				}
-			}
-
-			&.grid_3 {
-				.top {
-					display: inline-block;
-
-					.expandedBtn {
-						border: none;
-						margin-top: 0px;
-					}
-
-					.rating {
-						margin-top: 0px;
-					}
-				}
-
-				.bottom {
-					text-align: center;
-
-					.authorImg {
+					.bottom {
 						display: flex;
-						justify-content: center;
-						margin-top: 5px;
+						align-items: center;
+						gap: 10px;
 
-						.img {
+						.authorImg {
+							.img {
 
-							img {
-								width: 100%;
-								height: 100%;
-								border-radius: 50%;
-								object-fit: cover;
-
+								img {}
 							}
+						}
+
+						.info {
+							flex: 1;
+
+							.name {}
+
+							.deg {}
+						}
+					}
+				}
+
+			}
+
+			&.theme_3 {
+				.single {
+					display: flex;
+					flex-direction: column;
+
+					.top {
+						display: inline-block;
+
+						.expandBtn {
+							border: none;
+							margin-top: 0px;
+						}
+
+						.rating {
+							margin-top: 0px;
 						}
 					}
 
-					.info {
-						flex: 1;
-						margin-top: 8px;
+					.bottom {
+						text-align: center;
+						margin-top: auto;
 
-						.name {}
+						.authorImg {
+							display: flex;
+							justify-content: center;
+							margin-top: 5px;
 
-						.deg {}
+							.img {
+
+								img {}
+							}
+						}
+
+						.info {
+							flex: 1;
+							margin-top: 8px;
+
+							.name {}
+
+							.deg {}
+						}
 					}
 				}
+
 			}
 
-			&.grid_4 {
+			&.theme_4 {
 				.single {
 					display: flex;
 					flex-direction: column;
@@ -275,9 +288,14 @@ html {
 				}
 			}
 
-			&.grid_5 {
+			&.theme_5 {
 				.single {
+					display: flex;
+					flex-direction: column;
+
 					.top {
+						align-items: flex-start;
+
 						.right {
 							svg {
 								display: block;
@@ -285,39 +303,37 @@ html {
 						}
 
 						.img {
-							border-radius: 1px;
 
-							img {
-								border-radius: 1px;
-							}
+							img {}
 						}
 					}
 
 					.bottom {
+						margin-top: auto;
+
 						.info {
 							display: flex;
 							align-items: center;
 							justify-content: flex-end;
+							gap: 5px;
 							margin-top: 10px;
 						}
 
 						.rating {
 							margin-top: 0px;
 							text-align: right;
-
-
 						}
-
-
 					}
 
 				}
 			}
 
-			&.masonry {
-				display: initial;
+			&.theme_6 {
 
 				.single {
+					display: flex;
+					flex-direction: column;
+
 					.top {
 						display: inline-block;
 						position: relative;
@@ -337,7 +353,8 @@ html {
 					.bottom {
 						display: flex;
 						gap: 10px;
-						margin-top: 30px;
+						margin-top: auto;
+
 
 						.rating {
 							margin: 0;
@@ -345,14 +362,35 @@ html {
 
 						.authorImg {
 							.img {
-								img {
-									width: 100%;
-									height: 100%;
-									border-radius: 50%;
-								}
+								img {}
 							}
 						}
 					}
+				}
+			}
+
+			&.masonry-layout {
+				display: initial;
+			}
+
+			.swiper {
+				width: 100%;
+			}
+
+			&.slider-layout {
+				display: initial;
+
+				.swiper-slide {
+					.single {
+						height: 100%;
+					}
+				}
+			}
+
+			&.slider-layout.theme_1,
+			&.slider-layout.theme_4 {
+				.swiper-slide {
+					padding-top: 50px;
 				}
 			}
 		}

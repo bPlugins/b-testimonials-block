@@ -9,7 +9,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2023-09-26T15:33:24+00:00\n"
+"POT-Creation-Date: 2023-10-01T16:58:47+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.6.0\n"
 "X-Domain: b-testimonials\n"
@@ -31,244 +31,288 @@ msgid "http://bplugins.com"
 msgstr ""
 
 #: dist/editor.js:1
-#: dist/editor.js:6446
+#: dist/editor.js:6507
+#: dist/editor.js:6513
 msgid "Default"
 msgstr ""
 
 #: dist/editor.js:1
-#: dist/editor.js:6447
-msgid "Grid-1"
+#: dist/editor.js:6508
+#: dist/editor.js:6667
+msgid "Slider"
 msgstr ""
 
 #: dist/editor.js:1
-#: dist/editor.js:6448
-msgid "Grid-2"
-msgstr ""
-
-#: dist/editor.js:1
-#: dist/editor.js:6449
-msgid "Grid-3"
-msgstr ""
-
-#: dist/editor.js:1
-#: dist/editor.js:6450
-msgid "Grid-4"
-msgstr ""
-
-#: dist/editor.js:1
-#: dist/editor.js:6451
-msgid "Grid-5"
-msgstr ""
-
-#: dist/editor.js:1
-#: dist/editor.js:6452
+#: dist/editor.js:6509
 msgid "Masonry"
 msgstr ""
 
 #: dist/editor.js:1
-#: dist/editor.js:6461
+#: dist/editor.js:6514
+msgid "Theme-1"
+msgstr ""
+
+#: dist/editor.js:1
+#: dist/editor.js:6515
+msgid "Theme-2"
+msgstr ""
+
+#: dist/editor.js:1
+#: dist/editor.js:6516
+msgid "Theme-3"
+msgstr ""
+
+#: dist/editor.js:1
+#: dist/editor.js:6517
+msgid "Theme-4"
+msgstr ""
+
+#: dist/editor.js:1
+#: dist/editor.js:6518
+msgid "Theme-5"
+msgstr ""
+
+#: dist/editor.js:1
+#: dist/editor.js:6519
+msgid "Theme-6"
+msgstr ""
+
+#: dist/editor.js:1
+#: dist/editor.js:6528
 msgid "General"
 msgstr ""
 
 #: dist/editor.js:1
-#: dist/editor.js:6462
+#: dist/editor.js:6529
 msgid "Style"
 msgstr ""
 
 #: dist/editor.js:1
-#: dist/editor.js:6525
+#: dist/editor.js:6593
 msgid "Add or Remove Items"
 msgstr ""
 
 #: dist/editor.js:1
-#: dist/editor.js:6529
+#: dist/editor.js:6597
 msgid "Image:"
 msgstr ""
 
 #: dist/editor.js:1
-#: dist/editor.js:6530
+#: dist/editor.js:6598
 msgid "Enter Image URL"
 msgstr ""
 
 #: dist/editor.js:1
-#: dist/editor.js:6532
-#: dist/editor.js:6555
-#: dist/editor.js:6607
+#: dist/editor.js:6600
+#: dist/editor.js:6623
+#: dist/editor.js:6703
 msgid "Name"
 msgstr ""
 
 #: dist/editor.js:1
-#: dist/editor.js:6534
-#: dist/editor.js:6557
-#: dist/editor.js:6613
+#: dist/editor.js:6602
+#: dist/editor.js:6625
+#: dist/editor.js:6709
 msgid "Designation"
 msgstr ""
 
 #: dist/editor.js:1
-#: dist/editor.js:6536
+#: dist/editor.js:6604
 msgid "Review"
 msgstr ""
 
 #: dist/editor.js:1
-#: dist/editor.js:6538
+#: dist/editor.js:6606
 msgid "Rating:"
 msgstr ""
 
 #: dist/editor.js:1
-#: dist/editor.js:6541
+#: dist/editor.js:6609
 msgid "Remove"
 msgstr ""
 
 #: dist/editor.js:1
-#: dist/editor.js:6543
+#: dist/editor.js:6611
 msgid "Duplicate"
 msgstr ""
 
 #: dist/editor.js:1
-#: dist/editor.js:6548
+#: dist/editor.js:6616
 msgid "Add New Card"
 msgstr ""
 
 #: dist/editor.js:1
-#: dist/editor.js:6552
+#: dist/editor.js:6620
 msgid "Elements"
 msgstr ""
 
 #: dist/editor.js:1
-#: dist/editor.js:6553
-#: dist/editor.js:6597
+#: dist/editor.js:6621
+#: dist/editor.js:6693
 msgid "Image"
 msgstr ""
 
 #: dist/editor.js:1
-#: dist/editor.js:6559
-#: dist/editor.js:6619
+#: dist/editor.js:6627
+#: dist/editor.js:6715
 msgid "Review Text"
 msgstr ""
 
 #: dist/editor.js:1
-#: dist/editor.js:6561
-msgid "Review Icon"
-msgstr ""
-
-#: dist/editor.js:1
-#: dist/editor.js:6564
-msgid "Layout"
-msgstr ""
-
-#: dist/editor.js:1
-#: dist/editor.js:6566
-msgid "Columns:"
-msgstr ""
-
-#: dist/editor.js:1
-#: dist/editor.js:6572
-msgid "Column Gap:"
-msgstr ""
-
-#: dist/editor.js:1
-#: dist/editor.js:6574
-msgid "Row Gap:"
-msgstr ""
-
-#: dist/editor.js:1
-#: dist/editor.js:6577
-msgid "Layout:"
-msgstr ""
-
-#: dist/editor.js:1
-#: dist/editor.js:6586
-msgid "Card"
-msgstr ""
-
-#: dist/editor.js:1
-#: dist/editor.js:6587
-#: dist/editor.js:6643
-msgid "Background Color"
-msgstr ""
-
-#: dist/editor.js:1
-#: dist/editor.js:6589
-#: dist/editor.js:6634
-#: dist/editor.js:6645
-msgid "Padding"
-msgstr ""
-
-#: dist/editor.js:1
-#: dist/editor.js:6591
-#: dist/editor.js:6603
-#: dist/editor.js:6636
-msgid "Border"
-msgstr ""
-
-#: dist/editor.js:1
-#: dist/editor.js:6599
-msgid "Width:"
-msgstr ""
-
-#: dist/editor.js:1
-#: dist/editor.js:6601
-msgid "Height:"
-msgstr ""
-
-#: dist/editor.js:1
-#: dist/editor.js:6608
-#: dist/editor.js:6614
-#: dist/editor.js:6620
-#: dist/editor.js:6630
-msgid "Typography"
-msgstr ""
-
-#: dist/editor.js:1
-#: dist/editor.js:6610
-#: dist/editor.js:6616
-#: dist/editor.js:6622
-msgid "Color"
-msgstr ""
-
-#: dist/editor.js:1
-#: dist/editor.js:6624
-msgid "Rating Icon Color"
-msgstr ""
-
-#: dist/editor.js:1
-#: dist/editor.js:6626
-msgid "Text length"
-msgstr ""
-
-#: dist/editor.js:1
 #: dist/editor.js:6629
+msgid "Rating"
+msgstr ""
+
+#: dist/editor.js:1
+#: dist/editor.js:6631
 msgid "Expanded Button"
 msgstr ""
 
 #: dist/editor.js:1
-#: dist/editor.js:6632
-msgid "Colors"
+#: dist/editor.js:6634
+msgid "Button"
+msgstr ""
+
+#: dist/editor.js:1
+#: dist/editor.js:6635
+msgid "Expand Text"
+msgstr ""
+
+#: dist/editor.js:1
+#: dist/editor.js:6637
+msgid "Collapse Text"
 msgstr ""
 
 #: dist/editor.js:1
 #: dist/editor.js:6641
+msgid "Layout"
+msgstr ""
+
+#: dist/editor.js:1
+#: dist/editor.js:6643
+msgid "Layout:"
+msgstr ""
+
+#: dist/editor.js:1
+#: dist/editor.js:6648
+msgid "Theme:"
+msgstr ""
+
+#: dist/editor.js:1
+#: dist/editor.js:6655
+msgid "Columns:"
+msgstr ""
+
+#: dist/editor.js:1
+#: dist/editor.js:6661
+msgid "Column Gap:"
+msgstr ""
+
+#: dist/editor.js:1
+#: dist/editor.js:6663
+msgid "Row Gap:"
+msgstr ""
+
+#: dist/editor.js:1
+#: dist/editor.js:6669
+msgid "Height"
+msgstr ""
+
+#: dist/editor.js:1
+#: dist/editor.js:6673
+msgid "AutoPlay"
+msgstr ""
+
+#: dist/editor.js:1
+#: dist/editor.js:6675
+msgid "MouseWheel"
+msgstr ""
+
+#: dist/editor.js:1
+#: dist/editor.js:6677
+msgid "Navigation"
+msgstr ""
+
+#: dist/editor.js:1
+#: dist/editor.js:6682
+msgid "Card"
+msgstr ""
+
+#: dist/editor.js:1
+#: dist/editor.js:6683
+#: dist/editor.js:6728
+msgid "Background Color"
+msgstr ""
+
+#: dist/editor.js:1
+#: dist/editor.js:6685
+#: dist/editor.js:6730
+msgid "Padding"
+msgstr ""
+
+#: dist/editor.js:1
+#: dist/editor.js:6687
+#: dist/editor.js:6699
+msgid "Border"
+msgstr ""
+
+#: dist/editor.js:1
+#: dist/editor.js:6695
+msgid "Width:"
+msgstr ""
+
+#: dist/editor.js:1
+#: dist/editor.js:6697
+msgid "Height:"
+msgstr ""
+
+#: dist/editor.js:1
+#: dist/editor.js:6704
+#: dist/editor.js:6710
+#: dist/editor.js:6716
+msgid "Typography"
+msgstr ""
+
+#: dist/editor.js:1
+#: dist/editor.js:6706
+#: dist/editor.js:6712
+#: dist/editor.js:6718
+msgid "Color"
+msgstr ""
+
+#: dist/editor.js:1
+#: dist/editor.js:6720
+msgid "Rating Icon Color"
+msgstr ""
+
+#: dist/editor.js:1
+#: dist/editor.js:6722
+msgid "Text length"
+msgstr ""
+
+#: dist/editor.js:1
+#: dist/editor.js:6726
 msgid "Top"
 msgstr ""
 
-#: dist/editor.js:6910
-#: dist/script.js:399
+#: dist/editor.js:1
+#: dist/editor.js:13444
 msgid "Enter your name"
 msgstr ""
 
-#: dist/editor.js:6917
-#: dist/script.js:406
+#: dist/editor.js:1
+#: dist/editor.js:13446
 msgid "Enter your designation"
 msgstr ""
 
-#: dist/editor.js:6932
-#: dist/script.js:422
+#: dist/editor.js:1
+#: dist/editor.js:13471
 msgid "Enter your review"
 msgstr ""
 
 #: block.json
 msgctxt "block title"
-msgid "Testimonials"
+msgid "B Testimonials Block"
 msgstr ""
 
 #: block.json

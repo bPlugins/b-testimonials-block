@@ -1,9 +1,9 @@
-=== Block Directory - Block Directory Block ===
-Contributors: abuhayat, charlescormier
+=== B Testimonials Block ===
+Contributors: abuhayat, btechnologies
 Donate link: https://gum.co/wpdonate/
-Tags: block, key1, key2, key3, Gutenberg block
+Tags: block, testimonials, rating, review, Gutenberg block
 Requires at least: 5.0+
-Tested up to: 6.2.2
+Tested up to: 6.3
 Stable tag: 1.0.0
 Requires PHP: 7.1
 License: GPLv3 or later

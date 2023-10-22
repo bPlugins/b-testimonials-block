@@ -55,47 +55,7 @@ const Layout = ({ itemsEls, ToolbarButton, MediaUpload, MediaUploadCheck, attrib
                             </ResponsiveMasonry>
                         );
                     case 'slider':
-                        // return (
-                        //     <Swiper modules={[Navigation, A11y, Autoplay, Mousewheel]} spaceBetween={columnGap} slidesPerView={mobile} breakpoints={{ 576: { slidesPerView: tablet }, 768: { slidesPerView: desktop } }} autoplay={{ delay: 2500, disableOnInteraction: false, }} mousewheel={true} navigation={true} pagination={true} scrollbar={{ draggable: true }}>
 
-                        //         {items.map((item, index) => {
-                        //             const itemProp = { item, index, itemEls: itemsEls[index], ...itemProps }
-
-                        //             switch (theme) {
-                        //                 case 'default':
-                        //                     return <SwiperSlide key={index}>
-                        //                         <Default {...itemProp} />
-                        //                     </SwiperSlide>;
-                        //                 case 'theme_1':
-                        //                     return <SwiperSlide key={index}>
-                        //                         <ThemeOne {...itemProp} />
-                        //                     </SwiperSlide>;
-                        //                 case 'theme_2':
-                        //                     return <SwiperSlide key={index}>
-                        //                         <ThemeTwo {...itemProp} />
-                        //                     </SwiperSlide>;
-                        //                 case 'theme_3':
-                        //                     return <SwiperSlide key={index}>
-                        //                         <ThemeThree {...itemProp} />
-                        //                     </SwiperSlide>;
-                        //                 case 'theme_4':
-                        //                     return <SwiperSlide key={index}>
-                        //                         <ThemeFour {...itemProp} />
-                        //                     </SwiperSlide>;
-                        //                 case 'theme_5':
-                        //                     return <SwiperSlide key={index}>
-                        //                         <ThemeFive {...itemProp} />
-                        //                     </SwiperSlide>;
-                        //                 case 'theme_6':
-                        //                     return <SwiperSlide key={index}>
-                        //                         <ThemeSix {...itemProp} />
-                        //                     </SwiperSlide>;
-                        //                 default:
-                        //                     return null;
-                        //             }
-                        //         })}
-                        //     </Swiper>
-                        // );
                         return <Slider attributes={attributes} itemsEls={itemsEls} itemProps={itemProps} />
                     case 'default':
                         return items.map((item, index) => {

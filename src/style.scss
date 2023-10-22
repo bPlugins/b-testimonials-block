@@ -378,13 +378,33 @@ html {
 			}
 
 			&.slider-layout {
-				display: initial;
+				display: flex;
 
-				.swiper-slide {
-					.single {
-						height: 100%;
+				.swiper {
+					padding: 0px 28px;
+
+					.swiper-wrapper {
+						display: flex;
+						height: 100% !important;
+
+						.swiper-slide {
+							height: auto !important;
+
+							.single {
+								height: 100%;
+							}
+						}
+					}
+
+					.swiper-button-prev {
+						left: 0;
+					}
+
+					.swiper-button-next {
+						right: 0;
 					}
 				}
+
 			}
 
 			&.slider-layout.theme_1,

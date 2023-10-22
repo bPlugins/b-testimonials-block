@@ -18,7 +18,7 @@ const Style = ({ attributes, clientId }) => {
 		${getTypoCSS(`${mainEl} .layoutSection .single .reviewText`, textTypo)?.styles}
 
 		${mainEl} .slider-layout .swiper-slide {
-			height:${height}px;
+			 
 		} 
 
 		${mainEl} .layoutSection {

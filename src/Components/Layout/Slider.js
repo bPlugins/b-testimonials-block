@@ -20,7 +20,7 @@ const Slider = ({ attributes, itemsEls, itemProps }) => {
     const { autoPlay, mouseWheel, navigation } = slider;
     const [rendered, setRendered] = useState(true);
 
-    const SwiperEl = () => <Swiper modules={[Navigation, A11y, Autoplay, Mousewheel]} spaceBetween={columnGap} slidesPerView={mobile} breakpoints={{ 576: { slidesPerView: tablet }, 768: { slidesPerView: desktop } }} autoplay={autoPlay} mousewheel={mouseWheel} navigation={navigation} pagination={true} scrollbar={{ draggable: true }}>
+    const SwiperEl = () => <Swiper modules={[Navigation, A11y, Autoplay, Mousewheel]} spaceBetween={columnGap} slidesPerView={mobile} breakpoints={{ 576: { slidesPerView: tablet }, 768: { slidesPerView: desktop } }} autoplay={autoPlay} mousewheel={mouseWheel} navigation={navigation} pagination={true} scrollbar={{ draggable: true }}  >
 
         {items.map((item, index) => {
             const itemProp = { item, index, itemEls: itemsEls[index], ...itemProps }

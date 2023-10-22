@@ -48,11 +48,11 @@
 			"default": [
 				{
 					"img": {
-						"url": "https://i.ibb.co/DWjhC8v/green-grass-field.jpg"
+						"url": "https://i.ibb.co/n7qL1wJ/user-dummy.png"
 					},
-					"name": "Md AlAmin WP",
-					"deg": "developer",
-					"reviewText": "It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. The point of using Lorem Ipsum is that it has a more-or-less normal distribution of letters, as opposed to using 'Content here, content here', making it look like readable English",
+					"name": "John Doe",
+					"deg": "Developer",
+					"reviewText": "It is a long-established fact that a reader will be distracted by the readable content of a page when looking at its layout",
 					"rating": 4
 				}
 			]
@@ -66,8 +66,8 @@
 				"reviewText": true,
 				"icon": true,
 				"expandBtn": true,
-				"expandText": "Show More",
-				"collapseText": "Show Less"
+				"expandText": "Expand",
+				"collapseText": "Less"
 			}
 		},
 		"background": {

@@ -24,11 +24,11 @@ const Settings = ({ attributes, setAttributes, updateItem, activeIndex, setActiv
 		setAttributes({
 			items: [...items, {
 				img: {
-					url: "https://i.ibb.co/DWjhC8v/green-grass-field.jpg"
+					url: "https://i.ibb.co/n7qL1wJ/user-dummy.png"
 				},
-				name: "Md AlAmin WP",
-				deg: "developer",
-				reviewText: "Review text here",
+				name: "John Doe",
+				deg: "Developer",
+				reviewText: "It is a long-established fact that a reader will be distracted by the readable content of a page when looking at its layout",
 				rating: 4
 			}]
 		});
@@ -116,9 +116,10 @@ const Settings = ({ attributes, setAttributes, updateItem, activeIndex, setActiv
 
 						<PanelRow>
 							<Label className="mt0 mb0">{__('Theme:', 'b-testimonials')}</Label>
-							<SelectControl value={theme} onChange={val => setAttributes({
-								theme: val, ...checkTheme(val, border)
-							})} options={themeOpt} />
+							<SelectControl value={theme}
+								onChange={val =>
+									setAttributes({ theme: val, ...checkTheme(val, border) })}
+								options={themeOpt} />
 						</PanelRow>
 
 						<PanelRow>
@@ -135,10 +136,10 @@ const Settings = ({ attributes, setAttributes, updateItem, activeIndex, setActiv
 					</PanelBody>
 
 					{layout === 'slider' && <PanelBody className='bPlPanelBody' title={__('Slider', 'b-testimonials')} initialOpen={false}>
-						<PanelRow>
+						{/* <PanelRow>
 							<Label className="mt0 mb0">{__('Height', 'b-testimonials')}</Label>
 							<NumberControl value={height} onChange={val => updateObject('slider', 'height', val)} />
-						</PanelRow>
+						</PanelRow> */}
 
 						<ToggleControl className='mt10' label={__('AutoPlay', 'b-testimonials')} labelPosition='left' checked={autoPlay} onChange={val => updateObject('slider', 'autoPlay', val)} />
 
@@ -189,7 +190,7 @@ const Settings = ({ attributes, setAttributes, updateItem, activeIndex, setActiv
 
 						<BColor className="mb10" label={__('Rating Icon Color', 'b-testimonials')} value={starIconColor} onChange={val => setAttributes({ starIconColor: val })} />
 
-						<RangeControl label={__('Text length', 'b-testimonials')} labelPosition='left' value={textLength} onChange={(val) => { setAttributes({ textLength: val }) }} min={10} max={1000} step={1} beforeIcon='grid-view' />
+						<RangeControl label={__('Excerpt length', 'b-testimonials')} labelPosition='left' value={textLength} onChange={(val) => { setAttributes({ textLength: val }) }} min={10} max={1000} step={1} beforeIcon='grid-view' />
 					</PanelBody>
 
 					{(layout === 'theme_2' || layout === 'masonry') &&

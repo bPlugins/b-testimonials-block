@@ -1,6 +1,6 @@
 
 import { useState } from 'react';
-import { render } from 'react-dom';
+import { createRoot } from 'react-dom/client';
 
 import './style.scss';
 import Style from './Style';
@@ -10,17 +10,17 @@ import ExpandButton from './Components/ExpandButton';
 //b testimonials Directory
 document.addEventListener('DOMContentLoaded', () => {
 
-	const allBlockDirectory = document.querySelectorAll('.wp-block-bptmb-b-testimonials');
-	allBlockDirectory.forEach(directory => {
-		const attributes = JSON.parse(directory.dataset.attributes);
+	const btestimonialsEls = document.querySelectorAll('.wp-block-bptmb-b-testimonials');
+	btestimonialsEls.forEach(testimonialsEl => {
+		const attributes = JSON.parse(testimonialsEl.dataset.attributes);
 
-		render(<>
+		createRoot(testimonialsEl).render(<>
 			<Style attributes={attributes} clientId={attributes.cId} />
 
 			<TestimonialsDir attributes={attributes} />
-		</>, directory);
+		</>);
 
-		directory?.removeAttribute('data-attributes');
+		testimonialsEl?.removeAttribute('data-attributes');
 	});
 });
 

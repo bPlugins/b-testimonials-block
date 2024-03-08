@@ -1,31 +1,29 @@
 === B Testimonials Block ===
 Contributors: abuhayat, btechnologies
 Donate link: https://www.buymeacoffee.com/abuhayat
-Tags: block, testimonials, rating, review, Gutenberg block
+Tags: block, b-testimonials, rating, review, Gutenberg block
 Requires at least: 5.0+
-Tested up to: 6.3
+Tested up to: 6.4.3
 Stable tag: 1.0.0
 Requires PHP: 7.1
 License: GPLv3 or later
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
-Short Description
+Enhance your website's credibility with the B Testimonials Block, showcasing customer ratings and reviews effortlessly.
 
 == Description ==
 
-Large Description
+The B Testimonials Block is your solution for displaying customer ratings and reviews seamlessly on your website. Boost trust and credibility by highlighting positive feedback from satisfied customers. With easy integration and customizable options, this block makes it simple to showcase testimonials that resonate with your audience.
 
-
-**[Demos](https://bblockswp.com/demo/block-directory/)**
+**[Demos](https://bblockswp.com/demo/b-testimonials/)**
 
 
 = Features =
-- **Fully Customizable**: All the options you need to arrange the showcase to your liking are available here.
-
+- **Layout**: Choose from three layout options.
 
 = How to use =
-- First install the Block Directory plugin
-- Add the Block Directory block from the block category called "Widgets" in Gutenberg editor.
+- First install the B Testimonials plugin
+- Add the B Testimonials block from the block category called "Widgets" in Gutenberg editor.
 - You can change block settings from the right side settings sidebar.
 - Enjoy!
 
@@ -58,25 +56,25 @@ Large Description
 
 = From Gutenberg Editor: =
 1. Go to the WordPress Block/Gutenberg Editor
-2. Search For **Block Directory**
-3. Click on the **Block Directory** to add the block
+2. Search For **B Testimonials Block**
+3. Click on the **B Testimonials Block** to add the block
 
 = Download & Upload: =
-1. Download the **Block Directory** plugin (*.zip file*)
+1. Download the **B Testimonials Block** plugin (*.zip file*)
 2. In your admin area, go to the Plugins menu and click on **Add New**
-3. Click on **Upload Plugin** and choose the **`block-directory.zip`** file and click on **Install Now**
+3. Click on **Upload Plugin** and choose the **`b-testimonials-block.zip`** file and click on **Install Now**
 4. Activate the plugin and Enjoy!
 
 = Manually: =
-1. Download and upload the **Block Directory** plugin to the **`/wp-content/plugins/`** directory
+1. Download and upload the **B Testimonials Block** plugin to the **`/wp-content/plugins/`** directory
 2. Activate the plugin through the Plugins menu in WordPress
 
 
 == Frequently Asked Questions ==
 
-= Is Block Directory free? =
+= Is B Testimonials Block free? =
 
-Yes, Block Directory is a free Gutenberg block plugin.
+Yes, B Testimonials Block is a free Gutenberg block plugin.
 
 = Does it work with any WordPress theme? =
 
@@ -92,12 +90,12 @@ You can use unlimited times as you want.
 
 = Where can I get support? =
 
-You can post your questions on the [support forum here](https://wordpress.org/support/plugin/block-directory/)
+You can post your questions on the [support forum here](https://wordpress.org/support/plugin/b-testimonials-block/)
 
 
 == Screenshots ==
 
-1. Block Directory
+1. Default
 2. Settings
 
 
@@ -111,3 +109,10 @@ You can post your questions on the [support forum here](https://wordpress.org/su
 
 = 1.0.0 =
 * Initial Release
+
+== Developer Notes ==
+Public source code GitHub link for review, study, and contribute.
+
+https://github.com/bPlugins-LLC/b-testimonials-block
+
+For more information on how to contribute to this plugin, please visit our GitHub repository.

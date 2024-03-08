@@ -3,8 +3,7 @@ import { getBoxValue } from '../../Components/utils/functions';
 import { getBorderCSS, getMultiShadowCSS, getTypoCSS } from '../../Components/utils/getCSS';
 
 const Style = ({ attributes, clientId }) => {
-	const { columnGap, rowGap, background, padding, border, shadow, image, imgBorder, nameTypo, nameColor, degTypo, degColor, textTypo, textColor, expandedTypo, grid2Bg, grid2Padding, slider } = attributes;
-	const { height } = slider;
+	const { columnGap, rowGap, background, padding, border, shadow, image, imgBorder, nameTypo, nameColor, degTypo, degColor, textTypo, textColor, expandedTypo, grid2Bg, grid2Padding } = attributes;
 
 	const mainEl = `#btbTestimonialsDir-${clientId}`;
 	return <style dangerouslySetInnerHTML={{
@@ -48,7 +47,7 @@ const Style = ({ attributes, clientId }) => {
 			${getBorderCSS(border)};
 			box-shadow: ${getMultiShadowCSS(shadow)};
 		}
-
+ 
 		${mainEl} .layoutSection .single .img {
 			width:${image?.width}px;
 			height:${image?.height}px;

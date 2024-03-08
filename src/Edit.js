@@ -46,9 +46,9 @@ const Edit = props => {
 				</MediaUploadCheck>
 			</div>,
 
-			name: elements?.name && <RichText tagName="h3" className='name' value={name} onChange={(val) => updateItem("name", val)} placeholder={__('Enter your name', 'b-testimonials')} inlineToolbar />,
+			name: elements?.name && <RichText tagName="h3" className='name' value={name} onChange={(val) => updateItem("name", val)} placeholder={__('Enter your name', 'b-testimonials-block')} inlineToolbar />,
 
-			deg: elements?.deg && <RichText tagName="h5" className='deg' value={deg} onChange={(val) => updateItem("deg", val)} placeholder={__('Enter your designation', 'b-testimonials')} inlineToolbar />,
+			deg: elements?.deg && <RichText tagName="h5" className='deg' value={deg} onChange={(val) => updateItem("deg", val)} placeholder={__('Enter your designation', 'b-testimonials-block')} inlineToolbar />,
 
 			reviewText: <ReviewText attributes={attributes} elements={elements} contentLength={contentLength} textLength={textLength} reviewText={reviewText} updateItem={updateItem} />
 		}
@@ -73,7 +73,7 @@ const ReviewText = ({ attributes, elements, contentLength, textLength, reviewTex
 	const [expanded, setExpanded] = useState(false);
 
 	return <>
-		{elements?.reviewText && <RichText tagName="p" className='reviewText' value={reviewText} onChange={(val) => updateItem("reviewText", val)} placeholder={__('Enter your review', 'b-testimonials')} inlineToolbar />}
+		{elements?.reviewText && <RichText tagName="p" className='reviewText' value={reviewText} onChange={(val) => updateItem("reviewText", val)} placeholder={__('Enter your review', 'b-testimonials-block')} inlineToolbar />}
 
 		{contentLength > textLength && <ExpandButton attributes={attributes} reviewText={reviewText} expanded={expanded} onChange={() => setExpanded(!expanded)} />}
 	</>

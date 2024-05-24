@@ -1,5 +1,5 @@
 === B Testimonials Block ===
-Contributors: abuhayat, btechnologies
+Contributors: bplugins, abuhayat, btechnologies
 Donate link: https://www.buymeacoffee.com/abuhayat
 Tags: block, b-testimonials, rating, review, Gutenberg block
 Requires at least: 5.0+

@@ -3,7 +3,7 @@
  * Plugin Name: B Testimonials Block
  * Description: Boost your website's credibility with B Testimonials Block, effortlessly showcasing customer ratings and reviews..
  * Version: 1.0.0
- * Author: bPlugins LLC
+ * Author: bPlugins
  * Author URI: http://bplugins.com
  * License: GPLv3
  * License URI: https://www.gnu.org/licenses/gpl-3.0.txt
@@ -14,7 +14,14 @@
 if (!defined('ABSPATH')) {exit;}
 
 // Constant
-define('BTB_PLUGIN_VERSION', 'localhost' === $_SERVER['HTTP_HOST'] ? time() : '1.0.0');
+if ('localhost' === $_SERVER['HTTP_HOST']) {
+    $plugin_version = time();
+} else {
+    $plugin_version = '1.0.0';
+}
+define('BTB_PLUGIN_VERSION', $plugin_version);
+
+// define('BTB_PLUGIN_VERSION', 'localhost' === $_SERVER['HTTP_HOST']  time() : '1.0.0');
 define('BTB_ASSETS_DIR', plugin_dir_url(__FILE__) . 'assets/');
 define('BTB_DIR', plugin_dir_url(__FILE__));
 

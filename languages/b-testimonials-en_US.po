@@ -9,7 +9,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2024-03-08T17:05:48+00:00\n"
+"POT-Creation-Date: 2024-03-08T17:11:12+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.6.0\n"
 "X-Domain: b-testimonials-block\n"
@@ -28,6 +28,63 @@ msgstr ""
 
 #. Author URI of the plugin
 msgid "http://bplugins.com"
+msgstr ""
+
+#: dist/editor.js:1
+#: dist/editor.js:8386
+#: dist/editor.js:8392
+msgid "Default"
+msgstr ""
+
+#: dist/editor.js:1
+#: dist/editor.js:8387
+#: dist/editor.js:8547
+msgid "Slider"
+msgstr ""
+
+#: dist/editor.js:1
+#: dist/editor.js:8388
+msgid "Masonry"
+msgstr ""
+
+#: dist/editor.js:1
+#: dist/editor.js:8393
+msgid "Theme-1"
+msgstr ""
+
+#: dist/editor.js:1
+#: dist/editor.js:8394
+msgid "Theme-2"
+msgstr ""
+
+#: dist/editor.js:1
+#: dist/editor.js:8395
+msgid "Theme-3"
+msgstr ""
+
+#: dist/editor.js:1
+#: dist/editor.js:8396
+msgid "Theme-4"
+msgstr ""
+
+#: dist/editor.js:1
+#: dist/editor.js:8397
+msgid "Theme-5"
+msgstr ""
+
+#: dist/editor.js:1
+#: dist/editor.js:8398
+msgid "Theme-6"
+msgstr ""
+
+#: dist/editor.js:1
+#: dist/editor.js:8407
+msgid "General"
+msgstr ""
+
+#: dist/editor.js:1
+#: dist/editor.js:8408
+msgid "Style"
 msgstr ""
 
 #: dist/editor.js:1
@@ -157,11 +214,6 @@ msgid "Row Gap:"
 msgstr ""
 
 #: dist/editor.js:1
-#: dist/editor.js:8547
-msgid "Slider"
-msgstr ""
-
-#: dist/editor.js:1
 #: dist/editor.js:8553
 msgid "AutoPlay"
 msgstr ""
@@ -236,6 +288,21 @@ msgstr ""
 #: dist/editor.js:1
 #: dist/editor.js:8606
 msgid "Top"
+msgstr ""
+
+#: dist/editor.js:1
+#: dist/editor.js:15283
+msgid "Enter your name"
+msgstr ""
+
+#: dist/editor.js:1
+#: dist/editor.js:15285
+msgid "Enter your designation"
+msgstr ""
+
+#: dist/editor.js:1
+#: dist/editor.js:15310
+msgid "Enter your review"
 msgstr ""
 
 #: block.json

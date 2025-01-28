@@ -1,0 +1,244 @@
+{
+  "$schema": "https://schemas.wp.org/trunk/block.json",
+  "apiVersion": 2,
+  "name": "bptmb/b-testimonials",
+  "title": "B Testimonials Block",
+  "description": "Boost your website's credibility with b testimonials block, effortlessly showcasing customer ratings and reviews.",
+  "category": "widgets",
+  "keywords": [
+    "testimonials",
+    "block",
+    "rating"
+  ],
+  "textdomain": "b-testimonials-block",
+  "attributes": {
+    "align": {
+      "type": "string",
+      "default": ""
+    },
+    "cId": {
+      "type": "string",
+      "default": ""
+    },
+    "layout": {
+      "type": "string",
+      "default": "default"
+    },
+    "theme": {
+      "type": "string",
+      "default": "default"
+    },
+    "columns": {
+      "type": "object",
+      "default": {
+        "desktop": 3,
+        "tablet": 2,
+        "mobile": 1
+      }
+    },
+    "columnGap": {
+      "type": "string",
+      "default": "30px"
+    },
+    "rowGap": {
+      "type": "string",
+      "default": "40px"
+    },
+    "items": {
+      "type": "array",
+      "default": [
+        {
+          "img": {
+            "url": "https://i.ibb.co/n7qL1wJ/user-dummy.png"
+          },
+          "name": "John Doe",
+          "deg": "Developer",
+          "reviewText": "It is a long-established fact that a reader will be distracted by the readable content of a page when looking at its layout",
+          "rating": 4
+        }
+      ]
+    },
+    "elements": {
+      "type": "object",
+      "default": {
+        "img": true,
+        "name": true,
+        "deg": true,
+        "reviewText": true,
+        "icon": true,
+        "expandBtn": true,
+        "expandText": "Expand",
+        "collapseText": "Less"
+      }
+    },
+    "background": {
+      "type": "string",
+      "default": "#0000"
+    },
+    "padding": {
+      "type": "object",
+      "default": {
+        "top": "10px",
+        "right": "15px",
+        "bottom": "10px",
+        "left": "15px"
+      }
+    },
+    "border": {
+      "type": "object",
+      "default": {
+        "width": "1px",
+        "style": "solid",
+        "color": "#0575e6",
+        "side": "all",
+        "radius": "3px"
+      }
+    },
+    "shadow": {
+      "type": "object",
+      "default": {}
+    },
+    "image": {
+      "type": "object",
+      "default": {
+        "width": 50,
+        "height": 50
+      }
+    },
+    "imgBorder": {
+      "type": "object",
+      "default": {
+        "width": "1px",
+        "style": "solid",
+        "color": "#0575e6",
+        "side": "all",
+        "radius": "50%"
+      }
+    },
+    "nameTypo": {
+      "type": "object",
+      "default": {
+        "fontSize": {
+          "desktop": 16,
+          "tablet": 16,
+          "mobile": 14
+        },
+        "fontFamily": "Open Sans",
+        "fontWeight": 700,
+        "lineHeight": "135%"
+      }
+    },
+    "nameColor": {
+      "type": "string",
+      "default": "#000"
+    },
+    "degTypo": {
+      "type": "object",
+      "default": {
+        "fontSize": {
+          "desktop": 14,
+          "tablet": 14,
+          "mobile": 14
+        },
+        "fontFamily": "Open Sans",
+        "fontWeight": 400,
+        "lineHeight": "135%"
+      }
+    },
+    "degColor": {
+      "type": "string",
+      "default": "#7B7B7B"
+    },
+    "textTypo": {
+      "type": "object",
+      "default": {
+        "fontSize": {
+          "desktop": 16,
+          "tablet": 16,
+          "mobile": 14
+        },
+        "fontWeight": 400,
+        "lineHeight": "135%"
+      }
+    },
+    "textColor": {
+      "type": "string",
+      "default": "#000"
+    },
+    "starIconColor": {
+      "type": "string",
+      "default": "#FF8C02"
+    },
+    "textLength": {
+      "type": "number",
+      "default": 120
+    },
+    "grid2Bg": {
+      "type": "string",
+      "default": "#f9f8f8"
+    },
+    "grid2Padding": {
+      "type": "object",
+      "default": {
+        "top": "10px",
+        "right": "10px",
+        "bottom": "10px",
+        "left": "10px"
+      }
+    },
+    "grid2Border": {
+      "type": "object",
+      "default": {
+        "width": "0px",
+        "style": "solid",
+        "color": "#0575e6",
+        "side": "all",
+        "radius": "3px"
+      }
+    },
+    "quoteIcon": {
+      "type": "object",
+      "default": {
+        "size": 23
+      }
+    },
+    "slider": {
+      "type": "object",
+      "default": {
+        "height": 500,
+        "autoPlay": true,
+        "mouseWheel": true,
+        "navigation": true
+      }
+    }
+  },
+  "supports": {
+    "align": [
+      "wide",
+      "full"
+    ],
+    "html": false
+  },
+  "example": {
+    "attributes": {
+      "preview": true,
+      "columns": {
+        "desktop": 1,
+        "tablet": 1,
+        "mobile": 1
+      }
+    }
+  },
+  "editorScript": [
+    "file:./index.js"
+  ],
+  "editorStyle": "file:./index.css",
+  "style": [
+    "file:./view.css"
+  ],
+  "render": "file:./render.php",
+  "viewScript": [
+    "file:./view.js",
+    "jquery"
+  ]
+}

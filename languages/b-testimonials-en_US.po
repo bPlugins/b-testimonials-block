@@ -1,4 +1,4 @@
-# Copyright (C) 2024 bPlugins LLC
+# Copyright (C) 2025 bPlugins
 # This file is distributed under the GPLv3.
 msgid ""
 msgstr ""
@@ -9,300 +9,29 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2024-03-08T17:11:12+00:00\n"
+"POT-Creation-Date: 2025-01-26T08:35:21+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
-"X-Generator: WP-CLI 2.6.0\n"
+"X-Generator: WP-CLI 2.11.0\n"
 "X-Domain: b-testimonials-block\n"
 
 #. Plugin Name of the plugin
+#: b-testimonials-block.php
 msgid "B Testimonials Block"
 msgstr ""
 
 #. Description of the plugin
+#: b-testimonials-block.php
 msgid "Boost your website's credibility with B Testimonials Block, effortlessly showcasing customer ratings and reviews.."
 msgstr ""
 
 #. Author of the plugin
-msgid "bPlugins LLC"
+#: b-testimonials-block.php
+msgid "bPlugins"
 msgstr ""
 
 #. Author URI of the plugin
+#: b-testimonials-block.php
 msgid "http://bplugins.com"
-msgstr ""
-
-#: dist/editor.js:1
-#: dist/editor.js:8386
-#: dist/editor.js:8392
-msgid "Default"
-msgstr ""
-
-#: dist/editor.js:1
-#: dist/editor.js:8387
-#: dist/editor.js:8547
-msgid "Slider"
-msgstr ""
-
-#: dist/editor.js:1
-#: dist/editor.js:8388
-msgid "Masonry"
-msgstr ""
-
-#: dist/editor.js:1
-#: dist/editor.js:8393
-msgid "Theme-1"
-msgstr ""
-
-#: dist/editor.js:1
-#: dist/editor.js:8394
-msgid "Theme-2"
-msgstr ""
-
-#: dist/editor.js:1
-#: dist/editor.js:8395
-msgid "Theme-3"
-msgstr ""
-
-#: dist/editor.js:1
-#: dist/editor.js:8396
-msgid "Theme-4"
-msgstr ""
-
-#: dist/editor.js:1
-#: dist/editor.js:8397
-msgid "Theme-5"
-msgstr ""
-
-#: dist/editor.js:1
-#: dist/editor.js:8398
-msgid "Theme-6"
-msgstr ""
-
-#: dist/editor.js:1
-#: dist/editor.js:8407
-msgid "General"
-msgstr ""
-
-#: dist/editor.js:1
-#: dist/editor.js:8408
-msgid "Style"
-msgstr ""
-
-#: dist/editor.js:1
-#: dist/editor.js:8472
-msgid "Add or Remove Items"
-msgstr ""
-
-#: dist/editor.js:1
-#: dist/editor.js:8476
-msgid "Image:"
-msgstr ""
-
-#: dist/editor.js:1
-#: dist/editor.js:8477
-msgid "Enter Image URL"
-msgstr ""
-
-#: dist/editor.js:1
-#: dist/editor.js:8479
-#: dist/editor.js:8502
-#: dist/editor.js:8583
-msgid "Name"
-msgstr ""
-
-#: dist/editor.js:1
-#: dist/editor.js:8481
-#: dist/editor.js:8504
-#: dist/editor.js:8589
-msgid "Designation"
-msgstr ""
-
-#: dist/editor.js:1
-#: dist/editor.js:8483
-msgid "Review"
-msgstr ""
-
-#: dist/editor.js:1
-#: dist/editor.js:8485
-msgid "Rating:"
-msgstr ""
-
-#: dist/editor.js:1
-#: dist/editor.js:8488
-msgid "Remove"
-msgstr ""
-
-#: dist/editor.js:1
-#: dist/editor.js:8490
-msgid "Duplicate"
-msgstr ""
-
-#: dist/editor.js:1
-#: dist/editor.js:8495
-msgid "Add New Card"
-msgstr ""
-
-#: dist/editor.js:1
-#: dist/editor.js:8499
-msgid "Elements"
-msgstr ""
-
-#: dist/editor.js:1
-#: dist/editor.js:8500
-#: dist/editor.js:8573
-msgid "Image"
-msgstr ""
-
-#: dist/editor.js:1
-#: dist/editor.js:8506
-#: dist/editor.js:8595
-msgid "Review Text"
-msgstr ""
-
-#: dist/editor.js:1
-#: dist/editor.js:8508
-msgid "Rating"
-msgstr ""
-
-#: dist/editor.js:1
-#: dist/editor.js:8510
-msgid "Expanded Button"
-msgstr ""
-
-#: dist/editor.js:1
-#: dist/editor.js:8513
-msgid "Button"
-msgstr ""
-
-#: dist/editor.js:1
-#: dist/editor.js:8514
-msgid "Expand Text"
-msgstr ""
-
-#: dist/editor.js:1
-#: dist/editor.js:8516
-msgid "Collapse Text"
-msgstr ""
-
-#: dist/editor.js:1
-#: dist/editor.js:8520
-msgid "Layout"
-msgstr ""
-
-#: dist/editor.js:1
-#: dist/editor.js:8522
-msgid "Layout:"
-msgstr ""
-
-#: dist/editor.js:1
-#: dist/editor.js:8527
-msgid "Theme:"
-msgstr ""
-
-#: dist/editor.js:1
-#: dist/editor.js:8535
-msgid "Columns:"
-msgstr ""
-
-#: dist/editor.js:1
-#: dist/editor.js:8541
-msgid "Column Gap:"
-msgstr ""
-
-#: dist/editor.js:1
-#: dist/editor.js:8543
-msgid "Row Gap:"
-msgstr ""
-
-#: dist/editor.js:1
-#: dist/editor.js:8553
-msgid "AutoPlay"
-msgstr ""
-
-#: dist/editor.js:1
-#: dist/editor.js:8555
-msgid "MouseWheel"
-msgstr ""
-
-#: dist/editor.js:1
-#: dist/editor.js:8557
-msgid "Navigation"
-msgstr ""
-
-#: dist/editor.js:1
-#: dist/editor.js:8562
-msgid "Card"
-msgstr ""
-
-#: dist/editor.js:1
-#: dist/editor.js:8563
-#: dist/editor.js:8608
-msgid "Background Color"
-msgstr ""
-
-#: dist/editor.js:1
-#: dist/editor.js:8565
-#: dist/editor.js:8610
-msgid "Padding"
-msgstr ""
-
-#: dist/editor.js:1
-#: dist/editor.js:8567
-#: dist/editor.js:8579
-msgid "Border"
-msgstr ""
-
-#: dist/editor.js:1
-#: dist/editor.js:8575
-msgid "Width:"
-msgstr ""
-
-#: dist/editor.js:1
-#: dist/editor.js:8577
-msgid "Height:"
-msgstr ""
-
-#: dist/editor.js:1
-#: dist/editor.js:8584
-#: dist/editor.js:8590
-#: dist/editor.js:8596
-msgid "Typography"
-msgstr ""
-
-#: dist/editor.js:1
-#: dist/editor.js:8586
-#: dist/editor.js:8592
-#: dist/editor.js:8598
-msgid "Color"
-msgstr ""
-
-#: dist/editor.js:1
-#: dist/editor.js:8600
-msgid "Rating Icon Color"
-msgstr ""
-
-#: dist/editor.js:1
-#: dist/editor.js:8602
-msgid "Excerpt length"
-msgstr ""
-
-#: dist/editor.js:1
-#: dist/editor.js:8606
-msgid "Top"
-msgstr ""
-
-#: dist/editor.js:1
-#: dist/editor.js:15283
-msgid "Enter your name"
-msgstr ""
-
-#: dist/editor.js:1
-#: dist/editor.js:15285
-msgid "Enter your designation"
-msgstr ""
-
-#: dist/editor.js:1
-#: dist/editor.js:15310
-msgid "Enter your review"
 msgstr ""
 
 #: block.json

@@ -2,10 +2,8 @@
 Contributors: bplugins, abuhayat, btechnologies
 Donate link: https://www.buymeacoffee.com/abuhayat
 Tags: block, b-testimonials, rating, review, Gutenberg block
-Requires at least: 5.0+
-Tested up to: 6.4.3
+Tested up to: 6.7.1
 Stable tag: 1.0.0
-Requires PHP: 7.1
 License: GPLv3 or later
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 

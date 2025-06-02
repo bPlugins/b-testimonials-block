@@ -2,7 +2,7 @@
 /**
  * Plugin Name: B Testimonials Block
  * Description: Boost your website's credibility with b testimonials block, effortlessly showcasing customer ratings and reviews..
- * Version: 1.0.0
+ * Version: 1.0.2
  * Author: bPlugins
  * Author URI: http://bplugins.com
  * Requires at least: 6.5
@@ -39,9 +39,9 @@ class BPBTB_Testimonials_Block{
 
     private function define_constants() {
         // Constant
-        define( 'BTB_PLUGIN_VERSION', isset( $_SERVER['HTTP_HOST'] ) && 'localhost' === $_SERVER['HTTP_HOST'] ? time() : '1.0.0' );
-        define( 'BTB_ASSETS_DIR', plugin_dir_url( __FILE__ ) . 'assets/' );
-        define( 'BTB_DIR', plugin_dir_url( __FILE__ ) );
+        define( 'BPBTB_PLUGIN_VERSION', isset( $_SERVER['HTTP_HOST'] ) && 'localhost' === $_SERVER['HTTP_HOST'] ? time() : '1.0.2' );
+        define( 'BPBTB_ASSETS_DIR', plugin_dir_url( __FILE__ ) . 'assets/' );
+        define( 'BPBTB_DIR', plugin_dir_url( __FILE__ ) );
     }
 
     private function load_classes() {

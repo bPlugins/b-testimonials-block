@@ -26,7 +26,7 @@ const Settings = ({ attributes, setAttributes, updateItem, activeIndex, setActiv
         setAttributes({
             items: [...items, {
                 img: {
-                    url: "https://i.ibb.co/n7qL1wJ/user-dummy.png"
+                    url: "https://templates.bplugins.com/wp-content/uploads/2025/02/p-29.png"
                 },
                 name: "John Doe",
                 deg: "Developer",

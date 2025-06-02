@@ -14,6 +14,7 @@ document.addEventListener('DOMContentLoaded', () => {
 	btestimonialsEls.forEach(testimonialsEl => {
 		const attributes = JSON.parse(testimonialsEl.dataset.attributes);
 
+
 		createRoot(testimonialsEl).render(<>
 			<Style attributes={attributes} clientId={attributes.cId} />
 

@@ -2,8 +2,8 @@
 Contributors: bplugins, abuhayat, btechnologies
 Donate link: https://www.buymeacoffee.com/abuhayat
 Tags: block, b-testimonials, rating, review, Gutenberg block
-Tested up to: 6.7.1
-Stable tag: 1.0.0
+Tested up to: 6.7.2
+Stable tag: 1.0.2
 License: GPLv3 or later
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -17,7 +17,14 @@ The B Testimonials Block is your solution for displaying customer ratings and re
 
 
 = Features =
-- **Layout**: Choose from three layout options.
+- **Choose from three layout options**: Default, Slider, and Masonry.
+- **Select from seven theme styles**: Default, Theme 1, Theme 2, Theme 3, Theme 4, Theme 5, and Theme 6.
+- Configure columns per device and adjust column gap and row gap for precise layout control.
+- Customize card design by modifying the background color, padding, border, and shadow.
+- Adjust image settings, including width, height, and border styling.
+- Personalize name, designation, and review text with custom typography and color settings.
+- Modify rating color and set the excerpt length to control review content display.
+
 
 = How to use =
 - First install the B Testimonials plugin
@@ -99,18 +106,23 @@ You can post your questions on the [support forum here](https://wordpress.org/su
 
 == Changelog ==
 
+= 1.0.2 - 12 April, 2025 =
+* Some issues fixed;
+
+= 1.0.1 - 26 Feb, 2025 =
+* Added screenshots, logo, banner, and feature list.
+
 = 1.0.0 =
 * Initial Release
 
 
 == Upgrade Notice ==
 
+= 1.0.2 - 12 April, 2025 =
+* Some issues fixed;
+
+= 1.0.1 - 26 Feb, 2025 =
+* Added screenshots, logo, banner, and feature list.
+
 = 1.0.0 =
 * Initial Release
-
-== Developer Notes ==
-Public source code GitHub link for review, study, and contribute.
-
-https://github.com/bPlugins-LLC/b-testimonials-block
-
-For more information on how to contribute to this plugin, please visit our GitHub repository.

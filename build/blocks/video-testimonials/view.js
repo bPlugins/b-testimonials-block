@@ -1,1 +1,99 @@
-(()=>{"use strict";document.addEventListener("DOMContentLoaded",()=>{document.querySelectorAll(".bVideoTestimonials .video-frame").forEach(e=>{if(e.dataset.bound)return;e.dataset.bound="1";const t=()=>{const t=e.dataset.embed;t&&(e.innerHTML=t,e.classList.add("is-playing"))};e.addEventListener("click",t),e.addEventListener("keydown",e=>{"Enter"!==e.key&&" "!==e.key||(e.preventDefault(),t())})})})})();
+/******/ (() => { // webpackBootstrap
+/******/ 	"use strict";
+/******/ 	var __webpack_modules__ = ({
+
+/***/ "./src/shared/styles/video.scss"
+/*!**************************************!*\
+  !*** ./src/shared/styles/video.scss ***!
+  \**************************************/
+(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
+
+__webpack_require__.r(__webpack_exports__);
+// extracted by mini-css-extract-plugin
+
+
+/***/ }
+
+/******/ 	});
+/************************************************************************/
+/******/ 	// The module cache
+/******/ 	const __webpack_module_cache__ = {};
+/******/ 	
+/******/ 	// The require function
+/******/ 	function __webpack_require__(moduleId) {
+/******/ 		// Check if module is in cache
+/******/ 		const cachedModule = __webpack_module_cache__[moduleId];
+/******/ 		if (cachedModule !== undefined) {
+/******/ 			return cachedModule.exports;
+/******/ 		}
+/******/ 		// Create a new module (and put it into the cache)
+/******/ 		const module = __webpack_module_cache__[moduleId] = {
+/******/ 			// no module.id needed
+/******/ 			// no module.loaded needed
+/******/ 			exports: {}
+/******/ 		};
+/******/ 	
+/******/ 		// Execute the module function
+/******/ 		if (!(moduleId in __webpack_modules__)) {
+/******/ 			delete __webpack_module_cache__[moduleId];
+/******/ 			const e = new Error("Cannot find module '" + moduleId + "'");
+/******/ 			e.code = 'MODULE_NOT_FOUND';
+/******/ 			throw e;
+/******/ 		}
+/******/ 		__webpack_modules__[moduleId](module, module.exports, __webpack_require__);
+/******/ 	
+/******/ 		// Return the exports of the module
+/******/ 		return module.exports;
+/******/ 	}
+/******/ 	
+/************************************************************************/
+/******/ 	/* webpack/runtime/make namespace object */
+/******/ 	(() => {
+/******/ 		// define __esModule on exports
+/******/ 		__webpack_require__.r = (exports) => {
+/******/ 			if(Symbol.toStringTag) {
+/******/ 				Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
+/******/ 			}
+/******/ 			Object.defineProperty(exports, '__esModule', { value: true });
+/******/ 		};
+/******/ 	})();
+/******/ 	
+/************************************************************************/
+let __webpack_exports__ = {};
+// This entry needs to be wrapped in an IIFE because it needs to be isolated against other modules in the chunk.
+(() => {
+/*!***********************************************!*\
+  !*** ./src/blocks/video-testimonials/view.js ***!
+  \***********************************************/
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _shared_styles_video_scss__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @shared/styles/video.scss */ "./src/shared/styles/video.scss");
+
+const initVideos = () => {
+  document.querySelectorAll('.bVideoTestimonials .video-frame').forEach(frame => {
+    if (frame.dataset.bound) {
+      return;
+    }
+    frame.dataset.bound = '1';
+    const play = () => {
+      const embed = frame.dataset.embed;
+      if (!embed) {
+        return;
+      }
+      frame.innerHTML = embed;
+      frame.classList.add('is-playing');
+    };
+    frame.addEventListener('click', play);
+    frame.addEventListener('keydown', e => {
+      if ('Enter' === e.key || ' ' === e.key) {
+        e.preventDefault();
+        play();
+      }
+    });
+  });
+};
+document.addEventListener('DOMContentLoaded', initVideos);
+})();
+
+/******/ })()
+;
+//# sourceMappingURL=view.js.map

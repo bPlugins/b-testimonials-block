@@ -1,0 +1,58 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 2,
+	"name": "bptmb/client-logos",
+	"title": "Client Logos",
+	"description": "Show a trusted-by grid of client or partner logos.",
+	"category": "bplugins",
+	"keywords": [ "logos", "clients", "trusted by", "brands" ],
+	"textdomain": "b-testimonials-block",
+	"attributes": {
+		"align": {
+			"type": "string",
+			"default": "wide"
+		},
+		"cId": {
+			"type": "string",
+			"default": ""
+		},
+		"logos": {
+			"type": "array",
+			"default": [
+				{ "img": { "url": "data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='60'%3E%3Crect width='160' height='60' rx='8' fill='%23e5e7eb'/%3E%3Ctext x='80' y='36' font-family='sans-serif' font-size='18' fill='%239ca3af' text-anchor='middle'%3ELogo%3C/text%3E%3C/svg%3E" }, "link": "" },
+				{ "img": { "url": "data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='60'%3E%3Crect width='160' height='60' rx='8' fill='%23e5e7eb'/%3E%3Ctext x='80' y='36' font-family='sans-serif' font-size='18' fill='%239ca3af' text-anchor='middle'%3ELogo%3C/text%3E%3C/svg%3E" }, "link": "" },
+				{ "img": { "url": "data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='60'%3E%3Crect width='160' height='60' rx='8' fill='%23e5e7eb'/%3E%3Ctext x='80' y='36' font-family='sans-serif' font-size='18' fill='%239ca3af' text-anchor='middle'%3ELogo%3C/text%3E%3C/svg%3E" }, "link": "" },
+				{ "img": { "url": "data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='60'%3E%3Crect width='160' height='60' rx='8' fill='%23e5e7eb'/%3E%3Ctext x='80' y='36' font-family='sans-serif' font-size='18' fill='%239ca3af' text-anchor='middle'%3ELogo%3C/text%3E%3C/svg%3E" }, "link": "" }
+			]
+		},
+		"columns": {
+			"type": "object",
+			"default": { "desktop": 4, "tablet": 3, "mobile": 2 }
+		},
+		"columnGap": {
+			"type": "string",
+			"default": "30px"
+		},
+		"rowGap": {
+			"type": "string",
+			"default": "30px"
+		},
+		"logoHeight": {
+			"type": "number",
+			"default": 60
+		},
+		"grayscale": {
+			"type": "boolean",
+			"default": true
+		}
+	},
+	"supports": {
+		"align": [ "wide", "full" ],
+		"html": false
+	},
+	"editorScript": [ "file:./index.js" ],
+	"editorStyle": "file:./index.css",
+	"style": [ "file:./view.css" ],
+	"viewScript": [ "file:./view.js" ],
+	"render": "file:./render.php"
+}

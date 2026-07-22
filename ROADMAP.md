@@ -30,31 +30,34 @@
 
 ---
 
-## Phase 1 — Core Layouts (Block 2–6)
+## Phase 1 — Core Layouts (Block 2–6) — ✅ সম্পন্ন
 
-একই ডেটা/অ্যাট্রিবিউট শেয়ার করে, শুধু লেআউট আলাদা — তাই দ্রুত।
-এই ধাপেই shared component (Themes, RatingIcon, Layout, Style, utils) `src/shared/`-এ উঠবে।
+একই ডেটা/অ্যাট্রিবিউট শেয়ার করে, শুধু লেআউট আলাদা।
+এই ধাপেই shared component (Themes, RatingIcon, Layout, Style, utils) `src/shared/`-এ উঠেছে।
 
-- [ ] `src/shared/` তৈরি + `@shared` alias
-- [ ] Block 2: **Slider / Carousel**
-- [ ] Block 3: **Masonry**
-- [ ] Block 4: **Single Testimonial / Quote**
-- [ ] Block 5: **List**
-- [ ] Block 6: **Marquee (scrolling wall of love)**
+- [x] `src/shared/` তৈরি + `@shared` alias; shared Edit / view / styles
+- [x] shared CSS একটা common `.bTestimonials` class-এ rescope
+- [x] Block 2: **Slider / Carousel** (`bptmb/testimonials-slider`)
+- [x] Block 3: **Masonry** (`bptmb/testimonials-masonry`)
+- [x] Block 4: **Single Testimonial / Quote** (`bptmb/testimonials-single`)
+- [x] Block 5: **List** (`bptmb/testimonials-list`) — নতুন `list` layout
+- [x] Block 6: **Marquee** (`bptmb/testimonials-marquee`) — নতুন `marquee` layout (auto-scroll, hover-pause, এডিটরে static)
 
-## Phase 2 — CPT + Form ("ফুল সলিউশন"-এর শুরু)
+## Phase 2 — CPT + Form ("ফুল সলিউশন"-এর শুরু) — ✅ সম্পন্ন
 
-- [ ] `testimonial` Custom Post Type (ratings, author, image, source meta)
-- [ ] প্রতি ব্লকে `Manual` / `From CPT` data-source toggle
-- [ ] Block 12: **Submission Form** (frontend → CPT, moderation)
+- [x] `testimonial` Custom Post Type ([includes/cpt.php](includes/cpt.php)): title=নাম, content=রিভিউ, featured image=ছবি, meta = rating / designation / company; classic editor + admin columns; REST-enabled
+- [x] প্রতি ব্লকে `Manual` / `Testimonials (CPT)` data-source toggle + query (number / orderBy / order)
+- [x] Frontend: `render.php` CPT থেকে items resolve করে (`bpbtb_prepare_block_items`)
+- [x] Editor: CPT হলে REST (`/wp/v2/testimonial?_embed`) থেকে fetch করে read-only preview
+- [x] **Phase 2b** — Block 7: **Testimonial Form** (`bptmb/testimonial-form`) → REST `bptmb/v1/submit` ([includes/form.php](includes/form.php)); nonce, sanitization, `pending` status (moderation), guarded image upload (image mime শুধু, ডিফল্ট off)
 
-## Phase 3 — Media / উৎস (Block 7–11) — বেশিরভাগ Pro
+## Phase 3 — Media / উৎস — 🚧 চলমান
 
-- [ ] Block 7: **Video Testimonials**
-- [ ] Block 8: **Google Reviews** (import)
-- [ ] Block 9: **Twitter / X Testimonials**
-- [ ] Block 10: **Client Logos / Trusted-by**
-- [ ] Block 11: **Case Study Card**
+- [x] **Client Logos** (`bptmb/client-logos`) — trusted-by grid, grayscale hover, static render (JS লজিক নেই)
+- [x] **Video Testimonials** (`bptmb/video-testimonials`) — click-to-play YouTube/Vimeo/MP4; YouTube poster fallback; keyboard-accessible
+- [ ] **Case Study Card** — manual, self-contained (পরের ধাপে)
+- [ ] **Google Reviews** (import) — external API + API key দরকার → **Pro / Phase 3b**
+- [ ] **Twitter / X Testimonials** — external API দরকার → **Pro / Phase 3b**
 
 ## Phase 4 — Interaction + Trust (Block 13–20)
 

@@ -1,0 +1,23 @@
+.btb-logo-row {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	margin-bottom: 12px;
+	padding-bottom: 12px;
+	border-bottom: 1px solid #f0f0f0;
+
+	.btb-logo-pick {
+		height: auto;
+		min-height: 40px;
+
+		img {
+			max-width: 90px;
+			max-height: 36px;
+			display: block;
+		}
+	}
+
+	> .components-base-control {
+		flex: 1;
+	}
+}

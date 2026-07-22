@@ -46,6 +46,8 @@ class BPBTB_Testimonials_Block{
     }
 
     private function load_classes() {
+        require_once __DIR__ . '/includes/cpt.php';
+        require_once __DIR__ . '/includes/form.php';
     }
 
     public function onInit(){

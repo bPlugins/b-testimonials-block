@@ -210,6 +210,18 @@
 				"mouseWheel": true,
 				"navigation": true
 			}
+		},
+		"dataSource": {
+			"type": "string",
+			"default": "manual"
+		},
+		"query": {
+			"type": "object",
+			"default": {
+				"number": 6,
+				"orderBy": "date",
+				"order": "desc"
+			}
 		}
 	},
 	"supports": {

@@ -1,0 +1,500 @@
+$primaryColor: #4527a4;
+
+// Common CSS
+html {
+	scroll-behavior: smooth;
+}
+
+// Dashicon
+.dashicons {
+	font-family: dashicons !important;
+}
+
+// Block Directory
+.bTestimonials {
+	* {
+		box-sizing: border-box;
+	}
+
+	p {
+		margin: 0;
+		padding: 0;
+	}
+
+	h1,
+	h2,
+	h3,
+	h4,
+	h5 {
+		margin: 0;
+		padding: 0;
+	}
+
+	.icon {
+		font-style: inherit;
+	}
+
+	img {
+		width: 100%;
+		max-width: 100%;
+	}
+
+	.btbTestimonialsDir {
+
+		.layoutSection {
+			display: grid;
+
+			.single {
+
+				.authorImg {
+
+					.img {
+						border-radius: 50%;
+						overflow: hidden;
+
+						img {
+							width: 100%;
+							height: 100%;
+							object-fit: fill;
+						}
+					}
+				}
+
+				.top {
+					display: flex;
+					align-items: center;
+					gap: 10px;
+
+					.info {
+						flex: 1;
+
+						.name {}
+
+						.deg {}
+					}
+				}
+
+				.rating {
+					margin-top: 5px;
+
+					svg {
+						margin-right: 2px;
+					}
+				}
+
+				.reviewText {
+					display: initial;
+				}
+
+				.expandBtn {
+					margin-top: 0px;
+					display: inline-block;
+					cursor: pointer;
+					font-size: 15px;
+					font-weight: bold;
+					margin-left: 5px;
+				}
+			}
+
+			&.theme_1 {
+				.single {
+					display: flex;
+					flex-direction: column;
+					text-align: center;
+
+					.top {
+						justify-content: center;
+						margin-top: -33px;
+					}
+
+					.body {
+						margin: 15px 0px;
+					}
+
+					.footer {
+						margin-top: auto;
+
+						.deg {
+							position: relative;
+
+
+							&::after {
+								content: '';
+								width: 30px;
+								display: block;
+								margin: 3px auto;
+								border: 1px solid #cccccc;
+							}
+						}
+
+						.rating {
+							margin: 0;
+						}
+					}
+				}
+			}
+
+			&.theme_2 {
+				.single {
+					display: flex;
+					flex-direction: column;
+
+					.top {
+						position: relative;
+						margin-bottom: 15px;
+						display: inline-block;
+						width: 100%;
+						flex-grow: 1;
+
+						.icon {
+							position: absolute;
+							bottom: -22px;
+							left: 35px;
+						}
+
+						.expandBtn {
+							border: none;
+						}
+					}
+
+					.bottom {
+						display: flex;
+						align-items: center;
+						gap: 10px;
+
+						.authorImg {
+							.img {
+
+								img {}
+							}
+						}
+
+						.info {
+							flex: 1;
+
+							.name {}
+
+							.deg {}
+						}
+					}
+				}
+
+			}
+
+			&.theme_3 {
+				.single {
+					display: flex;
+					flex-direction: column;
+
+					.top {
+						display: inline-block;
+
+						.expandBtn {
+							border: none;
+							margin-top: 0px;
+						}
+
+						.rating {
+							margin-top: 0px;
+						}
+					}
+
+					.bottom {
+						text-align: center;
+						margin-top: auto;
+
+						.authorImg {
+							display: flex;
+							justify-content: center;
+							margin-top: 5px;
+
+							.img {
+
+								img {}
+							}
+						}
+
+						.info {
+							flex: 1;
+							margin-top: 8px;
+
+							.name {}
+
+							.deg {}
+						}
+					}
+				}
+
+			}
+
+			&.theme_4 {
+				.single {
+					display: flex;
+					flex-direction: column;
+
+					.top {
+						justify-content: center;
+						margin-top: -19px;
+					}
+
+					.body {
+						margin: 15px 0px;
+						text-align: center;
+
+						.reviewText {
+							padding: 0px 10px;
+						}
+					}
+
+					.bottom {
+						margin-top: auto;
+						display: table;
+						table-layout: fixed;
+						width: 100%;
+
+						.rightQuote {
+							padding: 0px 10px;
+							padding-top: 10px;
+							text-align: center;
+							display: table-cell;
+							height: 100%;
+							vertical-align: middle;
+							width: 15%;
+
+						}
+
+						.info {
+							// border-left: 1px solid #4527a4;
+							// padding-left: 5px;
+							display: flex;
+							align-items: center;
+							gap: 5px;
+							width: 85%;
+							box-sizing: border-box;
+							text-align: left;
+							padding: 10px;
+							// display: table-cell;
+							height: 100%;
+							vertical-align: middle;
+
+							.deg {}
+
+							.rating {
+								margin: 0;
+							}
+						}
+
+					}
+				}
+			}
+
+			&.theme_5 {
+				.single {
+					display: flex;
+					flex-direction: column;
+
+					.top {
+						align-items: flex-start;
+
+						.right {
+							svg {
+								display: block;
+							}
+						}
+
+						.img {
+
+							img {}
+						}
+					}
+
+					.bottom {
+						margin-top: auto;
+
+						.info {
+							display: flex;
+							align-items: center;
+							justify-content: flex-end;
+							gap: 5px;
+							margin-top: 10px;
+						}
+
+						.rating {
+							margin-top: 0px;
+							text-align: right;
+						}
+					}
+
+				}
+			}
+
+			&.theme_6 {
+
+				.single {
+					display: flex;
+					flex-direction: column;
+
+					.top {
+						display: inline-block;
+						position: relative;
+
+						&::after {
+							content: "";
+							position: absolute;
+							bottom: -30px;
+							left: 0;
+							width: 0;
+							height: 0;
+							border-left: 0 solid transparent;
+							border-bottom: 30px solid transparent;
+						}
+					}
+
+					.bottom {
+						display: flex;
+						gap: 10px;
+						margin-top: auto;
+
+
+						.rating {
+							margin: 0;
+						}
+
+						.authorImg {
+							.img {
+								img {}
+							}
+						}
+					}
+				}
+			}
+
+			&.masonry-layout {
+				display: initial;
+			}
+
+			// List: one testimonial per full-width row.
+			&.list-layout {
+				display: flex;
+				flex-direction: column;
+			}
+
+			// Marquee: continuously scrolling "wall of love".
+			&.marquee-layout {
+				display: block;
+				overflow: hidden;
+
+				.marquee-track {
+					display: flex;
+					width: max-content;
+					animation: btbMarquee 30s linear infinite;
+				}
+
+				.marquee-group {
+					display: flex;
+				}
+
+				.marquee-item {
+					flex: 0 0 auto;
+					width: 320px;
+				}
+
+				&:hover .marquee-track {
+					animation-play-state: paused;
+				}
+
+				// In the editor keep it static & scrollable so cards stay editable.
+				&.is-editing {
+					overflow-x: auto;
+
+					.marquee-track {
+						animation: none;
+					}
+				}
+			}
+
+			.swiper {
+				width: 100%;
+			}
+
+			&.slider-layout {
+				display: flex;
+
+				.swiper {
+					padding: 0px 28px;
+
+					.swiper-wrapper {
+						display: flex;
+						height: 100% !important;
+
+						.swiper-slide {
+							height: auto !important;
+
+							.single {
+								height: 100%;
+							}
+						}
+					}
+
+					.swiper-button-prev {
+						left: 0;
+					}
+
+					.swiper-button-next {
+						right: 0;
+					}
+				}
+
+			}
+
+			&.slider-layout.theme_1,
+			&.slider-layout.theme_4 {
+				.swiper-slide {
+					padding-top: 50px;
+				}
+			}
+		}
+	}
+}
+
+
+
+/*
+*
+*column set
+*/
+@for $i from 1 through 12 {
+	.columns-#{$i} {
+		grid-template-columns: repeat(#{$i}, 1fr);
+	}
+}
+
+@media (max-width: 768px) {
+	@for $i from 1 through 12 {
+		.columns-tablet-#{$i} {
+			grid-template-columns: repeat(#{$i}, 1fr);
+		}
+	}
+}
+
+@media (max-width: 576px) {
+	@for $i from 1 through 12 {
+		.columns-mobile-#{$i} {
+			grid-template-columns: repeat(#{$i}, 1fr);
+		}
+	}
+}
+
+/*
+*
+* Marquee scroll
+*/
+@keyframes btbMarquee {
+	from {
+		transform: translateX(0);
+	}
+
+	to {
+		transform: translateX(-50%);
+	}
+}

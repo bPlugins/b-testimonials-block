@@ -1,0 +1,78 @@
+{
+  "$schema": "https://schemas.wp.org/trunk/block.json",
+  "apiVersion": 2,
+  "name": "bptmb/video-testimonials",
+  "title": "Video Testimonials",
+  "description": "Showcase video testimonials with click-to-play (YouTube, Vimeo or MP4).",
+  "category": "bplugins",
+  "keywords": [
+    "video",
+    "testimonials",
+    "youtube",
+    "vimeo",
+    "reviews"
+  ],
+  "textdomain": "b-testimonials-block",
+  "attributes": {
+    "align": {
+      "type": "string",
+      "default": "wide"
+    },
+    "cId": {
+      "type": "string",
+      "default": ""
+    },
+    "items": {
+      "type": "array",
+      "default": [
+        {
+          "videoUrl": "https://www.youtube.com/watch?v=ysz5S6PUM-U",
+          "poster": {
+            "url": ""
+          },
+          "name": "Jane Doe",
+          "deg": "CEO",
+          "company": "Acme Inc"
+        }
+      ]
+    },
+    "columns": {
+      "type": "object",
+      "default": {
+        "desktop": 3,
+        "tablet": 2,
+        "mobile": 1
+      }
+    },
+    "columnGap": {
+      "type": "string",
+      "default": "30px"
+    },
+    "rowGap": {
+      "type": "string",
+      "default": "30px"
+    },
+    "accentColor": {
+      "type": "string",
+      "default": "#0575e6"
+    }
+  },
+  "supports": {
+    "align": [
+      "wide",
+      "full"
+    ],
+    "html": false
+  },
+  "editorScript": [
+    "file:./index.js"
+  ],
+  "editorStyle": "file:./index.css",
+  "style": [
+    "file:./view.css"
+  ],
+  "viewScript": [
+    "file:./view.js"
+  ],
+  "render": "file:./render.php"
+}

@@ -1,0 +1,69 @@
+{
+  "$schema": "https://schemas.wp.org/trunk/block.json",
+  "apiVersion": 2,
+  "name": "bptmb/testimonial-form",
+  "title": "Testimonial Form",
+  "description": "Let visitors submit their own testimonials. Submissions are saved as pending for review.",
+  "category": "bplugins",
+  "keywords": [
+    "testimonial",
+    "form",
+    "submit",
+    "review"
+  ],
+  "textdomain": "b-testimonials-block",
+  "attributes": {
+    "align": {
+      "type": "string",
+      "default": "wide"
+    },
+    "cId": {
+      "type": "string",
+      "default": ""
+    },
+    "formTitle": {
+      "type": "string",
+      "default": "Share your experience"
+    },
+    "buttonText": {
+      "type": "string",
+      "default": "Submit testimonial"
+    },
+    "successMessage": {
+      "type": "string",
+      "default": "Thank you! Your testimonial has been submitted and is awaiting review."
+    },
+    "fields": {
+      "type": "object",
+      "default": {
+        "email": false,
+        "designation": true,
+        "company": false,
+        "rating": true,
+        "image": false
+      }
+    },
+    "accentColor": {
+      "type": "string",
+      "default": "#0575e6"
+    }
+  },
+  "supports": {
+    "align": [
+      "wide",
+      "full"
+    ],
+    "html": false
+  },
+  "editorScript": [
+    "file:./index.js"
+  ],
+  "editorStyle": "file:./index.css",
+  "style": [
+    "file:./view.css"
+  ],
+  "render": "file:./render.php",
+  "viewScript": [
+    "file:./view.js"
+  ]
+}

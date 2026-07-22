@@ -1,6 +1,6 @@
 
-import { getBoxValue } from '../../../../bpl-tools/utils/functions';
-import { getBorderCSS, getShadowCSS, getTypoCSS } from '../../../../bpl-tools/utils/getCSS';
+import { getBoxValue } from 'bpl-tools/utils/functions';
+import { getBorderCSS, getShadowCSS, getTypoCSS } from 'bpl-tools/utils/getCSS';
 
 const Style = ({ attributes, clientId }) => {
 	const { columnGap, rowGap, background, padding, border, shadow, image, imgBorder, nameTypo, nameColor, degTypo, degColor, textTypo, textColor, expandedTypo, grid2Bg, grid2Padding } = attributes;

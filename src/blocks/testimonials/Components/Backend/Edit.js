@@ -6,7 +6,7 @@ import { ToolbarButton } from '@wordpress/components';
 import { produce } from 'immer';
 
 // Settings Components
-import { tabController } from '../../../../bpl-tools/utils/functions';
+import { tabController } from 'bpl-tools/utils/functions';
 import ExpandButton from '../Common/ExpandButton';
 
 import '../../editor.scss';

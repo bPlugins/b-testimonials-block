@@ -25,6 +25,7 @@ class BPBTB_Testimonials_Block{
         $this->load_classes();
 
         add_action('init', [$this, 'onInit']);
+        add_filter('block_categories_all', [$this, 'register_block_category']);
     }
 
     public static function get_instance() {
@@ -48,7 +49,37 @@ class BPBTB_Testimonials_Block{
     }
 
     public function onInit(){
-		register_block_type( __DIR__ . '/build' );
+		// Register every block found under build/blocks/*.
+		// Each sub-block lives in src/blocks/<name>/ and is compiled to build/blocks/<name>/.
+		$blocks_dir = __DIR__ . '/build/blocks';
+
+		if ( is_dir( $blocks_dir ) ) {
+			foreach ( glob( $blocks_dir . '/*', GLOB_ONLYDIR ) as $block ) {
+				if ( file_exists( $block . '/block.json' ) ) {
+					register_block_type( $block );
+				}
+			}
+		} elseif ( file_exists( __DIR__ . '/build/block.json' ) ) {
+			// Fallback for the legacy single-block build layout.
+			register_block_type( __DIR__ . '/build' );
+		}
+	}
+
+	// Group all bPlugins testimonial blocks under one category in the inserter.
+	public function register_block_category( $categories ) {
+		foreach ( $categories as $category ) {
+			if ( isset( $category['slug'] ) && 'bplugins' === $category['slug'] ) {
+				return $categories;
+			}
+		}
+
+		array_unshift( $categories, [
+			'slug'  => 'bplugins',
+			'title' => __( 'bPlugins', 'b-testimonials-block' ),
+			'icon'  => null,
+		] );
+
+		return $categories;
 	}
      
 }

@@ -1,4 +1,4 @@
-=== B Testimonials Block ===
+=== B Testimonials Block – Showcase Testimonials with Custom Styles ===
 Contributors: bplugins, abuhayat, btechnologies
 Donate link: https://www.buymeacoffee.com/abuhayat
 Tags: block, b-testimonials, rating, review, Gutenberg block

@@ -6,12 +6,12 @@ import { PanelBody, PanelRow, TabPanel, TextControl, SelectControl, RangeControl
 import { produce } from 'immer';
 
 // Settings Components
-import { Label, ColorControl, InlineDetailMediaUpload, Typography, } from '../../../../../bpl-tools/Components';
-import { BDevice, BorderControl, ShadowControl } from '../../../../../bpl-tools/Components/Deprecated';
+import { Label, ColorControl, InlineDetailMediaUpload, Typography, } from 'bpl-tools/Components';
+import { BDevice, BorderControl, ShadowControl } from 'bpl-tools/Components/Deprecated';
 
-import { gearIcon } from '../../../../../bpl-tools/utils/icons';
-import { tabController } from '../../../../../bpl-tools/utils/functions';
-import { emUnit, perUnit, pxUnit } from '../../../../../bpl-tools/utils/options';
+import { gearIcon } from 'bpl-tools/utils/icons';
+import { tabController } from 'bpl-tools/utils/functions';
+import { emUnit, perUnit, pxUnit } from 'bpl-tools/utils/options';
 
 import { checkTheme } from '../../.././utils/functions';
 import { layoutOpt, generalStyleTabs, themeOpt } from './../../../utils/options';

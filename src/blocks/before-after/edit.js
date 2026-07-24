@@ -4,6 +4,7 @@ import { useBlockProps, InspectorControls, MediaUpload, MediaUploadCheck, PanelC
 import { PanelBody, RangeControl, TextControl, Button } from '@wordpress/components';
 import BlockSwitcher from '@shared/Components/Common/BlockSwitcher';
 
+import BeforeAfterSlider from '@shared/Components/Common/BeforeAfterSlider';
 import '@shared/styles/before-after.scss';
 
 const Edit = ( { attributes, setAttributes, clientId } ) => {
@@ -41,22 +42,9 @@ const Edit = ( { attributes, setAttributes, clientId } ) => {
 				<PanelColorSettings title={ __( 'Color', 'b-testimonials-block' ) } initialOpen={ false } colorSettings={ [ { value: accentColor, onChange: ( v ) => setAttributes( { accentColor: v } ), label: __( 'Handle color', 'b-testimonials-block' ) } ] } />
 			</InspectorControls>
 
-			<div { ...useBlockProps( { className: 'bBeforeAfter' } ) }>
+			<div { ...useBlockProps() }>
 				{ beforeImg?.url || afterImg?.url ? (
-					<div className="ba-wrap" style={ { '--pos': `${ startPosition }%` } }>
-						<div className="ba-before">
-							{ beforeImg?.url && <img src={ beforeImg.url } alt={ beforeImg?.alt || '' } /> }
-							{ beforeLabel && <span className="ba-label ba-label-before">{ beforeLabel }</span> }
-						</div>
-						<div className="ba-after">
-							{ afterImg?.url && <img src={ afterImg.url } alt={ afterImg?.alt || '' } /> }
-							{ afterLabel && <span className="ba-label ba-label-after">{ afterLabel }</span> }
-						</div>
-						<div className="ba-handle" style={ { borderColor: accentColor } }>
-							<span className="ba-handle-line" style={ { background: accentColor } } />
-							<span className="ba-handle-grip" style={ { background: accentColor } } />
-						</div>
-					</div>
+					<BeforeAfterSlider attributes={ attributes } />
 				) : (
 					<p className="ba-empty">{ __( 'Select a before and after image in the block settings.', 'b-testimonials-block' ) }</p>
 				) }

@@ -51,4 +51,8 @@ const initBeforeAfter = () => {
 	} );
 };
 
-document.addEventListener( 'DOMContentLoaded', initBeforeAfter );
+document.addEventListener( 'DOMContentLoaded', () => {
+	initBeforeAfter();
+	setTimeout( initBeforeAfter, 100 );
+	setTimeout( initBeforeAfter, 500 );
+} );

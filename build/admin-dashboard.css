@@ -1,2 +1,111 @@
+/*!*************************************************************************************************************************************************************************************************************************************************!*\
+  !*** css ./node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[4].use[1]!./node_modules/postcss-loader/dist/cjs.js??ruleSet[1].rules[4].use[2]!./node_modules/sass-loader/dist/cjs.js??ruleSet[1].rules[4].use[3]!./src/admin/dashboard.scss ***!
+  \*************************************************************************************************************************************************************************************************************************************************/
 @import url(https://fonts.googleapis.com/css2?family=Lato:wght@700;900&family=Roboto:wght@100..900&display=swap);
-:root{--bpl-dashboard-primary-color:#0b81ee;--bpl-dashboard-primary-color-rgb:11,129,238;--bpl-dashboard-secondary-color:#8c74fd;--bpl-dashboard-secondary-color-rgb:140,116,253;--bpl-dashboard-title-color:#070127;--bpl-dashboard-title-color-rgb:7,1,39;--bpl-dashboard-content-color:#1b2e4b;--bpl-dashboard-content-color-rgb:27,46,75}.fs-has-title,.fs-notice,.fs_notice_board,.notice,div.fs-notice.promotion,div.fs-notice.success,div.fs-notice.updated{display:none!important;height:0;left:-9999px;margin:0!important;opacity:0;padding:0!important;position:absolute!important;top:-9999px;visibility:hidden;width:0}.bPlDashboard{background:#f6f8fa;font-family:Roboto,sans-serif;margin:0 -20px;max-width:calc(100% + 20px);min-height:100vh;width:calc(100% + 20px)}.bPlDashboard *{box-sizing:border-box;font-family:Roboto,sans-serif;line-height:1.5;margin:0;padding:0}.bPlDashboard .bPlDashboardContainer{margin:0 auto!important;max-width:1320px;padding:0 15px;width:100%}.bPlDashboard .bPlDashboardMain{padding:28px 24px}.bPlDashboard .bPlDashboardMain .bPlDashboardContainer{display:flex;flex-direction:column;gap:24px;padding:20px 0}.bPlDashboard .bPlDashboardCard{background-color:#fff;padding:24px}.bPlDashboard .bPlDashboardButtons{align-items:center;display:flex;gap:10px}.bPlDashboard .bPlButton{border-radius:0!important}.bPlDashboard ::-webkit-scrollbar{width:8px}.bPlDashboard ::-webkit-scrollbar-track{background:transparent}.bPlDashboard ::-webkit-scrollbar-thumb{background:rgba(var(--bpl-dashboard-content-color-rgb,#1B2E4B),.25);border-radius:4px}.bPlDashboard ::-webkit-scrollbar-thumb:hover{background:rgba(var(--bpl-dashboard-content-color-rgb,#1B2E4B),.45)}.bPlDashboard a{text-decoration:none!important}.bPlDashboard .bPlUpgradeBtn,.bPlDashboard .proFeatures,.bPlDashboard .upgradeBtn,.bPlDashboard [class*=Pricing],.bPlDashboard [class*=Upgrade],.bPlDashboard [class*=pricing],.bPlDashboard [class*=upgrade],.bPlDashboard [href*=pricing]{display:none!important}
+/*!*****************************************************************************************************************************************************************************************************************************************************!*\
+  !*** css ./node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[4].use[1]!./node_modules/postcss-loader/dist/cjs.js??ruleSet[1].rules[4].use[2]!./node_modules/sass-loader/dist/cjs.js??ruleSet[1].rules[4].use[3]!./src/admin/dashboard.scss (1) ***!
+  \*****************************************************************************************************************************************************************************************************************************************************/
+:root {
+  --bpl-dashboard-primary-color: #0B81EE;
+  --bpl-dashboard-primary-color-rgb: 11, 129, 238;
+  --bpl-dashboard-secondary-color: #8C74FD;
+  --bpl-dashboard-secondary-color-rgb: 140, 116, 253;
+  --bpl-dashboard-title-color: #070127;
+  --bpl-dashboard-title-color-rgb: 7, 1, 39;
+  --bpl-dashboard-content-color: #1b2e4b;
+  --bpl-dashboard-content-color-rgb: 27, 46, 75;
+}
+
+.notice,
+.fs-notice,
+.fs-has-title,
+.fs_notice_board,
+div.fs-notice.promotion,
+div.fs-notice.success,
+div.fs-notice.updated {
+  width: 0;
+  height: 0;
+  position: absolute !important;
+  top: -9999px;
+  left: -9999px;
+  opacity: 0;
+  visibility: hidden;
+  display: none !important;
+  padding: 0 !important;
+  margin: 0 !important;
+}
+
+.bPlDashboard {
+  font-family: "Roboto", sans-serif;
+  width: calc(100% + 20px);
+  max-width: calc(100% + 20px);
+  min-height: 100vh;
+  background: #f6f8fa;
+  margin: 0 -20px 0 -20px;
+}
+.bPlDashboard * {
+  font-family: "Roboto", sans-serif;
+  padding: 0;
+  margin: 0;
+  box-sizing: border-box;
+  line-height: 1.5;
+}
+.bPlDashboard .bPlDashboardContainer {
+  width: 100%;
+  max-width: 1320px;
+  padding: 0 15px;
+  margin: 0 auto !important;
+}
+.bPlDashboard .bPlDashboardMain {
+  padding: 28px 24px;
+}
+.bPlDashboard .bPlDashboardMain .bPlDashboardContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  padding: 20px 0;
+}
+.bPlDashboard .bPlDashboardCard {
+  background-color: #fff;
+  padding: 24px;
+}
+.bPlDashboard .bPlDashboardButtons {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.bPlDashboard .bPlButton {
+  border-radius: 0 !important;
+}
+.bPlDashboard ::-webkit-scrollbar {
+  width: 8px;
+}
+.bPlDashboard ::-webkit-scrollbar-track {
+  background: transparent;
+}
+.bPlDashboard ::-webkit-scrollbar-thumb {
+  background: rgba(var(--bpl-dashboard-content-color-rgb, #1B2E4B), 0.25);
+  border-radius: 4px;
+}
+.bPlDashboard ::-webkit-scrollbar-thumb:hover {
+  background: rgba(var(--bpl-dashboard-content-color-rgb, #1B2E4B), 0.45);
+}
+
+/* Remove underline from all links inside dashboard */
+.bPlDashboard a {
+  text-decoration: none !important;
+}
+
+/* Hide upgrade / pricing / pro buttons */
+.bPlDashboard .upgradeBtn,
+.bPlDashboard .bPlUpgradeBtn,
+.bPlDashboard [class*=upgrade],
+.bPlDashboard [class*=Upgrade],
+.bPlDashboard [class*=pricing],
+.bPlDashboard [class*=Pricing],
+.bPlDashboard [href*=pricing],
+.bPlDashboard .proFeatures {
+  display: none !important;
+}
+
+/*# sourceMappingURL=admin-dashboard.css.map*/

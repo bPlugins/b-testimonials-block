@@ -10,16 +10,66 @@ import ThemeFive from '../Themes/ThemeFive';
 import ThemeSix from '../Themes/ThemeSix';
 import Slider from './Slider';
 import Marquee from './Marquee';
+import BeforeAfterSlider from '../BeforeAfterSlider';
 
-import { getStar } from '../../../utils/functions';
+import { getStar, getVideoEmbed } from '../../../utils/functions';
 import Image from '../Image';
 import RatingIcon from '../ratingIcon';
+
+const VideoCard = ( { item, accentColor } ) => {
+	const [ isPlaying, setIsPlaying ] = useState( false );
+	const embedHtml = item?.videoUrl ? getVideoEmbed( item.videoUrl ) : '';
+
+	return (
+		<div className="video-item">
+			<div
+				className={ `video-frame ${ isPlaying ? 'is-playing' : '' }` }
+				style={ ! isPlaying && item?.poster?.url ? { backgroundImage: `url(${ item.poster.url })` } : undefined }
+				data-embed={ embedHtml }
+				onClick={ () => {
+					if ( embedHtml ) {
+						setIsPlaying( true );
+					}
+				} }
+				tabIndex={ 0 }
+				role="button"
+				onKeyDown={ ( e ) => {
+					if ( ( e.key === 'Enter' || e.key === ' ' ) && embedHtml ) {
+						e.preventDefault();
+						setIsPlaying( true );
+					}
+				} }
+			>
+				{ isPlaying ? (
+					<div
+						className="video-embed-container"
+						style={ { width: '100%', height: '100%', position: 'absolute', inset: 0 } }
+						dangerouslySetInnerHTML={ { __html: embedHtml } }
+					/>
+				) : (
+					<span className="video-play" style={ accentColor ? { color: accentColor } : undefined }>
+						<svg viewBox="0 0 24 24" width="26" height="26" fill="currentColor">
+							<path d="M8 5v14l11-7z" />
+						</svg>
+					</span>
+				) }
+			</div>
+			<div className="video-meta">
+				{ item?.name && <h3 className="name">{ item.name }</h3> }
+				{ ( item?.deg || item?.company ) && (
+					<p className="deg">{ [ item?.deg, item?.company ].filter( Boolean ).join( ', ' ) }</p>
+				) }
+			</div>
+		</div>
+	);
+};
 
 const Layout = ({ itemsEls = [], ToolbarButton, MediaUpload, MediaUploadCheck, attributes = {}, setActiveIndex, activeIndex = 0, updateItem, isBackend = false, __, RichText }) => {
     const { items = [], columnGap = '30px', rowGap = '40px', layout = 'default', theme = 'default', columns = { desktop: 3, tablet: 2, mobile: 1 } } = attributes || {};
     const { desktop = 3, tablet = 2, mobile = 1 } = (columns && typeof columns === 'object') ? columns : { desktop: 3, tablet: 2, mobile: 1 };
 
     const [selectedAvatarIdx, setSelectedAvatarIdx] = useState(0);
+    const [cardStackIdx, setCardStackIdx] = useState(0);
     const itemProps = { attributes, setActiveIndex, activeIndex, updateItem, isBackend, __, RichText, MediaUpload, MediaUploadCheck, ToolbarButton };
 
     // Dynamic badge attributes (from block.json / sidebar settings)
@@ -53,7 +103,37 @@ const Layout = ({ itemsEls = [], ToolbarButton, MediaUpload, MediaUploadCheck, a
     //  CATEGORY D: Badge / Score Widgets (fully custom JSX, dynamic)
     // ================================================================
 
+    // Helper to calculate dynamic rating stats from items array
+    const computedStats = (() => {
+        const total = items.length;
+        if (total === 0) {
+            return {
+                total: 0,
+                avg: '5.0',
+                countText: '',
+                counts: { 5: 0, 4: 0, 3: 0, 2: 0, 1: 0 }
+            };
+        }
+        const counts = { 5: 0, 4: 0, 3: 0, 2: 0, 1: 0 };
+        let sum = 0;
+        items.forEach(it => {
+            const r = Math.min(5, Math.max(1, Number(it.rating ?? 5)));
+            const rounded = Math.round(r);
+            counts[rounded] = (counts[rounded] || 0) + 1;
+            sum += r;
+        });
+        const avg = (sum / total).toFixed(1);
+        return {
+            total,
+            avg,
+            countText: `Based on ${total} reviews`,
+            counts
+        };
+    })();
+
     if (layout === 'google-review-badge') {
+        const score = bs || (computedStats.total > 0 ? computedStats.avg : '4.9');
+        const count = bc || (computedStats.total > 0 ? `(${computedStats.total}+ Reviews)` : '(128+ Reviews)');
         return (
             <div className="btb-badge-card btb-google-badge">
                 <div className="btb-badge-header">
@@ -61,9 +141,9 @@ const Layout = ({ itemsEls = [], ToolbarButton, MediaUpload, MediaUploadCheck, a
                     <div className="btb-badge-info">
                         <h4 className="btb-badge-title">{bt || 'Google Reviews'}</h4>
                         <div className="btb-badge-rating">
-                            <span className="score">{bs || '4.9'}</span>
+                            <span className="score">{score}</span>
                             <span className="stars">★★★★★</span>
-                            <span className="count">{bc || '(128+ Reviews)'}</span>
+                            <span className="count">{count}</span>
                         </div>
                     </div>
                 </div>
@@ -72,6 +152,8 @@ const Layout = ({ itemsEls = [], ToolbarButton, MediaUpload, MediaUploadCheck, a
     }
 
     if (layout === 'capterra-review-badge') {
+        const score = bs || (computedStats.total > 0 ? computedStats.avg : '4.8');
+        const count = bc || (computedStats.total > 0 ? `(${computedStats.total} Reviews)` : 'Verified Software Reviews');
         return (
             <div className="btb-badge-card btb-capterra-badge">
                 <div className="btb-badge-header">
@@ -79,9 +161,9 @@ const Layout = ({ itemsEls = [], ToolbarButton, MediaUpload, MediaUploadCheck, a
                     <div className="btb-badge-info">
                         <h4 className="btb-badge-title">{bt || 'Capterra Rating'}</h4>
                         <div className="btb-badge-rating">
-                            <span className="score">{bs || '4.8'}</span>
+                            <span className="score">{score}</span>
                             <span className="stars">★★★★★</span>
-                            <span className="count">{bc || 'Verified Software Reviews'}</span>
+                            <span className="count">{count}</span>
                         </div>
                     </div>
                 </div>
@@ -90,6 +172,8 @@ const Layout = ({ itemsEls = [], ToolbarButton, MediaUpload, MediaUploadCheck, a
     }
 
     if (layout === 'facebook-review-badge') {
+        const score = bs || (computedStats.total > 0 ? computedStats.avg : '5.0');
+        const count = bc || (computedStats.total > 0 ? `Recommended by ${computedStats.total} Customers` : 'Recommended by 250+ Customers');
         return (
             <div className="btb-badge-card btb-facebook-badge">
                 <div className="btb-badge-header">
@@ -97,9 +181,9 @@ const Layout = ({ itemsEls = [], ToolbarButton, MediaUpload, MediaUploadCheck, a
                     <div className="btb-badge-info">
                         <h4 className="btb-badge-title">{bt || 'Facebook Reviews'}</h4>
                         <div className="btb-badge-rating">
-                            <span className="score">{bs || '5.0'}</span>
+                            <span className="score">{score}</span>
                             <span className="stars">★★★★★</span>
-                            <span className="count">{bc || 'Recommended by 250+ Customers'}</span>
+                            <span className="count">{count}</span>
                         </div>
                     </div>
                 </div>
@@ -108,6 +192,8 @@ const Layout = ({ itemsEls = [], ToolbarButton, MediaUpload, MediaUploadCheck, a
     }
 
     if (layout === 'trustpilot-review-badge') {
+        const score = bs || (computedStats.total > 0 ? `${computedStats.avg} / 5` : '4.9 / 5');
+        const count = bc || (computedStats.total > 0 ? `TrustScore | ${computedStats.total} Reviews` : 'TrustScore | 500+ Reviews');
         return (
             <div className="btb-badge-card btb-trustpilot-badge">
                 <div className="btb-badge-header">
@@ -115,9 +201,9 @@ const Layout = ({ itemsEls = [], ToolbarButton, MediaUpload, MediaUploadCheck, a
                     <div className="btb-badge-info">
                         <h4 className="btb-badge-title">{bt || 'Trustpilot Score'}</h4>
                         <div className="btb-badge-rating">
-                            <span className="score">{bs || '4.9 / 5'}</span>
+                            <span className="score">{score}</span>
                             <span className="stars">★★★★★</span>
-                            <span className="count">{bc || 'TrustScore | 500+ Reviews'}</span>
+                            <span className="count">{count}</span>
                         </div>
                     </div>
                 </div>
@@ -126,6 +212,8 @@ const Layout = ({ itemsEls = [], ToolbarButton, MediaUpload, MediaUploadCheck, a
     }
 
     if (layout === 'g2-review-badge') {
+        const score = bs || (computedStats.total > 0 ? `${computedStats.avg} / 5` : '4.8 / 5');
+        const count = bc || 'Leader Category 2026';
         return (
             <div className="btb-badge-card btb-g2-badge">
                 <div className="btb-badge-header">
@@ -133,9 +221,9 @@ const Layout = ({ itemsEls = [], ToolbarButton, MediaUpload, MediaUploadCheck, a
                     <div className="btb-badge-info">
                         <h4 className="btb-badge-title">{bt || 'G2 High Performer'}</h4>
                         <div className="btb-badge-rating">
-                            <span className="score">{bs || '4.8 / 5'}</span>
+                            <span className="score">{score}</span>
                             <span className="stars">★★★★★</span>
-                            <span className="count">{bc || 'Leader Category 2026'}</span>
+                            <span className="count">{count}</span>
                         </div>
                     </div>
                 </div>
@@ -158,6 +246,8 @@ const Layout = ({ itemsEls = [], ToolbarButton, MediaUpload, MediaUploadCheck, a
     }
 
     if (layout === 'review-badge-widget') {
+        const score = bs || (computedStats.total > 0 ? computedStats.avg : '4.9');
+        const count = bc || (computedStats.total > 0 ? `Based on ${computedStats.total} reviews` : 'Based on 320+ reviews');
         return (
             <div className="btb-badge-card btb-review-widget">
                 <div className="btb-badge-header">
@@ -165,9 +255,9 @@ const Layout = ({ itemsEls = [], ToolbarButton, MediaUpload, MediaUploadCheck, a
                     <div className="btb-badge-info">
                         <h4 className="btb-badge-title">{bt || 'Customer Reviews'}</h4>
                         <div className="btb-badge-rating">
-                            <span className="score">{bs || '4.9'}</span>
+                            <span className="score">{score}</span>
                             <span className="stars">★★★★★</span>
-                            <span className="count">{bc || 'Based on 320+ reviews'}</span>
+                            <span className="count">{count}</span>
                         </div>
                     </div>
                 </div>
@@ -236,15 +326,28 @@ const Layout = ({ itemsEls = [], ToolbarButton, MediaUpload, MediaUploadCheck, a
     }
 
     if (layout === 'rating-summary') {
+        const displayScore = bs || (computedStats.total > 0 ? computedStats.avg : '4.8');
+        const displayCountText = bc || (computedStats.total > 0 ? `Based on ${computedStats.total} reviews` : 'Based on 256 reviews');
+
+        const defaultPcts = { 5: 78, 4: 15, 3: 4, 2: 2, 1: 1 };
+
+        const rows = [5, 4, 3, 2, 1].map(s => {
+            const count = computedStats.counts[s];
+            const pct = computedStats.total > 0 
+                ? Math.round((count / computedStats.total) * 100) 
+                : (attributes[`star${s}Pct`] ?? defaultPcts[s]);
+            return { star: s, pct, count };
+        });
+
         return (
             <div className="btb-rating-summary">
                 <div className="btb-rs-left">
-                    <span className="btb-rs-big-number">{bs || '4.8'}</span>
+                    <span className="btb-rs-big-number">{displayScore}</span>
                     <div className="btb-rs-stars">★★★★★</div>
-                    <span className="btb-rs-count">{bc || 'Based on 256 reviews'}</span>
+                    <span className="btb-rs-count">{displayCountText}</span>
                 </div>
                 <div className="btb-rs-bars">
-                    {[{star: 5, pct: 78}, {star: 4, pct: 15}, {star: 3, pct: 4}, {star: 2, pct: 2}, {star: 1, pct: 1}].map(r => (
+                    {rows.map(r => (
                         <div key={r.star} className="btb-rs-bar-row">
                             <span className="btb-rs-bar-label">{r.star} ★</span>
                             <div className="btb-rs-bar-track"><div className="btb-rs-bar-fill" style={{ width: `${r.pct}%` }}></div></div>
@@ -257,14 +360,36 @@ const Layout = ({ itemsEls = [], ToolbarButton, MediaUpload, MediaUploadCheck, a
     }
 
     if (layout === 'star-rating-bars') {
+        const defaultCounts = { 5: 184, 4: 46, 3: 15, 2: 7, 1: 3 };
+
+        const rows = [5, 4, 3, 2, 1].map(s => {
+            const overrideVal = attributes[`star${s}Count`];
+            let count;
+            if (overrideVal !== undefined && overrideVal !== '') {
+                count = Number(overrideVal);
+            } else if (computedStats.total > 0) {
+                count = computedStats.counts[s];
+            } else {
+                count = defaultCounts[s];
+            }
+            return { star: s, count };
+        });
+
+        const totalCountSum = rows.reduce((sum, r) => sum + r.count, 0);
+
+        const rowsWithPct = rows.map(r => {
+            const pct = totalCountSum > 0 ? Math.round((r.count / totalCountSum) * 100) : 0;
+            return { ...r, pct };
+        });
+
         return (
             <div className="btb-star-rating-bars">
                 <h4 className="btb-srb-title">{bt || 'Rating Breakdown'}</h4>
-                {[{star: 5, pct: 72, count: 184}, {star: 4, pct: 18, count: 46}, {star: 3, pct: 6, count: 15}, {star: 2, pct: 3, count: 7}, {star: 1, pct: 1, count: 3}].map(r => (
+                {rowsWithPct.map(r => (
                     <div key={r.star} className="btb-srb-row">
-                        <span className="btb-srb-label">{r.star} Star</span>
+                        <span className="btb-srb-label">{r.star} {r.star === 1 ? 'Star' : 'Stars'}</span>
                         <div className="btb-srb-track"><div className="btb-srb-fill" style={{ width: `${r.pct}%` }}></div></div>
-                        <span className="btb-srb-count">{r.count}</span>
+                        <span className="btb-srb-count">{r.count} ({r.pct}%)</span>
                     </div>
                 ))}
             </div>
@@ -272,23 +397,36 @@ const Layout = ({ itemsEls = [], ToolbarButton, MediaUpload, MediaUploadCheck, a
     }
 
     if (layout === 'testimonial-stats') {
+        const fiveStarCount = computedStats.counts[5];
+        const calcAvg = computedStats.total > 0 ? computedStats.avg : '4.9';
+        const calc5Star = computedStats.total > 0 ? `${fiveStarCount}` : '500+';
+
+        const stat1Num = bs || (computedStats.total > 0 ? `${computedStats.total}+` : '10K+');
+        const stat1Label = bt || 'Happy Customers';
+        const stat2Num = bc || '98%';
+        const stat2Label = bd || 'Satisfaction Rate';
+        const stat3Num = attributes.stat3Number || calcAvg;
+        const stat3Label = attributes.stat3Label || 'Average Rating';
+        const stat4Num = attributes.stat4Number || calc5Star;
+        const stat4Label = attributes.stat4Label || '5-Star Reviews';
+
         return (
             <div className="btb-stats-grid">
                 <div className="btb-stat-card">
-                    <span className="btb-stat-number">{bs || '10K+'}</span>
-                    <span className="btb-stat-label">{bt || 'Happy Customers'}</span>
+                    <span className="btb-stat-number">{stat1Num}</span>
+                    <span className="btb-stat-label">{stat1Label}</span>
                 </div>
                 <div className="btb-stat-card">
-                    <span className="btb-stat-number">{bc || '98%'}</span>
-                    <span className="btb-stat-label">{bd || 'Satisfaction Rate'}</span>
+                    <span className="btb-stat-number">{stat2Num}</span>
+                    <span className="btb-stat-label">{stat2Label}</span>
                 </div>
                 <div className="btb-stat-card">
-                    <span className="btb-stat-number">4.9</span>
-                    <span className="btb-stat-label">Average Rating</span>
+                    <span className="btb-stat-number">{stat3Num}</span>
+                    <span className="btb-stat-label">{stat3Label}</span>
                 </div>
                 <div className="btb-stat-card">
-                    <span className="btb-stat-number">500+</span>
-                    <span className="btb-stat-label">5-Star Reviews</span>
+                    <span className="btb-stat-number">{stat4Num}</span>
+                    <span className="btb-stat-label">{stat4Label}</span>
                 </div>
             </div>
         );
@@ -407,57 +545,49 @@ const Layout = ({ itemsEls = [], ToolbarButton, MediaUpload, MediaUploadCheck, a
     }
 
     if (layout === 'video-testimonials') {
-        return (
-            <div className={`layoutSection btb-video-layout ${theme} columns-${desktop} columns-tablet-${tablet} columns-mobile-${mobile}`}>
-                {items.map((item, index) => (
-                    <div key={index} className="btb-video-card">
-                        <div className="btb-video-thumb">
-                            <img src={item.img?.url || 'https://templates.bplugins.com/wp-content/uploads/2025/02/p-29.png'} alt={item.name} />
-                            <div className="btb-video-play">
-                                <svg viewBox="0 0 24 24" width="48" height="48"><circle cx="12" cy="12" r="11" fill="rgba(0,0,0,0.6)"/><path fill="#fff" d="M10 8.64L15.27 12 10 15.36V8.64z"/></svg>
-                            </div>
-                        </div>
-                        <div className="btb-video-info">
-                            <h4>{item.name}</h4>
-                            <span>{item.deg}</span>
-                        </div>
-                    </div>
-                ))}
-            </div>
-        );
-    }
+        const videoGridVars = {
+            '--cols-d': desktop || 3,
+            '--cols-t': tablet || 2,
+            '--cols-m': mobile || 1,
+            '--col-gap': columnGap || '30px',
+            '--row-gap': rowGap || '30px',
+            '--accent': attributes.accentColor || '#0575e6',
+        };
 
-    if (layout === 'before-after') {
         return (
-            <div className="btb-before-after">
-                <h4 className="btb-ba-title">{bt || 'Before & After Using Our Product'}</h4>
-                <div className="btb-ba-columns">
-                    <div className="btb-ba-col btb-ba-before">
-                        <span className="btb-ba-label">Before</span>
-                        <div className="btb-ba-content">
-                            {items[0] && <p>"{items[0].reviewText}"</p>}
-                            {items[0] && <span className="btb-ba-author">— {items[0].name}</span>}
-                        </div>
-                    </div>
-                    <div className="btb-ba-col btb-ba-after">
-                        <span className="btb-ba-label">After</span>
-                        <div className="btb-ba-content">
-                            {items[1] && <p>"{items[1].reviewText}"</p>}
-                            {items[1] && <span className="btb-ba-author">— {items[1].name}</span>}
-                        </div>
-                    </div>
+            <div className="bVideoTestimonials">
+                <div className="videos-grid" style={videoGridVars}>
+                    {items.map((item, index) => (
+                        <VideoCard key={index} item={item} accentColor={attributes.accentColor} />
+                    ))}
                 </div>
             </div>
         );
     }
 
+    if (layout === 'before-after') {
+        return <BeforeAfterSlider attributes={attributes} />;
+    }
+
+
     if (layout === 'case-study-card') {
         return (
             <div className={`btb-case-study-grid columns-${desktop} columns-tablet-${tablet} columns-mobile-${mobile}`}>
                 {items.map((item, index) => {
-                    const challengeText = item.challenge ?? 'The customer needed a reliable solution to improve their workflow.';
-                    const solutionText = item.solution ?? item.reviewText ?? 'It is a long-established fact that a reader will be distracted by the readable content of a page when looking at its layout';
-                    const resultText = item.result ?? '95% improvement in efficiency and customer satisfaction.';
+                    const sections = item.sections || [
+                        {
+                            title: item.challengeTitle ?? item.challengeLabel ?? 'Challenge',
+                            content: item.challenge ?? 'The customer needed a reliable solution to improve their workflow.'
+                        },
+                        {
+                            title: item.solutionTitle ?? item.solutionLabel ?? 'Solution',
+                            content: item.solution ?? item.reviewText ?? 'It is a long-established fact that a reader will be distracted by the readable content of a page when looking at its layout'
+                        },
+                        {
+                            title: item.resultTitle ?? item.resultLabel ?? 'Result',
+                            content: item.result ?? '95% improvement in efficiency and customer satisfaction.'
+                        }
+                    ];
 
                     return (
                         <div key={index} className="btb-case-study">
@@ -469,18 +599,12 @@ const Layout = ({ itemsEls = [], ToolbarButton, MediaUpload, MediaUploadCheck, a
                                 </div>
                             </div>
                             <div className="btb-cs-body">
-                                <div className="btb-cs-section">
-                                    <span className="btb-cs-label">Challenge</span>
-                                    <p>{challengeText}</p>
-                                </div>
-                                <div className="btb-cs-section">
-                                    <span className="btb-cs-label">Solution</span>
-                                    <p>{solutionText}</p>
-                                </div>
-                                <div className="btb-cs-section">
-                                    <span className="btb-cs-label">Result</span>
-                                    <p>{resultText}</p>
-                                </div>
+                                {sections.map((sec, secIdx) => (
+                                    <div key={secIdx} className="btb-cs-section">
+                                        {sec.title && <span className="btb-cs-label">{sec.title}</span>}
+                                        {sec.content && <p>{sec.content}</p>}
+                                    </div>
+                                ))}
                             </div>
                         </div>
                     );
@@ -545,13 +669,84 @@ const Layout = ({ itemsEls = [], ToolbarButton, MediaUpload, MediaUploadCheck, a
     }
 
     if (layout === 'testimonials-card-stack') {
+        const totalItems = items.length;
+        const currentIdx = typeof setActiveIndex === 'function' ? (activeIndex || 0) : cardStackIdx;
+        const activeIdx = totalItems > 0 ? (currentIdx % totalItems + totalItems) % totalItems : 0;
+
+        const updateStackActive = (newIdx) => {
+            setCardStackIdx(newIdx);
+            if (typeof setActiveIndex === 'function') {
+                setActiveIndex(newIdx);
+            }
+        };
+
+        const nextCard = (e) => {
+            if (e) e.preventDefault();
+            if (totalItems > 1) {
+                updateStackActive((activeIdx + 1) % totalItems);
+            }
+        };
+
+        const prevCard = (e) => {
+            if (e) e.preventDefault();
+            if (totalItems > 1) {
+                updateStackActive((activeIdx - 1 + totalItems) % totalItems);
+            }
+        };
+
         return (
-            <div className="btb-card-stack-layout">
-                {items.map((item, index) => (
-                    <div key={index} className="btb-stacked-card" style={{ transform: `rotate(${(index - 1) * 2}deg)`, zIndex: items.length - index }}>
-                        {themeSelect(item, index)}
+            <div className={`btb-card-stack-wrapper ${isBackend ? 'is-editing' : ''}`}>
+                <div className="btb-card-stack-layout" data-active-index={activeIdx} data-total-items={totalItems}>
+                    {items.map((item, index) => {
+                        const pos = totalItems > 0 ? (index - activeIdx + totalItems) % totalItems : 0;
+                        const isTop = pos === 0;
+                        const isVisibleBehind = pos > 0 && pos <= 2;
+                        
+                        return (
+                            <div
+                                key={index}
+                                className={`btb-stacked-card ${isTop ? 'is-top' : ''} ${isVisibleBehind ? `is-behind-${pos}` : 'is-hidden'}`}
+                                data-index={index}
+                                data-stack-pos={pos}
+                                style={{
+                                    zIndex: isTop ? 10 : 10 - pos,
+                                }}
+                                onClick={() => {
+                                    if (isBackend) {
+                                        updateStackActive(index);
+                                    }
+                                }}
+                            >
+                                {themeSelect(item, index)}
+                            </div>
+                        );
+                    })}
+                </div>
+
+                {totalItems > 1 && (
+                    <div className="btb-stack-controls">
+                        <button type="button" className="btb-stack-btn btb-stack-prev" onClick={prevCard} aria-label="Previous card">
+                            ‹
+                        </button>
+                        <div className="btb-stack-dots">
+                            {items.map((_, idx) => (
+                                <button
+                                    key={idx}
+                                    type="button"
+                                    className={`btb-stack-dot ${idx === activeIdx ? 'is-active' : ''}`}
+                                    onClick={(e) => {
+                                        e.preventDefault();
+                                        updateStackActive(idx);
+                                    }}
+                                    aria-label={`Go to card ${idx + 1}`}
+                                />
+                            ))}
+                        </div>
+                        <button type="button" className="btb-stack-btn btb-stack-next" onClick={nextCard} aria-label="Next card">
+                            ›
+                        </button>
                     </div>
-                ))}
+                )}
             </div>
         );
     }
@@ -574,6 +769,7 @@ const Layout = ({ itemsEls = [], ToolbarButton, MediaUpload, MediaUploadCheck, a
                         );
                     case 'slider':
                     case 'slider-3d':
+                    case 'coverflow':
                         return <Slider attributes={attributes} itemsEls={itemsEls} itemProps={itemProps} />;
                     case 'marquee':
                         return <Marquee items={items} themeSelect={themeSelect} columnGap={columnGap} isBackend={isBackend} />;

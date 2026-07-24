@@ -72,3 +72,19 @@ export const htmlTagsStrip = (str) => {
 
     return str.replace(/(<([^>]+)>)/ig, '');
 }
+
+export const getVideoEmbed = ( url ) => {
+	if ( ! url ) return '';
+	
+	const ytMatch = url.match( /(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=))([\w-]{11})/ );
+	if ( ytMatch && ytMatch[ 1 ] ) {
+		return `<iframe src="https://www.youtube.com/embed/${ ytMatch[ 1 ] }?autoplay=1" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>`;
+	}
+
+	const vimeoMatch = url.match( /vimeo\.com\/(?:video\/)?(\d+)/ );
+	if ( vimeoMatch && vimeoMatch[ 1 ] ) {
+		return `<iframe src="https://player.vimeo.com/video/${ vimeoMatch[ 1 ] }?autoplay=1" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen></iframe>`;
+	}
+
+	return `<video src="${ url }" controls autoplay></video>`;
+};

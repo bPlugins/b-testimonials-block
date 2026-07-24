@@ -1,2 +1,47 @@
-.btb-stat-row .btb-stat-inline{display:flex;gap:8px}.btb-stat-row .btb-stat-inline>.components-base-control{flex:1}.btb-stat-row hr{border:0;border-top:1px solid #f0f0f0;margin:12px 0}
-.bTestimonialStats .stats-grid{display:grid;gap:var(--row-gap,30px) var(--col-gap,30px);grid-template-columns:repeat(var(--cols-d,3),1fr)}.bTestimonialStats .stat-item{text-align:center}.bTestimonialStats .stat-value{color:var(--accent,#0575e6);font-size:44px;font-weight:800;line-height:1.1}.bTestimonialStats .stat-label{color:#7b7b7b;font-size:16px;margin-top:6px}@media(max-width:768px){.bTestimonialStats .stats-grid{grid-template-columns:repeat(var(--cols-t,3),1fr)}}@media(max-width:576px){.bTestimonialStats .stats-grid{grid-template-columns:repeat(var(--cols-m,1),1fr)}}
+/*!***************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** css ./node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[4].use[1]!./node_modules/postcss-loader/dist/cjs.js??ruleSet[1].rules[4].use[2]!./node_modules/sass-loader/dist/cjs.js??ruleSet[1].rules[4].use[3]!./src/blocks/testimonial-stats/edit.scss ***!
+  \***************************************************************************************************************************************************************************************************************************************************************/
+.btb-stat-row .btb-stat-inline {
+  display: flex;
+  gap: 8px;
+}
+.btb-stat-row .btb-stat-inline > .components-base-control {
+  flex: 1;
+}
+.btb-stat-row hr {
+  border: 0;
+  border-top: 1px solid #f0f0f0;
+  margin: 12px 0;
+}
+/*!*****************************************************************************************************************************************************************************************************************************************************!*\
+  !*** css ./node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[4].use[1]!./node_modules/postcss-loader/dist/cjs.js??ruleSet[1].rules[4].use[2]!./node_modules/sass-loader/dist/cjs.js??ruleSet[1].rules[4].use[3]!./src/shared/styles/stats.scss ***!
+  \*****************************************************************************************************************************************************************************************************************************************************/
+.bTestimonialStats .stats-grid {
+  display: grid;
+  gap: var(--row-gap, 30px) var(--col-gap, 30px);
+  grid-template-columns: repeat(var(--cols-d, 3), 1fr);
+}
+.bTestimonialStats .stat-item {
+  text-align: center;
+}
+.bTestimonialStats .stat-value {
+  font-size: 44px;
+  font-weight: 800;
+  line-height: 1.1;
+  color: var(--accent, #0575e6);
+}
+.bTestimonialStats .stat-label {
+  margin-top: 6px;
+  font-size: 16px;
+  color: #7b7b7b;
+}
+@media (max-width: 768px) {
+  .bTestimonialStats .stats-grid {
+    grid-template-columns: repeat(var(--cols-t, 3), 1fr);
+  }
+}
+@media (max-width: 576px) {
+  .bTestimonialStats .stats-grid {
+    grid-template-columns: repeat(var(--cols-m, 1), 1fr);
+  }
+}

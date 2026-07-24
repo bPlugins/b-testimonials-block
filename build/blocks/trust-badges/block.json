@@ -88,26 +88,6 @@
     "layout": {
       "type": "string",
       "default": "trust-badges"
-    },
-    "theme": {
-      "type": "string",
-      "default": "default"
-    },
-    "badgeTitle": {
-      "type": "string",
-      "default": ""
-    },
-    "badgeDesc": {
-      "type": "string",
-      "default": ""
-    },
-    "badgeScore": {
-      "type": "string",
-      "default": ""
-    },
-    "badgeCount": {
-      "type": "string",
-      "default": ""
     }
   }
 }

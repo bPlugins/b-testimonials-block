@@ -55,26 +55,6 @@
 		"layout": {
 			"type": "string",
 			"default": "comparison-testimonial-table"
-		},
-		"theme": {
-			"type": "string",
-			"default": "default"
-		},
-		"badgeTitle": {
-			"type": "string",
-			"default": ""
-		},
-		"badgeDesc": {
-			"type": "string",
-			"default": ""
-		},
-		"badgeScore": {
-			"type": "string",
-			"default": ""
-		},
-		"badgeCount": {
-			"type": "string",
-			"default": ""
 		}
 	},
 	"supports": {

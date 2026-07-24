@@ -1,1 +1,44 @@
-.bRatingSummary{align-items:center;display:flex;flex-wrap:wrap;gap:12px}.bRatingSummary.is-stacked{align-items:center;flex-direction:column;gap:6px;text-align:center}.bRatingSummary .rs-score{font-size:34px;font-weight:800;line-height:1}.bRatingSummary .rs-stars{display:inline-block;font-size:26px;line-height:1;position:relative;white-space:nowrap}.bRatingSummary .rs-stars-base{color:#dcdcdc}.bRatingSummary .rs-stars-fill{color:#ff8c02;left:0;overflow:hidden;position:absolute;top:0;white-space:nowrap}.bRatingSummary .rs-count{color:#7b7b7b;font-size:15px}
+/*!**************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** css ./node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[4].use[1]!./node_modules/postcss-loader/dist/cjs.js??ruleSet[1].rules[4].use[2]!./node_modules/sass-loader/dist/cjs.js??ruleSet[1].rules[4].use[3]!./src/shared/styles/rating-summary.scss ***!
+  \**************************************************************************************************************************************************************************************************************************************************************/
+.bRatingSummary {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.bRatingSummary.is-stacked {
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 6px;
+}
+.bRatingSummary .rs-score {
+  font-size: 34px;
+  font-weight: 800;
+  line-height: 1;
+}
+.bRatingSummary .rs-stars {
+  position: relative;
+  display: inline-block;
+  font-size: 26px;
+  line-height: 1;
+  white-space: nowrap;
+}
+.bRatingSummary .rs-stars-base {
+  color: #dcdcdc;
+}
+.bRatingSummary .rs-stars-fill {
+  position: absolute;
+  top: 0;
+  left: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  color: #ff8c02;
+}
+.bRatingSummary .rs-count {
+  font-size: 15px;
+  color: #7b7b7b;
+}
+
+/*# sourceMappingURL=index.css.map*/

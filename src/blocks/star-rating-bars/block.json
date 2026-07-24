@@ -33,6 +33,24 @@
 					"deg": "Developer",
 					"reviewText": "It is a long-established fact that a reader will be distracted by the readable content of a page when looking at its layout",
 					"rating": 5
+				},
+				{
+					"img": {
+						"url": "https://templates.bplugins.com/wp-content/uploads/2025/02/p-29.png"
+					},
+					"name": "Jane Smith",
+					"deg": "Designer",
+					"reviewText": "Great experience working with this plugin!",
+					"rating": 5
+				},
+				{
+					"img": {
+						"url": "https://templates.bplugins.com/wp-content/uploads/2025/02/p-29.png"
+					},
+					"name": "Alex Johnson",
+					"deg": "Manager",
+					"reviewText": "Solid functionality and easy setup.",
+					"rating": 4
 				}
 			]
 		},
@@ -56,26 +74,23 @@
 			"type": "string",
 			"default": "star-rating-bars"
 		},
-		"theme": {
+		"dataSource": {
 			"type": "string",
-			"default": "default"
+			"default": "manual"
+		},
+		"query": {
+			"type": "object",
+			"default": {}
 		},
 		"badgeTitle": {
 			"type": "string",
-			"default": ""
+			"default": "Rating Breakdown"
 		},
-		"badgeDesc": {
-			"type": "string",
-			"default": ""
-		},
-		"badgeScore": {
-			"type": "string",
-			"default": ""
-		},
-		"badgeCount": {
-			"type": "string",
-			"default": ""
-		}
+		"star5Count": { "type": "string", "default": "" },
+		"star4Count": { "type": "string", "default": "" },
+		"star3Count": { "type": "string", "default": "" },
+		"star2Count": { "type": "string", "default": "" },
+		"star1Count": { "type": "string", "default": "" }
 	},
 	"supports": {
 		"align": [

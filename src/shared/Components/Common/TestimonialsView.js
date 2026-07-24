@@ -10,8 +10,8 @@ import ExpandButton from './ExpandButton';
  */
 const TestimonialsView = ( { attributes, clientId } ) => {
 	const cId = clientId ?? attributes.cId;
-	const { items = [], elements, textLength } = attributes;
-	const { expandBtn } = elements;
+	const { items = [], elements = {}, textLength } = attributes;
+	const { expandBtn } = elements || {};
 
 	const itemsEls = items.map( ( item ) => {
 		const { name, deg, reviewText } = item;

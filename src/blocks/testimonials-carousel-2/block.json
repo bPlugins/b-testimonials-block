@@ -54,27 +54,11 @@
 		},
 		"layout": {
 			"type": "string",
-			"default": "slider"
+			"default": "coverflow"
 		},
 		"theme": {
 			"type": "string",
 			"default": "theme_2"
-		},
-		"badgeTitle": {
-			"type": "string",
-			"default": ""
-		},
-		"badgeDesc": {
-			"type": "string",
-			"default": ""
-		},
-		"badgeScore": {
-			"type": "string",
-			"default": ""
-		},
-		"badgeCount": {
-			"type": "string",
-			"default": ""
 		}
 	},
 	"supports": {

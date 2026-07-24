@@ -32,9 +32,26 @@
 					"name": "John Doe",
 					"deg": "Developer",
 					"reviewText": "It is a long-established fact that a reader will be distracted by the readable content of a page when looking at its layout",
+					"challengeTitle": "Challenge",
 					"challenge": "The customer needed a reliable solution to improve their workflow.",
+					"solutionTitle": "Solution",
 					"solution": "It is a long-established fact that a reader will be distracted by the readable content of a page when looking at its layout",
+					"resultTitle": "Result",
 					"result": "95% improvement in efficiency and customer satisfaction.",
+					"sections": [
+						{
+							"title": "Challenge",
+							"content": "The customer needed a reliable solution to improve their workflow."
+						},
+						{
+							"title": "Solution",
+							"content": "It is a long-established fact that a reader will be distracted by the readable content of a page when looking at its layout"
+						},
+						{
+							"title": "Result",
+							"content": "95% improvement in efficiency and customer satisfaction."
+						}
+					],
 					"rating": 5
 				}
 			]
@@ -62,22 +79,6 @@
 		"theme": {
 			"type": "string",
 			"default": "default"
-		},
-		"badgeTitle": {
-			"type": "string",
-			"default": ""
-		},
-		"badgeDesc": {
-			"type": "string",
-			"default": ""
-		},
-		"badgeScore": {
-			"type": "string",
-			"default": ""
-		},
-		"badgeCount": {
-			"type": "string",
-			"default": ""
 		}
 	},
 	"supports": {

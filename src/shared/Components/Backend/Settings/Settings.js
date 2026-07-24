@@ -59,6 +59,17 @@ const Settings = ({ attributes = {}, setAttributes, updateItem, activeIndex, set
     const [device, setDevice] = useState('desktop');
     const { autoPlay = true, mouseWheel = true, navigation = true } = (slider && typeof slider === 'object') ? slider : {};
 
+    const singleItemBlocks = [
+        'verified-buyer-badge',
+        'trust-badges',
+        'testimonial-form',
+        'user-feedback-poll',
+        'social-proof-toast'
+    ];
+    const isSingleTestimonial = currentBlockName === 'bptmb/testimonials-single' || layout === 'single' || layout === 'testimonials-single';
+    const isSingleItemBlock = singleItemBlocks.includes(layout) || isSingleTestimonial;
+    const isCaseStudy = layout === 'case-study-card';
+
     const addItem = () => {
         setAttributes({
             items: [...items, {
@@ -101,34 +112,36 @@ const Settings = ({ attributes = {}, setAttributes, updateItem, activeIndex, set
                 {'general' === tab.name && <>
                     <BlockSwitcher clientId={clientId} currentBlockName={currentBlockName} />
 
-                    <PanelBody className='bPlPanelBody' title={__('Content Source', 'b-testimonials-block')}>
-                        <SelectControl
-                            label={__('Source', 'b-testimonials-block')}
-                            value={dataSource}
-                            options={[
-                                { label: __('Manual', 'b-testimonials-block'), value: 'manual' },
-                                { label: __('Testimonials (CPT)', 'b-testimonials-block'), value: 'cpt' },
-                            ]}
-                            onChange={val => setAttributes({ dataSource: val })}
-                        />
+                    {(!isSingleItemBlock || isSingleTestimonial) && (
+                        <PanelBody className='bPlPanelBody' title={__('Content Source', 'b-testimonials-block')}>
+                            <SelectControl
+                                label={__('Source', 'b-testimonials-block')}
+                                value={dataSource}
+                                options={[
+                                    { label: __('Manual', 'b-testimonials-block'), value: 'manual' },
+                                    { label: __('Testimonials (CPT)', 'b-testimonials-block'), value: 'cpt' },
+                                ]}
+                                onChange={val => setAttributes({ dataSource: val })}
+                            />
 
-                        {'cpt' === dataSource && <>
-                            <RangeControl label={__('Number', 'b-testimonials-block')} value={query?.number || 6} onChange={val => setAttributes({ query: { ...query, number: val } })} min={1} max={50} step={1} />
+                            {'cpt' === dataSource && <>
+                                <RangeControl label={__('Number', 'b-testimonials-block')} value={query?.number || 6} onChange={val => setAttributes({ query: { ...query, number: val } })} min={1} max={50} step={1} />
 
-                            <SelectControl label={__('Order By', 'b-testimonials-block')} value={query?.orderBy || 'date'} options={[
-                                { label: __('Date', 'b-testimonials-block'), value: 'date' },
-                                { label: __('Title', 'b-testimonials-block'), value: 'title' },
-                                { label: __('Menu Order', 'b-testimonials-block'), value: 'menu_order' },
-                            ]} onChange={val => setAttributes({ query: { ...query, orderBy: val } })} />
+                                <SelectControl label={__('Order By', 'b-testimonials-block')} value={query?.orderBy || 'date'} options={[
+                                    { label: __('Date', 'b-testimonials-block'), value: 'date' },
+                                    { label: __('Title', 'b-testimonials-block'), value: 'title' },
+                                    { label: __('Menu Order', 'b-testimonials-block'), value: 'menu_order' },
+                                ]} onChange={val => setAttributes({ query: { ...query, orderBy: val } })} />
 
-                            <SelectControl label={__('Order', 'b-testimonials-block')} value={query?.order || 'desc'} options={[
-                                { label: __('Descending', 'b-testimonials-block'), value: 'desc' },
-                                { label: __('Ascending', 'b-testimonials-block'), value: 'asc' },
-                            ]} onChange={val => setAttributes({ query: { ...query, order: val } })} />
+                                <SelectControl label={__('Order', 'b-testimonials-block')} value={query?.order || 'desc'} options={[
+                                    { label: __('Descending', 'b-testimonials-block'), value: 'desc' },
+                                    { label: __('Ascending', 'b-testimonials-block'), value: 'asc' },
+                                ]} onChange={val => setAttributes({ query: { ...query, order: val } })} />
 
-                            <p className='description'>{__('Manage testimonials under the Testimonials menu.', 'b-testimonials-block')}</p>
-                        </>}
-                    </PanelBody>
+                                <p className='description'>{__('Manage testimonials under the Testimonials menu.', 'b-testimonials-block')}</p>
+                            </>}
+                        </PanelBody>
+                    )}
 
                     {/* Context-aware Widget / Badge / Custom Block Settings */}
                     {(() => {
@@ -137,6 +150,74 @@ const Settings = ({ attributes = {}, setAttributes, updateItem, activeIndex, set
 
                         // Define context-specific labels per layout type
                         const fieldLabels = {
+                            'google-review-badge': {
+                                panel: 'Google Review Badge Settings',
+                                title: 'Badge Title',
+                                score: 'Rating Score',
+                                count: 'Review Count',
+                                titleHelp: 'Title for Google badge',
+                                scoreHelp: 'Rating score e.g. 4.9',
+                                countHelp: 'Total review count e.g. (128+ Reviews)',
+                            },
+                            'capterra-review-badge': {
+                                panel: 'Capterra Rating Badge Settings',
+                                title: 'Badge Title',
+                                score: 'Rating Score',
+                                count: 'Review Count / Text',
+                                titleHelp: 'Title for Capterra badge',
+                                scoreHelp: 'Rating score e.g. 4.8',
+                                countHelp: 'Subtext for Capterra badge',
+                            },
+                            'facebook-review-badge': {
+                                panel: 'Facebook Review Badge Settings',
+                                title: 'Badge Title',
+                                score: 'Rating Score',
+                                count: 'Recommendation Text',
+                                titleHelp: 'Title for Facebook badge',
+                                scoreHelp: 'Rating score e.g. 5.0',
+                                countHelp: 'Text e.g. Recommended by 250+ Customers',
+                            },
+                            'trustpilot-review-badge': {
+                                panel: 'Trustpilot Badge Settings',
+                                title: 'Badge Title',
+                                score: 'TrustScore',
+                                count: 'Review Count',
+                                titleHelp: 'Title for Trustpilot badge',
+                                scoreHelp: 'TrustScore e.g. 4.9 / 5',
+                                countHelp: 'Subtext e.g. TrustScore | 500+ Reviews',
+                            },
+                            'g2-review-badge': {
+                                panel: 'G2 Badge Settings',
+                                title: 'Badge Title',
+                                score: 'Rating Score',
+                                count: 'Category / Text',
+                                titleHelp: 'Title for G2 badge',
+                                scoreHelp: 'Rating score e.g. 4.8 / 5',
+                                countHelp: 'Subtext e.g. Leader Category 2026',
+                            },
+                            'verified-buyer-badge': {
+                                panel: 'Verified Buyer Badge Settings',
+                                title: 'Badge Title',
+                                desc: 'Description',
+                                titleHelp: 'Title for Verified badge',
+                                descHelp: 'Subtext e.g. All customer testimonials are authenticated & verified.',
+                            },
+                            'review-badge-widget': {
+                                panel: 'Review Badge Widget Settings',
+                                title: 'Widget Title',
+                                score: 'Rating Score',
+                                count: 'Review Count',
+                                titleHelp: 'Title for review widget',
+                                scoreHelp: 'Rating score e.g. 4.9',
+                                countHelp: 'Subtext e.g. Based on 320+ reviews',
+                            },
+                            'rating-summary': {
+                                panel: 'Rating Summary Settings',
+                                score: 'Overall Rating Score',
+                                count: 'Review Count Text',
+                                scoreHelp: 'Average score e.g. 4.8',
+                                countHelp: 'Subtext e.g. Based on 256 reviews',
+                            },
                             'before-after': {
                                 panel: 'Before & After Settings',
                                 title: 'Section Title',
@@ -220,20 +301,8 @@ const Settings = ({ attributes = {}, setAttributes, updateItem, activeIndex, set
                             },
                         };
 
-                        // Default labels for badge blocks
-                        const defaults = {
-                            panel: 'Badge & Widget Settings',
-                            title: 'Badge / Widget Title',
-                            desc: 'Description / Subtitle',
-                            score: 'Score / Rating Number',
-                            count: 'Review Count / Extra Text',
-                            titleHelp: 'Customize title for badges, forms, polls, or score widgets.',
-                            descHelp: 'Customize description text.',
-                            scoreHelp: 'Customize rating score e.g. 4.9 or 100%.',
-                            countHelp: 'Customize review count or subtitle badge info.',
-                        };
-
-                        const labels = fieldLabels[layout] || defaults;
+                        const labels = fieldLabels[layout];
+                        if (!labels) return null;
 
                         return (
                             <PanelBody className='bPlPanelBody' title={__(labels.panel, 'b-testimonials-block')} initialOpen={true}>
@@ -261,35 +330,59 @@ const Settings = ({ attributes = {}, setAttributes, updateItem, activeIndex, set
                                     onChange={val => setAttributes({ badgeCount: val })}
                                     help={labels.countHelp ? __(labels.countHelp, 'b-testimonials-block') : ''}
                                 />}
+                                {layout === 'star-rating-bars' && (
+                                    <>
+                                        <hr style={{ margin: '15px 0', borderColor: '#e2e8f0' }} />
+                                        <Label>{__('Manual Star Counts (Optional Overrides):', 'b-testimonials-block')}</Label>
+                                        <TextControl
+                                            className='mt5'
+                                            label={__('5-Star Count', 'b-testimonials-block')}
+                                            type="number"
+                                            value={attributes.star5Count ?? ''}
+                                            onChange={val => setAttributes({ star5Count: val })}
+                                            help={__('Overrides automatic count from items', 'b-testimonials-block')}
+                                        />
+                                        <TextControl
+                                            className='mt5'
+                                            label={__('4-Star Count', 'b-testimonials-block')}
+                                            type="number"
+                                            value={attributes.star4Count ?? ''}
+                                            onChange={val => setAttributes({ star4Count: val })}
+                                        />
+                                        <TextControl
+                                            className='mt5'
+                                            label={__('3-Star Count', 'b-testimonials-block')}
+                                            type="number"
+                                            value={attributes.star3Count ?? ''}
+                                            onChange={val => setAttributes({ star3Count: val })}
+                                        />
+                                        <TextControl
+                                            className='mt5'
+                                            label={__('2-Star Count', 'b-testimonials-block')}
+                                            type="number"
+                                            value={attributes.star2Count ?? ''}
+                                            onChange={val => setAttributes({ star2Count: val })}
+                                        />
+                                        <TextControl
+                                            className='mt5'
+                                            label={__('1-Star Count', 'b-testimonials-block')}
+                                            type="number"
+                                            value={attributes.star1Count ?? ''}
+                                            onChange={val => setAttributes({ star1Count: val })}
+                                        />
+                                    </>
+                                )}
                             </PanelBody>
                         );
                     })()}
 
-                    {/* Hide repeater buttons for single-card / widget blocks (excluding case-study-card which supports multiple cards) */}
+                    {/* Hide Card Content Settings panel for single item review badges / widgets (except single testimonial block) */}
                     {(() => {
-                        const singleItemBlocks = [
-                            'google-review-badge',
-                            'capterra-review-badge',
-                            'facebook-review-badge',
-                            'trustpilot-review-badge',
-                            'g2-review-badge',
-                            'verified-buyer-badge',
-                            'review-badge-widget',
-                            'trust-badges',
-                            'testimonial-form',
-                            'user-feedback-poll',
-                            'rating-summary',
-                            'star-rating-bars',
-                            'testimonial-stats',
-                            'social-proof-toast'
-                        ];
-                        const isSingleItemBlock = singleItemBlocks.includes(layout);
-                        const isCaseStudy = layout === 'case-study-card';
-
                         if ('manual' !== dataSource) return null;
+                        if (isSingleItemBlock && !isSingleTestimonial) return null;
 
                         return (
-                            <PanelBody className='bPlPanelBody addRemoveItems editItem' title={isSingleItemBlock ? __('Card Content Settings', 'b-testimonials-block') : __('Add or Remove Case Study Cards', 'b-testimonials-block')}>
+                            <PanelBody className='bPlPanelBody addRemoveItems editItem' title={isSingleTestimonial ? __('Single Testimonial Settings', 'b-testimonials-block') : isCaseStudy ? __('Add or Remove Case Study Cards', 'b-testimonials-block') : __('Add or Remove Testimonial Cards', 'b-testimonials-block')}>
                                 {null !== activeIndex && <>
                                     {!isSingleItemBlock && <h3 className='bplItemTitle'>{__(`Card ${activeIndex + 1}:`, 'b-testimonials-block')}</h3>}
 
@@ -302,30 +395,78 @@ const Settings = ({ attributes = {}, setAttributes, updateItem, activeIndex, set
 
                                     {isCaseStudy ? (
                                         <>
-                                            <TextareaControl
-                                                className='mt10'
-                                                label={__('Challenge', 'b-testimonials-block')}
-                                                value={currentItem.challenge ?? 'The customer needed a reliable solution to improve their workflow.'}
-                                                onChange={val => updateItem('challenge', val)}
-                                            />
-                                            <TextareaControl
-                                                className='mt10'
-                                                label={__('Solution', 'b-testimonials-block')}
-                                                value={currentItem.solution ?? reviewText ?? 'It is a long-established fact that a reader will be distracted by the readable content of a page when looking at its layout'}
-                                                onChange={val => updateItem('solution', val)}
-                                            />
-                                            <TextareaControl
-                                                className='mt10'
-                                                label={__('Result', 'b-testimonials-block')}
-                                                value={currentItem.result ?? '95% improvement in efficiency and customer satisfaction.'}
-                                                onChange={val => updateItem('result', val)}
-                                            />
+                                            {(() => {
+                                                const sections = currentItem.sections || [
+                                                    { title: currentItem.challengeTitle ?? 'Challenge', content: currentItem.challenge ?? 'The customer needed a reliable solution to improve their workflow.' },
+                                                    { title: currentItem.solutionTitle ?? 'Solution', content: currentItem.solution ?? reviewText ?? 'It is a long-established fact that a reader will be distracted by the readable content of a page when looking at its layout' },
+                                                    { title: currentItem.resultTitle ?? 'Result', content: currentItem.result ?? '95% improvement in efficiency and customer satisfaction.' }
+                                                ];
+
+                                                const updateSection = (secIdx, field, val) => {
+                                                    const newSections = sections.map((sec, i) => i === secIdx ? { ...sec, [field]: val } : sec);
+                                                    updateItem('sections', newSections);
+                                                };
+
+                                                const removeSection = (secIdx) => {
+                                                    const newSections = sections.filter((_, i) => i !== secIdx);
+                                                    updateItem('sections', newSections);
+                                                };
+
+                                                const addSection = () => {
+                                                    const newSections = [...sections, { title: 'New Section', content: '' }];
+                                                    updateItem('sections', newSections);
+                                                };
+
+                                                return (
+                                                    <div className='mt15 btb-case-study-sections'>
+                                                        <Label>{__('Case Study Sections:', 'b-testimonials-block')}</Label>
+                                                        {sections.map((sec, secIdx) => (
+                                                            <div key={secIdx} className='mt10 btb-section-card' style={{ border: '1px dashed #cbd5e1', borderRadius: '6px', padding: '10px', background: '#f8fafc' }}>
+                                                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                                                    <strong style={{ fontSize: '12px', color: '#475569' }}>{__(`Section ${secIdx + 1}`, 'b-testimonials-block')}</strong>
+                                                                    {sections.length > 1 && (
+                                                                        <Button
+                                                                            isDestructive
+                                                                            isSmall
+                                                                            variant='tertiary'
+                                                                            onClick={() => removeSection(secIdx)}
+                                                                            title={__('Remove Section', 'b-testimonials-block')}
+                                                                        >
+                                                                            <Dashicon icon='no' />
+                                                                        </Button>
+                                                                    )}
+                                                                </div>
+                                                                <TextControl
+                                                                    className='mt5'
+                                                                    label={__('Section Title', 'b-testimonials-block')}
+                                                                    value={sec.title ?? ''}
+                                                                    onChange={val => updateSection(secIdx, 'title', val)}
+                                                                />
+                                                                <TextareaControl
+                                                                    className='mt5'
+                                                                    label={__('Section Content', 'b-testimonials-block')}
+                                                                    value={sec.content ?? ''}
+                                                                    onChange={val => updateSection(secIdx, 'content', val)}
+                                                                />
+                                                            </div>
+                                                        ))}
+                                                        <Button
+                                                            className='mt10'
+                                                            variant='secondary'
+                                                            onClick={addSection}
+                                                            style={{ width: '100%', justifyContent: 'center' }}
+                                                        >
+                                                            <Dashicon icon='plus' />{__('Add New Section', 'b-testimonials-block')}
+                                                        </Button>
+                                                    </div>
+                                                );
+                                            })()}
                                         </>
                                     ) : (
                                         <TextareaControl className='mt10' label={__('Review / Quote Text', 'b-testimonials-block')} value={reviewText} onChange={val => updateItem('reviewText', val)} />
                                     )}
 
-                                    {!isSingleItemBlock && !isCaseStudy && (
+                                    {(!isSingleItemBlock || isSingleTestimonial) && !isCaseStudy && (
                                         <NumberControl className='mt10' label={__('Rating:', 'b-testimonials-block')} labelPosition='left' value={rating} onChange={val => updateItem('rating', val)} min={1} max={5} />
                                     )}
 
@@ -339,60 +480,66 @@ const Settings = ({ attributes = {}, setAttributes, updateItem, activeIndex, set
 
                                 {!isSingleItemBlock && (
                                     <div className='addItem'>
-                                        <Button label={__('Add New Case Study Card', 'b-testimonials-block')} onClick={addItem}><Dashicon icon='plus' size={23} />{__('Add New Case Study Card', 'b-testimonials-block')}</Button>
+                                        <Button label={isCaseStudy ? __('Add New Case Study Card', 'b-testimonials-block') : __('Add New Card', 'b-testimonials-block')} onClick={addItem}><Dashicon icon='plus' size={23} />{isCaseStudy ? __('Add New Case Study Card', 'b-testimonials-block') : __('Add New Card', 'b-testimonials-block')}</Button>
                                     </div>
                                 )}
                             </PanelBody>
                         );
                     })()}
 
-                    <PanelBody className='bPlPanelBody' title={__('Elements', 'b-testimonials-block')} initialOpen={false}>
-                        <ToggleControl className='mt10' label={__('Image', 'b-testimonials-block')} labelPosition='left' checked={elements?.img} onChange={val => updateObject('elements', 'img', val)} />
+                    {(!isSingleItemBlock || isSingleTestimonial) && (
+                        <>
+                            <PanelBody className='bPlPanelBody' title={__('Elements', 'b-testimonials-block')} initialOpen={false}>
+                                <ToggleControl className='mt10' label={__('Image', 'b-testimonials-block')} labelPosition='left' checked={elements?.img} onChange={val => updateObject('elements', 'img', val)} />
 
-                        <ToggleControl className='mt10' label={__('Name', 'b-testimonials-block')} labelPosition='left' checked={elements?.name} onChange={val => updateObject('elements', 'name', val)} />
+                                <ToggleControl className='mt10' label={__('Name', 'b-testimonials-block')} labelPosition='left' checked={elements?.name} onChange={val => updateObject('elements', 'name', val)} />
 
-                        <ToggleControl className='mt10' label={__('Designation', 'b-testimonials-block')} labelPosition='left' checked={elements?.deg} onChange={val => updateObject('elements', 'deg', val)} />
+                                <ToggleControl className='mt10' label={__('Designation', 'b-testimonials-block')} labelPosition='left' checked={elements?.deg} onChange={val => updateObject('elements', 'deg', val)} />
 
-                        <ToggleControl className='mt10' label={__('Review Text', 'b-testimonials-block')} labelPosition='left' checked={elements?.reviewText} onChange={val => updateObject('elements', 'reviewText', val)} />
+                                <ToggleControl className='mt10' label={__('Review Text', 'b-testimonials-block')} labelPosition='left' checked={elements?.reviewText} onChange={val => updateObject('elements', 'reviewText', val)} />
 
-                        <ToggleControl className='mt10' label={__('Rating', 'b-testimonials-block')} labelPosition='left' checked={elements?.icon} onChange={val => updateObject('elements', 'icon', val)} />
+                                <ToggleControl className='mt10' label={__('Rating', 'b-testimonials-block')} labelPosition='left' checked={elements?.icon} onChange={val => updateObject('elements', 'icon', val)} />
 
-                        <ToggleControl className='mt10' label={__('Expanded Button', 'b-testimonials-block')} labelPosition='left' checked={elements?.expandBtn} onChange={val => updateObject('elements', 'expandBtn', val)} />
-                    </PanelBody>
+                                <ToggleControl className='mt10' label={__('Expanded Button', 'b-testimonials-block')} labelPosition='left' checked={elements?.expandBtn} onChange={val => updateObject('elements', 'expandBtn', val)} />
+                            </PanelBody>
 
-                    {elements?.expandBtn && <PanelBody className='bPlPanelBody' title={__('Button', 'b-testimonials-block')} initialOpen={false}>
-                        <TextControl className='' label={__('Expand Text', 'b-testimonials-block')} value={elements?.expandText} onChange={val => updateObject('elements', 'expandText', val)} />
+                            {elements?.expandBtn && <PanelBody className='bPlPanelBody' title={__('Button', 'b-testimonials-block')} initialOpen={false}>
+                                <TextControl className='' label={__('Expand Text', 'b-testimonials-block')} value={elements?.expandText} onChange={val => updateObject('elements', 'expandText', val)} />
 
-                        <TextControl className='' label={__('Collapse Text', 'b-testimonials-block')} value={elements?.collapseText} onChange={val => updateObject('elements', 'collapseText', val)} />
-                    </PanelBody>}
+                                <TextControl className='' label={__('Collapse Text', 'b-testimonials-block')} value={elements?.collapseText} onChange={val => updateObject('elements', 'collapseText', val)} />
+                            </PanelBody>}
+                        </>
+                    )}
 
 
-                    <PanelBody className='bPlPanelBody' title={__('Layout', 'b-testimonials-block')} initialOpen={false}>
-                        <PanelRow>
-                            <Label className="mt0 mb0">{__('Layout:', 'b-testimonials-block')}</Label>
-                            <SelectControl value={layout} onChange={val => setAttributes({ layout: val })} options={layoutOpt} />
-                        </PanelRow>
+                    {(!isSingleItemBlock || isSingleTestimonial) && (
+                        <PanelBody className='bPlPanelBody' title={__('Layout', 'b-testimonials-block')} initialOpen={false}>
+                            <PanelRow>
+                                <Label className="mt0 mb0">{__('Layout:', 'b-testimonials-block')}</Label>
+                                <SelectControl value={layout} onChange={val => setAttributes({ layout: val })} options={layoutOpt} />
+                            </PanelRow>
 
-                        <PanelRow>
-                            <Label className="mt0 mb0">{__('Theme:', 'b-testimonials-block')}</Label>
-                            <SelectControl value={theme}
-                                onChange={val =>
-                                    setAttributes({ theme: val, ...checkTheme(val, border) })}
-                                options={themeOpt} />
-                        </PanelRow>
+                            <PanelRow>
+                                <Label className="mt0 mb0">{__('Theme:', 'b-testimonials-block')}</Label>
+                                <SelectControl value={theme}
+                                    onChange={val =>
+                                        setAttributes({ theme: val, ...checkTheme(val, border) })}
+                                    options={themeOpt} />
+                            </PanelRow>
 
-                        <PanelRow>
-                            <Label mt='0'>{__('Columns:', 'b-testimonials-block')}</Label>
-                            <BDevice device={device} onChange={val => setDevice(val)} />
-                        </PanelRow>
+                            <PanelRow>
+                                <Label mt='0'>{__('Columns:', 'b-testimonials-block')}</Label>
+                                <BDevice device={device} onChange={val => setDevice(val)} />
+                            </PanelRow>
 
-                        <RangeControl value={columns[device]} onChange={val => { setAttributes({ columns: { ...columns, [device]: val } }) }} min={1} max={6} step={1} beforeIcon='grid-view' />
+                            <RangeControl value={columns[device]} onChange={val => { setAttributes({ columns: { ...columns, [device]: val } }) }} min={1} max={6} step={1} beforeIcon='grid-view' />
 
-                        <UnitControl className='mt20' label={__('Column Gap:', 'b-testimonials-block')} labelPosition='left' value={columnGap} onChange={val => setAttributes({ columnGap: val })} units={[pxUnit(30), perUnit(3), emUnit(2)]} isResetValueOnUnitChange={true} />
+                            <UnitControl className='mt20' label={__('Column Gap:', 'b-testimonials-block')} labelPosition='left' value={columnGap} onChange={val => setAttributes({ columnGap: val })} units={[pxUnit(30), perUnit(3), emUnit(2)]} isResetValueOnUnitChange={true} />
 
-                        {layout !== "slider" && <UnitControl className='mt20' label={__('Row Gap:', 'b-testimonials-block')} labelPosition='left' value={rowGap} onChange={val => setAttributes({ rowGap: val })} units={[pxUnit(40), perUnit(3), emUnit(2.5)]} isResetValueOnUnitChange={true} />}
+                            {layout !== "slider" && <UnitControl className='mt20' label={__('Row Gap:', 'b-testimonials-block')} labelPosition='left' value={rowGap} onChange={val => setAttributes({ rowGap: val })} units={[pxUnit(40), perUnit(3), emUnit(2.5)]} isResetValueOnUnitChange={true} />}
 
-                    </PanelBody>
+                        </PanelBody>
+                    )}
 
                     {layout === 'slider' && <PanelBody className='bPlPanelBody' title={__('Slider', 'b-testimonials-block')} initialOpen={false}>
                         {/* <PanelRow>
@@ -465,11 +612,13 @@ const Settings = ({ attributes = {}, setAttributes, updateItem, activeIndex, set
             </>}</TabPanel>
         </InspectorControls>
 
-        <BlockControls>
-            <ToolbarGroup className='bPlToolbar'>
-                <ToolbarButton label={__('Add New Item', 'b-blocks')} onClick={addItem}><Dashicon icon='plus' size={23} /></ToolbarButton>
-            </ToolbarGroup>
-        </BlockControls>
+        {!isSingleItemBlock && (
+            <BlockControls>
+                <ToolbarGroup className='bPlToolbar'>
+                    <ToolbarButton label={__('Add New Item', 'b-blocks')} onClick={addItem}><Dashicon icon='plus' size={23} /></ToolbarButton>
+                </ToolbarGroup>
+            </BlockControls>
+        )}
     </>;
 };
 export default Settings;

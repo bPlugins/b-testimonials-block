@@ -50,51 +50,9 @@
       "type": "string",
       "default": "#0575e6"
     },
-    "columns": {
-      "type": "object",
-      "default": {
-        "desktop": 3,
-        "tablet": 2,
-        "mobile": 1
-      }
-    },
     "layout": {
       "type": "string",
       "default": "testimonial-form"
-    },
-    "theme": {
-      "type": "string",
-      "default": "default"
-    },
-    "items": {
-      "type": "array",
-      "default": [
-        {
-          "img": {
-            "url": "https://templates.bplugins.com/wp-content/uploads/2025/02/p-29.png"
-          },
-          "name": "John Doe",
-          "deg": "Developer",
-          "reviewText": "It is a long-established fact that a reader will be distracted by the readable content of a page when looking at its layout",
-          "rating": 5
-        }
-      ]
-    },
-    "badgeTitle": {
-      "type": "string",
-      "default": ""
-    },
-    "badgeDesc": {
-      "type": "string",
-      "default": ""
-    },
-    "badgeScore": {
-      "type": "string",
-      "default": ""
-    },
-    "badgeCount": {
-      "type": "string",
-      "default": ""
     }
   },
   "supports": {

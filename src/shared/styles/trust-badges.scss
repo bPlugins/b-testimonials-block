@@ -1,0 +1,48 @@
+.bTrustBadges {
+	.badges-grid {
+		display: grid;
+		gap: var(--row-gap, 30px) var(--col-gap, 30px);
+		grid-template-columns: repeat(var(--cols-d, 3), 1fr);
+	}
+
+	.badge-item {
+		display: flex;
+		align-items: center;
+		gap: 14px;
+		padding: 18px 20px;
+		border: 1px solid #ececec;
+		border-radius: 10px;
+		background: #fff;
+	}
+
+	.badge-icon {
+		width: 44px;
+		height: 44px;
+		object-fit: contain;
+		flex: 0 0 auto;
+	}
+
+	.badge-title {
+		margin: 0;
+		font-size: 16px;
+		font-weight: 700;
+	}
+
+	.badge-subtitle {
+		margin: 2px 0 0;
+		font-size: 14px;
+		color: #7b7b7b;
+	}
+
+	@media ( max-width: 768px ) {
+		.badges-grid {
+			grid-template-columns: repeat(var(--cols-t, 3), 1fr);
+		}
+	}
+
+	@media ( max-width: 576px ) {
+		.badges-grid {
+			grid-template-columns: repeat(var(--cols-m, 1), 1fr);
+		}
+	}
+}

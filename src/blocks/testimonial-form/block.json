@@ -1,11 +1,19 @@
 {
 	"$schema": "https://schemas.wp.org/trunk/block.json",
-	"apiVersion": 2,
+	"apiVersion": 3,
 	"name": "bptmb/testimonial-form",
 	"title": "Testimonial Form",
 	"description": "Let visitors submit their own testimonials. Submissions are saved as pending for review.",
 	"category": "bplugins",
-	"keywords": [ "testimonial", "form", "submit", "review" ],
+	"parent": [
+		"bptmb/b-testimonials"
+	],
+	"keywords": [
+		"testimonial",
+		"form",
+		"submit",
+		"review"
+	],
 	"textdomain": "b-testimonials-block",
 	"attributes": {
 		"align": {
@@ -41,15 +49,71 @@
 		"accentColor": {
 			"type": "string",
 			"default": "#0575e6"
+		},
+		"columns": {
+			"type": "object",
+			"default": {
+				"desktop": 3,
+				"tablet": 2,
+				"mobile": 1
+			}
+		},
+		"layout": {
+			"type": "string",
+			"default": "testimonial-form"
+		},
+		"theme": {
+			"type": "string",
+			"default": "default"
+		},
+		"items": {
+			"type": "array",
+			"default": [
+				{
+					"img": {
+						"url": "https://templates.bplugins.com/wp-content/uploads/2025/02/p-29.png"
+					},
+					"name": "John Doe",
+					"deg": "Developer",
+					"reviewText": "It is a long-established fact that a reader will be distracted by the readable content of a page when looking at its layout",
+					"rating": 5
+				}
+			]
+		},
+		"badgeTitle": {
+			"type": "string",
+			"default": ""
+		},
+		"badgeDesc": {
+			"type": "string",
+			"default": ""
+		},
+		"badgeScore": {
+			"type": "string",
+			"default": ""
+		},
+		"badgeCount": {
+			"type": "string",
+			"default": ""
 		}
 	},
 	"supports": {
-		"align": [ "wide", "full" ],
+		"align": [
+			"wide",
+			"full"
+		],
 		"html": false
 	},
-	"editorScript": [ "file:./index.js" ],
+	"editorScript": [
+		"file:./index.js"
+	],
 	"editorStyle": "file:./index.css",
-	"style": [ "file:./view.css" ],
+	"style": [
+		"file:./index.css",
+		"file:./view.css"
+	],
 	"render": "file:./render.php",
-	"viewScript": [ "file:./view.js" ]
+	"viewScript": [
+		"file:./view.js"
+	]
 }

@@ -1,11 +1,19 @@
 {
 	"$schema": "https://schemas.wp.org/trunk/block.json",
-	"apiVersion": 2,
+	"apiVersion": 3,
 	"name": "bptmb/client-logos",
 	"title": "Client Logos",
 	"description": "Show a trusted-by grid of client or partner logos.",
 	"category": "bplugins",
-	"keywords": [ "logos", "clients", "trusted by", "brands" ],
+	"parent": [
+		"bptmb/b-testimonials"
+	],
+	"keywords": [
+		"logos",
+		"clients",
+		"trusted by",
+		"brands"
+	],
 	"textdomain": "b-testimonials-block",
 	"attributes": {
 		"align": {
@@ -19,15 +27,39 @@
 		"logos": {
 			"type": "array",
 			"default": [
-				{ "img": { "url": "data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='60'%3E%3Crect width='160' height='60' rx='8' fill='%23e5e7eb'/%3E%3Ctext x='80' y='36' font-family='sans-serif' font-size='18' fill='%239ca3af' text-anchor='middle'%3ELogo%3C/text%3E%3C/svg%3E" }, "link": "" },
-				{ "img": { "url": "data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='60'%3E%3Crect width='160' height='60' rx='8' fill='%23e5e7eb'/%3E%3Ctext x='80' y='36' font-family='sans-serif' font-size='18' fill='%239ca3af' text-anchor='middle'%3ELogo%3C/text%3E%3C/svg%3E" }, "link": "" },
-				{ "img": { "url": "data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='60'%3E%3Crect width='160' height='60' rx='8' fill='%23e5e7eb'/%3E%3Ctext x='80' y='36' font-family='sans-serif' font-size='18' fill='%239ca3af' text-anchor='middle'%3ELogo%3C/text%3E%3C/svg%3E" }, "link": "" },
-				{ "img": { "url": "data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='60'%3E%3Crect width='160' height='60' rx='8' fill='%23e5e7eb'/%3E%3Ctext x='80' y='36' font-family='sans-serif' font-size='18' fill='%239ca3af' text-anchor='middle'%3ELogo%3C/text%3E%3C/svg%3E" }, "link": "" }
+				{
+					"img": {
+						"url": "data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='60'%3E%3Crect width='160' height='60' rx='8' fill='%23e5e7eb'/%3E%3Ctext x='80' y='36' font-family='sans-serif' font-size='18' fill='%239ca3af' text-anchor='middle'%3ELogo%3C/text%3E%3C/svg%3E"
+					},
+					"link": ""
+				},
+				{
+					"img": {
+						"url": "data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='60'%3E%3Crect width='160' height='60' rx='8' fill='%23e5e7eb'/%3E%3Ctext x='80' y='36' font-family='sans-serif' font-size='18' fill='%239ca3af' text-anchor='middle'%3ELogo%3C/text%3E%3C/svg%3E"
+					},
+					"link": ""
+				},
+				{
+					"img": {
+						"url": "data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='60'%3E%3Crect width='160' height='60' rx='8' fill='%23e5e7eb'/%3E%3Ctext x='80' y='36' font-family='sans-serif' font-size='18' fill='%239ca3af' text-anchor='middle'%3ELogo%3C/text%3E%3C/svg%3E"
+					},
+					"link": ""
+				},
+				{
+					"img": {
+						"url": "data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='60'%3E%3Crect width='160' height='60' rx='8' fill='%23e5e7eb'/%3E%3Ctext x='80' y='36' font-family='sans-serif' font-size='18' fill='%239ca3af' text-anchor='middle'%3ELogo%3C/text%3E%3C/svg%3E"
+					},
+					"link": ""
+				}
 			]
 		},
 		"columns": {
 			"type": "object",
-			"default": { "desktop": 4, "tablet": 3, "mobile": 2 }
+			"default": {
+				"desktop": 4,
+				"tablet": 3,
+				"mobile": 2
+			}
 		},
 		"columnGap": {
 			"type": "string",
@@ -44,15 +76,63 @@
 		"grayscale": {
 			"type": "boolean",
 			"default": true
+		},
+		"layout": {
+			"type": "string",
+			"default": "client-logos"
+		},
+		"theme": {
+			"type": "string",
+			"default": "default"
+		},
+		"items": {
+			"type": "array",
+			"default": [
+				{
+					"img": {
+						"url": "https://templates.bplugins.com/wp-content/uploads/2025/02/p-29.png"
+					},
+					"name": "John Doe",
+					"deg": "Developer",
+					"reviewText": "It is a long-established fact that a reader will be distracted by the readable content of a page when looking at its layout",
+					"rating": 5
+				}
+			]
+		},
+		"badgeTitle": {
+			"type": "string",
+			"default": ""
+		},
+		"badgeDesc": {
+			"type": "string",
+			"default": ""
+		},
+		"badgeScore": {
+			"type": "string",
+			"default": ""
+		},
+		"badgeCount": {
+			"type": "string",
+			"default": ""
 		}
 	},
 	"supports": {
-		"align": [ "wide", "full" ],
+		"align": [
+			"wide",
+			"full"
+		],
 		"html": false
 	},
-	"editorScript": [ "file:./index.js" ],
+	"editorScript": [
+		"file:./index.js"
+	],
 	"editorStyle": "file:./index.css",
-	"style": [ "file:./view.css" ],
-	"viewScript": [ "file:./view.js" ],
+	"style": [
+		"file:./index.css",
+		"file:./view.css"
+	],
+	"viewScript": [
+		"file:./view.js"
+	],
 	"render": "file:./render.php"
 }

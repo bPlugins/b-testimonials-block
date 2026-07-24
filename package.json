@@ -22,6 +22,7 @@
 	"dependencies": {
 		"immer": "^9.0.21",
 		"react-responsive-masonry": "^2.1.7",
+		"react-router-dom": "^7.18.1",
 		"swiper": "^11.2.10"
 	},
 	"devDependencies": {

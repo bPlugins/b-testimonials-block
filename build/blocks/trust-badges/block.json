@@ -1,0 +1,113 @@
+{
+  "$schema": "https://schemas.wp.org/trunk/block.json",
+  "apiVersion": 3,
+  "category": "bplugins",
+  "parent": [
+    "bptmb/b-testimonials"
+  ],
+  "textdomain": "b-testimonials-block",
+  "supports": {
+    "align": [
+      "wide",
+      "full"
+    ],
+    "html": false
+  },
+  "editorScript": [
+    "file:./index.js"
+  ],
+  "editorStyle": "file:./index.css",
+  "style": [
+    "file:./index.css",
+    "file:./view.css"
+  ],
+  "viewScript": [
+    "file:./view.js"
+  ],
+  "render": "file:./render.php",
+  "name": "bptmb/trust-badges",
+  "title": "Trust Badges",
+  "description": "A row of trust badges with a title and subtitle.",
+  "keywords": [
+    "trust",
+    "badges",
+    "guarantee",
+    "features"
+  ],
+  "attributes": {
+    "align": {
+      "type": "string",
+      "default": "wide"
+    },
+    "cId": {
+      "type": "string",
+      "default": ""
+    },
+    "items": {
+      "type": "array",
+      "default": [
+        {
+          "img": {
+            "url": ""
+          },
+          "title": "Verified reviews",
+          "subtitle": "100% authentic"
+        },
+        {
+          "img": {
+            "url": ""
+          },
+          "title": "Money-back",
+          "subtitle": "30-day guarantee"
+        },
+        {
+          "img": {
+            "url": ""
+          },
+          "title": "Secure",
+          "subtitle": "SSL protected"
+        }
+      ]
+    },
+    "columns": {
+      "type": "object",
+      "default": {
+        "desktop": 3,
+        "tablet": 3,
+        "mobile": 1
+      }
+    },
+    "columnGap": {
+      "type": "string",
+      "default": "30px"
+    },
+    "rowGap": {
+      "type": "string",
+      "default": "30px"
+    },
+    "layout": {
+      "type": "string",
+      "default": "trust-badges"
+    },
+    "theme": {
+      "type": "string",
+      "default": "default"
+    },
+    "badgeTitle": {
+      "type": "string",
+      "default": ""
+    },
+    "badgeDesc": {
+      "type": "string",
+      "default": ""
+    },
+    "badgeScore": {
+      "type": "string",
+      "default": ""
+    },
+    "badgeCount": {
+      "type": "string",
+      "default": ""
+    }
+  }
+}

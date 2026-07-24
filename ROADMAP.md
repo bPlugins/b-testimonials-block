@@ -59,16 +59,19 @@
 - [ ] **Google Reviews** (import) — external API + API key দরকার → **Pro / Phase 3b**
 - [ ] **Twitter / X Testimonials** — external API দরকার → **Pro / Phase 3b**
 
-## Phase 4 — Interaction + Trust (Block 13–20)
+## Phase 4 — Interaction + Trust — 🚧 চলমান
 
-- [ ] Block 13: **Tabs**
-- [ ] Block 14: **Accordion**
-- [ ] Block 15: **Popup / Modal**
-- [ ] Block 16: **Rating Summary** (aggregate stars + count)
-- [ ] Block 17: **Stats / Counter**
-- [ ] Block 18: **Trust Badges**
-- [ ] Block 19: **Before / After**
-- [ ] Block 20: **Featured Quote / Comparison**
+**Trust cluster (✅ সম্পন্ন):**
+- [x] **Rating Summary** (`bptmb/rating-summary`) — aggregate fractional stars + count, static
+- [x] **Testimonial Stats** (`bptmb/testimonial-stats`) — count-up counters (IntersectionObserver)
+- [x] **Trust Badges** (`bptmb/trust-badges`) — icon + title + subtitle grid
+- [x] **Before / After** (`bptmb/before-after`) — draggable image comparison (clip-path, touch + keyboard)
+
+**Interaction wrappers (Phase 4b — testimonial collection মোড়ায়, `TestimonialsView` + Manual/CPT reuse করবে):**
+- [ ] **Tabs**
+- [ ] **Accordion**
+- [ ] **Popup / Modal**
+- [ ] **Featured Quote / Comparison**
 
 ## Phase 5 — Polish
 

@@ -15,12 +15,49 @@ import { emUnit, perUnit, pxUnit } from 'bpl-tools/utils/options';
 
 import { checkTheme } from '../../.././utils/functions';
 import { layoutOpt, generalStyleTabs, themeOpt } from './../../../utils/options';
+import BlockSwitcher from '../../Common/BlockSwitcher';
 
-const Settings = ({ attributes, setAttributes, updateItem, activeIndex, setActiveIndex }) => {
-    const { columns, columnGap, rowGap, layout, theme, items, elements, background, padding, shadow, border, image, imgBorder, nameTypo, nameColor, degTypo, degColor, textTypo, textColor, starIconColor, textLength, grid2Bg, grid2Padding, slider, dataSource = 'manual', query = {} } = attributes;
+const Settings = ({ attributes = {}, setAttributes, updateItem, activeIndex, setActiveIndex, clientId, currentBlockName }) => {
+    const {
+        columns = { desktop: 3, tablet: 2, mobile: 1 },
+        columnGap = '30px',
+        rowGap = '40px',
+        layout = 'default',
+        theme = 'default',
+        items = [],
+        elements: rawElements = {},
+        background = '#0000',
+        padding = { top: '10px', right: '15px', bottom: '10px', left: '15px' },
+        shadow = {},
+        border = { width: '1px', style: 'solid', color: '#0575e6', side: 'all', radius: '3px' },
+        image = { width: 50, height: 50 },
+        imgBorder = { width: '1px', style: 'solid', color: '#0575e6', side: 'all', radius: '50%' },
+        nameTypo = {},
+        nameColor = '#000',
+        degTypo = {},
+        degColor = '#7B7B7B',
+        textTypo = {},
+        textColor = '#000',
+        starIconColor = '#FF8C02',
+        textLength = 120,
+        grid2Bg = '#f9f8f8',
+        grid2Padding = {},
+        slider = { height: 500, autoPlay: true, mouseWheel: true, navigation: true },
+        dataSource = 'manual',
+        query = {}
+    } = attributes || {};
+
+    const elements = {
+        img: true,
+        name: true,
+        deg: true,
+        reviewText: true,
+        icon: true,
+        ...(rawElements || {})
+    };
 
     const [device, setDevice] = useState('desktop');
-    const { autoPlay, mouseWheel, navigation } = slider;
+    const { autoPlay = true, mouseWheel = true, navigation = true } = (slider && typeof slider === 'object') ? slider : {};
 
     const addItem = () => {
         setAttributes({
@@ -55,12 +92,14 @@ const Settings = ({ attributes, setAttributes, updateItem, activeIndex, setActiv
         newAttr[key] = val;
         setAttributes({ [attr]: newAttr })
     }
-    const { img, name, reviewText, deg, rating } = items[activeIndex] || {};
+    const currentItem = items[activeIndex] || items[0] || {};
+    const { img = {}, name = '', reviewText = '', deg = '', rating = 5 } = currentItem;
 
     return <>
         <InspectorControls>
             <TabPanel className='bPlTabPanel' activeClass='activeTab' tabs={generalStyleTabs} onSelect={tabController}>{tab => <>
                 {'general' === tab.name && <>
+                    <BlockSwitcher clientId={clientId} currentBlockName={currentBlockName} />
 
                     <PanelBody className='bPlPanelBody' title={__('Content Source', 'b-testimonials-block')}>
                         <SelectControl
@@ -91,32 +130,221 @@ const Settings = ({ attributes, setAttributes, updateItem, activeIndex, setActiv
                         </>}
                     </PanelBody>
 
-                    {'manual' === dataSource && <PanelBody className='bPlPanelBody addRemoveItems editItem' title={__('Add or Remove Items', 'b-testimonials-block')}>
-                        {null !== activeIndex && <>
-                            <h3 className='bplItemTitle'>{__(`Item ${activeIndex + 1}:`, 'b-testimonials-block')}</h3>
+                    {/* Context-aware Widget / Badge / Custom Block Settings */}
+                    {(() => {
+                        // Skip top panel for case-study-card (handled inside item cards)
+                        if (layout === 'case-study-card') return null;
 
-                            <Label>{__('Image:', 'b-testimonials-block')}</Label>
-                            <InlineDetailMediaUpload value={img} type={['image']} onChange={val => updateItem('img', val)} placeholder={__('Enter Image URL', 'b-testimonials-block')} />
+                        // Define context-specific labels per layout type
+                        const fieldLabels = {
+                            'before-after': {
+                                panel: 'Before & After Settings',
+                                title: 'Section Title',
+                                desc: '',
+                                score: '',
+                                count: '',
+                                titleHelp: 'Main heading above the comparison',
+                            },
+                            'testimonial-form': {
+                                panel: 'Form Settings',
+                                title: 'Form Title',
+                                desc: '',
+                                score: '',
+                                count: 'Submit Button Text',
+                                titleHelp: 'Heading above the form',
+                                countHelp: 'Text shown on the submit button',
+                            },
+                            'user-feedback-poll': {
+                                panel: 'Poll Settings',
+                                title: 'Poll Question',
+                                desc: 'Poll Subtitle',
+                                score: '',
+                                count: '',
+                                titleHelp: 'The main question displayed to visitors',
+                                descHelp: 'Short description below the question',
+                            },
+                            'social-proof-toast': {
+                                panel: 'Toast Settings',
+                                title: 'Toast Message',
+                                desc: 'Time Label',
+                                score: '',
+                                count: '',
+                                titleHelp: 'Notification message text',
+                                descHelp: 'Timestamp text (e.g. "Just now", "2 min ago")',
+                            },
+                            'testimonial-stats': {
+                                panel: 'Stats Settings',
+                                title: 'Stat 1 Label',
+                                desc: 'Stat 2 Label',
+                                score: 'Stat 1 Number',
+                                count: 'Stat 2 Number',
+                                titleHelp: 'Label for first stat card',
+                                descHelp: 'Label for second stat card',
+                                scoreHelp: 'Number for first stat card (e.g. 10K+)',
+                                countHelp: 'Number for second stat card (e.g. 98%)',
+                            },
+                            'star-rating-bars': {
+                                panel: 'Rating Bars Settings',
+                                title: 'Section Title',
+                                desc: '',
+                                score: '',
+                                count: '',
+                                titleHelp: 'Heading above the rating breakdown',
+                            },
+                            'comparison-testimonial-table': {
+                                panel: 'Table Settings',
+                                title: 'Table Title',
+                                desc: '',
+                                score: '',
+                                count: '',
+                                titleHelp: 'Heading above the comparison table',
+                            },
+                            'faq-testimonial-accordion': {
+                                panel: 'FAQ Settings',
+                                title: 'FAQ Title',
+                                desc: '',
+                                score: '',
+                                count: '',
+                                titleHelp: 'Heading above the FAQ accordion',
+                            },
+                            'trust-badges': {
+                                panel: 'Trust Badges Settings',
+                                title: 'Badge 1 Text',
+                                desc: 'Badge 2 Text',
+                                score: 'Badge 3 Text',
+                                count: 'Badge 4 Text',
+                                titleHelp: 'Text for first trust badge',
+                                descHelp: 'Text for second trust badge',
+                                scoreHelp: 'Text for third trust badge',
+                                countHelp: 'Text for fourth trust badge',
+                            },
+                        };
 
-                            <TextControl className='mt10' label={__('Name', 'b-testimonials-block')} value={name} onChange={val => updateItem('name', val)} />
+                        // Default labels for badge blocks
+                        const defaults = {
+                            panel: 'Badge & Widget Settings',
+                            title: 'Badge / Widget Title',
+                            desc: 'Description / Subtitle',
+                            score: 'Score / Rating Number',
+                            count: 'Review Count / Extra Text',
+                            titleHelp: 'Customize title for badges, forms, polls, or score widgets.',
+                            descHelp: 'Customize description text.',
+                            scoreHelp: 'Customize rating score e.g. 4.9 or 100%.',
+                            countHelp: 'Customize review count or subtitle badge info.',
+                        };
 
-                            <TextControl className='mt10' label={__('Designation', 'b-testimonials-block')} value={deg} onChange={val => updateItem('deg', val)} />
+                        const labels = fieldLabels[layout] || defaults;
 
-                            <TextareaControl className='mt10' label={__('Review', 'b-testimonials-block')} value={reviewText} onChange={val => updateItem('reviewText', val)} />
+                        return (
+                            <PanelBody className='bPlPanelBody' title={__(labels.panel, 'b-testimonials-block')} initialOpen={true}>
+                                {labels.title && <TextControl
+                                    label={__(labels.title, 'b-testimonials-block')}
+                                    value={attributes.badgeTitle ?? ''}
+                                    onChange={val => setAttributes({ badgeTitle: val })}
+                                    help={labels.titleHelp ? __(labels.titleHelp, 'b-testimonials-block') : ''}
+                                />}
+                                {labels.desc && <TextControl
+                                    label={__(labels.desc, 'b-testimonials-block')}
+                                    value={attributes.badgeDesc ?? ''}
+                                    onChange={val => setAttributes({ badgeDesc: val })}
+                                    help={labels.descHelp ? __(labels.descHelp, 'b-testimonials-block') : ''}
+                                />}
+                                {labels.score && <TextControl
+                                    label={__(labels.score, 'b-testimonials-block')}
+                                    value={attributes.badgeScore ?? ''}
+                                    onChange={val => setAttributes({ badgeScore: val })}
+                                    help={labels.scoreHelp ? __(labels.scoreHelp, 'b-testimonials-block') : ''}
+                                />}
+                                {labels.count && <TextControl
+                                    label={__(labels.count, 'b-testimonials-block')}
+                                    value={attributes.badgeCount ?? ''}
+                                    onChange={val => setAttributes({ badgeCount: val })}
+                                    help={labels.countHelp ? __(labels.countHelp, 'b-testimonials-block') : ''}
+                                />}
+                            </PanelBody>
+                        );
+                    })()}
 
-                            <NumberControl className='mt10' label={__('Rating:', 'b-testimonials-block')} labelPosition='left' value={rating} onChange={val => updateItem('rating', val)} min={1} max={5} />
+                    {/* Hide repeater buttons for single-card / widget blocks (excluding case-study-card which supports multiple cards) */}
+                    {(() => {
+                        const singleItemBlocks = [
+                            'google-review-badge',
+                            'capterra-review-badge',
+                            'facebook-review-badge',
+                            'trustpilot-review-badge',
+                            'g2-review-badge',
+                            'verified-buyer-badge',
+                            'review-badge-widget',
+                            'trust-badges',
+                            'testimonial-form',
+                            'user-feedback-poll',
+                            'rating-summary',
+                            'star-rating-bars',
+                            'testimonial-stats',
+                            'social-proof-toast'
+                        ];
+                        const isSingleItemBlock = singleItemBlocks.includes(layout);
+                        const isCaseStudy = layout === 'case-study-card';
 
-                            <PanelRow className='itemAction mt10 mb15'>
-                                {1 < items?.length && <Button className='removeItem' label={__('Remove', 'b-testimonials-block')} onClick={removeItem}><Dashicon icon='no' />{__('Remove', 'b-testimonials-block')}</Button>}
+                        if ('manual' !== dataSource) return null;
 
-                                <Button className='duplicateItem' label={__('Duplicate', 'b-testimonials-block')} onClick={duplicateItem}>{gearIcon}{__('Duplicate', 'b-testimonials-block')}</Button>
-                            </PanelRow>
-                        </>}
+                        return (
+                            <PanelBody className='bPlPanelBody addRemoveItems editItem' title={isSingleItemBlock ? __('Card Content Settings', 'b-testimonials-block') : __('Add or Remove Case Study Cards', 'b-testimonials-block')}>
+                                {null !== activeIndex && <>
+                                    {!isSingleItemBlock && <h3 className='bplItemTitle'>{__(`Card ${activeIndex + 1}:`, 'b-testimonials-block')}</h3>}
 
-                        <div className='addItem'>
-                            <Button label={__('Add New Card', 'b-testimonials-block')} onClick={addItem}><Dashicon icon='plus' size={23} />{__('Add New Card', 'b-testimonials-block')}</Button>
-                        </div>
-                    </PanelBody>}
+                                    <Label>{__('Customer Image / Avatar:', 'b-testimonials-block')}</Label>
+                                    <InlineDetailMediaUpload value={img} type={['image']} onChange={val => updateItem('img', val)} placeholder={__('Enter Image URL', 'b-testimonials-block')} />
+
+                                    <TextControl className='mt10' label={__('Name', 'b-testimonials-block')} value={name} onChange={val => updateItem('name', val)} />
+
+                                    <TextControl className='mt10' label={__('Company / Designation', 'b-testimonials-block')} value={deg} onChange={val => updateItem('deg', val)} />
+
+                                    {isCaseStudy ? (
+                                        <>
+                                            <TextareaControl
+                                                className='mt10'
+                                                label={__('Challenge', 'b-testimonials-block')}
+                                                value={currentItem.challenge ?? 'The customer needed a reliable solution to improve their workflow.'}
+                                                onChange={val => updateItem('challenge', val)}
+                                            />
+                                            <TextareaControl
+                                                className='mt10'
+                                                label={__('Solution', 'b-testimonials-block')}
+                                                value={currentItem.solution ?? reviewText ?? 'It is a long-established fact that a reader will be distracted by the readable content of a page when looking at its layout'}
+                                                onChange={val => updateItem('solution', val)}
+                                            />
+                                            <TextareaControl
+                                                className='mt10'
+                                                label={__('Result', 'b-testimonials-block')}
+                                                value={currentItem.result ?? '95% improvement in efficiency and customer satisfaction.'}
+                                                onChange={val => updateItem('result', val)}
+                                            />
+                                        </>
+                                    ) : (
+                                        <TextareaControl className='mt10' label={__('Review / Quote Text', 'b-testimonials-block')} value={reviewText} onChange={val => updateItem('reviewText', val)} />
+                                    )}
+
+                                    {!isSingleItemBlock && !isCaseStudy && (
+                                        <NumberControl className='mt10' label={__('Rating:', 'b-testimonials-block')} labelPosition='left' value={rating} onChange={val => updateItem('rating', val)} min={1} max={5} />
+                                    )}
+
+                                    {!isSingleItemBlock && (
+                                        <PanelRow className='itemAction mt10 mb15'>
+                                            {1 < items?.length && <Button className='removeItem' label={__('Remove', 'b-testimonials-block')} onClick={removeItem}><Dashicon icon='no' />{__('Remove', 'b-testimonials-block')}</Button>}
+                                            <Button className='duplicateItem' label={__('Duplicate', 'b-testimonials-block')} onClick={duplicateItem}>{gearIcon}{__('Duplicate', 'b-testimonials-block')}</Button>
+                                        </PanelRow>
+                                    )}
+                                </>}
+
+                                {!isSingleItemBlock && (
+                                    <div className='addItem'>
+                                        <Button label={__('Add New Case Study Card', 'b-testimonials-block')} onClick={addItem}><Dashicon icon='plus' size={23} />{__('Add New Case Study Card', 'b-testimonials-block')}</Button>
+                                    </div>
+                                )}
+                            </PanelBody>
+                        );
+                    })()}
 
                     <PanelBody className='bPlPanelBody' title={__('Elements', 'b-testimonials-block')} initialOpen={false}>
                         <ToggleControl className='mt10' label={__('Image', 'b-testimonials-block')} labelPosition='left' checked={elements?.img} onChange={val => updateObject('elements', 'img', val)} />

@@ -1,0 +1,45 @@
+.bRatingSummary {
+	display: flex;
+	align-items: center;
+	gap: 12px;
+	flex-wrap: wrap;
+
+	&.is-stacked {
+		flex-direction: column;
+		align-items: center;
+		text-align: center;
+		gap: 6px;
+	}
+
+	.rs-score {
+		font-size: 34px;
+		font-weight: 800;
+		line-height: 1;
+	}
+
+	.rs-stars {
+		position: relative;
+		display: inline-block;
+		font-size: 26px;
+		line-height: 1;
+		white-space: nowrap;
+	}
+
+	.rs-stars-base {
+		color: #dcdcdc;
+	}
+
+	.rs-stars-fill {
+		position: absolute;
+		top: 0;
+		left: 0;
+		overflow: hidden;
+		white-space: nowrap;
+		color: #ff8c02;
+	}
+
+	.rs-count {
+		font-size: 15px;
+		color: #7b7b7b;
+	}
+}

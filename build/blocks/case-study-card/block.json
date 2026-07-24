@@ -1,0 +1,98 @@
+{
+  "$schema": "https://schemas.wp.org/trunk/block.json",
+  "apiVersion": 3,
+  "name": "bptmb/case-study-card",
+  "title": "Customer Case Study",
+  "description": "Detailed case study card with metrics & quote.",
+  "category": "bplugins",
+  "parent": [
+    "bptmb/b-testimonials"
+  ],
+  "keywords": [
+    "testimonials",
+    "case-study-card"
+  ],
+  "textdomain": "b-testimonials-block",
+  "attributes": {
+    "align": {
+      "type": "string",
+      "default": "wide"
+    },
+    "cId": {
+      "type": "string",
+      "default": ""
+    },
+    "items": {
+      "type": "array",
+      "default": [
+        {
+          "img": {
+            "url": "https://templates.bplugins.com/wp-content/uploads/2025/02/p-29.png"
+          },
+          "name": "John Doe",
+          "deg": "Developer",
+          "reviewText": "It is a long-established fact that a reader will be distracted by the readable content of a page when looking at its layout",
+          "challenge": "The customer needed a reliable solution to improve their workflow.",
+          "solution": "It is a long-established fact that a reader will be distracted by the readable content of a page when looking at its layout",
+          "result": "95% improvement in efficiency and customer satisfaction.",
+          "rating": 5
+        }
+      ]
+    },
+    "elements": {
+      "type": "object",
+      "default": {
+        "name": true,
+        "deg": true,
+        "reviewText": true
+      }
+    },
+    "columns": {
+      "type": "object",
+      "default": {
+        "desktop": 3,
+        "tablet": 2,
+        "mobile": 1
+      }
+    },
+    "layout": {
+      "type": "string",
+      "default": "case-study-card"
+    },
+    "theme": {
+      "type": "string",
+      "default": "default"
+    },
+    "badgeTitle": {
+      "type": "string",
+      "default": ""
+    },
+    "badgeDesc": {
+      "type": "string",
+      "default": ""
+    },
+    "badgeScore": {
+      "type": "string",
+      "default": ""
+    },
+    "badgeCount": {
+      "type": "string",
+      "default": ""
+    }
+  },
+  "supports": {
+    "align": [
+      "wide",
+      "full"
+    ],
+    "html": false
+  },
+  "editorScript": "file:./index.js",
+  "editorStyle": "file:./index.css",
+  "render": "file:./render.php",
+  "viewScript": "file:./view.js",
+  "style": [
+    "file:./index.css",
+    "file:./view.css"
+  ]
+}

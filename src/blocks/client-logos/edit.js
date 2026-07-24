@@ -3,6 +3,7 @@ import { __ } from '@wordpress/i18n';
 import { useBlockProps, InspectorControls, MediaUpload, MediaUploadCheck } from '@wordpress/block-editor';
 import { PanelBody, RangeControl, ToggleControl, TextControl, Button, Dashicon } from '@wordpress/components';
 import { produce } from 'immer';
+import BlockSwitcher from '@shared/Components/Common/BlockSwitcher';
 
 import './edit.scss';
 import '@shared/styles/logos.scss';
@@ -36,6 +37,7 @@ const Edit = ( { attributes, setAttributes, clientId } ) => {
 	return (
 		<>
 			<InspectorControls>
+				<BlockSwitcher clientId={ clientId } />
 				<PanelBody title={ __( 'Layout', 'b-testimonials-block' ) }>
 					<RangeControl label={ __( 'Columns (Desktop)', 'b-testimonials-block' ) } value={ columns?.desktop } onChange={ ( val ) => setColumn( 'desktop', val ) } min={ 1 } max={ 8 } />
 					<RangeControl label={ __( 'Columns (Tablet)', 'b-testimonials-block' ) } value={ columns?.tablet } onChange={ ( val ) => setColumn( 'tablet', val ) } min={ 1 } max={ 6 } />

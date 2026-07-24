@@ -498,3 +498,492 @@ html {
 		transform: translateX(-50%);
 	}
 }
+
+/* ============================================================
+   CUSTOM BLOCK STYLES — unique styling for every block layout
+   ============================================================ */
+
+/* --- Badge Blocks (Category D) --- */
+.btb-badge-card {
+	display: inline-flex;
+	align-items: center;
+	padding: 20px 28px;
+	border-radius: 14px;
+	background: #ffffff;
+	border: 1px solid #e2e8f0;
+	box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+	margin: 10px 0;
+	transition: box-shadow 0.2s, transform 0.2s;
+
+	&:hover {
+		box-shadow: 0 8px 30px rgba(0,0,0,0.1);
+		transform: translateY(-2px);
+	}
+
+	.btb-badge-header {
+		display: flex;
+		align-items: center;
+		gap: 16px;
+	}
+
+	.btb-badge-brand-logo { flex-shrink: 0; }
+
+	.btb-badge-info {
+		.btb-badge-title {
+			font-size: 17px;
+			font-weight: 700;
+			color: #1e293b;
+			margin: 0 0 4px;
+		}
+		.btb-badge-desc {
+			font-size: 13px;
+			color: #64748b;
+			margin: 0;
+		}
+		.btb-badge-rating {
+			display: flex;
+			align-items: center;
+			gap: 8px;
+			.score { font-weight: 800; color: #0f172a; font-size: 18px; }
+			.stars { color: #f59e0b; letter-spacing: 2px; font-size: 16px; }
+			.count { font-size: 13px; color: #64748b; }
+		}
+	}
+}
+.btb-google-badge { border-left: 4px solid #4285F4; }
+.btb-capterra-badge { border-left: 4px solid #FF9D28; }
+.btb-facebook-badge { border-left: 4px solid #1877F2; }
+.btb-trustpilot-badge { border-left: 4px solid #00B67A; }
+.btb-g2-badge { border-left: 4px solid #FF492C; }
+.btb-verified-badge { border-left: 4px solid #4527a4; }
+.btb-review-widget { border-left: 4px solid #6366f1; }
+
+/* --- Trust Badges Grid --- */
+.btb-trust-badges-grid {
+	display: grid;
+	grid-template-columns: repeat(4, 1fr);
+	gap: 16px;
+
+	.btb-trust-item {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		gap: 10px;
+		padding: 20px 12px;
+		background: #ffffff;
+		border: 1px solid #e2e8f0;
+		border-radius: 12px;
+		text-align: center;
+		font-weight: 600;
+		font-size: 13px;
+		color: #334155;
+		box-shadow: 0 2px 10px rgba(0,0,0,0.03);
+	}
+
+	@media (max-width: 768px) { grid-template-columns: repeat(2, 1fr); }
+}
+
+/* --- Testimonial Form (Category E) --- */
+.btb-form-wrapper {
+	background: #ffffff;
+	border: 1px solid #e2e8f0;
+	border-radius: 16px;
+	padding: 32px;
+	max-width: 600px;
+	margin: 0 auto;
+	box-shadow: 0 10px 30px rgba(0,0,0,0.04);
+
+	.btb-form-title { font-size: 22px; font-weight: 700; margin: 0 0 24px; color: #0f172a; }
+	.btb-form-grid {
+		display: flex; flex-direction: column; gap: 14px;
+
+		.btb-input, .btb-textarea {
+			width: 100%; padding: 12px 16px; border: 1px solid #cbd5e1;
+			border-radius: 8px; font-size: 14px; box-sizing: border-box;
+			&:focus { outline: none; border-color: #4527a4; box-shadow: 0 0 0 3px rgba(69,39,164,0.1); }
+		}
+		.btb-textarea { min-height: 100px; resize: vertical; }
+		.btb-form-rating-selector { .stars { color: #f59e0b; font-size: 20px; letter-spacing: 3px; } }
+		.btb-submit-btn {
+			background: #4527a4; color: #fff; padding: 12px 28px; border: none;
+			border-radius: 8px; font-weight: 600; cursor: pointer; align-self: flex-start;
+			transition: background 0.2s;
+			&:hover { background: #331b82; }
+		}
+	}
+}
+
+/* --- NPS Poll (Category E) --- */
+.btb-poll-wrapper {
+	background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 16px;
+	padding: 32px; text-align: center; max-width: 600px; margin: 0 auto;
+
+	.btb-poll-title { font-size: 18px; font-weight: 700; margin: 0 0 8px; color: #1e293b; }
+	.btb-poll-desc { font-size: 13px; color: #64748b; margin: 0 0 20px; }
+	.btb-poll-scale {
+		display: flex; align-items: center; gap: 10px; justify-content: center;
+		.btb-poll-label-low, .btb-poll-label-high { font-size: 12px; color: #94a3b8; font-weight: 500; }
+	}
+	.btb-poll-buttons {
+		display: flex; gap: 6px;
+		.btb-poll-num-btn {
+			width: 38px; height: 38px; border-radius: 8px; border: 1px solid #cbd5e1;
+			background: #fff; font-weight: 700; cursor: pointer; transition: all 0.15s;
+			&:hover { background: #4527a4; color: #fff; border-color: #4527a4; }
+		}
+	}
+}
+
+/* --- Rating Summary (Category E) --- */
+.btb-rating-summary {
+	display: flex; gap: 32px; align-items: center; background: #fff;
+	border: 1px solid #e2e8f0; border-radius: 16px; padding: 28px;
+	box-shadow: 0 4px 16px rgba(0,0,0,0.04); max-width: 600px; margin: 0 auto;
+
+	.btb-rs-left {
+		text-align: center; min-width: 120px;
+		.btb-rs-big-number { font-size: 48px; font-weight: 800; color: #0f172a; display: block; }
+		.btb-rs-stars { color: #f59e0b; font-size: 20px; letter-spacing: 2px; margin: 4px 0; }
+		.btb-rs-count { font-size: 13px; color: #64748b; }
+	}
+	.btb-rs-bars { flex: 1; display: flex; flex-direction: column; gap: 8px; }
+	.btb-rs-bar-row {
+		display: flex; align-items: center; gap: 10px;
+		.btb-rs-bar-label { font-size: 13px; font-weight: 600; width: 36px; color: #334155; }
+		.btb-rs-bar-track { flex: 1; height: 8px; background: #f1f5f9; border-radius: 4px; overflow: hidden; }
+		.btb-rs-bar-fill { height: 100%; background: #f59e0b; border-radius: 4px; transition: width 0.5s; }
+		.btb-rs-bar-pct { font-size: 12px; color: #64748b; width: 36px; text-align: right; }
+	}
+	@media (max-width: 576px) { flex-direction: column; }
+}
+
+/* --- Star Rating Bars (Category E) --- */
+.btb-star-rating-bars {
+	background: #fff; border: 1px solid #e2e8f0; border-radius: 14px;
+	padding: 24px; max-width: 500px; margin: 0 auto;
+
+	.btb-srb-title { font-size: 17px; font-weight: 700; margin: 0 0 16px; color: #1e293b; }
+	.btb-srb-row {
+		display: flex; align-items: center; gap: 10px; margin-bottom: 8px;
+		.btb-srb-label { font-size: 13px; font-weight: 600; width: 50px; color: #334155; }
+		.btb-srb-track { flex: 1; height: 10px; background: #f1f5f9; border-radius: 5px; overflow: hidden; }
+		.btb-srb-fill { height: 100%; background: linear-gradient(90deg, #f59e0b, #fbbf24); border-radius: 5px; }
+		.btb-srb-count { font-size: 12px; color: #64748b; width: 30px; text-align: right; }
+	}
+}
+
+/* --- Testimonial Stats (Category E) --- */
+.btb-stats-grid {
+	display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px;
+
+	.btb-stat-card {
+		background: #fff; border: 1px solid #e2e8f0; border-radius: 14px;
+		padding: 24px 16px; text-align: center; box-shadow: 0 2px 10px rgba(0,0,0,0.03);
+		.btb-stat-number { font-size: 32px; font-weight: 800; color: #4527a4; display: block; }
+		.btb-stat-label { font-size: 13px; color: #64748b; margin-top: 4px; }
+	}
+	@media (max-width: 768px) { grid-template-columns: repeat(2, 1fr); }
+}
+
+/* --- Social Proof Toast (Category E) --- */
+.btb-toast-wrapper {
+	.btb-toast-card {
+		display: flex; align-items: center; gap: 14px;
+		background: #fff; border: 1px solid #e2e8f0; border-radius: 12px;
+		padding: 14px 20px; box-shadow: 0 8px 30px rgba(0,0,0,0.1);
+		max-width: 380px; animation: btbToastSlide 0.4s ease;
+
+		.btb-toast-avatar {
+			width: 44px; height: 44px; border-radius: 50%; overflow: hidden; flex-shrink: 0;
+			img { width: 100%; height: 100%; object-fit: cover; }
+		}
+		.btb-toast-body {
+			.btb-toast-text { font-size: 14px; font-weight: 600; color: #1e293b; margin: 0 0 2px; }
+			.btb-toast-meta { font-size: 12px; color: #94a3b8; }
+		}
+	}
+}
+@keyframes btbToastSlide { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+
+/* --- Comparison Table (Category E) --- */
+.btb-comparison-table {
+	background: #fff; border: 1px solid #e2e8f0; border-radius: 14px;
+	padding: 24px; overflow: hidden;
+
+	.btb-ct-title { font-size: 18px; font-weight: 700; margin: 0 0 16px; color: #1e293b; }
+	.btb-ct-table {
+		width: 100%; border-collapse: collapse;
+		th { background: #f8fafc; padding: 10px 14px; font-size: 13px; font-weight: 600; color: #475569; text-align: left; border-bottom: 2px solid #e2e8f0; }
+		td { padding: 10px 14px; font-size: 13px; color: #334155; border-bottom: 1px solid #f1f5f9; }
+		.btb-ct-rating { color: #f59e0b; }
+	}
+}
+
+/* --- FAQ Accordion (Category E) --- */
+.btb-faq-accordion {
+	max-width: 700px; margin: 0 auto;
+	.btb-faq-title { font-size: 20px; font-weight: 700; margin: 0 0 16px; color: #1e293b; }
+	.btb-faq-item {
+		border: 1px solid #e2e8f0; border-radius: 10px; margin-bottom: 8px; overflow: hidden;
+		&[open] { border-color: #4527a4; }
+		.btb-faq-question {
+			padding: 14px 18px; font-weight: 600; font-size: 15px; color: #1e293b;
+			cursor: pointer; list-style: none;
+			&::-webkit-details-marker { display: none; }
+			&::before { content: '+'; margin-right: 10px; font-size: 18px; color: #4527a4; }
+		}
+		&[open] .btb-faq-question::before { content: '−'; }
+		.btb-faq-answer {
+			padding: 0 18px 14px; font-size: 14px; color: #475569;
+			p { margin: 0 0 6px; }
+			.btb-faq-author { font-size: 12px; color: #94a3b8; font-style: italic; }
+		}
+	}
+}
+
+/* --- Avatar Reviews List (Category C) --- */
+.btb-avatar-list-wrapper {
+	text-align: center; max-width: 700px; margin: 0 auto;
+
+	.btb-avatar-row {
+		display: flex; justify-content: center; gap: 16px; margin-bottom: 24px; flex-wrap: wrap;
+		.btb-avatar-thumb {
+			width: 60px; height: 60px; border-radius: 50%; overflow: hidden; cursor: pointer;
+			border: 2px solid #e2e8f0; transition: all 0.25s;
+			img { width: 100%; height: 100%; object-fit: cover; }
+			&.active { border: 3px solid #4527a4; transform: scale(1.15); box-shadow: 0 4px 16px rgba(69,39,164,0.2); }
+		}
+	}
+	.btb-avatar-detail {
+		background: #fff; border-radius: 16px; padding: 28px; border: 1px solid #e2e8f0;
+		box-shadow: 0 8px 24px rgba(0,0,0,0.04);
+		.btb-avatar-review { font-style: italic; font-size: 16px; color: #334155; margin: 0 0 16px; }
+		.btb-avatar-name { margin: 0; font-weight: 700; color: #0f172a; font-size: 16px; }
+		.btb-avatar-deg { font-size: 13px; color: #64748b; }
+	}
+}
+
+/* --- Timeline Layout (Category C) --- */
+.btb-timeline-layout {
+	position: relative; padding-left: 40px;
+
+	&::before {
+		content: ''; position: absolute; top: 0; bottom: 0; left: 16px;
+		width: 3px; background: linear-gradient(180deg, #4527a4 0%, #e2e8f0 100%);
+	}
+
+	.btb-timeline-item {
+		position: relative; margin-bottom: 30px;
+		.btb-timeline-dot {
+			position: absolute; left: -30px; top: 18px;
+			width: 14px; height: 14px; border-radius: 50%;
+			background: #4527a4; border: 3px solid #fff;
+			box-shadow: 0 0 0 3px #4527a4;
+		}
+		.btb-timeline-card .single { margin-bottom: 0; }
+	}
+}
+
+/* --- Audio Testimonials (Category C) --- */
+.btb-audio-layout {
+	display: grid; gap: 20px;
+	.btb-audio-card {
+		background: #fff; border: 1px solid #e2e8f0; border-radius: 14px;
+		padding: 20px; box-shadow: 0 2px 12px rgba(0,0,0,0.03);
+		.btb-audio-player {
+			display: flex; align-items: center; gap: 12px; margin-bottom: 14px;
+			padding-bottom: 14px; border-bottom: 1px solid #f1f5f9;
+			.btb-audio-wave {
+				display: flex; align-items: flex-end; gap: 3px; height: 36px;
+				.btb-wave-bar {
+					width: 4px; background: #4527a4; border-radius: 2px; opacity: 0.5;
+					animation: btbWave 1.2s ease-in-out infinite alternate;
+					&:nth-child(odd) { animation-delay: 0.2s; }
+				}
+			}
+		}
+	}
+}
+@keyframes btbWave { 0% { opacity: 0.3; } 100% { opacity: 1; } }
+
+/* --- Video Testimonials (Category C) --- */
+.btb-video-layout {
+	display: grid; gap: 20px;
+	.btb-video-card {
+		background: #fff; border: 1px solid #e2e8f0; border-radius: 14px;
+		overflow: hidden; box-shadow: 0 2px 12px rgba(0,0,0,0.03);
+		.btb-video-thumb {
+			position: relative; aspect-ratio: 16/9; overflow: hidden;
+			img { width: 100%; height: 100%; object-fit: cover; }
+			.btb-video-play {
+				position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+				opacity: 0.85; transition: opacity 0.2s; cursor: pointer;
+				&:hover { opacity: 1; }
+			}
+		}
+		.btb-video-info {
+			padding: 14px 18px;
+			h4 { margin: 0 0 2px; font-size: 15px; font-weight: 600; color: #1e293b; }
+			span { font-size: 13px; color: #64748b; }
+		}
+	}
+}
+
+/* --- Before/After (Category C) --- */
+.btb-before-after {
+	max-width: 700px; margin: 0 auto;
+	.btb-ba-title { font-size: 20px; font-weight: 700; text-align: center; margin: 0 0 20px; color: #1e293b; }
+	.btb-ba-columns {
+		display: grid; grid-template-columns: 1fr 1fr; gap: 20px;
+		@media (max-width: 576px) { grid-template-columns: 1fr; }
+	}
+	.btb-ba-col {
+		padding: 20px; border-radius: 14px;
+		.btb-ba-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 10px; display: block; }
+		.btb-ba-content {
+			p { font-size: 14px; color: #334155; font-style: italic; margin: 0 0 8px; }
+			.btb-ba-author { font-size: 12px; color: #94a3b8; }
+		}
+	}
+	.btb-ba-before { background: #fef2f2; border: 1px solid #fecaca; .btb-ba-label { color: #dc2626; } }
+	.btb-ba-after { background: #f0fdf4; border: 1px solid #bbf7d0; .btb-ba-label { color: #16a34a; } }
+}
+
+/* --- Case Study Card (Category C) --- */
+.btb-case-study-grid {
+	display: grid;
+	gap: 20px;
+}
+
+.btb-case-study {
+	background: #fff; border: 1px solid #e2e8f0; border-radius: 16px;
+	padding: 28px; box-shadow: 0 4px 16px rgba(0,0,0,0.04);
+
+	.btb-cs-header {
+		display: flex; align-items: center; gap: 14px; margin-bottom: 20px; padding-bottom: 16px; border-bottom: 1px solid #f1f5f9;
+		.btb-cs-avatar { width: 56px; height: 56px; border-radius: 50%; object-fit: cover; }
+		.btb-cs-name { font-size: 17px; font-weight: 700; color: #1e293b; margin: 0; }
+		.btb-cs-deg { font-size: 13px; color: #64748b; }
+	}
+	.btb-cs-body {
+		.btb-cs-section {
+			margin-bottom: 16px;
+			.btb-cs-label {
+				font-size: 11px; font-weight: 700; text-transform: uppercase;
+				letter-spacing: 1px; color: #4527a4; margin-bottom: 6px; display: block;
+			}
+			p { font-size: 14px; color: #475569; margin: 0; line-height: 1.6; }
+		}
+	}
+}
+
+
+/* --- Client Logos (Category C) --- */
+.btb-client-logos {
+	display: grid; gap: 20px;
+	.btb-logo-item {
+		background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px;
+		padding: 20px; display: flex; align-items: center; justify-content: center;
+		transition: box-shadow 0.2s;
+		&:hover { box-shadow: 0 4px 16px rgba(0,0,0,0.08); }
+		img { max-height: 60px; width: auto; max-width: 100%; object-fit: contain; }
+	}
+}
+
+/* --- Hero Layout (Category B) --- */
+.btb-hero-layout {
+	.btb-hero-card {
+		margin-bottom: 24px;
+		.single { font-size: 1.1em; padding: 28px; }
+	}
+	.btb-hero-grid { display: grid; gap: 20px; }
+}
+
+/* --- Floating Bubble (Category B) --- */
+.btb-floating-bubble-layout {
+	display: flex; flex-wrap: wrap; gap: 20px; justify-content: center;
+	.btb-bubble-item {
+		display: flex; gap: 12px; max-width: 340px;
+		animation: btbBubbleFloat 3s ease-in-out infinite alternate;
+		.btb-bubble-avatar {
+			width: 48px; height: 48px; border-radius: 50%; overflow: hidden; flex-shrink: 0;
+			border: 2px solid #4527a4;
+			img { width: 100%; height: 100%; object-fit: cover; }
+		}
+		.btb-bubble-content {
+			background: #f1f5f9; padding: 12px 16px; border-radius: 14px 14px 14px 4px;
+			position: relative;
+			p { font-size: 13px; color: #334155; margin: 0 0 4px; }
+			.btb-bubble-name { font-size: 12px; font-weight: 600; color: #4527a4; }
+		}
+	}
+}
+@keyframes btbBubbleFloat { from { transform: translateY(0); } to { transform: translateY(-6px); } }
+
+/* --- Card Stack (Category B) --- */
+.btb-card-stack-layout {
+	position: relative; max-width: 450px; margin: 40px auto; min-height: 250px;
+	.btb-stacked-card {
+		position: absolute; top: 0; left: 0; right: 0;
+		background: #fff; border: 1px solid #e2e8f0; border-radius: 14px;
+		padding: 8px; box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+		transition: transform 0.3s;
+		&:first-child { position: relative; }
+	}
+}
+
+/* --- Quote Box Layout (Category B — CSS-only variation) --- */
+.btb-testimonials-quote-box-layout {
+	.single {
+		position: relative; overflow: hidden;
+		background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+		border-left: 5px solid #4527a4;
+		border-radius: 12px; padding: 24px 28px;
+		box-shadow: 0 10px 25px -5px rgba(0,0,0,0.05);
+
+		&::before {
+			content: '\201C'; position: absolute; top: 5px; right: 15px;
+			font-size: 90px; font-family: Georgia, serif;
+			color: rgba(69,39,164,0.08); line-height: 1;
+		}
+	}
+}
+
+/* --- Speech Bubble Layout (Category B — CSS-only variation) --- */
+.btb-testimonials-speech-bubble-layout {
+	.single {
+		background: #ffffff; border: 1px solid #e2e8f0;
+		border-radius: 16px; padding: 20px; position: relative;
+		box-shadow: 0 4px 12px rgba(0,0,0,0.03); margin-bottom: 20px;
+
+		&::after {
+			content: ''; position: absolute; bottom: -12px; left: 30px;
+			width: 0; height: 0;
+			border-left: 12px solid transparent;
+			border-right: 12px solid transparent;
+			border-top: 12px solid #ffffff;
+			filter: drop-shadow(0 2px 1px rgba(0,0,0,0.05));
+		}
+	}
+}
+
+/* --- Compact Layout (Category B — CSS-only variation) --- */
+.btb-testimonials-compact-layout {
+	.single {
+		display: flex; align-items: center; gap: 14px;
+		padding: 14px 18px; background: #ffffff; border-radius: 10px;
+		border: 1px solid #f1f5f9; box-shadow: 0 2px 8px rgba(0,0,0,0.02);
+		margin-bottom: 8px;
+		.authorImg { width: 44px; height: 44px; flex-shrink: 0; }
+		.body { flex: 1; }
+		.top { flex-shrink: 0; }
+	}
+}
+
+/* --- Popup Modal Grid (Category B) --- */
+.btb-popup-modal-grid .single {
+	cursor: pointer;
+	transition: box-shadow 0.2s, transform 0.2s;
+	&:hover { box-shadow: 0 8px 30px rgba(0,0,0,0.12); transform: translateY(-3px); }
+}
+

@@ -1,0 +1,16 @@
+.btb-stat-row {
+	.btb-stat-inline {
+		display: flex;
+		gap: 8px;
+
+		> .components-base-control {
+			flex: 1;
+		}
+	}
+
+	hr {
+		border: 0;
+		border-top: 1px solid #f0f0f0;
+		margin: 12px 0;
+	}
+}

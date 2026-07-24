@@ -2,7 +2,7 @@
 /**
  * Plugin Name: B Testimonials Block
  * Description: Boost your website's credibility with b testimonials block, effortlessly showcasing customer ratings and reviews..
- * Version: 1.0.2
+ * Version: 1.0.3
  * Author: bPlugins
  * Author URI: http://bplugins.com
  * Requires at least: 6.5
@@ -26,6 +26,37 @@ class BPBTB_Testimonials_Block{
 
         add_action('init', [$this, 'onInit']);
         add_filter('block_categories_all', [$this, 'register_block_category']);
+
+        // Redirect to Demo & Help page on first activation.
+        register_activation_hook( __FILE__, [ $this, 'on_activation' ] );
+        add_action( 'admin_init', [ $this, 'maybe_redirect_after_activation' ] );
+    }
+
+    /**
+     * Set a flag so we know a redirect is needed on the next admin page load.
+     */
+    public function on_activation() {
+        update_option( 'bpbtb_activation_redirect', true );
+    }
+
+    /**
+     * Redirect to the Demo & Help dashboard page once after activation.
+     */
+    public function maybe_redirect_after_activation() {
+        if ( ! get_option( 'bpbtb_activation_redirect', false ) ) {
+            return;
+        }
+
+        delete_option( 'bpbtb_activation_redirect' );
+
+        // Don't redirect on bulk activate or WP-CLI.
+        $activate_multi = isset( $_GET['activate-multi'] ) ? sanitize_text_field( wp_unslash( $_GET['activate-multi'] ) ) : '';
+        if ( wp_doing_ajax() || ( defined( 'WP_CLI' ) && WP_CLI ) || ! empty( $activate_multi ) ) {
+            return;
+        }
+
+        wp_safe_redirect( admin_url( 'edit.php?post_type=testimonial' ) );
+        exit;
     }
 
     public static function get_instance() {
@@ -39,8 +70,9 @@ class BPBTB_Testimonials_Block{
     }
 
     private function define_constants() {
+        $http_host = isset( $_SERVER['HTTP_HOST'] ) ? sanitize_text_field( wp_unslash( $_SERVER['HTTP_HOST'] ) ) : '';
         // Constant
-        define( 'BPBTB_PLUGIN_VERSION', isset( $_SERVER['HTTP_HOST'] ) && 'localhost' === $_SERVER['HTTP_HOST'] ? time() : '1.0.2' );
+        define( 'BPBTB_PLUGIN_VERSION', 'localhost' === $http_host ? time() : '1.0.3' );
         define( 'BPBTB_ASSETS_DIR', plugin_dir_url( __FILE__ ) . 'assets/' );
         define( 'BPBTB_DIR', plugin_dir_url( __FILE__ ) );
     }
@@ -48,6 +80,8 @@ class BPBTB_Testimonials_Block{
     private function load_classes() {
         require_once __DIR__ . '/includes/cpt.php';
         require_once __DIR__ . '/includes/form.php';
+        require_once __DIR__ . '/includes/admin-submissions.php';
+        require_once __DIR__ . '/includes/admin-menu.php';
     }
 
     public function onInit(){

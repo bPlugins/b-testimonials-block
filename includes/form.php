@@ -22,7 +22,7 @@ function bpbtb_register_form_route() {
 		[
 			'methods'             => 'POST',
 			'callback'            => 'bpbtb_handle_form_submit',
-			'permission_callback' => '__return_true', // Public form; protected by a nonce below.
+			'permission_callback' => '__return_true', // Public form.
 		]
 	);
 }
@@ -46,17 +46,6 @@ function bpbtb_form_nonce_action() {
 function bpbtb_handle_form_submit( $request ) {
 	$params = $request->get_params();
 
-	$nonce = isset( $params['nonce'] ) ? sanitize_text_field( $params['nonce'] ) : '';
-	if ( ! wp_verify_nonce( $nonce, bpbtb_form_nonce_action() ) ) {
-		return new WP_REST_Response(
-			[
-				'success' => false,
-				'message' => __( 'Security check failed. Please refresh the page and try again.', 'b-testimonials-block' ),
-			],
-			403
-		);
-	}
-
 	$name   = isset( $params['name'] ) ? sanitize_text_field( $params['name'] ) : '';
 	$review = isset( $params['review'] ) ? sanitize_textarea_field( $params['review'] ) : '';
 
@@ -67,6 +56,23 @@ function bpbtb_handle_form_submit( $request ) {
 				'message' => __( 'Please provide your name and a review.', 'b-testimonials-block' ),
 			],
 			400
+		);
+	}
+
+	$nonce        = isset( $params['nonce'] ) ? sanitize_text_field( wp_unslash( $params['nonce'] ) ) : '';
+	$header_nonce = isset( $_SERVER['HTTP_X_WP_NONCE'] ) ? sanitize_text_field( wp_unslash( $_SERVER['HTTP_X_WP_NONCE'] ) ) : '';
+
+	$valid_nonce = wp_verify_nonce( $nonce, bpbtb_form_nonce_action() )
+		|| wp_verify_nonce( $nonce, 'wp_rest' )
+		|| ( ! empty( $header_nonce ) && wp_verify_nonce( $header_nonce, 'wp_rest' ) );
+
+	if ( ! $valid_nonce ) {
+		return new WP_REST_Response(
+			[
+				'success' => false,
+				'message' => __( 'Security check failed. Please refresh the page and try again.', 'b-testimonials-block' ),
+			],
+			403
 		);
 	}
 

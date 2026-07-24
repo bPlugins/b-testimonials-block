@@ -1,8 +1,8 @@
-
 import { useState, useEffect } from 'react';
 import { __ } from '@wordpress/i18n';
-import { RichText, MediaUpload, MediaUploadCheck, useBlockProps } from '@wordpress/block-editor';
+import { RichText, MediaUpload, MediaUploadCheck, useBlockProps, InnerBlocks } from '@wordpress/block-editor';
 import { ToolbarButton } from '@wordpress/components';
+import { useSelect } from '@wordpress/data';
 import apiFetch from '@wordpress/api-fetch';
 import { addQueryArgs } from '@wordpress/url';
 import { produce } from 'immer';
@@ -10,6 +10,8 @@ import { produce } from 'immer';
 // Settings Components
 import { tabController } from 'bpl-tools/utils/functions';
 import ExpandButton from '../Common/ExpandButton';
+import BlockPlaceholder from '../Common/BlockPlaceholder';
+import { ALLOWED_CHILD_BLOCKS } from '../Common/BlockSwitcherModal';
 
 import '@shared/styles/editor.scss';
 import Settings from './Settings/Settings';
@@ -28,9 +30,41 @@ const mapCptPost = ( post ) => ( {
 } );
 
 const Edit = props => {
-	const { attributes, setAttributes, clientId, isSelected } = props;
-	const { items, elements, textLength, dataSource = 'manual', query = {} } = attributes;
+	const { attributes = {}, setAttributes, clientId, isSelected, name } = props;
+	const {
+		items: rawItems = [],
+		elements: rawElements = {},
+		textLength = 120,
+		dataSource = 'manual',
+		query = {}
+	} = attributes || {};
+
+	const elements = {
+		img: true,
+		name: true,
+		deg: true,
+		reviewText: true,
+		icon: true,
+		...(rawElements || {})
+	};
+
+	const DEFAULT_TESTIMONIAL = {
+		img: { url: 'https://templates.bplugins.com/wp-content/uploads/2025/02/p-29.png' },
+		name: 'John Doe',
+		deg: 'Developer',
+		reviewText: 'It is a long-established fact that a reader will be distracted by the readable content of a page when looking at its layout',
+		rating: 5,
+	};
+
+	const items = (Array.isArray(rawItems) && rawItems.length > 0) ? rawItems : [DEFAULT_TESTIMONIAL];
 	const isCpt = 'cpt' === dataSource;
+
+	// Check if current block is the Main Container Block (bptmb/b-testimonials)
+	const isMainParentBlock = name === 'bptmb/b-testimonials';
+	const innerBlocks = useSelect(
+		(select) => (clientId ? select('core/block-editor').getBlock(clientId)?.innerBlocks : []),
+		[clientId]
+	);
 
 	useEffect(() => { clientId && setAttributes({ cId: clientId.substring(0, 10) }); }, [clientId]); // Set & Update clientId to cId
 
@@ -59,6 +93,33 @@ const Edit = props => {
 
 		return () => { active = false; };
 	}, [isCpt, query?.number, query?.orderBy, query?.order]);
+
+	// Main Parent Block Rendering with InnerBlocks
+	if (isMainParentBlock) {
+		if (!innerBlocks?.length) {
+			return (
+				<div {...useBlockProps({ className: 'bTestimonialsMainBlock' })}>
+					<Settings attributes={attributes} setAttributes={setAttributes} updateItem={() => {}} activeIndex={activeIndex} setActiveIndex={setActiveIndex} clientId={clientId} currentBlockName={name} />
+					<BlockPlaceholder clientId={clientId} currentBlockName={name} />
+					<InnerBlocks
+						templateLock={false}
+						allowedBlocks={ALLOWED_CHILD_BLOCKS}
+						renderAppender={() => false}
+					/>
+				</div>
+			);
+		}
+
+		return (
+			<div {...useBlockProps({ className: 'bTestimonialsMainBlock' })}>
+				<Settings attributes={attributes} setAttributes={setAttributes} updateItem={() => {}} activeIndex={activeIndex} setActiveIndex={setActiveIndex} clientId={clientId} currentBlockName={name} />
+				<InnerBlocks
+					templateLock={false}
+					allowedBlocks={ALLOWED_CHILD_BLOCKS}
+				/>
+			</div>
+		);
+	}
 
 	const updateItem = (type, val, childType = false) => {
 		const newItems = produce(items, draft => {
@@ -91,7 +152,7 @@ const Edit = props => {
 	});
 
 	return <>
-		<Settings attributes={attributes} setAttributes={setAttributes} updateItem={updateItem} activeIndex={activeIndex} setActiveIndex={setActiveIndex} />
+		<Settings attributes={attributes} setAttributes={setAttributes} updateItem={updateItem} activeIndex={activeIndex} setActiveIndex={setActiveIndex} clientId={clientId} currentBlockName={name} />
 
 		<div {...useBlockProps({ className: 'bTestimonials' })} id={`btbTestimonialsDir-${clientId}`}>
 			{isCpt ? (

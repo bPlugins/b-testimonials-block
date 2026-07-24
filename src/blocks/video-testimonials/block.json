@@ -1,11 +1,20 @@
 {
 	"$schema": "https://schemas.wp.org/trunk/block.json",
-	"apiVersion": 2,
+	"apiVersion": 3,
 	"name": "bptmb/video-testimonials",
 	"title": "Video Testimonials",
 	"description": "Showcase video testimonials with click-to-play (YouTube, Vimeo or MP4).",
 	"category": "bplugins",
-	"keywords": [ "video", "testimonials", "youtube", "vimeo", "reviews" ],
+	"parent": [
+		"bptmb/b-testimonials"
+	],
+	"keywords": [
+		"video",
+		"testimonials",
+		"youtube",
+		"vimeo",
+		"reviews"
+	],
 	"textdomain": "b-testimonials-block",
 	"attributes": {
 		"align": {
@@ -19,12 +28,24 @@
 		"items": {
 			"type": "array",
 			"default": [
-				{ "videoUrl": "https://www.youtube.com/watch?v=ysz5S6PUM-U", "poster": { "url": "" }, "name": "Jane Doe", "deg": "CEO", "company": "Acme Inc" }
+				{
+					"videoUrl": "https://www.youtube.com/watch?v=ysz5S6PUM-U",
+					"poster": {
+						"url": ""
+					},
+					"name": "Jane Doe",
+					"deg": "CEO",
+					"company": "Acme Inc"
+				}
 			]
 		},
 		"columns": {
 			"type": "object",
-			"default": { "desktop": 3, "tablet": 2, "mobile": 1 }
+			"default": {
+				"desktop": 3,
+				"tablet": 2,
+				"mobile": 1
+			}
 		},
 		"columnGap": {
 			"type": "string",
@@ -37,15 +58,49 @@
 		"accentColor": {
 			"type": "string",
 			"default": "#0575e6"
+		},
+		"layout": {
+			"type": "string",
+			"default": "video-testimonials"
+		},
+		"theme": {
+			"type": "string",
+			"default": "default"
+		},
+		"badgeTitle": {
+			"type": "string",
+			"default": ""
+		},
+		"badgeDesc": {
+			"type": "string",
+			"default": ""
+		},
+		"badgeScore": {
+			"type": "string",
+			"default": ""
+		},
+		"badgeCount": {
+			"type": "string",
+			"default": ""
 		}
 	},
 	"supports": {
-		"align": [ "wide", "full" ],
+		"align": [
+			"wide",
+			"full"
+		],
 		"html": false
 	},
-	"editorScript": [ "file:./index.js" ],
+	"editorScript": [
+		"file:./index.js"
+	],
 	"editorStyle": "file:./index.css",
-	"style": [ "file:./view.css" ],
-	"viewScript": [ "file:./view.js" ],
+	"style": [
+		"file:./index.css",
+		"file:./view.css"
+	],
+	"viewScript": [
+		"file:./view.js"
+	],
 	"render": "file:./render.php"
 }

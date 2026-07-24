@@ -3,7 +3,11 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-// Resolve manual items vs. the Testimonial CPT (helper lives in includes/cpt.php).
+if ( ! empty( trim( $content ) ) ) {
+	echo $content;
+	return;
+}
+
 if ( function_exists( 'bpbtb_prepare_block_items' ) ) {
 	$attributes = bpbtb_prepare_block_items( $attributes );
 }

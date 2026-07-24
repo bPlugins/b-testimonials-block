@@ -1,0 +1,36 @@
+.bTestimonialStats {
+	.stats-grid {
+		display: grid;
+		gap: var(--row-gap, 30px) var(--col-gap, 30px);
+		grid-template-columns: repeat(var(--cols-d, 3), 1fr);
+	}
+
+	.stat-item {
+		text-align: center;
+	}
+
+	.stat-value {
+		font-size: 44px;
+		font-weight: 800;
+		line-height: 1.1;
+		color: var(--accent, #0575e6);
+	}
+
+	.stat-label {
+		margin-top: 6px;
+		font-size: 16px;
+		color: #7b7b7b;
+	}
+
+	@media ( max-width: 768px ) {
+		.stats-grid {
+			grid-template-columns: repeat(var(--cols-t, 3), 1fr);
+		}
+	}
+
+	@media ( max-width: 576px ) {
+		.stats-grid {
+			grid-template-columns: repeat(var(--cols-m, 1), 1fr);
+		}
+	}
+}

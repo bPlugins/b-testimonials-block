@@ -1,0 +1,19 @@
+.btb-badge-row {
+	.btb-badge-pick {
+		height: auto;
+		min-height: 40px;
+		margin-bottom: 8px;
+
+		img {
+			max-width: 60px;
+			max-height: 40px;
+			display: block;
+		}
+	}
+
+	hr {
+		border: 0;
+		border-top: 1px solid #f0f0f0;
+		margin: 12px 0;
+	}
+}

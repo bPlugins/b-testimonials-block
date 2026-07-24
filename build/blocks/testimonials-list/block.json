@@ -1,10 +1,13 @@
 {
   "$schema": "https://schemas.wp.org/trunk/block.json",
-  "apiVersion": 2,
+  "apiVersion": 3,
   "name": "bptmb/testimonials-list",
   "title": "Testimonials List",
   "description": "List customer testimonials one per full-width row.",
   "category": "bplugins",
+  "parent": [
+    "bptmb/b-testimonials"
+  ],
   "keywords": [
     "testimonials",
     "list",
@@ -222,6 +225,22 @@
         "orderBy": "date",
         "order": "desc"
       }
+    },
+    "badgeTitle": {
+      "type": "string",
+      "default": ""
+    },
+    "badgeDesc": {
+      "type": "string",
+      "default": ""
+    },
+    "badgeScore": {
+      "type": "string",
+      "default": ""
+    },
+    "badgeCount": {
+      "type": "string",
+      "default": ""
     }
   },
   "supports": {
@@ -246,6 +265,7 @@
   ],
   "editorStyle": "file:./index.css",
   "style": [
+    "file:./index.css",
     "file:./view.css"
   ],
   "render": "file:./render.php",

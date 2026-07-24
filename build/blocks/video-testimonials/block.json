@@ -1,10 +1,13 @@
 {
   "$schema": "https://schemas.wp.org/trunk/block.json",
-  "apiVersion": 2,
+  "apiVersion": 3,
   "name": "bptmb/video-testimonials",
   "title": "Video Testimonials",
   "description": "Showcase video testimonials with click-to-play (YouTube, Vimeo or MP4).",
   "category": "bplugins",
+  "parent": [
+    "bptmb/b-testimonials"
+  ],
   "keywords": [
     "video",
     "testimonials",
@@ -55,6 +58,30 @@
     "accentColor": {
       "type": "string",
       "default": "#0575e6"
+    },
+    "layout": {
+      "type": "string",
+      "default": "video-testimonials"
+    },
+    "theme": {
+      "type": "string",
+      "default": "default"
+    },
+    "badgeTitle": {
+      "type": "string",
+      "default": ""
+    },
+    "badgeDesc": {
+      "type": "string",
+      "default": ""
+    },
+    "badgeScore": {
+      "type": "string",
+      "default": ""
+    },
+    "badgeCount": {
+      "type": "string",
+      "default": ""
     }
   },
   "supports": {
@@ -69,6 +96,7 @@
   ],
   "editorStyle": "file:./index.css",
   "style": [
+    "file:./index.css",
     "file:./view.css"
   ],
   "viewScript": [

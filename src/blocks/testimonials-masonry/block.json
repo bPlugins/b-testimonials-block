@@ -1,10 +1,13 @@
 {
 	"$schema": "https://schemas.wp.org/trunk/block.json",
-	"apiVersion": 2,
+	"apiVersion": 3,
 	"name": "bptmb/testimonials-masonry",
 	"title": "Testimonials Masonry",
 	"description": "Display customer testimonials in a Pinterest-style masonry grid.",
 	"category": "bplugins",
+	"parent": [
+		"bptmb/b-testimonials"
+	],
 	"keywords": [
 		"testimonials",
 		"masonry",
@@ -27,7 +30,7 @@
 		},
 		"theme": {
 			"type": "string",
-			"default": "default"
+			"default": "theme_4"
 		},
 		"columns": {
 			"type": "object",
@@ -223,6 +226,22 @@
 				"orderBy": "date",
 				"order": "desc"
 			}
+		},
+		"badgeTitle": {
+			"type": "string",
+			"default": ""
+		},
+		"badgeDesc": {
+			"type": "string",
+			"default": ""
+		},
+		"badgeScore": {
+			"type": "string",
+			"default": ""
+		},
+		"badgeCount": {
+			"type": "string",
+			"default": ""
 		}
 	},
 	"supports": {
@@ -247,6 +266,7 @@
 	],
 	"editorStyle": "file:./index.css",
 	"style": [
+		"file:./index.css",
 		"file:./view.css"
 	],
 	"render": "file:./render.php",

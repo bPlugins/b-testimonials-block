@@ -1,8 +1,12 @@
+const RatingIcon = ({ attributes = {}, getStar, rating = 5, starIconColor = '#FF8C02' }) => {
+	const { elements = {} } = attributes || {};
+	const showIcon = elements?.icon ?? true;
 
-const RatingIcon = ({ attributes, getStar, rating, starIconColor }) => {
-    const { elements } = attributes;
-    return elements?.icon && <div className="rating">
-        {getStar(rating, starIconColor)}
-    </div>
-}
+	return showIcon ? (
+		<div className="rating">
+			{typeof getStar === 'function' ? getStar(rating, starIconColor) : null}
+		</div>
+	) : null;
+};
+
 export default RatingIcon;

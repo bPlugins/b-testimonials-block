@@ -73,7 +73,8 @@ const Settings = ({ attributes = {}, setAttributes, updateItem, activeIndex, set
         'rating-summary',
         'star-rating-bars',
         'before-after',
-        'testimonial-stats'
+        'testimonial-stats',
+        'comparison-testimonial-table'
     ];
     const isSingleTestimonial = currentBlockName === 'bptmb/testimonials-single' || layout === 'single' || layout === 'testimonials-single';
     const isSingleItemBlock = singleItemBlocks.includes(layout) || isSingleTestimonial;
@@ -413,6 +414,112 @@ const Settings = ({ attributes = {}, setAttributes, updateItem, activeIndex, set
                                             value={attributes.star1Count ?? ''}
                                             onChange={val => setAttributes({ star1Count: val })}
                                         />
+                                    </>
+                                )}
+                                {layout === 'comparison-testimonial-table' && (
+                                    <>
+                                        <hr style={{ margin: '15px 0', borderColor: '#e2e8f0' }} />
+                                        <Label>{__('Table Column Headers:', 'b-testimonials-block')}</Label>
+                                        <TextControl
+                                            className='mt5'
+                                            label={__('Column 1 Header', 'b-testimonials-block')}
+                                            value={attributes.col1Header ?? 'Customer'}
+                                            onChange={val => setAttributes({ col1Header: val })}
+                                        />
+                                        <TextControl
+                                            className='mt5'
+                                            label={__('Column 2 Header', 'b-testimonials-block')}
+                                            value={attributes.col2Header ?? 'Rating'}
+                                            onChange={val => setAttributes({ col2Header: val })}
+                                        />
+                                        <TextControl
+                                            className='mt5'
+                                            label={__('Column 3 Header', 'b-testimonials-block')}
+                                            value={attributes.col3Header ?? 'Review'}
+                                            onChange={val => setAttributes({ col3Header: val })}
+                                        />
+
+                                        <hr style={{ margin: '15px 0', borderColor: '#e2e8f0' }} />
+                                        <Label>{__('Table Items / Rows:', 'b-testimonials-block')}</Label>
+                                        {items.map((rowItem, rowIdx) => (
+                                            <div key={rowIdx} className='mt10 btb-section-card' style={{ border: '1px solid #e2e8f0', borderRadius: '8px', padding: '12px', background: '#f8fafc' }}>
+                                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                                    <strong style={{ fontSize: '12px', color: '#334155' }}>{__(`Row ${rowIdx + 1}`, 'b-testimonials-block')}</strong>
+                                                    <div style={{ display: 'flex', gap: '4px' }}>
+                                                        <Button
+                                                            isSmall
+                                                            variant='secondary'
+                                                            onClick={() => {
+                                                                const newItems = [...items.slice(0, rowIdx + 1), { ...items[rowIdx] }, ...items.slice(rowIdx + 1)];
+                                                                setAttributes({ items: newItems });
+                                                            }}
+                                                            title={__('Duplicate Row', 'b-testimonials-block')}
+                                                        >
+                                                            <Dashicon icon='admin-page' />
+                                                        </Button>
+                                                        {items.length > 1 && (
+                                                            <Button
+                                                                isDestructive
+                                                                isSmall
+                                                                variant='tertiary'
+                                                                onClick={() => {
+                                                                    const newItems = items.filter((_, i) => i !== rowIdx);
+                                                                    setAttributes({ items: newItems });
+                                                                }}
+                                                                title={__('Remove Row', 'b-testimonials-block')}
+                                                            >
+                                                                <Dashicon icon='no' />
+                                                            </Button>
+                                                        )}
+                                                    </div>
+                                                </div>
+
+                                                <TextControl
+                                                    className='mt5'
+                                                    label={__('Customer Name', 'b-testimonials-block')}
+                                                    value={rowItem.name ?? ''}
+                                                    onChange={val => {
+                                                        const newItems = produce(items, draft => { draft[rowIdx].name = val; });
+                                                        setAttributes({ items: newItems });
+                                                    }}
+                                                />
+
+                                                <NumberControl
+                                                    className='mt5'
+                                                    label={__('Rating (1 - 5)', 'b-testimonials-block')}
+                                                    labelPosition='left'
+                                                    value={rowItem.rating ?? 5}
+                                                    onChange={val => {
+                                                        const newItems = produce(items, draft => { draft[rowIdx].rating = parseInt(val, 10) || 5; });
+                                                        setAttributes({ items: newItems });
+                                                    }}
+                                                    min={1}
+                                                    max={5}
+                                                />
+
+                                                <TextareaControl
+                                                    className='mt5'
+                                                    label={__('Review / Content', 'b-testimonials-block')}
+                                                    value={rowItem.reviewText ?? ''}
+                                                    onChange={val => {
+                                                        const newItems = produce(items, draft => { draft[rowIdx].reviewText = val; });
+                                                        setAttributes({ items: newItems });
+                                                    }}
+                                                />
+                                            </div>
+                                        ))}
+
+                                        <Button
+                                            className='mt15'
+                                            variant='secondary'
+                                            onClick={() => {
+                                                const newItems = [...items, { name: 'Customer Name', rating: 5, reviewText: 'Great product and excellent support!' }];
+                                                setAttributes({ items: newItems });
+                                            }}
+                                            style={{ width: '100%', justifyContent: 'center' }}
+                                        >
+                                            <Dashicon icon='plus' />{__('Add New Row', 'b-testimonials-block')}
+                                        </Button>
                                     </>
                                 )}
                             </PanelBody>

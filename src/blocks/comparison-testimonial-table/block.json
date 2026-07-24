@@ -26,15 +26,37 @@
 			"type": "array",
 			"default": [
 				{
-					"img": {
-						"url": "https://templates.bplugins.com/wp-content/uploads/2025/02/p-29.png"
-					},
-					"name": "John Doe",
-					"deg": "Developer",
-					"reviewText": "It is a long-established fact that a reader will be distracted by the readable content of a page when looking at its layout",
-					"rating": 5
+					"name": "Sarah Jenkins",
+					"rating": 5,
+					"reviewText": "Exceptional service and outstanding quality!"
+				},
+				{
+					"name": "Michael Chang",
+					"rating": 5,
+					"reviewText": "Transformed our workflow, highly recommended."
+				},
+				{
+					"name": "Emily Watson",
+					"rating": 4,
+					"reviewText": "Great support team and very user friendly."
 				}
 			]
+		},
+		"badgeTitle": {
+			"type": "string",
+			"default": "Customer Comparison"
+		},
+		"col1Header": {
+			"type": "string",
+			"default": "Customer"
+		},
+		"col2Header": {
+			"type": "string",
+			"default": "Rating"
+		},
+		"col3Header": {
+			"type": "string",
+			"default": "Review"
 		},
 		"elements": {
 			"type": "object",

@@ -479,17 +479,28 @@ const Layout = ({ itemsEls = [], ToolbarButton, MediaUpload, MediaUploadCheck, a
     }
 
     if (layout === 'comparison-testimonial-table') {
+        const title = bt || attributes.badgeTitle || 'Customer Comparison';
+        const col1 = attributes.col1Header || 'Customer';
+        const col2 = attributes.col2Header || 'Rating';
+        const col3 = attributes.col3Header || 'Review';
+
         return (
             <div className="btb-comparison-table">
-                <h4 className="btb-ct-title">{bt || 'Customer Comparison'}</h4>
+                <h4 className="btb-ct-title">{title}</h4>
                 <table className="btb-ct-table">
-                    <thead><tr><th>Customer</th><th>Rating</th><th>Review</th></tr></thead>
+                    <thead>
+                        <tr>
+                            <th>{col1}</th>
+                            <th>{col2}</th>
+                            <th>{col3}</th>
+                        </tr>
+                    </thead>
                     <tbody>
-                        {items.slice(0, 5).map((item, i) => (
+                        {items.map((item, i) => (
                             <tr key={i}>
-                                <td className="btb-ct-name">{item.name}</td>
+                                <td className="btb-ct-name">{item.name || ''}</td>
                                 <td className="btb-ct-rating">{'★'.repeat(item.rating || 5)}</td>
-                                <td className="btb-ct-text">{(item.reviewText || '').substring(0, 80)}…</td>
+                                <td className="btb-ct-text">{item.reviewText || ''}</td>
                             </tr>
                         ))}
                     </tbody>

@@ -8,12 +8,12 @@ import { addQueryArgs } from '@wordpress/url';
 import { produce } from 'immer';
 
 // Settings Components
-import { tabController } from 'bpl-tools/utils/functions';
+import { tabController } from '../../../../../bpl-tools/utils/functions';
 import ExpandButton from '../Common/ExpandButton';
 import BlockPlaceholder from '../Common/BlockPlaceholder';
 import { ALLOWED_CHILD_BLOCKS } from '../Common/BlockSwitcherModal';
 
-import '@shared/styles/editor.scss';
+import '../../styles/editor.scss';
 import Settings from './Settings/Settings';
 import Style from '../Common/Style';
 import Layout from '../Common/Layout/Layout';
@@ -123,18 +123,21 @@ const Edit = props => {
 
 	const updateItem = (type, val, childType = false) => {
 		const newItems = produce(items, draft => {
+			if (!draft || !draft[activeIndex]) return;
 			if (childType) {
+				if (!draft[activeIndex][type]) draft[activeIndex][type] = {};
 				draft[activeIndex][type][childType] = val;
 			} else {
 				draft[activeIndex][type] = val;
 			}
 		});
 		setAttributes({ items: newItems });
-	}
+	};
 
 	const itemsEls = items.map((item) => {
-		const { name, deg, img, reviewText } = item;
-		const contentLength = htmlTagsStrip(reviewText).length;
+		if (!item) return { img: null, name: null, deg: null, reviewText: null };
+		const { name = '', deg = '', img = {}, reviewText = '' } = item;
+		const contentLength = htmlTagsStrip(reviewText || '').length;
 
 		return {
 			img: <div className="upload">
@@ -143,12 +146,12 @@ const Edit = props => {
 				</MediaUploadCheck>
 			</div>,
 
-			name: elements?.name && <RichText tagName="h3" className='name' value={name} onChange={(val) => updateItem("name", val)} placeholder={__('Enter your name', 'b-testimonials-block')} inlineToolbar />,
+			name: elements?.name && <RichText tagName="h3" className='name' value={name || ''} onChange={(val) => updateItem("name", val)} placeholder={__('Enter your name', 'b-testimonials-block')} inlineToolbar />,
 
-			deg: elements?.deg && <RichText tagName="h5" className='deg' value={deg} onChange={(val) => updateItem("deg", val)} placeholder={__('Enter your designation', 'b-testimonials-block')} inlineToolbar />,
+			deg: elements?.deg && <RichText tagName="h5" className='deg' value={deg || ''} onChange={(val) => updateItem("deg", val)} placeholder={__('Enter your designation', 'b-testimonials-block')} inlineToolbar />,
 
-			reviewText: <ReviewText attributes={attributes} elements={elements} contentLength={contentLength} textLength={textLength} reviewText={reviewText} updateItem={updateItem} />
-		}
+			reviewText: <ReviewText attributes={attributes} elements={elements} contentLength={contentLength} textLength={textLength} reviewText={reviewText || ''} updateItem={updateItem} />
+		};
 	});
 
 	return <>

@@ -2,9 +2,9 @@ import { useEffect } from 'react';
 import { __ } from '@wordpress/i18n';
 import { useBlockProps, InspectorControls, PanelColorSettings } from '@wordpress/block-editor';
 import { PanelBody, TextControl, TextareaControl, ToggleControl } from '@wordpress/components';
-import BlockSwitcher from '@shared/Components/Common/BlockSwitcher';
+import BlockSwitcher from '../../shared/Components/Common/BlockSwitcher';
 
-import '@shared/styles/form.scss';
+import '../../shared/styles/form.scss';
 
 const Edit = ( { attributes, setAttributes, clientId } ) => {
 	const { formTitle, buttonText, successMessage, fields, accentColor } = attributes;

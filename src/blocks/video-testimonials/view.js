@@ -1,6 +1,6 @@
-import '@shared/styles/frontend.scss';
-import '@shared/view';
-import '@shared/styles/video.scss';
+import '../../shared/styles/frontend.scss';
+import '../../shared/view';
+import '../../shared/styles/video.scss';
 
 const handlePlay = ( frame ) => {
 	if ( ! frame || frame.classList.contains( 'is-playing' ) ) {

@@ -6,12 +6,12 @@ import { PanelBody, PanelRow, TabPanel, TextControl, SelectControl, RangeControl
 import { produce } from 'immer';
 
 // Settings Components
-import { Label, ColorControl, InlineDetailMediaUpload, Typography, } from 'bpl-tools/Components';
-import { BDevice, BorderControl, ShadowControl } from 'bpl-tools/Components/Deprecated';
+import { Label, ColorControl, InlineDetailMediaUpload, Typography, } from '../../../../../../bpl-tools/Components';
+import { BDevice, BorderControl, ShadowControl } from '../../../../../../bpl-tools/Components/Deprecated';
 
-import { gearIcon } from 'bpl-tools/utils/icons';
-import { tabController } from 'bpl-tools/utils/functions';
-import { emUnit, perUnit, pxUnit } from 'bpl-tools/utils/options';
+import { gearIcon } from '../../../../../../bpl-tools/utils/icons';
+import { tabController } from '../../../../../../bpl-tools/utils/functions';
+import { emUnit, perUnit, pxUnit } from '../../../../../../bpl-tools/utils/options';
 
 import { checkTheme } from '../../.././utils/functions';
 import { layoutOpt, generalStyleTabs, themeOpt } from './../../../utils/options';
@@ -64,7 +64,16 @@ const Settings = ({ attributes = {}, setAttributes, updateItem, activeIndex, set
         'trust-badges',
         'testimonial-form',
         'user-feedback-poll',
-        'social-proof-toast'
+        'google-review-badge',
+        'capterra-review-badge',
+        'facebook-review-badge',
+        'trustpilot-review-badge',
+        'g2-review-badge',
+        'review-badge-widget',
+        'rating-summary',
+        'star-rating-bars',
+        'before-after',
+        'testimonial-stats'
     ];
     const isSingleTestimonial = currentBlockName === 'bptmb/testimonials-single' || layout === 'single' || layout === 'testimonials-single';
     const isSingleItemBlock = singleItemBlocks.includes(layout) || isSingleTestimonial;
@@ -330,6 +339,40 @@ const Settings = ({ attributes = {}, setAttributes, updateItem, activeIndex, set
                                     onChange={val => setAttributes({ badgeCount: val })}
                                     help={labels.countHelp ? __(labels.countHelp, 'b-testimonials-block') : ''}
                                 />}
+                                {layout === 'user-feedback-poll' && (
+                                    <>
+                                        <hr style={{ margin: '15px 0', borderColor: '#e2e8f0' }} />
+                                        <Label>{__('Scale & Rating Marks Options:', 'b-testimonials-block')}</Label>
+                                        <TextControl
+                                            className='mt5'
+                                            label={__('Minimum Mark', 'b-testimonials-block')}
+                                            type="number"
+                                            value={attributes.minScore ?? 0}
+                                            onChange={val => setAttributes({ minScore: parseInt(val, 10) || 0 })}
+                                            help={__('Starting mark option (default: 0)', 'b-testimonials-block')}
+                                        />
+                                        <TextControl
+                                            className='mt5'
+                                            label={__('Maximum Mark', 'b-testimonials-block')}
+                                            type="number"
+                                            value={attributes.maxScore ?? 10}
+                                            onChange={val => setAttributes({ maxScore: parseInt(val, 10) || 10 })}
+                                            help={__('Ending mark option (e.g. 5, 10, 15, 20)', 'b-testimonials-block')}
+                                        />
+                                        <TextControl
+                                            className='mt5'
+                                            label={__('Low Scale Label', 'b-testimonials-block')}
+                                            value={attributes.lowLabel ?? 'Not likely'}
+                                            onChange={val => setAttributes({ lowLabel: val })}
+                                        />
+                                        <TextControl
+                                            className='mt5'
+                                            label={__('High Scale Label', 'b-testimonials-block')}
+                                            value={attributes.highLabel ?? 'Very likely'}
+                                            onChange={val => setAttributes({ highLabel: val })}
+                                        />
+                                    </>
+                                )}
                                 {layout === 'star-rating-bars' && (
                                     <>
                                         <hr style={{ margin: '15px 0', borderColor: '#e2e8f0' }} />
@@ -383,6 +426,20 @@ const Settings = ({ attributes = {}, setAttributes, updateItem, activeIndex, set
 
                         return (
                             <PanelBody className='bPlPanelBody addRemoveItems editItem' title={isSingleTestimonial ? __('Single Testimonial Settings', 'b-testimonials-block') : isCaseStudy ? __('Add or Remove Case Study Cards', 'b-testimonials-block') : __('Add or Remove Testimonial Cards', 'b-testimonials-block')}>
+                                {!isSingleItemBlock && items?.length > 1 && (
+                                    <div className='btb-card-selector-list mb15' style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
+                                        {items.map((_, idx) => (
+                                            <Button
+                                                key={idx}
+                                                variant={activeIndex === idx ? 'primary' : 'secondary'}
+                                                isSmall
+                                                onClick={() => setActiveIndex(idx)}
+                                            >
+                                                {__(`Card ${idx + 1}`, 'b-testimonials-block')}
+                                            </Button>
+                                        ))}
+                                    </div>
+                                )}
                                 {null !== activeIndex && <>
                                     {!isSingleItemBlock && <h3 className='bplItemTitle'>{__(`Card ${activeIndex + 1}:`, 'b-testimonials-block')}</h3>}
 
@@ -568,37 +625,45 @@ const Settings = ({ attributes = {}, setAttributes, updateItem, activeIndex, set
                         <ShadowControl label={__('Shadow:', 'sound-cloud')} value={shadow} onChange={val => setAttributes({ shadow: val })} produce={produce} />
                     </PanelBody>
 
-                    <PanelBody className='bPlPanelBody' title={__('Image', 'b-testimonials-block')} initialOpen={false} >
-                        <PanelRow>
-                            <NumberControl className='mt10' label={__('Width:', 'b-testimonials-block')} labelPosition='left' value={image?.width} onChange={val => updateObject('image', 'width', val)} />
+                    {(!isSingleItemBlock || isSingleTestimonial) && elements?.img !== false && (
+                        <PanelBody className='bPlPanelBody' title={__('Image', 'b-testimonials-block')} initialOpen={false} >
+                            <PanelRow>
+                                <NumberControl className='mt10' label={__('Width:', 'b-testimonials-block')} labelPosition='left' value={image?.width} onChange={val => updateObject('image', 'width', val)} />
 
-                            <NumberControl className='mt10' label={__('Height:', 'b-testimonials-block')} labelPosition='left' value={image?.height} onChange={val => updateObject('image', 'height', val)} />
-                        </PanelRow>
-                        <BorderControl className='' label={__('Border', 'b-testimonials-block')} value={imgBorder}
-                            onChange={(val) => setAttributes({ imgBorder: val })} />
-                    </PanelBody>
+                                <NumberControl className='mt10' label={__('Height:', 'b-testimonials-block')} labelPosition='left' value={image?.height} onChange={val => updateObject('image', 'height', val)} />
+                            </PanelRow>
+                            <BorderControl className='' label={__('Border', 'b-testimonials-block')} value={imgBorder}
+                                onChange={(val) => setAttributes({ imgBorder: val })} />
+                        </PanelBody>
+                    )}
 
-                    <PanelBody className='bPlPanelBody' title={__('Name', 'b-testimonials-block')} initialOpen={false} >
-                        <Typography className='mt10' label={__('Typography', 'b-testimonials-block')} value={nameTypo} onChange={val => setAttributes({ nameTypo: val })} produce={produce} />
+                    {(!isSingleItemBlock || isSingleTestimonial) && elements?.name !== false && (
+                        <PanelBody className='bPlPanelBody' title={__('Name', 'b-testimonials-block')} initialOpen={false} >
+                            <Typography className='mt10' label={__('Typography', 'b-testimonials-block')} value={nameTypo} onChange={val => setAttributes({ nameTypo: val })} produce={produce} />
 
-                        <ColorControl className="mb10" label={__('Color', 'b-testimonials-block')} value={nameColor} onChange={val => setAttributes({ nameColor: val })} />
-                    </PanelBody>
+                            <ColorControl className="mb10" label={__('Color', 'b-testimonials-block')} value={nameColor} onChange={val => setAttributes({ nameColor: val })} />
+                        </PanelBody>
+                    )}
 
-                    <PanelBody className='bPlPanelBody' title={__('Designation', 'b-testimonials-block')} initialOpen={false} >
-                        <Typography className='mt10' label={__('Typography', 'b-testimonials-block')} value={degTypo} onChange={val => setAttributes({ degTypo: val })} produce={produce} />
+                    {(!isSingleItemBlock || isSingleTestimonial) && elements?.deg !== false && (
+                        <PanelBody className='bPlPanelBody' title={__('Designation', 'b-testimonials-block')} initialOpen={false} >
+                            <Typography className='mt10' label={__('Typography', 'b-testimonials-block')} value={degTypo} onChange={val => setAttributes({ degTypo: val })} produce={produce} />
 
-                        <ColorControl className="mb10" label={__('Color', 'b-testimonials-block')} value={degColor} onChange={val => setAttributes({ degColor: val })} />
-                    </PanelBody>
+                            <ColorControl className="mb10" label={__('Color', 'b-testimonials-block')} value={degColor} onChange={val => setAttributes({ degColor: val })} />
+                        </PanelBody>
+                    )}
 
-                    <PanelBody className='bPlPanelBody' title={__('Review Text', 'b-testimonials-block')} initialOpen={false} >
-                        <Typography className='mt10' label={__('Typography', 'b-testimonials-block')} value={textTypo} onChange={val => setAttributes({ textTypo: val })} produce={produce} />
+                    {(!isSingleItemBlock || isSingleTestimonial) && elements?.reviewText !== false && (
+                        <PanelBody className='bPlPanelBody' title={__('Review Text', 'b-testimonials-block')} initialOpen={false} >
+                            <Typography className='mt10' label={__('Typography', 'b-testimonials-block')} value={textTypo} onChange={val => setAttributes({ textTypo: val })} produce={produce} />
 
-                        <ColorControl className="mb10" label={__('Color', 'b-testimonials-block')} value={textColor} onChange={val => setAttributes({ textColor: val })} />
+                            <ColorControl className="mb10" label={__('Color', 'b-testimonials-block')} value={textColor} onChange={val => setAttributes({ textColor: val })} />
 
-                        <ColorControl className="mb10" label={__('Rating Icon Color', 'b-testimonials-block')} value={starIconColor} onChange={val => setAttributes({ starIconColor: val })} />
+                            <ColorControl className="mb10" label={__('Rating Icon Color', 'b-testimonials-block')} value={starIconColor} onChange={val => setAttributes({ starIconColor: val })} />
 
-                        <RangeControl label={__('Excerpt length', 'b-testimonials-block')} labelPosition='left' value={textLength} onChange={(val) => { setAttributes({ textLength: val }) }} min={10} max={1000} step={1} beforeIcon='grid-view' />
-                    </PanelBody>
+                            <RangeControl label={__('Excerpt length', 'b-testimonials-block')} labelPosition='left' value={textLength} onChange={(val) => { setAttributes({ textLength: val }) }} min={10} max={1000} step={1} beforeIcon='grid-view' />
+                        </PanelBody>
+                    )}
 
                     {(layout === 'theme_2' || layout === 'masonry') &&
                         <PanelBody className='bPlPanelBody' title={__('Top', 'b-testimonials-block')} initialOpen={false} >

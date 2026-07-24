@@ -1,6 +1,6 @@
-import { createRoot } from 'react-dom/client';
+import { createRoot, render } from '@wordpress/element';
 
-import TestimonialsView from '@shared/Components/Common/TestimonialsView';
+import TestimonialsView from './Components/Common/TestimonialsView';
 
 /**
  * Shared frontend renderer for every testimonials block.
@@ -18,7 +18,11 @@ export const initTestimonials = ( selector = '.bTestimonials' ) => {
 
 		const attributes = JSON.parse( el.dataset.attributes );
 
-		createRoot( el ).render( <TestimonialsView attributes={ attributes } /> );
+		if ( createRoot ) {
+			createRoot( el ).render( <TestimonialsView attributes={ attributes } /> );
+		} else if ( render ) {
+			render( <TestimonialsView attributes={ attributes } />, el );
+		}
 
 		el.removeAttribute( 'data-attributes' );
 	} );

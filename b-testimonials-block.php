@@ -81,6 +81,7 @@ class BPBTB_Testimonials_Block{
         require_once __DIR__ . '/includes/cpt.php';
         require_once __DIR__ . '/includes/form.php';
         require_once __DIR__ . '/includes/admin-submissions.php';
+        require_once __DIR__ . '/includes/admin-nps-poll.php';
         require_once __DIR__ . '/includes/admin-menu.php';
     }
 

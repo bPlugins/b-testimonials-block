@@ -1,5 +1,5 @@
-import { getBoxValue } from 'bpl-tools/utils/functions';
-import { getBorderCSS, getShadowCSS, getTypoCSS } from 'bpl-tools/utils/getCSS';
+import { getBoxValue } from '../../../../../bpl-tools/utils/functions';
+import { getBorderCSS, getShadowCSS, getTypoCSS } from '../../../../../bpl-tools/utils/getCSS';
 
 const Style = ({ attributes = {}, clientId }) => {
 	const {
@@ -20,6 +20,7 @@ const Style = ({ attributes = {}, clientId }) => {
 		expandedTypo = {},
 		grid2Bg = '#f9f8f8',
 		grid2Padding = {},
+		starIconColor = '#FF8C02',
 	} = attributes || {};
 
 	const mainEl = `#btbTestimonialsDir-${clientId}`;
@@ -60,7 +61,12 @@ const Style = ({ attributes = {}, clientId }) => {
 			border-left: ${border?.width || '0px'} ${border?.style || 'solid'} ${border?.color || 'transparent'};
 		}
 
-		${mainEl} .layoutSection .single {
+		${mainEl} .layoutSection .single,
+		${mainEl} .btb-star-rating-bars,
+		${mainEl} .btb-badge-card,
+		${mainEl} .btb-stat-card,
+		${mainEl} .btb-toast-card,
+		${mainEl} .btb-trust-badges-grid {
 			background:${background};
 			padding:${getBoxValue(padding)};
 			${getBorderCSS(border)};
@@ -85,6 +91,18 @@ const Style = ({ attributes = {}, clientId }) => {
 			color:${textColor};
 		}
 
+		${mainEl} .btb-srb-title {
+			color: ${nameColor || '#1e293b'};
+		}
+
+		${mainEl} .btb-srb-label,
+		${mainEl} .btb-srb-count {
+			color: ${textColor || '#334155'};
+		}
+
+		${mainEl} .btb-srb-fill {
+			background: ${starIconColor || '#f59e0b'};
+		}
 	`,
 			}}
 		/>

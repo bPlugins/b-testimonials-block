@@ -2,9 +2,9 @@ import { useEffect } from 'react';
 import { __ } from '@wordpress/i18n';
 import { useBlockProps, InspectorControls, PanelColorSettings } from '@wordpress/block-editor';
 import { PanelBody, RangeControl, TextControl, ToggleControl } from '@wordpress/components';
-import BlockSwitcher from '@shared/Components/Common/BlockSwitcher';
+import BlockSwitcher from '../../shared/Components/Common/BlockSwitcher';
 
-import '@shared/styles/rating-summary.scss';
+import '../../shared/styles/rating-summary.scss';
 
 const Edit = ( { attributes, setAttributes, clientId } ) => {
 	const { rating, outOf, count, showCount, countText, starColor, stacked } = attributes;

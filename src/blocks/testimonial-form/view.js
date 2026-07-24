@@ -1,6 +1,6 @@
-import '@shared/styles/frontend.scss';
-import '@shared/view';
-import '@shared/styles/form.scss';
+import '../../shared/styles/frontend.scss';
+import '../../shared/view';
+import '../../shared/styles/form.scss';
 
 const setMessage = ( form, text, type ) => {
 	const msg = form.querySelector( '.btb-tform-msg' );

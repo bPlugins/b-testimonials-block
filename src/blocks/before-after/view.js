@@ -1,6 +1,6 @@
-import '@shared/styles/frontend.scss';
-import '@shared/view';
-import '@shared/styles/before-after.scss';
+import '../../shared/styles/frontend.scss';
+import '../../shared/view';
+import '../../shared/styles/before-after.scss';
 
 const clamp = ( n, min, max ) => Math.max( min, Math.min( max, n ) );
 

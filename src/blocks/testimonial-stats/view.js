@@ -1,6 +1,6 @@
-import '@shared/styles/frontend.scss';
-import '@shared/view';
-import '@shared/styles/stats.scss';
+import '../../shared/styles/frontend.scss';
+import '../../shared/view';
+import '../../shared/styles/stats.scss';
 
 const format = ( num, decimals ) =>
 	decimals > 0 ? num.toFixed( decimals ) : Math.round( num ).toLocaleString();

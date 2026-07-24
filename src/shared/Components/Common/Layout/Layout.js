@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Masonry, { ResponsiveMasonry } from "react-responsive-masonry";
 
 import Default from '../Themes/Default';
@@ -64,6 +64,35 @@ const VideoCard = ( { item, accentColor } ) => {
 	);
 };
 
+const SocialProofToast = ({ items = [], bt, bd, isBackend, activeIndex }) => {
+    const [currentIndex, setCurrentIndex] = useState(0);
+
+    useEffect(() => {
+        if (isBackend || items.length <= 1) return;
+        const interval = setInterval(() => {
+            setCurrentIndex((prev) => (prev + 1) % items.length);
+        }, 4000);
+        return () => clearInterval(interval);
+    }, [isBackend, items.length]);
+
+    const activeItemIndex = isBackend ? (activeIndex < items.length ? activeIndex : 0) : currentIndex;
+    const currentItem = items[activeItemIndex] || {};
+
+    return (
+        <div className="btb-toast-wrapper">
+            <div className="btb-toast-card" key={activeItemIndex}>
+                <div className="btb-toast-avatar">
+                    <img src={currentItem.img?.url || 'https://templates.bplugins.com/wp-content/uploads/2025/02/p-29.png'} alt={currentItem.name || ''} />
+                </div>
+                <div className="btb-toast-body">
+                    <p className="btb-toast-text">{currentItem.reviewText || bt || 'Someone just left a 5-star review!'}</p>
+                    <span className="btb-toast-meta">{currentItem.name || 'John Doe'} — {bd || 'Just now'}</span>
+                </div>
+            </div>
+        </div>
+    );
+};
+
 const Layout = ({ itemsEls = [], ToolbarButton, MediaUpload, MediaUploadCheck, attributes = {}, setActiveIndex, activeIndex = 0, updateItem, isBackend = false, __, RichText }) => {
     const { items = [], columnGap = '30px', rowGap = '40px', layout = 'default', theme = 'default', columns = { desktop: 3, tablet: 2, mobile: 1 } } = attributes || {};
     const { desktop = 3, tablet = 2, mobile = 1 } = (columns && typeof columns === 'object') ? columns : { desktop: 3, tablet: 2, mobile: 1 };
@@ -80,7 +109,7 @@ const Layout = ({ itemsEls = [], ToolbarButton, MediaUpload, MediaUploadCheck, a
 
     // === Theme selector (shared by all testimonial-items layouts) ===
     const themeSelect = (item, index) => {
-        const itemProp = { item, index, itemEls: itemsEls[index], ...itemProps };
+        const itemProp = { item: item || {}, index, itemEls: itemsEls?.[index] || {}, ...itemProps };
         switch (theme) {
             case 'theme_1': return <ThemeOne {...itemProp} />;
             case 'theme_2': return <ThemeTwo {...itemProp} />;
@@ -105,7 +134,7 @@ const Layout = ({ itemsEls = [], ToolbarButton, MediaUpload, MediaUploadCheck, a
 
     // Helper to calculate dynamic rating stats from items array
     const computedStats = (() => {
-        const total = items.length;
+        const total = Array.isArray(items) ? items.length : 0;
         if (total === 0) {
             return {
                 total: 0,
@@ -117,7 +146,8 @@ const Layout = ({ itemsEls = [], ToolbarButton, MediaUpload, MediaUploadCheck, a
         const counts = { 5: 0, 4: 0, 3: 0, 2: 0, 1: 0 };
         let sum = 0;
         items.forEach(it => {
-            const r = Math.min(5, Math.max(1, Number(it.rating ?? 5)));
+            const rawVal = Number(it?.rating ?? 5);
+            const r = Math.min(5, Math.max(1, isNaN(rawVal) ? 5 : rawVal));
             const rounded = Math.round(r);
             counts[rounded] = (counts[rounded] || 0) + 1;
             sum += r;
@@ -308,19 +338,30 @@ const Layout = ({ itemsEls = [], ToolbarButton, MediaUpload, MediaUploadCheck, a
     }
 
     if (layout === 'user-feedback-poll') {
+        const minVal = attributes.minScore !== undefined ? Number(attributes.minScore) : 0;
+        const maxVal = attributes.maxScore !== undefined ? Number(attributes.maxScore) : 10;
+        const lowLbl = attributes.lowLabel !== undefined ? attributes.lowLabel : 'Not likely';
+        const highLbl = attributes.highLabel !== undefined ? attributes.highLabel : 'Very likely';
+
+        const pollNumbers = [];
+        for (let i = minVal; i <= maxVal; i++) {
+            pollNumbers.push(i);
+        }
+
         return (
             <div className="btb-poll-wrapper">
                 <h4 className="btb-poll-title">{bt || 'How likely are you to recommend us?'}</h4>
                 <p className="btb-poll-desc">{bd || 'Net Promoter Score Survey'}</p>
                 <div className="btb-poll-scale">
-                    <span className="btb-poll-label-low">Not likely</span>
+                    {lowLbl && <span className="btb-poll-label-low">{lowLbl}</span>}
                     <div className="btb-poll-buttons">
-                        {[0,1,2,3,4,5,6,7,8,9,10].map(n => (
-                            <button key={n} type="button" className="btb-poll-num-btn">{n}</button>
+                        {pollNumbers.map(n => (
+                            <button key={n} type="button" className="btb-poll-num-btn" data-mark={n}>{n}</button>
                         ))}
                     </div>
-                    <span className="btb-poll-label-high">Very likely</span>
+                    {highLbl && <span className="btb-poll-label-high">{highLbl}</span>}
                 </div>
+                <div className="btb-poll-response-msg" style={{ display: 'none' }}></div>
             </div>
         );
     }
@@ -366,8 +407,8 @@ const Layout = ({ itemsEls = [], ToolbarButton, MediaUpload, MediaUploadCheck, a
             const overrideVal = attributes[`star${s}Count`];
             let count;
             if (overrideVal !== undefined && overrideVal !== '') {
-                count = Number(overrideVal);
-            } else if (computedStats.total > 0) {
+                count = Number(overrideVal) || 0;
+            } else if (computedStats.total > 0 && computedStats.counts[s] > 0) {
                 count = computedStats.counts[s];
             } else {
                 count = defaultCounts[s];
@@ -375,10 +416,11 @@ const Layout = ({ itemsEls = [], ToolbarButton, MediaUpload, MediaUploadCheck, a
             return { star: s, count };
         });
 
-        const totalCountSum = rows.reduce((sum, r) => sum + r.count, 0);
+        const totalCountSum = rows.reduce((sum, r) => sum + (Number(r.count) || 0), 0);
 
         const rowsWithPct = rows.map(r => {
-            const pct = totalCountSum > 0 ? Math.round((r.count / totalCountSum) * 100) : 0;
+            const rawPct = totalCountSum > 0 ? Math.round((r.count / totalCountSum) * 100) : 0;
+            const pct = isNaN(rawPct) ? 0 : rawPct;
             return { ...r, pct };
         });
 
@@ -433,20 +475,7 @@ const Layout = ({ itemsEls = [], ToolbarButton, MediaUpload, MediaUploadCheck, a
     }
 
     if (layout === 'social-proof-toast') {
-        const firstItem = items[0] || {};
-        return (
-            <div className="btb-toast-wrapper">
-                <div className="btb-toast-card">
-                    <div className="btb-toast-avatar">
-                        <img src={firstItem.img?.url || 'https://templates.bplugins.com/wp-content/uploads/2025/02/p-29.png'} alt="" />
-                    </div>
-                    <div className="btb-toast-body">
-                        <p className="btb-toast-text">{bt || 'Someone just left a 5-star review!'}</p>
-                        <span className="btb-toast-meta">{firstItem.name || 'John Doe'} — {bd || 'Just now'}</span>
-                    </div>
-                </div>
-            </div>
-        );
+        return <SocialProofToast items={items} bt={bt} bd={bd} isBackend={isBackend} activeIndex={activeIndex} />;
     }
 
     if (layout === 'comparison-testimonial-table') {

@@ -69,7 +69,7 @@ export const checkTheme = (val, border) => {
 }
 
 export const htmlTagsStrip = (str) => {
-
+    if (!str || typeof str !== 'string') return '';
     return str.replace(/(<([^>]+)>)/ig, '');
 }
 

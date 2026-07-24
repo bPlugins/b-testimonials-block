@@ -55,6 +55,22 @@
     "layout": {
       "type": "string",
       "default": "user-feedback-poll"
+    },
+    "minScore": {
+      "type": "number",
+      "default": 0
+    },
+    "maxScore": {
+      "type": "number",
+      "default": 10
+    },
+    "lowLabel": {
+      "type": "string",
+      "default": "Not likely"
+    },
+    "highLabel": {
+      "type": "string",
+      "default": "Very likely"
     }
   },
   "supports": {

@@ -659,7 +659,14 @@ html {
 			width: 38px; height: 38px; border-radius: 8px; border: 1px solid #cbd5e1;
 			background: #fff; font-weight: 700; cursor: pointer; transition: all 0.15s;
 			&:hover { background: #4527a4; color: #fff; border-color: #4527a4; }
+			&.is-selected { background: #4527a4; color: #fff; border-color: #4527a4; transform: scale(1.1); box-shadow: 0 4px 12px rgba(69, 39, 164, 0.3); }
+			&:disabled { cursor: not-allowed; opacity: 0.7; }
 		}
+	}
+	.btb-poll-response-msg {
+		margin-top: 16px; font-size: 14px; font-weight: 600; color: #4527a4;
+		.btb-poll-success { color: #10b981; }
+		.btb-poll-error { color: #64748b; }
 	}
 }
 
@@ -694,10 +701,10 @@ html {
 	.btb-srb-title { font-size: 17px; font-weight: 700; margin: 0 0 16px; color: #1e293b; }
 	.btb-srb-row {
 		display: flex; align-items: center; gap: 10px; margin-bottom: 8px;
-		.btb-srb-label { font-size: 13px; font-weight: 600; width: 50px; color: #334155; }
+		.btb-srb-label { font-size: 13px; font-weight: 600; width: 60px; flex-shrink: 0; color: #334155; }
 		.btb-srb-track { flex: 1; height: 10px; background: #f1f5f9; border-radius: 5px; overflow: hidden; }
-		.btb-srb-fill { height: 100%; background: linear-gradient(90deg, #f59e0b, #fbbf24); border-radius: 5px; }
-		.btb-srb-count { font-size: 12px; color: #64748b; width: 30px; text-align: right; }
+		.btb-srb-fill { height: 100%; background: linear-gradient(90deg, #f59e0b, #fbbf24); border-radius: 5px; transition: width 0.4s ease; }
+		.btb-srb-count { font-size: 12px; color: #64748b; min-width: 75px; text-align: right; white-space: nowrap; flex-shrink: 0; }
 	}
 }
 

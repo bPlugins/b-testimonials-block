@@ -3,10 +3,10 @@ import { __ } from '@wordpress/i18n';
 import { useBlockProps, InspectorControls, MediaUpload, MediaUploadCheck } from '@wordpress/block-editor';
 import { PanelBody, RangeControl, TextControl, Button, Dashicon } from '@wordpress/components';
 import { produce } from 'immer';
-import BlockSwitcher from '@shared/Components/Common/BlockSwitcher';
+import BlockSwitcher from '../../shared/Components/Common/BlockSwitcher';
 
 import './edit.scss';
-import '@shared/styles/trust-badges.scss';
+import '../../shared/styles/trust-badges.scss';
 
 const gridVars = ( { columns, columnGap, rowGap } ) => ( {
 	'--cols-d': columns?.desktop || 3,

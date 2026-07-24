@@ -1,8 +1,8 @@
 import { HashRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 
-import Welcome from 'bpl-tools/Admin/Welcome';
-import Demos from 'bpl-tools/Admin/Demos';
-import OurPlugins from 'bpl-tools/Admin/OurPlugins';
+import Welcome from '../../../../bpl-tools/Admin/Welcome';
+import Demos from '../../../../bpl-tools/Admin/Demos';
+import OurPlugins from '../../../../bpl-tools/Admin/OurPlugins';
 
 import Layout from './Layout';
 import { demoInfo, welcomeInfo } from '../utils/data';

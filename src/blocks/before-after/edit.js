@@ -2,10 +2,10 @@ import { useEffect } from 'react';
 import { __ } from '@wordpress/i18n';
 import { useBlockProps, InspectorControls, MediaUpload, MediaUploadCheck, PanelColorSettings } from '@wordpress/block-editor';
 import { PanelBody, RangeControl, TextControl, Button } from '@wordpress/components';
-import BlockSwitcher from '@shared/Components/Common/BlockSwitcher';
+import BlockSwitcher from '../../shared/Components/Common/BlockSwitcher';
 
-import BeforeAfterSlider from '@shared/Components/Common/BeforeAfterSlider';
-import '@shared/styles/before-after.scss';
+import BeforeAfterSlider from '../../shared/Components/Common/BeforeAfterSlider';
+import '../../shared/styles/before-after.scss';
 
 const Edit = ( { attributes, setAttributes, clientId } ) => {
 	const { beforeImg, afterImg, beforeLabel, afterLabel, startPosition, accentColor } = attributes;

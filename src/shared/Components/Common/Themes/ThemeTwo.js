@@ -5,10 +5,10 @@ import Image from '../Image';
 import ReviewText from '../ReviewText';
 import RatingIcon from '../ratingIcon';
 
-const ThemeTwo = ({ attributes, itemEls, item, index, activeIndex, setActiveIndex, isBackend }) => {
-    const { starIconColor, grid2Bg } = attributes;
+const ThemeTwo = ({ attributes = {}, itemEls = {}, item = {}, index, activeIndex, setActiveIndex, isBackend }) => {
+    const { starIconColor, grid2Bg } = attributes || {};
 
-    const { img, reviewText, rating } = item;
+    const { img = {}, reviewText = '', rating = 5 } = item || {};
 
     return <div key={index} className={`single ${isBackend && index === activeIndex ? "btbNowEditing" : ""}`} onClick={() => isBackend && setActiveIndex(index)}>
 
@@ -21,10 +21,10 @@ const ThemeTwo = ({ attributes, itemEls, item, index, activeIndex, setActiveInde
         </div>
 
         <div className="bottom">
-            <Image attributes={attributes} img={img}>{itemEls.img}</Image>
+            <Image attributes={attributes} img={img}>{itemEls?.img}</Image>
             <div className='info'>
-                {itemEls.name}
-                {itemEls.deg}
+                {itemEls?.name}
+                {itemEls?.deg}
             </div>
         </div>
     </div>

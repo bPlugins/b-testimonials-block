@@ -1,5 +1,5 @@
 import { Outlet, Link, useLocation } from 'react-router-dom';
-import Header from 'bpl-tools/Admin/Header';
+import Header from '../../../../bpl-tools/Admin/Header';
 
 const navigation = [
 	{ name: 'Welcome', href: '/welcome' },

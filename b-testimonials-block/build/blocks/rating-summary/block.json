@@ -1,0 +1,131 @@
+{
+  "$schema": "https://schemas.wp.org/trunk/block.json",
+  "apiVersion": 3,
+  "category": "bplugins",
+  "parent": [
+    "bptmb/b-testimonials"
+  ],
+  "textdomain": "b-testimonials-block",
+  "supports": {
+    "align": [
+      "wide",
+      "full"
+    ],
+    "html": false
+  },
+  "editorScript": [
+    "file:./index.js"
+  ],
+  "editorStyle": "file:./index.css",
+  "style": [
+    "file:./index.css",
+    "file:./view.css"
+  ],
+  "viewScript": [
+    "file:./view.js"
+  ],
+  "render": "file:./render.php",
+  "name": "bptmb/rating-summary",
+  "title": "Rating Summary",
+  "description": "Show an aggregate star rating with a review count.",
+  "keywords": [
+    "rating",
+    "stars",
+    "summary",
+    "aggregate"
+  ],
+  "attributes": {
+    "align": {
+      "type": "string",
+      "default": "wide"
+    },
+    "cId": {
+      "type": "string",
+      "default": ""
+    },
+    "items": {
+      "type": "array",
+      "default": [
+        {
+          "img": {
+            "url": "https://templates.bplugins.com/wp-content/uploads/2025/02/p-29.png"
+          },
+          "name": "John Doe",
+          "deg": "Developer",
+          "reviewText": "It is a long-established fact that a reader will be distracted by the readable content of a page when looking at its layout",
+          "rating": 5
+        },
+        {
+          "img": {
+            "url": "https://templates.bplugins.com/wp-content/uploads/2025/02/p-29.png"
+          },
+          "name": "Jane Smith",
+          "deg": "Designer",
+          "reviewText": "Great experience working with this plugin!",
+          "rating": 5
+        },
+        {
+          "img": {
+            "url": "https://templates.bplugins.com/wp-content/uploads/2025/02/p-29.png"
+          },
+          "name": "Alex Johnson",
+          "deg": "Manager",
+          "reviewText": "Solid functionality and easy setup.",
+          "rating": 4
+        }
+      ]
+    },
+    "layout": {
+      "type": "string",
+      "default": "rating-summary"
+    },
+    "dataSource": {
+      "type": "string",
+      "default": "manual"
+    },
+    "query": {
+      "type": "object",
+      "default": {}
+    },
+    "badgeTitle": {
+      "type": "string",
+      "default": "Rating Summary"
+    },
+    "badgeScore": {
+      "type": "string",
+      "default": ""
+    },
+    "badgeCount": {
+      "type": "string",
+      "default": ""
+    },
+    "rating": {
+      "type": "number",
+      "default": 4.8
+    },
+    "outOf": {
+      "type": "number",
+      "default": 5
+    },
+    "count": {
+      "type": "number",
+      "default": 1234
+    },
+    "showCount": {
+      "type": "boolean",
+      "default": true
+    },
+    "countText": {
+      "type": "string",
+      "default": "Based on {count} reviews"
+    },
+    "starColor": {
+      "type": "string",
+      "default": "#FF8C02"
+    },
+    "stacked": {
+      "type": "boolean",
+      "default": false
+    }
+  }
+}

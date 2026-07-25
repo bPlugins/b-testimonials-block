@@ -1,7 +1,7 @@
 
 import Image from '../Image';
 import ReviewText from '../ReviewText';
-import RatingIcon from '../ratingIcon';
+import RatingIcon from '../RatingIcon';
 import { getStar } from '../../../utils/functions';
 
 const ThemeFive = ({ itemEls = {}, item = {}, index, attributes = {}, activeIndex, setActiveIndex, isBackend }) => {

@@ -5,6 +5,27 @@ import metadata from './block.json';
 import Edit from '../../shared/Components/Backend/Edit';
 import { blockIcon } from '../../shared/utils/icons';
 
+const deprecated = [
+	{
+		attributes: metadata.attributes,
+		save() {
+			return null;
+		},
+	},
+	{
+		attributes: metadata.attributes,
+		save() {
+			return <div className="wp-block-bptmb-b-testimonials"></div>;
+		},
+	},
+	{
+		attributes: metadata.attributes,
+		save() {
+			return <div className="wp-block-bptmb-testimonials"></div>;
+		},
+	},
+];
+
 registerBlockType( metadata, {
 	icon: blockIcon,
 	edit: Edit,
@@ -16,4 +37,5 @@ registerBlockType( metadata, {
 			</div>
 		);
 	},
+	deprecated,
 } );

@@ -2,7 +2,7 @@
 import { getStar } from '../../../utils/functions';
 import Image from '../Image';
 import ReviewText from '../ReviewText';
-import RatingIcon from '../ratingIcon';
+import RatingIcon from '../RatingIcon';
 
 const Default = ({ item = {}, index, itemEls = {}, attributes = {}, activeIndex, setActiveIndex, isBackend, }) => {
 

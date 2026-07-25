@@ -3,7 +3,7 @@ import { getStar } from '../../../utils/functions';
 import { symbol } from '../../../utils/icons';
 import Image from '../Image';
 import ReviewText from '../ReviewText';
-import RatingIcon from '../ratingIcon';
+import RatingIcon from '../RatingIcon';
 
 const ThemeTwo = ({ attributes = {}, itemEls = {}, item = {}, index, activeIndex, setActiveIndex, isBackend }) => {
     const { starIconColor, grid2Bg } = attributes || {};

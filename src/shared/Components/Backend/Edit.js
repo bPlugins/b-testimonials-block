@@ -99,17 +99,41 @@ const Edit = props => {
 
 	const blockProps = useBlockProps({ className: 'bTestimonials' + (isMainParentBlock ? ' bTestimonialsMainBlock' : '') });
 
-	// Main Parent Block Rendering with InnerBlocks if sub-blocks exist
-	if (isMainParentBlock && innerBlocks?.length > 0) {
-		return (
-			<div {...blockProps}>
-				<Settings attributes={attributes} setAttributes={setAttributes} updateItem={() => { }} activeIndex={activeIndex} setActiveIndex={setActiveIndex} clientId={clientId} currentBlockName={name} />
-				<InnerBlocks
-					templateLock={false}
-					allowedBlocks={ALLOWED_CHILD_BLOCKS}
-				/>
-			</div>
-		);
+	// Main Parent Block Rendering (bptmb/b-testimonials)
+	if (isMainParentBlock) {
+		// 1. If child blocks are present, render InnerBlocks container
+		if (innerBlocks?.length > 0) {
+			return (
+				<div {...blockProps}>
+					<Settings attributes={attributes} setAttributes={setAttributes} updateItem={() => { }} activeIndex={activeIndex} setActiveIndex={setActiveIndex} clientId={clientId} currentBlockName={name} />
+					<InnerBlocks
+						templateLock={false}
+						allowedBlocks={ALLOWED_CHILD_BLOCKS}
+					/>
+				</div>
+			);
+		}
+
+		// 2. If no child blocks are present, check if this is an OLD v1.0.2 block vs a NEW v1.0.3 block
+		const isOldUserBlock = (attributes.items && attributes.items.length > 1) ||
+			(attributes.theme && attributes.theme !== 'default') ||
+			(attributes.layout && attributes.layout !== 'default') ||
+			attributes.isLegacyBlock;
+
+		// 3. For NEW users without child blocks and not using classic editor: render BlockPlaceholder template selector
+		if (!isOldUserBlock && !attributes.useClassicEditor) {
+			return (
+				<div {...blockProps}>
+					<Settings attributes={attributes} setAttributes={setAttributes} updateItem={() => { }} activeIndex={activeIndex} setActiveIndex={setActiveIndex} clientId={clientId} currentBlockName={name} />
+					<BlockPlaceholder clientId={clientId} currentBlockName={name} />
+					<InnerBlocks
+						templateLock={false}
+						allowedBlocks={ALLOWED_CHILD_BLOCKS}
+						renderAppender={() => false}
+					/>
+				</div>
+			);
+		}
 	}
 
 	const updateItem = (type, val, childType = false) => {

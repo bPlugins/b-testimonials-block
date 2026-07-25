@@ -90,21 +90,31 @@ You can post your questions on the [WordPress.org support forum](https://wordpre
 
 == Changelog ==
 
-= 1.0.3 =
-* New: Enabled 40+ modern block layouts & social proof widgets as 100% Free features available in the plugin.
-* New: Added modern React Admin Dashboard under Testimonials -> Demo & Help.
-* New: Added Customer Submissions Management System (`Testimonials → Submissions`) with pending review approval workflow.
-* New: Added full dynamic editing for Avatar Reviews List (`testimonials-avatar-list`) with live canvas RichText, active thumbnail sync, and sidebar item controls.
-* Fix: Preserved 100% backward compatibility for existing / legacy blocks so old user data and layouts are seamlessly preserved.
-* Fix: Corrected CSS selector string scoping in `Style.js` to ensure background, padding, border, and typography styles apply cleanly without affecting the block container element.
-* Fix: Enhanced Block Switcher modal popup and canvas placeholder layout selector.
-* Fix: Hardened security, input sanitization (`wp_unslash`), and REST API nonces.
-* Fix: Resolved Gutenberg component destructuring errors across all child block layouts.
+= 1.0.3 – Major Feature Expansion & Security Hardening =
+* **New:** Expanded from a single Testimonials block to **40+ modern child block layouts** — including Grids, Sliders, Carousels, Masonry, Marquee Tickers, Speech Bubbles, Timelines, Card Stacks, Floating Avatars, Hero Layouts, Quote Boxes, Popup Modals, Video & Audio Testimonials, and more.
+* **New:** Added official-style **Social Proof & Rating Badge** blocks for Google, Trustpilot, G2, Facebook, Capterra, and Verified Buyer seals.
+* **New:** Added **Client Logos** grid block to showcase trusted-by brand logos with grayscale hover effects.
+* **New:** Added interactive **Before / After** image comparison slider block.
+* **New:** Added **Testimonial Form** block for collecting customer reviews directly from the frontend.
+* **New:** Added **Customer Submissions Dashboard** (`Testimonials → Submissions`) with approve, reject, and bulk action workflow.
+* **New:** Added **Feedback & NPS Poll** admin dashboard for tracking Net Promoter Score responses.
+* **New:** Added modern React-based **Demo & Help** admin page under Testimonials menu with first-activation redirect.
+* **New:** Added **Block Switcher** — switch between any child block layout instantly from the sidebar without losing content.
+* **New:** Added **Star Rating Bars**, **Rating Summary**, **Comparison Table**, **Case Study Card**, **FAQ Accordion**, **Social Proof Toast**, and **Testimonial Stats** blocks.
+* **New:** Introduced **Testimonials Custom Post Type (CPT)** for centralized testimonial management with dynamic block sourcing.
+* **Improvement:** Full responsive device controls — columns, column gap, and row gap adjustable independently for Desktop, Tablet, and Mobile.
+* **Improvement:** Complete card design customization — background, box-shadow, padding, border, and border-radius.
+* **Improvement:** Full typography and color controls for reviewer name, designation, review text, and rating icons.
+* **Improvement:** Excerpt length control with expandable Read More / Show Less buttons.
+* **Fix:** Hardened plugin security — added proper output escaping (`wp_kses_post`), input sanitization (`wp_unslash`, `sanitize_text_field`), and nonce verification across all admin pages and REST API endpoints.
+* **Fix:** Resolved WordPress Plugin Check (PCP) compliance — fixed all errors and warnings for internationalization, variable prefixing, and escape output standards.
+* **Fix:** Ensured 100% backward compatibility — existing legacy blocks and user data are seamlessly preserved after update.
+* **Fix:** Corrected CSS selector scoping in dynamic styles to prevent leaking into parent containers.
 
 = 1.0.0 =
-* Initial public release.
+* Initial public release with a single Testimonials block.
 
 == Upgrade Notice ==
 
 = 1.0.3 =
-This update includes 40+ free block layouts, customer submissions management, enhanced block switcher controls, and complete backward compatibility for existing legacy blocks.
+Major update — now includes 40+ free block layouts, social proof badges, customer submissions dashboard, NPS polls, and important security hardening. Fully backward compatible with existing blocks.

@@ -99,22 +99,8 @@ const Edit = props => {
 
 	const blockProps = useBlockProps({ className: isMainParentBlock ? 'bTestimonialsMainBlock' : 'bTestimonials' });
 
-	// Main Parent Block Rendering with InnerBlocks
-	if (isMainParentBlock) {
-		if (!innerBlocks?.length) {
-			return (
-				<div {...blockProps}>
-					<Settings attributes={attributes} setAttributes={setAttributes} updateItem={() => { }} activeIndex={activeIndex} setActiveIndex={setActiveIndex} clientId={clientId} currentBlockName={name} />
-					<BlockPlaceholder clientId={clientId} currentBlockName={name} />
-					<InnerBlocks
-						templateLock={false}
-						allowedBlocks={ALLOWED_CHILD_BLOCKS}
-						renderAppender={() => false}
-					/>
-				</div>
-			);
-		}
-
+	// Main Parent Block Rendering with InnerBlocks if sub-blocks exist
+	if (isMainParentBlock && innerBlocks?.length > 0) {
 		return (
 			<div {...blockProps}>
 				<Settings attributes={attributes} setAttributes={setAttributes} updateItem={() => { }} activeIndex={activeIndex} setActiveIndex={setActiveIndex} clientId={clientId} currentBlockName={name} />

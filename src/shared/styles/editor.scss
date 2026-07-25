@@ -657,9 +657,14 @@ $primaryColor: #4527a4;
 				transition: transform 0.25s ease;
 
 				.dashicons {
+					font-family: dashicons !important;
 					font-size: 24px;
 					width: 24px;
 					height: 24px;
+					line-height: 1;
+					display: inline-flex;
+					align-items: center;
+					justify-content: center;
 					color: $primaryColor;
 				}
 			}

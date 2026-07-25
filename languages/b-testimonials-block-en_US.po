@@ -9,7 +9,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-07-25T03:03:50+00:00\n"
+"POT-Creation-Date: 2026-07-25T03:20:02+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: b-testimonials-block\n"
@@ -26,7 +26,7 @@ msgstr ""
 
 #. Author of the plugin
 #: b-testimonials-block.php
-#: b-testimonials-block.php:140
+#: b-testimonials-block.php:142
 msgid "bPlugins"
 msgstr ""
 
@@ -4741,114 +4741,6 @@ msgstr ""
 #: build/blocks/verified-buyer-badge/index.js:1
 #: build/blocks/video-testimonials/index.js:1
 msgid "Use This Layout"
-msgstr ""
-
-#: build/blocks/audio-testimonials/index.js:1
-#: build/blocks/capterra-review-badge/index.js:1
-#: build/blocks/case-study-card/index.js:1
-#: build/blocks/comparison-testimonial-table/index.js:1
-#: build/blocks/facebook-review-badge/index.js:1
-#: build/blocks/faq-testimonial-accordion/index.js:1
-#: build/blocks/g2-review-badge/index.js:1
-#: build/blocks/google-review-badge/index.js:1
-#: build/blocks/review-badge-widget/index.js:1
-#: build/blocks/social-proof-toast/index.js:1
-#: build/blocks/star-rating-bars/index.js:1
-#: build/blocks/testimonials-avatar-list/index.js:1
-#: build/blocks/testimonials-card-stack/index.js:1
-#: build/blocks/testimonials-carousel-2/index.js:1
-#: build/blocks/testimonials-compact/index.js:1
-#: build/blocks/testimonials-floating-bubble/index.js:1
-#: build/blocks/testimonials-grid-2/index.js:1
-#: build/blocks/testimonials-grid-3/index.js:1
-#: build/blocks/testimonials-grid-minimal/index.js:1
-#: build/blocks/testimonials-hero/index.js:1
-#: build/blocks/testimonials-list/index.js:1
-#: build/blocks/testimonials-marquee/index.js:1
-#: build/blocks/testimonials-masonry/index.js:1
-#: build/blocks/testimonials-popup-modal/index.js:1
-#: build/blocks/testimonials-quote-box/index.js:1
-#: build/blocks/testimonials-slider-3d/index.js:1
-#: build/blocks/testimonials-slider/index.js:1
-#: build/blocks/testimonials-speech-bubble/index.js:1
-#: build/blocks/testimonials-timeline/index.js:1
-#: build/blocks/testimonials/index.js:1
-#: build/blocks/trustpilot-review-badge/index.js:1
-#: build/blocks/user-feedback-poll/index.js:1
-#: build/blocks/verified-buyer-badge/index.js:1
-msgid "Select Your Testimonial Block"
-msgstr ""
-
-#: build/blocks/audio-testimonials/index.js:1
-#: build/blocks/capterra-review-badge/index.js:1
-#: build/blocks/case-study-card/index.js:1
-#: build/blocks/comparison-testimonial-table/index.js:1
-#: build/blocks/facebook-review-badge/index.js:1
-#: build/blocks/faq-testimonial-accordion/index.js:1
-#: build/blocks/g2-review-badge/index.js:1
-#: build/blocks/google-review-badge/index.js:1
-#: build/blocks/review-badge-widget/index.js:1
-#: build/blocks/social-proof-toast/index.js:1
-#: build/blocks/star-rating-bars/index.js:1
-#: build/blocks/testimonials-avatar-list/index.js:1
-#: build/blocks/testimonials-card-stack/index.js:1
-#: build/blocks/testimonials-carousel-2/index.js:1
-#: build/blocks/testimonials-compact/index.js:1
-#: build/blocks/testimonials-floating-bubble/index.js:1
-#: build/blocks/testimonials-grid-2/index.js:1
-#: build/blocks/testimonials-grid-3/index.js:1
-#: build/blocks/testimonials-grid-minimal/index.js:1
-#: build/blocks/testimonials-hero/index.js:1
-#: build/blocks/testimonials-list/index.js:1
-#: build/blocks/testimonials-marquee/index.js:1
-#: build/blocks/testimonials-masonry/index.js:1
-#: build/blocks/testimonials-popup-modal/index.js:1
-#: build/blocks/testimonials-quote-box/index.js:1
-#: build/blocks/testimonials-slider-3d/index.js:1
-#: build/blocks/testimonials-slider/index.js:1
-#: build/blocks/testimonials-speech-bubble/index.js:1
-#: build/blocks/testimonials-timeline/index.js:1
-#: build/blocks/testimonials/index.js:1
-#: build/blocks/trustpilot-review-badge/index.js:1
-#: build/blocks/user-feedback-poll/index.js:1
-#: build/blocks/verified-buyer-badge/index.js:1
-msgid "Choose from the popular testimonial layouts or click below for all 40+ layouts"
-msgstr ""
-
-#: build/blocks/audio-testimonials/index.js:1
-#: build/blocks/capterra-review-badge/index.js:1
-#: build/blocks/case-study-card/index.js:1
-#: build/blocks/comparison-testimonial-table/index.js:1
-#: build/blocks/facebook-review-badge/index.js:1
-#: build/blocks/faq-testimonial-accordion/index.js:1
-#: build/blocks/g2-review-badge/index.js:1
-#: build/blocks/google-review-badge/index.js:1
-#: build/blocks/review-badge-widget/index.js:1
-#: build/blocks/social-proof-toast/index.js:1
-#: build/blocks/star-rating-bars/index.js:1
-#: build/blocks/testimonials-avatar-list/index.js:1
-#: build/blocks/testimonials-card-stack/index.js:1
-#: build/blocks/testimonials-carousel-2/index.js:1
-#: build/blocks/testimonials-compact/index.js:1
-#: build/blocks/testimonials-floating-bubble/index.js:1
-#: build/blocks/testimonials-grid-2/index.js:1
-#: build/blocks/testimonials-grid-3/index.js:1
-#: build/blocks/testimonials-grid-minimal/index.js:1
-#: build/blocks/testimonials-hero/index.js:1
-#: build/blocks/testimonials-list/index.js:1
-#: build/blocks/testimonials-marquee/index.js:1
-#: build/blocks/testimonials-masonry/index.js:1
-#: build/blocks/testimonials-popup-modal/index.js:1
-#: build/blocks/testimonials-quote-box/index.js:1
-#: build/blocks/testimonials-slider-3d/index.js:1
-#: build/blocks/testimonials-slider/index.js:1
-#: build/blocks/testimonials-speech-bubble/index.js:1
-#: build/blocks/testimonials-timeline/index.js:1
-#: build/blocks/testimonials/index.js:1
-#: build/blocks/trustpilot-review-badge/index.js:1
-#: build/blocks/user-feedback-poll/index.js:1
-#: build/blocks/verified-buyer-badge/index.js:1
-msgid "View All 40+ Layouts & Widgets in Modal Popup"
 msgstr ""
 
 #: build/blocks/audio-testimonials/index.js:1

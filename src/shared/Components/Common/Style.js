@@ -23,7 +23,9 @@ const Style = ({ attributes = {}, clientId }) => {
 		starIconColor = '#FF8C02',
 	} = attributes || {};
 
-	const mainEl = `#btbTestimonialsDir-${clientId}`;
+	const cId = clientId || attributes?.cId || '';
+	const idSelector = cId ? `#btbTestimonialsDir-${cId}` : '';
+	const mainEl = idSelector ? `${idSelector}, .bTestimonials` : '.bTestimonials';
 	return (
 		<style
 			dangerouslySetInnerHTML={{

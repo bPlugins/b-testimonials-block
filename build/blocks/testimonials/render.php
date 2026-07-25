@@ -17,8 +17,13 @@ if ( function_exists( 'bpbtb_prepare_block_items' ) ) {
 	$attributes = bpbtb_prepare_block_items( $attributes );
 }
 
+$btb_c_id = $attributes['cId'] ?? '';
+if ( empty( $btb_c_id ) ) {
+	$btb_c_id = 'legacy-' . substr( md5( wp_json_encode( $attributes ) ), 0, 8 );
+	$attributes['cId'] = $btb_c_id;
+}
+
 $btb_align     = $attributes['align'] ?? 'wide';
-$btb_c_id      = $attributes['cId'] ?? '';
 $btb_extra_cls = $attributes['className'] ?? '';
 $btb_classes   = trim( 'bTestimonials wp-block-bptmb-testimonials wp-block-bptmb-b-testimonials ' . $btb_extra_cls . ' align' . $btb_align );
 ?>

@@ -28,6 +28,8 @@ class BPBTB_Testimonials_Block{
 
         add_action('init', [$this, 'onInit']);
         add_action('wp_enqueue_scripts', [$this, 'enqueue_assets']);
+        add_action('admin_enqueue_scripts', [$this, 'enqueue_assets']);
+        add_action('enqueue_block_editor_assets', [$this, 'enqueue_assets']);
         add_filter('block_categories_all', [$this, 'register_block_category']);
 
         // Redirect to Demo & Help page on first activation.

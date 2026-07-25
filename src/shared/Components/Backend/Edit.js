@@ -49,7 +49,7 @@ const Edit = props => {
 		...(rawElements || {})
 	};
 
-	useIframeAssetSync(['bptmb-b-testimonials-editor-style-css', 'bptmb-b-testimonials-editor-script-js']);
+	useIframeAssetSync(['dashicons', 'bptmb-b-testimonials-editor-style-css', 'bptmb-b-testimonials-editor-script-js']);
 
 	const DEFAULT_TESTIMONIAL = {
 		img: { url: 'https://templates.bplugins.com/wp-content/uploads/2025/02/p-29.png' },

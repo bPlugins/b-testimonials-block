@@ -73,11 +73,29 @@
 - [ ] **Popup / Modal**
 - [ ] **Featured Quote / Comparison**
 
-## Phase 5 — Polish
+## Phase 5 — SEO, Filtering & E-commerce Boosters — 📋 পরিকল্পনা
+- [ ] **Schema.org Structured Data (JSON-LD)** — AggregateRating & Review schema generation for Google Rich Snippets
+- [ ] **Dynamic Category Filter & Live Search** — Category tabs & keyword filter bar for Testimonials Grid/Slider
+- [ ] **WooCommerce Product Reviews Sync** — Display Woo product reviews inside testimonials blocks dynamically
+- [ ] **In-Testimonial CTA Buttons** — Call-to-action link buttons inside testimonial cards (e.g., "View Case Study", "Buy Now")
+- [ ] **CSV / JSON Export & Import Tool** — WP Admin import/export manager for testimonials CPT
 
-- [ ] Block Patterns / ready-made templates
-- [ ] i18n (pot ফাইলনেম ঠিক করা), অ্যাক্সেসিবিলিটি অডিট
-- [ ] ডকুমেন্টেশন, `readme.txt` আপডেট, WP.org সাবমিশন
+## Phase 6 — Social Proof Sync & Automation — 📋 পরিকল্পনা
+- [ ] **Google Places / Maps API Importer** — Auto-sync Google Reviews with CRON & caching
+- [ ] **Live Social Proof Toast (FOMO Popup)** — Floating real-time testimonial notifications on screen corners
+- [ ] **Slack / Discord & Email Webhooks** — Real-time notification when a new testimonial is submitted
+- [ ] **QR Code Testimonial Generator** — Generate QR code in Admin for instant mobile testimonial collection
+
+## Phase 7 — AI & Advanced Media Features — 📋 পরিকল্পনা
+- [ ] **In-Form Video & Voice Recorder** — Record video/audio directly from browser webcam/mic in submission form
+- [ ] **AI Review Summarizer & Sentiment Analysis** — Auto-generate 1-sentence takeaways & auto-approve positive 5-star reviews
+- [ ] **Floating Review Collector Widget** — Corner floating tab opening a testimonial reader & review submission modal
+- [ ] **Analytics & Conversion Dashboard** — Track testimonial impressions, CTA clicks, and video play rates
+
+## Phase 8 — Polish & WP.org Submission — 📋 পরিকল্পনা
+- [ ] 20+ Gutenberg Block Patterns (Wall of Love, Hero Testimonials, E-commerce Social Proof)
+- [ ] i18n pot build script fix & accessibility (a11y) audit for keyboard navigation
+- [ ] Documentation, `readme.txt` update & WP.org submission
 
 ---
 

@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { __ } from '@wordpress/i18n';
 import { dispatch, useSelect } from '@wordpress/data';
 import { createBlock } from '@wordpress/blocks';
+import { getLayoutSvgIcon } from '../../utils/icons';
 
 export const CHILD_BLOCKS_LIST = [
 	// Original 12 Blocks
@@ -404,7 +405,7 @@ const BlockSwitcherModal = ({ isOpen, onRequestClose, clientId, currentBlockName
 				<div className="btb-custom-modal-header">
 					<div className="btb-modal-title-wrap">
 						<div className="btb-modal-header-icon">
-							<span className="dashicons dashicons-grid-view" />
+							{getLayoutSvgIcon('grid-view', 24, '#ffffff')}
 						</div>
 						<div>
 							<h3 className="btb-modal-title">{__('Testimonial Block Switcher', 'b-testimonials-block')}</h3>
@@ -419,7 +420,7 @@ const BlockSwitcherModal = ({ isOpen, onRequestClose, clientId, currentBlockName
 						onClick={onRequestClose}
 						aria-label={__('Close modal', 'b-testimonials-block')}
 					>
-						&times;
+						{getLayoutSvgIcon('close', 18)}
 					</button>
 				</div>
 
@@ -438,7 +439,9 @@ const BlockSwitcherModal = ({ isOpen, onRequestClose, clientId, currentBlockName
 						))}
 					</div>
 					<div className="btb-modal-search-box">
-						<span className="dashicons dashicons-search search-icon" />
+						<span className="search-icon">
+							{getLayoutSvgIcon('search', 16)}
+						</span>
 						<input
 							type="text"
 							placeholder={__('Search layouts…', 'b-testimonials-block')}
@@ -451,7 +454,7 @@ const BlockSwitcherModal = ({ isOpen, onRequestClose, clientId, currentBlockName
 								className="clear-search-btn"
 								onClick={() => setSearchQuery('')}
 							>
-								&times;
+								{getLayoutSvgIcon('close', 14)}
 							</button>
 						)}
 					</div>
@@ -469,7 +472,7 @@ const BlockSwitcherModal = ({ isOpen, onRequestClose, clientId, currentBlockName
 							>
 								<div className="btb-modern-card-header">
 									<div className="btb-modern-icon">
-										<span className={`dashicons dashicons-${item.icon}`} />
+										{getLayoutSvgIcon(item.icon, 24)}
 									</div>
 									{item.badge && <span className="btb-modern-badge">{item.badge}</span>}
 								</div>

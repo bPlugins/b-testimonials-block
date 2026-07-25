@@ -119,12 +119,6 @@ $primaryColor: #4527a4;
 		align-items: center;
 		justify-content: center;
 		box-shadow: 0 8px 16px rgba(69, 39, 164, 0.25);
-
-		.dashicons {
-			font-size: 26px;
-			width: 26px;
-			height: 26px;
-		}
 	}
 
 	.btb-modal-title {
@@ -333,11 +327,12 @@ $primaryColor: #4527a4;
 	justify-content: center;
 	transition: all 0.25s ease;
 
-	.dashicons {
-		font-size: 24px;
-		width: 24px;
-		height: 24px;
+	svg {
+		display: block;
+		flex-shrink: 0;
 	}
+
+
 }
 
 .btb-modern-badge {
@@ -456,11 +451,7 @@ $primaryColor: #4527a4;
 	justify-content: center;
 	transition: all 0.25s ease;
 
-	.dashicons {
-		font-size: 24px;
-		width: 24px;
-		height: 24px;
-	}
+
 }
 
 .btbSmartBadge {
@@ -579,11 +570,7 @@ $primaryColor: #4527a4;
 	align-items: center;
 	gap: 8px;
 
-	.dashicons {
-		font-size: 20px;
-		width: 20px;
-		height: 20px;
-	}
+
 }
 
 /* Canvas Placeholder Grid matching my-social-feeds */
@@ -656,17 +643,7 @@ $primaryColor: #4527a4;
 				justify-content: center;
 				transition: transform 0.25s ease;
 
-				.dashicons {
-					font-family: dashicons !important;
-					font-size: 24px;
-					width: 24px;
-					height: 24px;
-					line-height: 1;
-					display: inline-flex;
-					align-items: center;
-					justify-content: center;
-					color: $primaryColor;
-				}
+
 			}
 
 			.btbItemBadge {
@@ -693,10 +670,7 @@ $primaryColor: #4527a4;
 
 				.icon {
 					background: $primaryColor;
-
-					.dashicons {
-						color: #ffffff;
-					}
+					color: #ffffff;
 				}
 			}
 		}

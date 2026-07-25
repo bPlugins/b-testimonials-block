@@ -3,6 +3,7 @@ import { __ } from '@wordpress/i18n';
 import { PanelBody, Button } from '@wordpress/components';
 import { dispatch, useSelect } from '@wordpress/data';
 import { createBlock } from '@wordpress/blocks';
+import { getLayoutSvgIcon } from '../../utils/icons';
 import BlockSwitcherModal from './BlockSwitcherModal';
 
 const BlockSwitcher = ({ clientId, currentBlockName, attributes = {}, setAttributes }) => {
@@ -119,7 +120,7 @@ const BlockSwitcher = ({ clientId, currentBlockName, attributes = {}, setAttribu
 			>
 				<div className="btbSidebarSwitcherCard">
 					<div className="btbSidebarIconWrap">
-						<span className="dashicons dashicons-layout" />
+						{getLayoutSvgIcon('layout', 24)}
 					</div>
 					<div className="btbSidebarTextWrap">
 						<h4 className="btbSidebarTitle">{__('Change Block Layout', 'b-testimonials-block')}</h4>
@@ -132,7 +133,9 @@ const BlockSwitcher = ({ clientId, currentBlockName, attributes = {}, setAttribu
 						className="btbSidebarChangeBtn"
 						onClick={() => setIsModalOpen(true)}
 					>
-						<span className="dashicons dashicons-update" />
+						<span style={{ marginRight: '6px', display: 'inline-flex', alignItems: 'center' }}>
+							{getLayoutSvgIcon('update', 16)}
+						</span>
 						{__('Change Block / Layout', 'b-testimonials-block')}
 					</Button>
 

@@ -3,6 +3,7 @@ import { __ } from '@wordpress/i18n';
 import { Button } from '@wordpress/components';
 import { dispatch } from '@wordpress/data';
 import { createBlock } from '@wordpress/blocks';
+import { getLayoutSvgIcon } from '../../utils/icons';
 import BlockSwitcherModal, { CHILD_BLOCKS_LIST } from './BlockSwitcherModal';
 
 const BlockPlaceholder = ({ clientId, currentBlockName, setAttributes }) => {
@@ -34,7 +35,7 @@ const BlockPlaceholder = ({ clientId, currentBlockName, setAttributes }) => {
 						onClick={() => handleInsertBlock(item.name)}
 					>
 						<div className="icon">
-							<span className={`dashicons dashicons-${item.icon}`} />
+							{getLayoutSvgIcon(item.icon, 24)}
 						</div>
 						<h3>{item.title}</h3>
 						<p>{item.desc}</p>
@@ -49,7 +50,9 @@ const BlockPlaceholder = ({ clientId, currentBlockName, setAttributes }) => {
 					className="btbOpenModalBtn"
 					onClick={() => setIsModalOpen(true)}
 				>
-					<span className="dashicons dashicons-grid-view" />
+					<span style={{ marginRight: '6px', display: 'inline-flex', alignItems: 'center' }}>
+						{getLayoutSvgIcon('grid-view', 18)}
+					</span>
 					{__('View All 40+ Layouts & Widgets in Modal Popup', 'b-testimonials-block')}
 				</Button>
 
@@ -59,7 +62,9 @@ const BlockPlaceholder = ({ clientId, currentBlockName, setAttributes }) => {
 						className="btbUseClassicBtn"
 						onClick={() => setAttributes({ useClassicEditor: true, isLegacyBlock: true })}
 					>
-						<span className="dashicons dashicons-admin-settings" style={{ marginRight: '4px' }} />
+						<span style={{ marginRight: '6px', display: 'inline-flex', alignItems: 'center' }}>
+							{getLayoutSvgIcon('settings', 18)}
+						</span>
 						{__('Use Classic Single Block Slider', 'b-testimonials-block')}
 					</Button>
 				)}

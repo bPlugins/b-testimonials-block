@@ -1,1 +1,31 @@
-striptags
+=====================================================
+  B TESTIMONIALS BLOCK - PROJECT TODO & ROADMAP
+=====================================================
+
+[HIGH PRIORITY / IMMEDIATE]
+[ ] Schema.org JSON-LD Review & AggregateRating SEO output for Google Search snippets
+[ ] Dynamic Category Filter & Search Bar in Testimonial Grid & Slider blocks
+[ ] In-Testimonial CTA (Call To Action) Button & Link option per testimonial
+[ ] CSV / JSON Export & Import tool for Testimonial CPT in WP Admin
+[ ] Sanitization & Security: Apply strict striptags / wp_kses across all submission forms
+
+[MEDIUM PRIORITY / CORE ENHANCEMENTS]
+[ ] Google Places / Maps Reviews API Auto-Sync & Cache
+[ ] WooCommerce Product Reviews Sync Integration (Filter by Product ID/Category)
+[ ] Live Social Proof Toast / Activity Popup Notification on Frontend
+[ ] Direct Video & Audio Microphone Recording in Testimonial Submission Form
+[ ] Email Notifications & Slack / Discord Webhooks on new submission
+[ ] 20+ Ready-made Gutenberg Block Patterns (Wall of Love, SaaS Hero, E-commerce Grid)
+
+[ADVANCED & PRO FEATURES]
+[ ] Trustpilot, Twitter/X, & Facebook Reviews API Importer
+[ ] AI Review Summarizer & Sentiment Analysis (Auto-Approve positive reviews)
+[ ] Floating Review Collector Widget ("Leave a Review" floating tab/modal)
+[ ] QR Code Generator for mobile testimonial collection forms
+[ ] Testimonial Performance Analytics Dashboard (Clicks, Impressions, Video Plays)
+[ ] A/B Testing for Testimonial Layouts & Conversion tracking
+
+[CLEANUP & POLISH]
+[ ] Accessibility (a11y) audit for keyboard navigation & ARIA attributes across all 40 blocks
+[ ] Fix i18n POT file generation script name in package.json
+[ ] Comprehensive WP.org plugin guidelines review & submission prep

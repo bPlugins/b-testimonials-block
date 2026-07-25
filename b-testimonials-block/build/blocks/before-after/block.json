@@ -1,0 +1,76 @@
+{
+  "$schema": "https://schemas.wp.org/trunk/block.json",
+  "apiVersion": 3,
+  "category": "bplugins",
+  "parent": [
+    "bptmb/b-testimonials"
+  ],
+  "textdomain": "b-testimonials-block",
+  "supports": {
+    "align": [
+      "wide",
+      "full"
+    ],
+    "html": false
+  },
+  "editorScript": [
+    "file:./index.js"
+  ],
+  "editorStyle": "file:./index.css",
+  "style": [
+    "file:./index.css",
+    "file:./view.css"
+  ],
+  "viewScript": [
+    "file:./view.js"
+  ],
+  "render": "file:./render.php",
+  "name": "bptmb/before-after",
+  "title": "Before / After",
+  "description": "An interactive before/after image comparison slider.",
+  "keywords": [
+    "before",
+    "after",
+    "comparison",
+    "slider",
+    "image"
+  ],
+  "attributes": {
+    "align": {
+      "type": "string",
+      "default": "wide"
+    },
+    "cId": {
+      "type": "string",
+      "default": ""
+    },
+    "beforeImg": {
+      "type": "object",
+      "default": {
+        "url": ""
+      }
+    },
+    "afterImg": {
+      "type": "object",
+      "default": {
+        "url": ""
+      }
+    },
+    "beforeLabel": {
+      "type": "string",
+      "default": "Before"
+    },
+    "afterLabel": {
+      "type": "string",
+      "default": "After"
+    },
+    "startPosition": {
+      "type": "number",
+      "default": 50
+    },
+    "accentColor": {
+      "type": "string",
+      "default": "#ffffff"
+    }
+  }
+}

@@ -5,7 +5,7 @@ import { dispatch } from '@wordpress/data';
 import { createBlock } from '@wordpress/blocks';
 import BlockSwitcherModal, { CHILD_BLOCKS_LIST } from './BlockSwitcherModal';
 
-const BlockPlaceholder = ({ clientId, currentBlockName }) => {
+const BlockPlaceholder = ({ clientId, currentBlockName, setAttributes }) => {
 	const [isModalOpen, setIsModalOpen] = useState(false);
 
 	const handleInsertBlock = (blockName) => {
@@ -43,7 +43,7 @@ const BlockPlaceholder = ({ clientId, currentBlockName }) => {
 				))}
 			</div>
 
-			<div className="btbPlaceholderModalBtnWrap">
+			<div className="btbPlaceholderModalBtnWrap" style={{ display: 'flex', gap: '12px', justifyContent: 'center', alignItems: 'center', flexWrap: 'wrap' }}>
 				<Button
 					variant="primary"
 					className="btbOpenModalBtn"
@@ -52,6 +52,17 @@ const BlockPlaceholder = ({ clientId, currentBlockName }) => {
 					<span className="dashicons dashicons-grid-view" />
 					{__('View All 40+ Layouts & Widgets in Modal Popup', 'b-testimonials-block')}
 				</Button>
+
+				{setAttributes && (
+					<Button
+						variant="secondary"
+						className="btbUseClassicBtn"
+						onClick={() => setAttributes({ useClassicEditor: true, isLegacyBlock: true })}
+					>
+						<span className="dashicons dashicons-admin-settings" style={{ marginRight: '4px' }} />
+						{__('Use Classic Single Block Slider', 'b-testimonials-block')}
+					</Button>
+				)}
 			</div>
 
 			<BlockSwitcherModal

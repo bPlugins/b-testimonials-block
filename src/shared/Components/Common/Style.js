@@ -24,8 +24,7 @@ const Style = ({ attributes = {}, clientId }) => {
 	} = attributes || {};
 
 	const cId = clientId || attributes?.cId || '';
-	const idSelector = cId ? `#btbTestimonialsDir-${cId}` : '';
-	const mainEl = idSelector ? `${idSelector}, .bTestimonials` : '.bTestimonials';
+	const mainEl = cId ? `#btbTestimonialsDir-${cId}` : '.bTestimonials';
 	return (
 		<style
 			dangerouslySetInnerHTML={{
@@ -34,10 +33,10 @@ const Style = ({ attributes = {}, clientId }) => {
 		${getTypoCSS('', degTypo)?.googleFontLink || ''}
 		${getTypoCSS('', textTypo)?.googleFontLink || ''}
 		${getTypoCSS('', expandedTypo)?.googleFontLink || ''}
-		${getTypoCSS(`${mainEl} .layoutSection .single .name`, nameTypo)?.styles || ''}
-		${getTypoCSS(`${mainEl} .layoutSection .single .deg`, degTypo)?.styles || ''}
-		${getTypoCSS(`${mainEl} .layoutSection .single .reviewText`, textTypo)?.styles || ''}
-
+		${getTypoCSS(`${mainEl} .layoutSection .single .name, ${mainEl} .btb-avatar-name`, nameTypo)?.styles || ''}
+		${getTypoCSS(`${mainEl} .layoutSection .single .deg, ${mainEl} .btb-avatar-deg`, degTypo)?.styles || ''}
+		${getTypoCSS(`${mainEl} .layoutSection .single .reviewText, ${mainEl} .btb-avatar-review`, textTypo)?.styles || ''}
+ 
 		${mainEl} .slider-layout .swiper-slide {
 			 
 		} 
@@ -68,6 +67,7 @@ const Style = ({ attributes = {}, clientId }) => {
 		${mainEl} .btb-badge-card,
 		${mainEl} .btb-stat-card,
 		${mainEl} .btb-toast-card,
+		${mainEl} .btb-avatar-list-wrapper,
 		${mainEl} .btb-trust-badges-grid {
 			background:${background};
 			padding:${getBoxValue(padding)};
@@ -81,15 +81,18 @@ const Style = ({ attributes = {}, clientId }) => {
 			${getBorderCSS(imgBorder)};
 		}
 
-		${mainEl} .layoutSection .single .name{
+		${mainEl} .layoutSection .single .name,
+		${mainEl} .btb-avatar-name {
 			color:${nameColor};
 		}
 
-		${mainEl} .layoutSection .single .deg{
+		${mainEl} .layoutSection .single .deg,
+		${mainEl} .btb-avatar-deg {
 			color:${degColor};
 		}
 
-		${mainEl} .layoutSection .single .reviewText{
+		${mainEl} .layoutSection .single .reviewText,
+		${mainEl} .btb-avatar-review {
 			color:${textColor};
 		}
 

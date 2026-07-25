@@ -99,31 +99,56 @@ const Edit = props => {
 
 	const blockProps = useBlockProps({ className: 'bTestimonials' + (isMainParentBlock ? ' bTestimonialsMainBlock' : '') });
 
-	// Main Parent Block Rendering with InnerBlocks
+	// Main Parent Block Rendering Logic
 	if (isMainParentBlock) {
-		if (!innerBlocks?.length) {
-			return (
-				<div {...blockProps}>
-					<Settings attributes={attributes} setAttributes={setAttributes} updateItem={() => { }} activeIndex={activeIndex} setActiveIndex={setActiveIndex} clientId={clientId} currentBlockName={name} />
-					<BlockPlaceholder clientId={clientId} currentBlockName={name} />
-					<InnerBlocks
-						templateLock={false}
-						allowedBlocks={ALLOWED_CHILD_BLOCKS}
-						renderAppender={() => false}
-					/>
-				</div>
-			);
-		}
+		const isClassicExplicit = attributes.useClassicEditor === true || attributes.isLegacyBlock === true;
+		const isClassicExplicitOff = attributes.useClassicEditor === false;
 
-		return (
-			<div {...blockProps}>
-				<Settings attributes={attributes} setAttributes={setAttributes} updateItem={() => { }} activeIndex={activeIndex} setActiveIndex={setActiveIndex} clientId={clientId} currentBlockName={name} />
-				<InnerBlocks
-					templateLock={false}
-					allowedBlocks={ALLOWED_CHILD_BLOCKS}
-				/>
-			</div>
-		);
+		const isFreshDefaultItem =
+			Array.isArray(attributes?.items) &&
+			attributes.items.length === 1 &&
+			attributes.items[0]?.name === 'John Doe' &&
+			attributes.items[0]?.deg === 'Developer' &&
+			attributes.items[0]?.reviewText === 'It is a long-established fact that a reader will be distracted by the readable content of a page when looking at its layout';
+
+		const isFreshNewBlock =
+			isFreshDefaultItem &&
+			(attributes.theme === 'default' || !attributes.theme) &&
+			(attributes.layout === 'default' || !attributes.layout) &&
+			(attributes.dataSource === 'manual' || !attributes.dataSource);
+
+		// If NOT explicitly classic mode:
+		if (!isClassicExplicit) {
+			// 1. If child blocks are present, render child blocks container
+			if (innerBlocks && innerBlocks.length > 0) {
+				return (
+					<div {...blockProps}>
+						<Settings attributes={attributes} setAttributes={setAttributes} updateItem={() => { }} activeIndex={activeIndex} setActiveIndex={setActiveIndex} clientId={clientId} currentBlockName={name} />
+						<Style attributes={attributes} clientId={clientId} />
+						<InnerBlocks
+							templateLock={false}
+							allowedBlocks={ALLOWED_CHILD_BLOCKS}
+						/>
+					</div>
+				);
+			}
+
+			// 2. If no child blocks: show BlockPlaceholder if explicitly turned off classic OR if it is a fresh new block
+			if (isClassicExplicitOff || isFreshNewBlock) {
+				return (
+					<div {...blockProps}>
+						<Settings attributes={attributes} setAttributes={setAttributes} updateItem={() => { }} activeIndex={activeIndex} setActiveIndex={setActiveIndex} clientId={clientId} currentBlockName={name} />
+						<BlockPlaceholder clientId={clientId} currentBlockName={name} setAttributes={setAttributes} />
+						<InnerBlocks
+							templateLock={false}
+							allowedBlocks={ALLOWED_CHILD_BLOCKS}
+							renderAppender={() => false}
+						/>
+					</div>
+				);
+			}
+		}
+		// Otherwise (isClassicExplicit is true OR existing saved block without classic off), fall through to Classic Single Block rendering below
 	}
 
 	const updateItem = (type, val, childType = false) => {

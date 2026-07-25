@@ -532,21 +532,62 @@ const Layout = ({ itemsEls = [], ToolbarButton, MediaUpload, MediaUploadCheck, a
     // ================================================================
 
     if (layout === 'testimonials-avatar-list') {
-        const activeItem = items[selectedAvatarIdx] || items[0] || {};
+        const activeIdx = isBackend && typeof activeIndex === 'number' ? activeIndex : selectedAvatarIdx;
+        const currentActiveIdx = activeIdx < items.length ? activeIdx : 0;
+        const activeItem = items[currentActiveIdx] || items[0] || {};
+
+        const handleAvatarClick = (idx) => {
+            setSelectedAvatarIdx(idx);
+            if (typeof setActiveIndex === 'function') {
+                setActiveIndex(idx);
+            }
+        };
+
         return (
             <div className="btb-avatar-list-wrapper">
                 <div className="btb-avatar-row">
                     {items.map((it, idx) => (
-                        <div key={idx} onClick={() => setSelectedAvatarIdx(idx)}
-                            className={`btb-avatar-thumb ${selectedAvatarIdx === idx ? 'active' : ''}`}>
-                            <img src={it.img?.url || 'https://templates.bplugins.com/wp-content/uploads/2025/02/p-29.png'} alt={it.name} />
+                        <div key={idx} onClick={() => handleAvatarClick(idx)}
+                            className={`btb-avatar-thumb ${currentActiveIdx === idx ? 'active' : ''}`}>
+                            <img src={it.img?.url || 'https://templates.bplugins.com/wp-content/uploads/2025/02/p-29.png'} alt={it.name || ''} />
                         </div>
                     ))}
                 </div>
                 <div className="btb-avatar-detail">
-                    <p className="btb-avatar-review">&quot;{activeItem.reviewText}&quot;</p>
-                    <h4 className="btb-avatar-name">{activeItem.name}</h4>
-                    <span className="btb-avatar-deg">{activeItem.deg}</span>
+                    {isBackend && RichText ? (
+                        <>
+                            <RichText
+                                tagName="p"
+                                className="btb-avatar-review"
+                                value={activeItem.reviewText || ''}
+                                onChange={(val) => updateItem('reviewText', val)}
+                                placeholder={__('Enter review text', 'b-testimonials-block')}
+                                inlineToolbar
+                            />
+                            <RichText
+                                tagName="h4"
+                                className="btb-avatar-name"
+                                value={activeItem.name || ''}
+                                onChange={(val) => updateItem('name', val)}
+                                placeholder={__('Enter name', 'b-testimonials-block')}
+                                inlineToolbar
+                            />
+                            <RichText
+                                tagName="span"
+                                className="btb-avatar-deg"
+                                value={activeItem.deg || ''}
+                                onChange={(val) => updateItem('deg', val)}
+                                placeholder={__('Enter designation', 'b-testimonials-block')}
+                                inlineToolbar
+                            />
+                        </>
+                    ) : (
+                        <>
+                            <p className="btb-avatar-review">&quot;{activeItem.reviewText || ''}&quot;</p>
+                            <h4 className="btb-avatar-name">{activeItem.name || ''}</h4>
+                            <span className="btb-avatar-deg">{activeItem.deg || ''}</span>
+                        </>
+                    )}
                 </div>
             </div>
         );

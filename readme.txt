@@ -90,12 +90,21 @@ You can post your questions on the [WordPress.org support forum](https://wordpre
 
 == Changelog ==
 
-= 1.0.2 =
+= 1.0.3 =
+* New: Enabled 40+ modern block layouts & social proof widgets as 100% Free features available in the plugin.
 * New: Added modern React Admin Dashboard under Testimonials -> Demo & Help.
-* New: Added 28 new child block layouts & widgets (40 total child blocks).
-* New: Added Customer Submissions Management System (`Testimonials → Submissions`).
+* New: Added Customer Submissions Management System (`Testimonials → Submissions`) with pending review approval workflow.
+* New: Added full dynamic editing for Avatar Reviews List (`testimonials-avatar-list`) with live canvas RichText, active thumbnail sync, and sidebar item controls.
+* Fix: Preserved 100% backward compatibility for existing / legacy blocks so old user data and layouts are seamlessly preserved.
+* Fix: Corrected CSS selector string scoping in `Style.js` to ensure background, padding, border, and typography styles apply cleanly without affecting the block container element.
+* Fix: Enhanced Block Switcher modal popup and canvas placeholder layout selector.
 * Fix: Hardened security, input sanitization (`wp_unslash`), and REST API nonces.
 * Fix: Resolved Gutenberg component destructuring errors across all child block layouts.
 
 = 1.0.0 =
 * Initial public release.
+
+== Upgrade Notice ==
+
+= 1.0.3 =
+This update includes 40+ free block layouts, customer submissions management, enhanced block switcher controls, and complete backward compatibility for existing legacy blocks.

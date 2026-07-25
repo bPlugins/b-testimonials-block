@@ -159,7 +159,7 @@ export const CHILD_BLOCKS_LIST = [
 		category: 'layouts',
 		icon: 'welcome-learn-more',
 		desc: __('Detailed case study card with metrics & quote.', 'b-testimonials-block'),
-		badge: __('Pro', 'b-testimonials-block'),
+		badge: __('Popular', 'b-testimonials-block'),
 	},
 	{
 		name: 'bptmb/google-review-badge',
@@ -306,12 +306,17 @@ const BlockSwitcherModal = ({ isOpen, onRequestClose, clientId, currentBlockName
 	const [activeCategory, setActiveCategory] = useState('all');
 	const [searchQuery, setSearchQuery] = useState('');
 
-	const { currentBlock, innerBlocks } = useSelect(
+	const { currentBlock, parentBlock, innerBlocks } = useSelect(
 		(select) => {
-			if (!clientId) return { currentBlock: null, innerBlocks: [] };
+			if (!clientId) return { currentBlock: null, parentBlock: null, innerBlocks: [] };
 			const block = select('core/block-editor').getBlock(clientId);
+			const parents = select('core/block-editor').getBlockParents(clientId);
+			const parent = parents && parents.length > 0
+				? select('core/block-editor').getBlock(parents[parents.length - 1])
+				: null;
 			return {
 				currentBlock: block,
+				parentBlock: parent,
 				innerBlocks: block ? block.innerBlocks : [],
 			};
 		},
@@ -340,11 +345,21 @@ const BlockSwitcherModal = ({ isOpen, onRequestClose, clientId, currentBlockName
 			const newChildBlock = createBlock(targetBlockName);
 
 			if (currentBlock && currentBlock.name === 'bptmb/b-testimonials') {
+				dispatch('core/block-editor').updateBlockAttributes(clientId, {
+					useClassicEditor: false,
+					isLegacyBlock: false,
+				});
 				if (innerBlocks && innerBlocks.length > 0) {
 					dispatch('core/block-editor').replaceBlock(innerBlocks[0].clientId, newChildBlock);
 				} else {
 					dispatch('core/block-editor').insertBlock(newChildBlock, 0, clientId);
 				}
+			} else if (parentBlock && parentBlock.name === 'bptmb/b-testimonials') {
+				dispatch('core/block-editor').updateBlockAttributes(parentBlock.clientId, {
+					useClassicEditor: false,
+					isLegacyBlock: false,
+				});
+				dispatch('core/block-editor').replaceBlock(clientId, newChildBlock);
 			} else {
 				dispatch('core/block-editor').replaceBlock(clientId, newChildBlock);
 			}

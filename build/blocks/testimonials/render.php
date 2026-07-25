@@ -5,9 +5,11 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 
 
-if ( ! empty( $content ) ) {
-	$clean_content = trim( str_replace( [ '<div class="wp-block-bptmb-testimonials">', '</div>' ], '', $content ) );
-	if ( ! empty( $clean_content ) ) {
+$is_classic = ! empty( $attributes['useClassicEditor'] ) || ! empty( $attributes['isLegacyBlock'] );
+
+if ( ! $is_classic && ! empty( $content ) ) {
+	$inner_content = trim( preg_replace( '/^<div[^>]*>(.*)<\/div>$/ss', '$1', trim( $content ) ) );
+	if ( ! empty( $inner_content ) ) {
 		echo $content;
 		return;
 	}

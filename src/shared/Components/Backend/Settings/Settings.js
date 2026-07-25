@@ -81,7 +81,6 @@ const Settings = ({ attributes = {}, setAttributes, updateItem, activeIndex, set
         'testimonial-stats',
         'comparison-testimonial-table',
         'faq-testimonial-accordion',
-        'testimonials-avatar-list',
         'testimonials-card-stack'
     ];
     const isSingleTestimonial = layout === 'single' || layout === 'testimonials-single';
@@ -128,7 +127,7 @@ const Settings = ({ attributes = {}, setAttributes, updateItem, activeIndex, set
         <InspectorControls>
             <TabPanel className='bPlTabPanel' activeClass='activeTab' tabs={generalStyleTabs} onSelect={tabController}>{tab => <>
                 {'general' === tab.name && <>
-                    <BlockSwitcher clientId={clientId} currentBlockName={currentBlockName} />
+                    <BlockSwitcher clientId={clientId} currentBlockName={currentBlockName} attributes={attributes} setAttributes={setAttributes} />
 
                     {(!isSingleItemBlock || isSingleTestimonial) && (
                         <PanelBody className='bPlPanelBody' title={__('Content Source', 'b-testimonials-block')}>
@@ -316,6 +315,9 @@ const Settings = ({ attributes = {}, setAttributes, updateItem, activeIndex, set
                                 descHelp: 'Text for second trust badge',
                                 scoreHelp: 'Text for third trust badge',
                                 countHelp: 'Text for fourth trust badge',
+                            },
+                            'testimonials-avatar-list': {
+                                panel: 'Avatar Reviews List Settings',
                             },
                         };
 

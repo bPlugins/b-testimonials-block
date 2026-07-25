@@ -168,9 +168,11 @@ function bpbtb_render_admin_submissions_page() {
 		return;
 	}
 
+	// phpcs:ignore WordPress.Security.NonceVerification.Recommended
 	$raw_status    = isset( $_GET['status'] ) ? sanitize_key( wp_unslash( $_GET['status'] ) ) : 'pending';
 	$status_filter = in_array( $raw_status, [ 'pending', 'publish', 'trash', 'all' ], true ) ? $raw_status : 'pending';
 
+	// phpcs:ignore WordPress.Security.NonceVerification.Recommended
 	$paged = isset( $_GET['paged'] ) ? absint( wp_unslash( $_GET['paged'] ) ) : 1;
 	$args  = [
 		'post_type'      => 'testimonial',
@@ -540,11 +542,15 @@ function bpbtb_render_admin_submissions_page() {
 			</div>
 		</div>
 
-		<?php if ( isset( $_GET['msg'] ) ) : ?>
+		<?php
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		if ( isset( $_GET['msg'] ) ) :
+		?>
 			<div class="notice notice-success is-dismissible" style="border-radius: 8px; margin-bottom: 20px;">
 				<p>
 					<?php
-					$msg = sanitize_key( $_GET['msg'] );
+					// phpcs:ignore WordPress.Security.NonceVerification.Recommended
+					$msg = sanitize_key( wp_unslash( $_GET['msg'] ) );
 					if ( 'approved' === $msg ) {
 						esc_html_e( 'Testimonial submission approved and published successfully!', 'b-testimonials-block' );
 					} elseif ( 'rejected' === $msg ) {

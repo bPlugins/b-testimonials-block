@@ -3,14 +3,14 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-
+// phpcs:disable WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound
 
 $is_classic = ! empty( $attributes['useClassicEditor'] ) || ! empty( $attributes['isLegacyBlock'] );
 
 if ( ! $is_classic && ! empty( $content ) ) {
 	$inner_content = trim( preg_replace( '/^<div[^>]*>(.*)<\/div>$/ss', '$1', trim( $content ) ) );
 	if ( ! empty( $inner_content ) ) {
-		echo $content;
+		echo wp_kses_post( $content ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 		return;
 	}
 }

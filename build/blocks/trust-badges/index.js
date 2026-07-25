@@ -1,1 +1,3252 @@
-(()=>{"use strict";const e=window.wp.blocks,t=JSON.parse('{"$schema":"https://schemas.wp.org/trunk/block.json","apiVersion":3,"category":"bplugins","parent":["bptmb/b-testimonials"],"textdomain":"b-testimonials-block","supports":{"align":["wide","full"],"html":false},"editorScript":["file:./index.js"],"editorStyle":"file:./index.css","style":["file:./index.css","file:./view.css"],"viewScript":["file:./view.js"],"render":"file:./render.php","name":"bptmb/trust-badges","title":"Trust Badges","description":"A row of trust badges with a title and subtitle.","keywords":["trust","badges","guarantee","features"],"attributes":{"align":{"type":"string","default":"wide"},"cId":{"type":"string","default":""},"items":{"type":"array","default":[{"img":{"url":""},"title":"Verified reviews","subtitle":"100% authentic"},{"img":{"url":""},"title":"Money-back","subtitle":"30-day guarantee"},{"img":{"url":""},"title":"Secure","subtitle":"SSL protected"}]},"columns":{"type":"object","default":{"desktop":3,"tablet":3,"mobile":1}},"columnGap":{"type":"string","default":"30px"},"rowGap":{"type":"string","default":"30px"},"layout":{"type":"string","default":"trust-badges"}}}'),o=window.React,i=window.wp.i18n,a=window.wp.blockEditor,r=window.wp.components;var n=Symbol.for("immer-nothing"),l=Symbol.for("immer-draftable"),s=Symbol.for("immer-state");function c(e,...t){throw new Error(`[Immer] minified error nr: ${e}. Full error at: https://bit.ly/3cXEKWf`)}var m=Object.getPrototypeOf;function d(e){return!!e&&!!e[s]}function b(e){return!!e&&(h(e)||Array.isArray(e)||!!e[l]||!!e.constructor?.[l]||f(e)||v(e))}var u=Object.prototype.constructor.toString(),p=new WeakMap;function h(e){if(!e||"object"!=typeof e)return!1;const t=Object.getPrototypeOf(e);if(null===t||t===Object.prototype)return!0;const o=Object.hasOwnProperty.call(t,"constructor")&&t.constructor;if(o===Object)return!0;if("function"!=typeof o)return!1;let i=p.get(o);return void 0===i&&(i=Function.toString.call(o),p.set(o,i)),i===u}function g(e,t,o=!0){0===k(e)?(o?Reflect.ownKeys(e):Object.keys(e)).forEach(o=>{t(o,e[o],e)}):e.forEach((o,i)=>t(i,o,e))}function k(e){const t=e[s];return t?t.type_:Array.isArray(e)?1:f(e)?2:v(e)?3:0}function _(e,t){return 2===k(e)?e.has(t):Object.prototype.hasOwnProperty.call(e,t)}function y(e,t,o){const i=k(e);2===i?e.set(t,o):3===i?e.add(o):e[t]=o}function f(e){return e instanceof Map}function v(e){return e instanceof Set}function w(e){return e.copy_||e.base_}function E(e,t){if(f(e))return new Map(e);if(v(e))return new Set(e);if(Array.isArray(e))return Array.prototype.slice.call(e);const o=h(e);if(!0===t||"class_only"===t&&!o){const t=Object.getOwnPropertyDescriptors(e);delete t[s];let o=Reflect.ownKeys(t);for(let i=0;i<o.length;i++){const a=o[i],r=t[a];!1===r.writable&&(r.writable=!0,r.configurable=!0),(r.get||r.set)&&(t[a]={configurable:!0,writable:!0,enumerable:r.enumerable,value:e[a]})}return Object.create(m(e),t)}{const t=m(e);if(null!==t&&o)return{...e};const i=Object.create(t);return Object.assign(i,e)}}function x(e,t=!1){return S(e)||d(e)||!b(e)||(k(e)>1&&Object.defineProperties(e,{set:B,add:B,clear:B,delete:B}),Object.freeze(e),t&&Object.values(e).forEach(e=>x(e,!0))),e}var B={value:function(){c(2)}};function S(e){return null===e||"object"!=typeof e||Object.isFrozen(e)}var C,L={};function N(e){const t=L[e];return t||c(0),t}function j(){return C}function P(e,t){t&&(N("Patches"),e.patches_=[],e.inversePatches_=[],e.patchListener_=t)}function M(e){z(e),e.drafts_.forEach(W),e.drafts_=null}function z(e){e===C&&(C=e.parent_)}function A(e){return C={drafts_:[],parent_:C,immer_:e,canAutoFreeze_:!0,unfinalizedDrafts_:0}}function W(e){const t=e[s];0===t.type_||1===t.type_?t.revoke_():t.revoked_=!0}function O(e,t){t.unfinalizedDrafts_=t.drafts_.length;const o=t.drafts_[0];return void 0!==e&&e!==o?(o[s].modified_&&(M(t),c(4)),b(e)&&(e=T(t,e),t.parent_||I(t,e)),t.patches_&&N("Patches").generateReplacementPatches_(o[s].base_,e,t.patches_,t.inversePatches_)):e=T(t,o,[]),M(t),t.patches_&&t.patchListener_(t.patches_,t.inversePatches_),e!==n?e:void 0}function T(e,t,o){if(S(t))return t;const i=e.immer_.shouldUseStrictIteration(),a=t[s];if(!a)return g(t,(i,r)=>F(e,a,t,i,r,o),i),t;if(a.scope_!==e)return t;if(!a.modified_)return I(e,a.base_,!0),a.base_;if(!a.finalized_){a.finalized_=!0,a.scope_.unfinalizedDrafts_--;const t=a.copy_;let r=t,n=!1;3===a.type_&&(r=new Set(t),t.clear(),n=!0),g(r,(i,r)=>F(e,a,t,i,r,o,n),i),I(e,t,!1),o&&e.patches_&&N("Patches").generatePatches_(a,o,e.patches_,e.inversePatches_)}return a.copy_}function F(e,t,o,i,a,r,n){if(null==a)return;if("object"!=typeof a&&!n)return;const l=S(a);if(!l||n){if(d(a)){const n=T(e,a,r&&t&&3!==t.type_&&!_(t.assigned_,i)?r.concat(i):void 0);if(y(o,i,n),!d(n))return;e.canAutoFreeze_=!1}else n&&o.add(a);if(b(a)&&!l){if(!e.immer_.autoFreeze_&&e.unfinalizedDrafts_<1)return;if(t&&t.base_&&t.base_[i]===a&&l)return;T(e,a),t&&t.scope_.parent_||"symbol"==typeof i||!(f(o)?o.has(i):Object.prototype.propertyIsEnumerable.call(o,i))||I(e,a)}}}function I(e,t,o=!1){!e.parent_&&e.immer_.autoFreeze_&&e.canAutoFreeze_&&x(t,o)}var R={get(e,t){if(t===s)return e;const o=w(e);if(!_(o,t))return function(e,t,o){const i=H(t,o);return i?"value"in i?i.value:i.get?.call(e.draft_):void 0}(e,o,t);const i=o[t];return e.finalized_||!b(i)?i:i===D(e.base_,t)?(q(e),e.copy_[t]=U(i,e)):i},has:(e,t)=>t in w(e),ownKeys:e=>Reflect.ownKeys(w(e)),set(e,t,o){const i=H(w(e),t);if(i?.set)return i.set.call(e.draft_,o),!0;if(!e.modified_){const i=D(w(e),t),n=i?.[s];if(n&&n.base_===o)return e.copy_[t]=o,e.assigned_[t]=!1,!0;if(((a=o)===(r=i)?0!==a||1/a==1/r:a!=a&&r!=r)&&(void 0!==o||_(e.base_,t)))return!0;q(e),G(e)}var a,r;return e.copy_[t]===o&&(void 0!==o||t in e.copy_)||Number.isNaN(o)&&Number.isNaN(e.copy_[t])||(e.copy_[t]=o,e.assigned_[t]=!0),!0},deleteProperty:(e,t)=>(void 0!==D(e.base_,t)||t in e.base_?(e.assigned_[t]=!1,q(e),G(e)):delete e.assigned_[t],e.copy_&&delete e.copy_[t],!0),getOwnPropertyDescriptor(e,t){const o=w(e),i=Reflect.getOwnPropertyDescriptor(o,t);return i?{writable:!0,configurable:1!==e.type_||"length"!==t,enumerable:i.enumerable,value:o[t]}:i},defineProperty(){c(11)},getPrototypeOf:e=>m(e.base_),setPrototypeOf(){c(12)}},V={};function D(e,t){const o=e[s];return(o?w(o):e)[t]}function H(e,t){if(!(t in e))return;let o=m(e);for(;o;){const e=Object.getOwnPropertyDescriptor(o,t);if(e)return e;o=m(o)}}function G(e){e.modified_||(e.modified_=!0,e.parent_&&G(e.parent_))}function q(e){e.copy_||(e.copy_=E(e.base_,e.scope_.immer_.useStrictShallowCopy_))}function U(e,t){const o=f(e)?N("MapSet").proxyMap_(e,t):v(e)?N("MapSet").proxySet_(e,t):function(e,t){const o=Array.isArray(e),i={type_:o?1:0,scope_:t?t.scope_:j(),modified_:!1,finalized_:!1,assigned_:{},parent_:t,base_:e,draft_:null,copy_:null,revoke_:null,isManual_:!1};let a=i,r=R;o&&(a=[i],r=V);const{revoke:n,proxy:l}=Proxy.revocable(a,r);return i.draft_=l,i.revoke_=n,l}(e,t);return(t?t.scope_:j()).drafts_.push(o),o}function K(e){if(!b(e)||S(e))return e;const t=e[s];let o,i=!0;if(t){if(!t.modified_)return t.base_;t.finalized_=!0,o=E(e,t.scope_.immer_.useStrictShallowCopy_),i=t.scope_.immer_.shouldUseStrictIteration()}else o=E(e,!0);return g(o,(e,t)=>{y(o,e,K(t))},i),t&&(t.finalized_=!1),o}g(R,(e,t)=>{V[e]=function(){return arguments[0]=arguments[0][0],t.apply(this,arguments)}}),V.deleteProperty=function(e,t){return V.set.call(this,e,t,void 0)},V.set=function(e,t,o){return R.set.call(this,e[0],t,o,e[0])};var Q=(new class{constructor(e){this.autoFreeze_=!0,this.useStrictShallowCopy_=!1,this.useStrictIteration_=!0,this.produce=(e,t,o)=>{if("function"==typeof e&&"function"!=typeof t){const o=t;t=e;const i=this;return function(e=o,...a){return i.produce(e,e=>t.call(this,e,...a))}}let i;if("function"!=typeof t&&c(6),void 0!==o&&"function"!=typeof o&&c(7),b(e)){const a=A(this),r=U(e,void 0);let n=!0;try{i=t(r),n=!1}finally{n?M(a):z(a)}return P(a,o),O(i,a)}if(!e||"object"!=typeof e){if(i=t(e),void 0===i&&(i=e),i===n&&(i=void 0),this.autoFreeze_&&x(i,!0),o){const t=[],a=[];N("Patches").generateReplacementPatches_(e,i,t,a),o(t,a)}return i}c(1)},this.produceWithPatches=(e,t)=>{if("function"==typeof e)return(t,...o)=>this.produceWithPatches(t,t=>e(t,...o));let o,i;return[this.produce(e,t,(e,t)=>{o=e,i=t}),o,i]},"boolean"==typeof e?.autoFreeze&&this.setAutoFreeze(e.autoFreeze),"boolean"==typeof e?.useStrictShallowCopy&&this.setUseStrictShallowCopy(e.useStrictShallowCopy),"boolean"==typeof e?.useStrictIteration&&this.setUseStrictIteration(e.useStrictIteration)}createDraft(e){var t;b(e)||c(8),d(e)&&(d(t=e)||c(10),e=K(t));const o=A(this),i=U(e,void 0);return i[s].isManual_=!0,z(o),i}finishDraft(e,t){const o=e&&e[s];o&&o.isManual_||c(9);const{scope_:i}=o;return P(i,t),O(void 0,i)}setAutoFreeze(e){this.autoFreeze_=e}setUseStrictShallowCopy(e){this.useStrictShallowCopy_=e}setUseStrictIteration(e){this.useStrictIteration_=e}shouldUseStrictIteration(){return this.useStrictIteration_}applyPatches(e,t){let o;for(o=t.length-1;o>=0;o--){const i=t[o];if(0===i.path.length&&"replace"===i.op){e=i.value;break}}o>-1&&(t=t.slice(o+1));const i=N("Patches").applyPatches_;return d(e)?i(e,t):this.produce(e,e=>i(e,t))}}).produce;const $=window.wp.data;(0,o.createElement)("svg",{xmlns:"http://www.w3.org/2000/svg",fill:"#000000",width:"20px",height:"20px",viewBox:"0 0 512 512"},(0,o.createElement)("path",{d:"M232 280L64 280 64 232 232 232 232 64 280 64 280 232 448 232 448 280 280 280 280 448 232 448 232 280Z"}));const J=(0,o.createElement)("svg",{xmlns:"http://www.w3.org/2000/svg",width:"800px",height:"800px",viewBox:"0 0 20 20"},(0,o.createElement)("rect",{x:"0",fill:"none",width:"20",height:"20"}),(0,o.createElement)("g",null,(0,o.createElement)("path",{d:"M4 3h12c.55 0 1.02.2 1.41.59S18 4.45 18 5v7c0 .55-.2 1.02-.59 1.41S16.55 14 16 14h-1l-5 5v-5H4c-.55 0-1.02-.2-1.41-.59S2 12.55 2 12V5c0-.55.2-1.02.59-1.41S3.45 3 4 3zm11 2H4v1h11V5zm1 3H4v1h12V8zm-3 3H4v1h9v-1z"}))),X=((0,o.createElement)("svg",{xmlns:"http://www.w3.org/2000/svg",width:24,height:24,viewBox:"0 0 14.707 14.707"},(0,o.createElement)("rect",{x:"6.275",y:"0",width:"2.158",height:"14.707"})),(0,o.createElement)("svg",{xmlns:"http://www.w3.org/2000/svg",width:24,height:24,viewBox:"0 0 357 357"},(0,o.createElement)("path",{d:"M357,204H0v-51h357V204z"})),(e,t=22,i="currentColor")=>{switch(e){case"slides":case"carousel":return(0,o.createElement)("svg",{width:t,height:t,viewBox:"0 0 24 24",fill:"none",stroke:i,strokeWidth:"2",strokeLinecap:"round",strokeLinejoin:"round"},(0,o.createElement)("rect",{x:"2",y:"5",width:"20",height:"14",rx:"2"}),(0,o.createElement)("path",{d:"M8 12l4-4 4 4"}),(0,o.createElement)("path",{d:"M12 8v8"}));case"editor-ul":case"list":return(0,o.createElement)("svg",{width:t,height:t,viewBox:"0 0 24 24",fill:"none",stroke:i,strokeWidth:"2",strokeLinecap:"round",strokeLinejoin:"round"},(0,o.createElement)("line",{x1:"8",y1:"6",x2:"21",y2:"6"}),(0,o.createElement)("line",{x1:"8",y1:"12",x2:"21",y2:"12"}),(0,o.createElement)("line",{x1:"8",y1:"18",x2:"21",y2:"18"}),(0,o.createElement)("line",{x1:"3",y1:"6",x2:"3.01",y2:"6"}),(0,o.createElement)("line",{x1:"3",y1:"12",x2:"3.01",y2:"12"}),(0,o.createElement)("line",{x1:"3",y1:"18",x2:"3.01",y2:"18"}));case"dashboard":case"masonry":return(0,o.createElement)("svg",{width:t,height:t,viewBox:"0 0 24 24",fill:"none",stroke:i,strokeWidth:"2",strokeLinecap:"round",strokeLinejoin:"round"},(0,o.createElement)("rect",{x:"3",y:"3",width:"7",height:"9",rx:"1"}),(0,o.createElement)("rect",{x:"14",y:"3",width:"7",height:"5",rx:"1"}),(0,o.createElement)("rect",{x:"14",y:"12",width:"7",height:"9",rx:"1"}),(0,o.createElement)("rect",{x:"3",y:"16",width:"7",height:"5",rx:"1"}));case"update-alt":case"update":case"marquee":return(0,o.createElement)("svg",{width:t,height:t,viewBox:"0 0 24 24",fill:"none",stroke:i,strokeWidth:"2",strokeLinecap:"round",strokeLinejoin:"round"},(0,o.createElement)("path",{d:"M21.5 2v6h-6"}),(0,o.createElement)("path",{d:"M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"}));case"star-filled":case"star-half":case"rating":return(0,o.createElement)("svg",{width:t,height:t,viewBox:"0 0 24 24",fill:"currentColor"===i?"#ff9800":i,stroke:"currentColor"===i?"#ff9800":i,strokeWidth:"1.5"},(0,o.createElement)("polygon",{points:"12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"}));case"chart-bar":case"stats":return(0,o.createElement)("svg",{width:t,height:t,viewBox:"0 0 24 24",fill:"none",stroke:i,strokeWidth:"2",strokeLinecap:"round",strokeLinejoin:"round"},(0,o.createElement)("line",{x1:"12",y1:"20",x2:"12",y2:"10"}),(0,o.createElement)("line",{x1:"18",y1:"20",x2:"18",y2:"4"}),(0,o.createElement)("line",{x1:"6",y1:"20",x2:"6",y2:"16"}));case"shield":case"yes-alt":case"verified":return(0,o.createElement)("svg",{width:t,height:t,viewBox:"0 0 24 24",fill:"none",stroke:i,strokeWidth:"2",strokeLinecap:"round",strokeLinejoin:"round"},(0,o.createElement)("path",{d:"M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"}),(0,o.createElement)("path",{d:"M9 12l2 2 4-4"}));case"groups":case"admin-users":return(0,o.createElement)("svg",{width:t,height:t,viewBox:"0 0 24 24",fill:"none",stroke:i,strokeWidth:"2",strokeLinecap:"round",strokeLinejoin:"round"},(0,o.createElement)("path",{d:"M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"}),(0,o.createElement)("circle",{cx:"9",cy:"7",r:"4"}),(0,o.createElement)("path",{d:"M23 21v-2a4 4 0 0 0-3-3.87"}),(0,o.createElement)("path",{d:"M16 3.13a4 4 0 0 1 0 7.75"}));case"video-alt3":case"video":return(0,o.createElement)("svg",{width:t,height:t,viewBox:"0 0 24 24",fill:"none",stroke:i,strokeWidth:"2",strokeLinecap:"round",strokeLinejoin:"round"},(0,o.createElement)("polygon",{points:"23 7 16 12 23 17 23 7"}),(0,o.createElement)("rect",{x:"1",y:"5",width:"15",height:"14",rx:"2",ry:"2"}));case"image-flip-horizontal":case"before-after":return(0,o.createElement)("svg",{width:t,height:t,viewBox:"0 0 24 24",fill:"none",stroke:i,strokeWidth:"2",strokeLinecap:"round",strokeLinejoin:"round"},(0,o.createElement)("rect",{x:"3",y:"3",width:"18",height:"18",rx:"2"}),(0,o.createElement)("line",{x1:"12",y1:"3",x2:"12",y2:"21"}),(0,o.createElement)("path",{d:"M8 10l-3 3 3 3"}),(0,o.createElement)("path",{d:"M16 10l3 3-3 3"}));case"feedback":case"form":return(0,o.createElement)("svg",{width:t,height:t,viewBox:"0 0 24 24",fill:"none",stroke:i,strokeWidth:"2",strokeLinecap:"round",strokeLinejoin:"round"},(0,o.createElement)("path",{d:"M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"}));case"align-center":case"grid-view":case"grid":case"layout":default:return(0,o.createElement)("svg",{width:t,height:t,viewBox:"0 0 24 24",fill:"none",stroke:i,strokeWidth:"2",strokeLinecap:"round",strokeLinejoin:"round"},(0,o.createElement)("rect",{x:"3",y:"3",width:"7",height:"7",rx:"1"}),(0,o.createElement)("rect",{x:"14",y:"3",width:"7",height:"7",rx:"1"}),(0,o.createElement)("rect",{x:"14",y:"14",width:"7",height:"7",rx:"1"}),(0,o.createElement)("rect",{x:"3",y:"14",width:"7",height:"7",rx:"1"}));case"columns":return(0,o.createElement)("svg",{width:t,height:t,viewBox:"0 0 24 24",fill:"none",stroke:i,strokeWidth:"2",strokeLinecap:"round",strokeLinejoin:"round"},(0,o.createElement)("rect",{x:"3",y:"3",width:"18",height:"18",rx:"2"}),(0,o.createElement)("line",{x1:"9",y1:"3",x2:"9",y2:"21"}),(0,o.createElement)("line",{x1:"15",y1:"3",x2:"15",y2:"21"}));case"excerpt-view":case"compact":return(0,o.createElement)("svg",{width:t,height:t,viewBox:"0 0 24 24",fill:"none",stroke:i,strokeWidth:"2",strokeLinecap:"round",strokeLinejoin:"round"},(0,o.createElement)("rect",{x:"3",y:"4",width:"18",height:"4",rx:"1"}),(0,o.createElement)("rect",{x:"3",y:"10",width:"18",height:"4",rx:"1"}),(0,o.createElement)("rect",{x:"3",y:"16",width:"18",height:"4",rx:"1"}));case"format-quote":case"quote":return(0,o.createElement)("svg",{width:t,height:t,viewBox:"0 0 24 24",fill:"currentColor"===i?"currentColor":i},(0,o.createElement)("path",{d:"M6 17h3l2-4V7H5v6h3zm8 0h3l2-4V7h-6v6h3z"}));case"format-chat":case"speech":return(0,o.createElement)("svg",{width:t,height:t,viewBox:"0 0 24 24",fill:"none",stroke:i,strokeWidth:"2",strokeLinecap:"round",strokeLinejoin:"round"},(0,o.createElement)("path",{d:"M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"}));case"list-view":case"timeline":return(0,o.createElement)("svg",{width:t,height:t,viewBox:"0 0 24 24",fill:"none",stroke:i,strokeWidth:"2",strokeLinecap:"round",strokeLinejoin:"round"},(0,o.createElement)("line",{x1:"12",y1:"2",x2:"12",y2:"22"}),(0,o.createElement)("circle",{cx:"12",cy:"6",r:"2"}),(0,o.createElement)("circle",{cx:"12",cy:"12",r:"2"}),(0,o.createElement)("circle",{cx:"12",cy:"18",r:"2"}));case"index-card":case"card-stack":return(0,o.createElement)("svg",{width:t,height:t,viewBox:"0 0 24 24",fill:"none",stroke:i,strokeWidth:"2",strokeLinecap:"round",strokeLinejoin:"round"},(0,o.createElement)("rect",{x:"2",y:"7",width:"16",height:"14",rx:"2"}),(0,o.createElement)("path",{d:"M6 3h14a2 2 0 0 1 2 2v12"}));case"welcome-learn-more":case"case-study":return(0,o.createElement)("svg",{width:t,height:t,viewBox:"0 0 24 24",fill:"none",stroke:i,strokeWidth:"2",strokeLinecap:"round",strokeLinejoin:"round"},(0,o.createElement)("path",{d:"M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"}),(0,o.createElement)("polyline",{points:"14 2 14 8 20 8"}),(0,o.createElement)("line",{x1:"16",y1:"13",x2:"8",y2:"13"}),(0,o.createElement)("line",{x1:"16",y1:"17",x2:"8",y2:"17"}),(0,o.createElement)("polyline",{points:"10 9 9 9 8 9"}));case"google":return(0,o.createElement)("svg",{width:t,height:t,viewBox:"0 0 24 24"},(0,o.createElement)("path",{fill:"#4285F4",d:"M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.665-5.17 3.665-9.17z"}),(0,o.createElement)("path",{fill:"#34A853",d:"M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.12 0-5.77-2.1-6.72-4.93H1.26v3.15C3.25 21.35 7.33 24 12 24z"}),(0,o.createElement)("path",{fill:"#FBBC05",d:"M5.28 14.27c-.25-.72-.38-1.49-.38-2.27s.13-1.55.38-2.27V6.58H1.26C.46 8.18 0 9.98 0 12s.46 3.82 1.26 5.42l4.02-3.15z"}),(0,o.createElement)("path",{fill:"#EA4335",d:"M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.33 0 3.25 2.65 1.26 6.58l4.02 3.15c.95-2.83 3.6-4.98 6.72-4.98z"}));case"trustpilot":return(0,o.createElement)("svg",{width:t,height:t,viewBox:"0 0 24 24",fill:"#00b67a"},(0,o.createElement)("polygon",{points:"12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"}));case"facebook":return(0,o.createElement)("svg",{width:t,height:t,viewBox:"0 0 24 24",fill:"#1877F2"},(0,o.createElement)("path",{d:"M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"}));case"awards":case"capterra":case"g2":return(0,o.createElement)("svg",{width:t,height:t,viewBox:"0 0 24 24",fill:"none",stroke:i,strokeWidth:"2",strokeLinecap:"round",strokeLinejoin:"round"},(0,o.createElement)("circle",{cx:"12",cy:"8",r:"7"}),(0,o.createElement)("polyline",{points:"8.21 13.89 7 23 12 20 17 23 15.79 13.88"}));case"sticky":case"widget":return(0,o.createElement)("svg",{width:t,height:t,viewBox:"0 0 24 24",fill:"none",stroke:i,strokeWidth:"2",strokeLinecap:"round",strokeLinejoin:"round"},(0,o.createElement)("path",{d:"M16 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V8z"}),(0,o.createElement)("polyline",{points:"15 3 15 9 21 9"}));case"testimonial":case"toast":return(0,o.createElement)("svg",{width:t,height:t,viewBox:"0 0 24 24",fill:"none",stroke:i,strokeWidth:"2",strokeLinecap:"round",strokeLinejoin:"round"},(0,o.createElement)("rect",{x:"2",y:"4",width:"20",height:"16",rx:"3"}),(0,o.createElement)("circle",{cx:"8",cy:"12",r:"2"}),(0,o.createElement)("path",{d:"M14 10h4"}),(0,o.createElement)("path",{d:"M14 14h3"}));case"controls-play":case"audio":return(0,o.createElement)("svg",{width:t,height:t,viewBox:"0 0 24 24",fill:"none",stroke:i,strokeWidth:"2",strokeLinecap:"round",strokeLinejoin:"round"},(0,o.createElement)("polygon",{points:"11 5 6 9 2 9 2 15 6 15 11 19 11 5"}),(0,o.createElement)("path",{d:"M15.54 8.46a5 5 0 0 1 0 7.07"}),(0,o.createElement)("path",{d:"M19.07 4.93a10 10 0 0 1 0 14.14"}));case"chart-pie":case"poll":return(0,o.createElement)("svg",{width:t,height:t,viewBox:"0 0 24 24",fill:"none",stroke:i,strokeWidth:"2",strokeLinecap:"round",strokeLinejoin:"round"},(0,o.createElement)("path",{d:"M21.21 15.89A10 10 0 1 1 8 2.83"}),(0,o.createElement)("path",{d:"M22 12A10 10 0 0 0 12 2v10z"}));case"table-col-after":case"table":return(0,o.createElement)("svg",{width:t,height:t,viewBox:"0 0 24 24",fill:"none",stroke:i,strokeWidth:"2",strokeLinecap:"round",strokeLinejoin:"round"},(0,o.createElement)("rect",{x:"3",y:"3",width:"18",height:"18",rx:"2"}),(0,o.createElement)("line",{x1:"12",y1:"3",x2:"12",y2:"21"}),(0,o.createElement)("line",{x1:"3",y1:"9",x2:"21",y2:"9"}),(0,o.createElement)("line",{x1:"3",y1:"15",x2:"21",y2:"15"}));case"arrow-down-alt2":case"accordion":return(0,o.createElement)("svg",{width:t,height:t,viewBox:"0 0 24 24",fill:"none",stroke:i,strokeWidth:"2",strokeLinecap:"round",strokeLinejoin:"round"},(0,o.createElement)("polyline",{points:"6 9 12 15 18 9"}));case"superhero":case"hero":return(0,o.createElement)("svg",{width:t,height:t,viewBox:"0 0 24 24",fill:"none",stroke:i,strokeWidth:"2",strokeLinecap:"round",strokeLinejoin:"round"},(0,o.createElement)("polygon",{points:"12 2 2 7 12 12 22 7 12 2"}),(0,o.createElement)("polyline",{points:"2 17 12 22 22 17"}),(0,o.createElement)("polyline",{points:"2 12 12 17 22 12"}));case"bubbles":case"floating-bubble":return(0,o.createElement)("svg",{width:t,height:t,viewBox:"0 0 24 24",fill:"none",stroke:i,strokeWidth:"2",strokeLinecap:"round",strokeLinejoin:"round"},(0,o.createElement)("circle",{cx:"7.5",cy:"7.5",r:"4.5"}),(0,o.createElement)("circle",{cx:"16.5",cy:"16.5",r:"4.5"}),(0,o.createElement)("circle",{cx:"17.5",cy:"6.5",r:"2.5"}));case"external":case"popup-modal":return(0,o.createElement)("svg",{width:t,height:t,viewBox:"0 0 24 24",fill:"none",stroke:i,strokeWidth:"2",strokeLinecap:"round",strokeLinejoin:"round"},(0,o.createElement)("path",{d:"M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"}),(0,o.createElement)("polyline",{points:"15 3 21 3 21 9"}),(0,o.createElement)("line",{x1:"10",y1:"14",x2:"21",y2:"3"}));case"search":return(0,o.createElement)("svg",{width:t,height:t,viewBox:"0 0 24 24",fill:"none",stroke:i,strokeWidth:"2",strokeLinecap:"round",strokeLinejoin:"round"},(0,o.createElement)("circle",{cx:"11",cy:"11",r:"8"}),(0,o.createElement)("line",{x1:"21",y1:"21",x2:"16.65",y2:"16.65"}));case"close":return(0,o.createElement)("svg",{width:t,height:t,viewBox:"0 0 24 24",fill:"none",stroke:i,strokeWidth:"2",strokeLinecap:"round",strokeLinejoin:"round"},(0,o.createElement)("line",{x1:"18",y1:"6",x2:"6",y2:"18"}),(0,o.createElement)("line",{x1:"6",y1:"6",x2:"18",y2:"18"}));case"settings":case"admin-settings":return(0,o.createElement)("svg",{width:t,height:t,viewBox:"0 0 24 24",fill:"none",stroke:i,strokeWidth:"2",strokeLinecap:"round",strokeLinejoin:"round"},(0,o.createElement)("circle",{cx:"12",cy:"12",r:"3"}),(0,o.createElement)("path",{d:"M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"}))}}),Z=[{name:"bptmb/testimonials-slider",title:(0,i.__)("Testimonials Slider","b-testimonials-block"),category:"layouts",icon:"slides",desc:(0,i.__)("Interactive carousel slider with navigation dots.","b-testimonials-block"),badge:(0,i.__)("Slider","b-testimonials-block")},{name:"bptmb/testimonials-list",title:(0,i.__)("Testimonials List","b-testimonials-block"),category:"layouts",icon:"editor-ul",desc:(0,i.__)("Clean, vertical list representation of reviews.","b-testimonials-block")},{name:"bptmb/testimonials-masonry",title:(0,i.__)("Testimonials Masonry","b-testimonials-block"),category:"layouts",icon:"dashboard",desc:(0,i.__)("Staggered grid layout for variable height cards.","b-testimonials-block")},{name:"bptmb/testimonials-marquee",title:(0,i.__)("Testimonials Marquee","b-testimonials-block"),category:"layouts",icon:"update-alt",desc:(0,i.__)("Smooth infinite ticker tape / scrolling reviews.","b-testimonials-block"),badge:(0,i.__)("New","b-testimonials-block")},{name:"bptmb/rating-summary",title:(0,i.__)("Rating Summary","b-testimonials-block"),category:"social",icon:"star-filled",desc:(0,i.__)("Overall score & star rating distribution summary.","b-testimonials-block")},{name:"bptmb/testimonial-stats",title:(0,i.__)("Testimonial Stats","b-testimonials-block"),category:"social",icon:"chart-bar",desc:(0,i.__)("Key statistics, satisfaction percentages & counters.","b-testimonials-block")},{name:"bptmb/trust-badges",title:(0,i.__)("Trust Badges","b-testimonials-block"),category:"social",icon:"shield",desc:(0,i.__)("Security, guarantee, and award badges.","b-testimonials-block")},{name:"bptmb/client-logos",title:(0,i.__)("Client Logos","b-testimonials-block"),category:"social",icon:"groups",desc:(0,i.__)("Showcase brand and client logos in grid or carousel.","b-testimonials-block")},{name:"bptmb/video-testimonials",title:(0,i.__)("Video Testimonials","b-testimonials-block"),category:"media",icon:"video-alt3",desc:(0,i.__)("Video reviews with lightbox popup playback.","b-testimonials-block"),badge:(0,i.__)("Video","b-testimonials-block")},{name:"bptmb/before-after",title:(0,i.__)("Before & After","b-testimonials-block"),category:"media",icon:"image-flip-horizontal",desc:(0,i.__)("Comparison showcase for results & transformation.","b-testimonials-block")},{name:"bptmb/testimonial-form",title:(0,i.__)("Testimonial Form","b-testimonials-block"),category:"interactive",icon:"feedback",desc:(0,i.__)("Frontend form for collecting customer reviews.","b-testimonials-block")},{name:"bptmb/testimonials-grid-2",title:(0,i.__)("Centered Cards Grid","b-testimonials-block"),category:"layouts",icon:"align-center",desc:(0,i.__)("Sleek centered profile and testimonial card grid.","b-testimonials-block"),badge:(0,i.__)("Popular","b-testimonials-block")},{name:"bptmb/testimonials-grid-3",title:(0,i.__)("Gradient Border Grid","b-testimonials-block"),category:"layouts",icon:"grid-view",desc:(0,i.__)("Modern gradient border cards with star badges.","b-testimonials-block")},{name:"bptmb/testimonials-carousel-2",title:(0,i.__)("Coverflow Carousel","b-testimonials-block"),category:"layouts",icon:"columns",desc:(0,i.__)("Center-focused 3D coverflow carousel slider.","b-testimonials-block"),badge:(0,i.__)("3D","b-testimonials-block")},{name:"bptmb/testimonials-compact",title:(0,i.__)("Compact Reviews List","b-testimonials-block"),category:"layouts",icon:"excerpt-view",desc:(0,i.__)("Space-saving minimal customer testimonial list.","b-testimonials-block")},{name:"bptmb/testimonials-avatar-list",title:(0,i.__)("Avatar Reviews List","b-testimonials-block"),category:"layouts",icon:"admin-users",desc:(0,i.__)("Prominent avatar & customer spotlight review rows.","b-testimonials-block")},{name:"bptmb/testimonials-quote-box",title:(0,i.__)("Quote Box Showcase","b-testimonials-block"),category:"layouts",icon:"format-quote",desc:(0,i.__)("Bold quote mark styling with accent backgrounds.","b-testimonials-block")},{name:"bptmb/testimonials-speech-bubble",title:(0,i.__)("Speech Bubble Cards","b-testimonials-block"),category:"layouts",icon:"format-chat",desc:(0,i.__)("Chat bubble style testimonial cards.","b-testimonials-block"),badge:(0,i.__)("Popular","b-testimonials-block")},{name:"bptmb/testimonials-timeline",title:(0,i.__)("Customer Journey Timeline","b-testimonials-block"),category:"layouts",icon:"list-view",desc:(0,i.__)("Vertical timeline of customer success stories.","b-testimonials-block")},{name:"bptmb/testimonials-card-stack",title:(0,i.__)("Stacked Review Cards","b-testimonials-block"),category:"layouts",icon:"index-card",desc:(0,i.__)("Overlapping stacked review card deck.","b-testimonials-block")},{name:"bptmb/case-study-card",title:(0,i.__)("Customer Case Study","b-testimonials-block"),category:"layouts",icon:"welcome-learn-more",desc:(0,i.__)("Detailed case study card with metrics & quote.","b-testimonials-block"),badge:(0,i.__)("Popular","b-testimonials-block")},{name:"bptmb/google-review-badge",title:(0,i.__)("Google Reviews Badge","b-testimonials-block"),category:"social",icon:"google",desc:(0,i.__)("Official style Google Business score badge.","b-testimonials-block"),badge:(0,i.__)("Badge","b-testimonials-block")},{name:"bptmb/trustpilot-review-badge",title:(0,i.__)("Trustpilot Score Badge","b-testimonials-block"),category:"social",icon:"star-filled",desc:(0,i.__)("Trustpilot style rating & review summary badge.","b-testimonials-block"),badge:(0,i.__)("Badge","b-testimonials-block")},{name:"bptmb/g2-review-badge",title:(0,i.__)("G2 Review Badge","b-testimonials-block"),category:"social",icon:"awards",desc:(0,i.__)("G2 / Capterra software review score badge.","b-testimonials-block")},{name:"bptmb/review-badge-widget",title:(0,i.__)("Floating Review Badge","b-testimonials-block"),category:"social",icon:"sticky",desc:(0,i.__)("Corner / floating trust review badge widget.","b-testimonials-block")},{name:"bptmb/star-rating-bars",title:(0,i.__)("Star Rating Progress Bars","b-testimonials-block"),category:"social",icon:"chart-bar",desc:(0,i.__)("5-star rating breakdown bars & percentage stats.","b-testimonials-block")},{name:"bptmb/social-proof-toast",title:(0,i.__)("Social Proof Toast","b-testimonials-block"),category:"social",icon:"testimonial",desc:(0,i.__)("Live social proof popup notification toast.","b-testimonials-block"),badge:(0,i.__)("New","b-testimonials-block")},{name:"bptmb/audio-testimonials",title:(0,i.__)("Audio Testimonials","b-testimonials-block"),category:"media",icon:"controls-play",desc:(0,i.__)("Voice note & audio review player with wave style.","b-testimonials-block"),badge:(0,i.__)("Audio","b-testimonials-block")},{name:"bptmb/user-feedback-poll",title:(0,i.__)("Feedback & NPS Poll","b-testimonials-block"),category:"interactive",icon:"chart-pie",desc:(0,i.__)("Quick Net Promoter Score (NPS) feedback poll.","b-testimonials-block")},{name:"bptmb/comparison-testimonial-table",title:(0,i.__)("Comparison Review Table","b-testimonials-block"),category:"interactive",icon:"table-col-after",desc:(0,i.__)("Side-by-side customer comparison table.","b-testimonials-block")},{name:"bptmb/faq-testimonial-accordion",title:(0,i.__)("FAQ Review Accordion","b-testimonials-block"),category:"interactive",icon:"arrow-down-alt2",desc:(0,i.__)("Collapsible FAQ & customer feedback accordion.","b-testimonials-block")},{name:"bptmb/testimonials-hero",title:(0,i.__)("Hero Testimonial Spotlight","b-testimonials-block"),category:"layouts",icon:"superhero",desc:(0,i.__)("High-impact hero banner with quote & CTA.","b-testimonials-block"),badge:(0,i.__)("Hero","b-testimonials-block")},{name:"bptmb/testimonials-grid-minimal",title:(0,i.__)("Minimalist Reviews Grid","b-testimonials-block"),category:"layouts",icon:"layout",desc:(0,i.__)("Clean monochrome review cards with subtle hover elevation.","b-testimonials-block")},{name:"bptmb/testimonials-slider-3d",title:(0,i.__)("3D Flip Perspective Carousel","b-testimonials-block"),category:"layouts",icon:"update",desc:(0,i.__)("Interactive 3D perspective flip card carousel slider.","b-testimonials-block"),badge:(0,i.__)("3D","b-testimonials-block")},{name:"bptmb/testimonials-floating-bubble",title:(0,i.__)("Floating Avatar Bubbles","b-testimonials-block"),category:"social",icon:"bubbles",desc:(0,i.__)("Interactive floating customer avatar bubbles with popup tooltips.","b-testimonials-block")},{name:"bptmb/facebook-review-badge",title:(0,i.__)("Facebook Recommendation Badge","b-testimonials-block"),category:"social",icon:"facebook",desc:(0,i.__)("Official style Facebook page recommendation & rating summary badge.","b-testimonials-block"),badge:(0,i.__)("Badge","b-testimonials-block")},{name:"bptmb/capterra-review-badge",title:(0,i.__)("Capterra Score Badge","b-testimonials-block"),category:"social",icon:"star-half",desc:(0,i.__)("Software review rating summary badge styled like Capterra.","b-testimonials-block"),badge:(0,i.__)("Badge","b-testimonials-block")},{name:"bptmb/verified-buyer-badge",title:(0,i.__)("Verified Buyer Trust Seal","b-testimonials-block"),category:"social",icon:"yes-alt",desc:(0,i.__)("E-commerce verified purchase seal & satisfaction guarantee widget.","b-testimonials-block")},{name:"bptmb/testimonials-popup-modal",title:(0,i.__)("Popup Modal Review Trigger","b-testimonials-block"),category:"interactive",icon:"external",desc:(0,i.__)("Clickable badge/button that opens a full review popup modal.","b-testimonials-block"),badge:(0,i.__)("New","b-testimonials-block")}],Y=(Z.map(e=>e.name),({isOpen:t,onRequestClose:a,clientId:r,currentBlockName:n})=>{const[l,s]=(0,o.useState)("all"),[c,m]=(0,o.useState)(""),{currentBlock:d,parentBlock:b,innerBlocks:u}=(0,$.useSelect)(e=>{if(!r)return{currentBlock:null,parentBlock:null,innerBlocks:[]};const t=e("core/block-editor").getBlock(r),o=e("core/block-editor").getBlockParents(r);return{currentBlock:t,parentBlock:o&&o.length>0?e("core/block-editor").getBlock(o[o.length-1]):null,innerBlocks:t?t.innerBlocks:[]}},[r]);if((0,o.useEffect)(()=>{const e=e=>{"Escape"===e.key&&a()};return t&&window.addEventListener("keydown",e),()=>window.removeEventListener("keydown",e)},[t,a]),!t)return null;const p=t=>{if(a(),r)try{const o=(0,e.createBlock)(t);d&&"bptmb/b-testimonials"===d.name?((0,$.dispatch)("core/block-editor").updateBlockAttributes(r,{useClassicEditor:!1,isLegacyBlock:!1}),u&&u.length>0?(0,$.dispatch)("core/block-editor").replaceBlock(u[0].clientId,o):(0,$.dispatch)("core/block-editor").insertBlock(o,0,r)):b&&"bptmb/b-testimonials"===b.name?((0,$.dispatch)("core/block-editor").updateBlockAttributes(b.clientId,{useClassicEditor:!1,isLegacyBlock:!1}),(0,$.dispatch)("core/block-editor").replaceBlock(r,o)):(0,$.dispatch)("core/block-editor").replaceBlock(r,o)}catch(e){console.error("Failed to insert/switch child block:",e)}},h=Z.filter(e=>{const t="all"===l||e.category===l,o=!c||e.title.toLowerCase().includes(c.toLowerCase())||e.desc.toLowerCase().includes(c.toLowerCase());return t&&o}),g=[{id:"all",label:(0,i.__)("All 40 Blocks","b-testimonials-block")},{id:"layouts",label:(0,i.__)("Grid & Layouts","b-testimonials-block")},{id:"social",label:(0,i.__)("Trust & Badges","b-testimonials-block")},{id:"media",label:(0,i.__)("Media & Audio","b-testimonials-block")},{id:"interactive",label:(0,i.__)("Forms & Polls","b-testimonials-block")}];let k="";return d&&(k="bptmb/b-testimonials"===d.name?u?.[0]?.name||"":d.name),!k&&n&&(k=n.startsWith("bptmb/")?n:`bptmb/${n}`),(0,o.createElement)("div",{className:"btb-custom-modal-backdrop",onClick:a},(0,o.createElement)("div",{className:"btb-custom-modal-dialog",onClick:e=>e.stopPropagation()},(0,o.createElement)("div",{className:"btb-custom-modal-header"},(0,o.createElement)("div",{className:"btb-modal-title-wrap"},(0,o.createElement)("div",{className:"btb-modal-header-icon"},X("grid-view",24,"#ffffff")),(0,o.createElement)("div",null,(0,o.createElement)("h3",{className:"btb-modal-title"},(0,i.__)("Testimonial Block Switcher","b-testimonials-block")),(0,o.createElement)("p",{className:"btb-modal-desc"},(0,i.__)("Select from 40+ modern layouts & social proof widgets","b-testimonials-block")))),(0,o.createElement)("button",{type:"button",className:"btb-modal-close-btn",onClick:a,"aria-label":(0,i.__)("Close modal","b-testimonials-block")},X("close",18))),(0,o.createElement)("div",{className:"btb-custom-modal-toolbar"},(0,o.createElement)("div",{className:"btb-modal-cats"},g.map(e=>(0,o.createElement)("button",{key:e.id,type:"button",className:"btb-cat-chip "+(l===e.id?"is-active":""),onClick:()=>s(e.id)},e.label))),(0,o.createElement)("div",{className:"btb-modal-search-box"},(0,o.createElement)("span",{className:"search-icon"},X("search",16)),(0,o.createElement)("input",{type:"text",placeholder:(0,i.__)("Search layouts…","b-testimonials-block"),value:c,onChange:e=>m(e.target.value)}),c&&(0,o.createElement)("button",{type:"button",className:"clear-search-btn",onClick:()=>m("")},X("close",14)))),(0,o.createElement)("div",{className:"btb-custom-modal-grid"},h.map(e=>{const t=e.name===k;return(0,o.createElement)("div",{key:e.name,className:"btb-modern-card "+(t?"is-active":""),onClick:()=>p(e.name)},(0,o.createElement)("div",{className:"btb-modern-card-header"},(0,o.createElement)("div",{className:"btb-modern-icon"},X(e.icon,24)),e.badge&&(0,o.createElement)("span",{className:"btb-modern-badge"},e.badge)),(0,o.createElement)("div",{className:"btb-modern-card-body"},(0,o.createElement)("h4",{className:"btb-modern-card-title"},e.title,t&&(0,o.createElement)("span",{className:"btb-active-pill"},(0,i.__)("Active","b-testimonials-block"))),(0,o.createElement)("p",{className:"btb-modern-card-desc"},e.desc)),(0,o.createElement)("div",{className:"btb-modern-card-footer"},(0,o.createElement)("button",{type:"button",className:"btb-modern-select-btn "+(t?"is-selected":""),onClick:t=>{t.stopPropagation(),p(e.name)}},t?(0,i.__)("Currently Selected","b-testimonials-block"):(0,i.__)("Use This Layout","b-testimonials-block"))))}))))}),ee=({clientId:t,currentBlockName:a,attributes:n={},setAttributes:l})=>{const[s,c]=(0,o.useState)(!1),{currentBlock:m,parentBlock:d,innerBlocks:b}=(0,$.useSelect)(e=>{if(!t)return{currentBlock:null,parentBlock:null,innerBlocks:[]};const o=e("core/block-editor").getBlock(t),i=e("core/block-editor").getBlockParents(t);return{currentBlock:o,parentBlock:i&&i.length>0?e("core/block-editor").getBlock(i[i.length-1]):null,innerBlocks:o?o.innerBlocks:[]}},[t]),u="bptmb/b-testimonials"===m?.name?t:"bptmb/b-testimonials"===d?.name?d.clientId:null,p=u?"bptmb/b-testimonials"===m?.name?n:d?.attributes||{}:n,h=p?.isLegacyBlock||p?.useClassicEditor;return(0,o.createElement)(o.Fragment,null,(0,o.createElement)(r.PanelBody,{className:"bPlPanelBody btbSidebarSwitcherPanel",title:(0,i.__)("Select / Switch Block","b-testimonials-block"),initialOpen:!0},(0,o.createElement)("div",{className:"btbSidebarSwitcherCard"},(0,o.createElement)("div",{className:"btbSidebarIconWrap"},X("layout",24)),(0,o.createElement)("div",{className:"btbSidebarTextWrap"},(0,o.createElement)("h4",{className:"btbSidebarTitle"},(0,i.__)("Change Block Layout","b-testimonials-block")),(0,o.createElement)("p",{className:"btbSidebarDesc"},(0,i.__)("Click below to open the popup modal and switch to any layout.","b-testimonials-block"))),(0,o.createElement)(r.Button,{variant:"secondary",className:"btbSidebarChangeBtn",onClick:()=>c(!0)},(0,o.createElement)("span",{style:{marginRight:"6px",display:"inline-flex",alignItems:"center"}},X("update",16)),(0,i.__)("Change Block / Layout","b-testimonials-block")),(0,o.createElement)("div",{style:{marginTop:"10px",paddingTop:"8px",borderTop:"1px solid #e2e8f0"}},h?(0,o.createElement)(r.Button,{variant:"tertiary",style:{fontSize:"11px",height:"auto",padding:"4px 0",textDecoration:"underline"},onClick:()=>{try{if(u){(0,$.dispatch)("core/block-editor").updateBlockAttributes(u,{useClassicEditor:!1,isLegacyBlock:!1});const e="bptmb/b-testimonials"===m?.name?b:d?.innerBlocks||[];e&&e.length>0&&e.forEach(e=>{try{(0,$.dispatch)("core/block-editor").removeBlock(e.clientId)}catch(e){console.warn("Could not remove child block:",e)}})}else{const o=(0,e.createBlock)("bptmb/b-testimonials",{...m?.attributes||{},useClassicEditor:!1,isLegacyBlock:!1});(0,$.dispatch)("core/block-editor").replaceBlock(t,o)}}catch(e){console.error("Failed to switch to placeholder mode:",e)}}},(0,i.__)("Switch to 40+ Layout Placeholder","b-testimonials-block")):(0,o.createElement)(r.Button,{variant:"tertiary",style:{fontSize:"11px",height:"auto",padding:"4px 0",textDecoration:"underline"},onClick:()=>{try{if(u){(0,$.dispatch)("core/block-editor").updateBlockAttributes(u,{useClassicEditor:!0,isLegacyBlock:!0}),(0,$.dispatch)("core/block-editor").getBlock;const e="bptmb/b-testimonials"===m?.name?b:d?.innerBlocks||[];e&&e.length>0&&e.forEach(e=>{try{(0,$.dispatch)("core/block-editor").removeBlock(e.clientId)}catch(e){console.warn("Could not remove child block:",e)}})}else{const o=(0,e.createBlock)("bptmb/b-testimonials",{...m?.attributes||{},useClassicEditor:!0,isLegacyBlock:!0});(0,$.dispatch)("core/block-editor").replaceBlock(t,o)}}catch(e){console.error("Failed to switch to classic mode:",e)}}},(0,i.__)("Switch to Classic Single Block Mode","b-testimonials-block"))))),(0,o.createElement)(Y,{isOpen:s,onRequestClose:()=>c(!1),clientId:t,currentBlockName:a}))},te=({columns:e,columnGap:t,rowGap:o})=>({"--cols-d":e?.desktop||3,"--cols-t":e?.tablet||3,"--cols-m":e?.mobile||1,"--col-gap":t,"--row-gap":o});(0,e.registerBlockType)(t,{icon:J,edit:({attributes:e,setAttributes:t,clientId:n})=>{const{items:l=[],columns:s,columnGap:c,rowGap:m}=e;(0,o.useEffect)(()=>{n&&t({cId:n.substring(0,10)})},[n]);const d=(e,o)=>t({columns:{...s,[e]:o}}),b=(e,o,i)=>t({items:Q(l,t=>{t[e][o]=i})});return(0,o.createElement)(o.Fragment,null,(0,o.createElement)(a.InspectorControls,null,(0,o.createElement)(ee,{clientId:n}),(0,o.createElement)(r.PanelBody,{title:(0,i.__)("Layout","b-testimonials-block")},(0,o.createElement)(r.RangeControl,{label:(0,i.__)("Columns (Desktop)","b-testimonials-block"),value:s?.desktop,onChange:e=>d("desktop",e),min:1,max:6}),(0,o.createElement)(r.RangeControl,{label:(0,i.__)("Columns (Tablet)","b-testimonials-block"),value:s?.tablet,onChange:e=>d("tablet",e),min:1,max:4}),(0,o.createElement)(r.RangeControl,{label:(0,i.__)("Columns (Mobile)","b-testimonials-block"),value:s?.mobile,onChange:e=>d("mobile",e),min:1,max:2}),(0,o.createElement)(r.TextControl,{label:(0,i.__)("Column gap","b-testimonials-block"),value:c,onChange:e=>t({columnGap:e})}),(0,o.createElement)(r.TextControl,{label:(0,i.__)("Row gap","b-testimonials-block"),value:m,onChange:e=>t({rowGap:e})})),(0,o.createElement)(r.PanelBody,{title:(0,i.__)("Badges","b-testimonials-block"),initialOpen:!1},l.map((e,n)=>(0,o.createElement)("div",{key:n,className:"btb-badge-row"},(0,o.createElement)(a.MediaUploadCheck,null,(0,o.createElement)(a.MediaUpload,{allowedTypes:["image"],value:e?.img,onSelect:e=>b(n,"img",{id:e.id,url:e.url,alt:e.alt}),render:({open:t})=>(0,o.createElement)(r.Button,{variant:"secondary",onClick:t,className:"btb-badge-pick"},e?.img?.url?(0,o.createElement)("img",{src:e.img.url,alt:""}):(0,i.__)("Select icon","b-testimonials-block"))})),(0,o.createElement)(r.TextControl,{label:(0,i.__)("Title","b-testimonials-block"),value:e?.title||"",onChange:e=>b(n,"title",e)}),(0,o.createElement)(r.TextControl,{label:(0,i.__)("Subtitle","b-testimonials-block"),value:e?.subtitle||"",onChange:e=>b(n,"subtitle",e)}),(0,o.createElement)(r.Button,{isDestructive:!0,onClick:()=>(e=>t({items:l.filter((t,o)=>o!==e)}))(n)},(0,o.createElement)(r.Dashicon,{icon:"trash"})," ",(0,i.__)("Remove","b-testimonials-block")),(0,o.createElement)("hr",null))),(0,o.createElement)(r.Button,{variant:"primary",onClick:()=>t({items:[...l,{img:{url:""},title:"",subtitle:""}]})},(0,o.createElement)(r.Dashicon,{icon:"plus"})," ",(0,i.__)("Add badge","b-testimonials-block")))),(0,o.createElement)("div",{...(0,a.useBlockProps)({className:"bTrustBadges"})},(0,o.createElement)("div",{className:"badges-grid",style:te(e)},l.map((e,t)=>(0,o.createElement)("div",{className:"badge-item",key:t},e?.img?.url&&(0,o.createElement)("img",{className:"badge-icon",src:e.img.url,alt:e?.img?.alt||""}),(0,o.createElement)("div",{className:"badge-text"},e?.title&&(0,o.createElement)("h4",{className:"badge-title"},e.title),e?.subtitle&&(0,o.createElement)("p",{className:"badge-subtitle"},e.subtitle)))))))}})})();
+/******/ (() => { // webpackBootstrap
+/******/ 	"use strict";
+/******/ 	var __webpack_modules__ = ({
+
+/***/ "./src/blocks/trust-badges/edit.js"
+/*!*****************************************!*\
+  !*** ./src/blocks/trust-badges/edit.js ***!
+  \*****************************************/
+(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "react");
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @wordpress/i18n */ "@wordpress/i18n");
+/* harmony import */ var _wordpress_i18n__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__);
+/* harmony import */ var _wordpress_block_editor__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @wordpress/block-editor */ "@wordpress/block-editor");
+/* harmony import */ var _wordpress_block_editor__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(_wordpress_block_editor__WEBPACK_IMPORTED_MODULE_2__);
+/* harmony import */ var _wordpress_components__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @wordpress/components */ "@wordpress/components");
+/* harmony import */ var _wordpress_components__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(_wordpress_components__WEBPACK_IMPORTED_MODULE_3__);
+/* harmony import */ var immer__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! immer */ "../../../../../../../Development/dev/node_modules/immer/dist/immer.mjs");
+/* harmony import */ var _shared_Components_Common_BlockSwitcher__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ../../shared/Components/Common/BlockSwitcher */ "./src/shared/Components/Common/BlockSwitcher.js");
+/* harmony import */ var _edit_scss__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./edit.scss */ "./src/blocks/trust-badges/edit.scss");
+/* harmony import */ var _shared_styles_trust_badges_scss__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ../../shared/styles/trust-badges.scss */ "./src/shared/styles/trust-badges.scss");
+
+
+
+
+
+
+
+
+
+const gridVars = ({
+  columns,
+  columnGap,
+  rowGap
+}) => ({
+  '--cols-d': columns?.desktop || 3,
+  '--cols-t': columns?.tablet || 3,
+  '--cols-m': columns?.mobile || 1,
+  '--col-gap': columnGap,
+  '--row-gap': rowGap
+});
+const Edit = ({
+  attributes,
+  setAttributes,
+  clientId
+}) => {
+  const {
+    items = [],
+    columns,
+    columnGap,
+    rowGap
+  } = attributes;
+  (0,react__WEBPACK_IMPORTED_MODULE_0__.useEffect)(() => {
+    clientId && setAttributes({
+      cId: clientId.substring(0, 10)
+    });
+  }, [clientId]);
+  const setColumn = (device, val) => setAttributes({
+    columns: {
+      ...columns,
+      [device]: val
+    }
+  });
+  const updateItem = (i, key, val) => setAttributes({
+    items: (0,immer__WEBPACK_IMPORTED_MODULE_4__.produce)(items, d => {
+      d[i][key] = val;
+    })
+  });
+  const addItem = () => setAttributes({
+    items: [...items, {
+      img: {
+        url: ''
+      },
+      title: '',
+      subtitle: ''
+    }]
+  });
+  const removeItem = i => setAttributes({
+    items: items.filter((_, idx) => idx !== i)
+  });
+  return (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)(react__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_block_editor__WEBPACK_IMPORTED_MODULE_2__.InspectorControls, null, (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)(_shared_Components_Common_BlockSwitcher__WEBPACK_IMPORTED_MODULE_5__["default"], {
+    clientId: clientId
+  }), (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_components__WEBPACK_IMPORTED_MODULE_3__.PanelBody, {
+    title: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)('Layout', 'b-testimonials-block')
+  }, (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_components__WEBPACK_IMPORTED_MODULE_3__.RangeControl, {
+    label: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)('Columns (Desktop)', 'b-testimonials-block'),
+    value: columns?.desktop,
+    onChange: v => setColumn('desktop', v),
+    min: 1,
+    max: 6
+  }), (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_components__WEBPACK_IMPORTED_MODULE_3__.RangeControl, {
+    label: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)('Columns (Tablet)', 'b-testimonials-block'),
+    value: columns?.tablet,
+    onChange: v => setColumn('tablet', v),
+    min: 1,
+    max: 4
+  }), (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_components__WEBPACK_IMPORTED_MODULE_3__.RangeControl, {
+    label: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)('Columns (Mobile)', 'b-testimonials-block'),
+    value: columns?.mobile,
+    onChange: v => setColumn('mobile', v),
+    min: 1,
+    max: 2
+  }), (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_components__WEBPACK_IMPORTED_MODULE_3__.TextControl, {
+    label: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)('Column gap', 'b-testimonials-block'),
+    value: columnGap,
+    onChange: v => setAttributes({
+      columnGap: v
+    })
+  }), (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_components__WEBPACK_IMPORTED_MODULE_3__.TextControl, {
+    label: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)('Row gap', 'b-testimonials-block'),
+    value: rowGap,
+    onChange: v => setAttributes({
+      rowGap: v
+    })
+  })), (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_components__WEBPACK_IMPORTED_MODULE_3__.PanelBody, {
+    title: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)('Badges', 'b-testimonials-block'),
+    initialOpen: false
+  }, items.map((item, i) => (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("div", {
+    key: i,
+    className: "btb-badge-row"
+  }, (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_block_editor__WEBPACK_IMPORTED_MODULE_2__.MediaUploadCheck, null, (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_block_editor__WEBPACK_IMPORTED_MODULE_2__.MediaUpload, {
+    allowedTypes: ['image'],
+    value: item?.img,
+    onSelect: m => updateItem(i, 'img', {
+      id: m.id,
+      url: m.url,
+      alt: m.alt
+    }),
+    render: ({
+      open
+    }) => (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_components__WEBPACK_IMPORTED_MODULE_3__.Button, {
+      variant: "secondary",
+      onClick: open,
+      className: "btb-badge-pick"
+    }, item?.img?.url ? (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("img", {
+      src: item.img.url,
+      alt: ""
+    }) : (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)('Select icon', 'b-testimonials-block'))
+  })), (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_components__WEBPACK_IMPORTED_MODULE_3__.TextControl, {
+    label: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)('Title', 'b-testimonials-block'),
+    value: item?.title || '',
+    onChange: v => updateItem(i, 'title', v)
+  }), (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_components__WEBPACK_IMPORTED_MODULE_3__.TextControl, {
+    label: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)('Subtitle', 'b-testimonials-block'),
+    value: item?.subtitle || '',
+    onChange: v => updateItem(i, 'subtitle', v)
+  }), (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_components__WEBPACK_IMPORTED_MODULE_3__.Button, {
+    isDestructive: true,
+    onClick: () => removeItem(i)
+  }, (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_components__WEBPACK_IMPORTED_MODULE_3__.Dashicon, {
+    icon: "trash"
+  }), " ", (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)('Remove', 'b-testimonials-block')), (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("hr", null))), (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_components__WEBPACK_IMPORTED_MODULE_3__.Button, {
+    variant: "primary",
+    onClick: addItem
+  }, (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_components__WEBPACK_IMPORTED_MODULE_3__.Dashicon, {
+    icon: "plus"
+  }), " ", (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)('Add badge', 'b-testimonials-block')))), (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("div", {
+    ...(0,_wordpress_block_editor__WEBPACK_IMPORTED_MODULE_2__.useBlockProps)({
+      className: 'bTrustBadges'
+    })
+  }, (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("div", {
+    className: "badges-grid",
+    style: gridVars(attributes)
+  }, items.map((item, i) => (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("div", {
+    className: "badge-item",
+    key: i
+  }, item?.img?.url && (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("img", {
+    className: "badge-icon",
+    src: item.img.url,
+    alt: item?.img?.alt || ''
+  }), (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("div", {
+    className: "badge-text"
+  }, item?.title && (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("h4", {
+    className: "badge-title"
+  }, item.title), item?.subtitle && (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("p", {
+    className: "badge-subtitle"
+  }, item.subtitle)))))));
+};
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (Edit);
+
+/***/ },
+
+/***/ "./src/shared/Components/Common/BlockSwitcher.js"
+/*!*******************************************************!*\
+  !*** ./src/shared/Components/Common/BlockSwitcher.js ***!
+  \*******************************************************/
+(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "react");
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @wordpress/i18n */ "@wordpress/i18n");
+/* harmony import */ var _wordpress_i18n__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__);
+/* harmony import */ var _wordpress_components__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @wordpress/components */ "@wordpress/components");
+/* harmony import */ var _wordpress_components__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(_wordpress_components__WEBPACK_IMPORTED_MODULE_2__);
+/* harmony import */ var _wordpress_data__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @wordpress/data */ "@wordpress/data");
+/* harmony import */ var _wordpress_data__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(_wordpress_data__WEBPACK_IMPORTED_MODULE_3__);
+/* harmony import */ var _wordpress_blocks__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @wordpress/blocks */ "@wordpress/blocks");
+/* harmony import */ var _wordpress_blocks__WEBPACK_IMPORTED_MODULE_4___default = /*#__PURE__*/__webpack_require__.n(_wordpress_blocks__WEBPACK_IMPORTED_MODULE_4__);
+/* harmony import */ var _utils_icons__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ../../utils/icons */ "./src/shared/utils/icons.js");
+/* harmony import */ var _BlockSwitcherModal__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./BlockSwitcherModal */ "./src/shared/Components/Common/BlockSwitcherModal.js");
+
+
+
+
+
+
+
+
+const BlockSwitcher = ({
+  clientId,
+  currentBlockName,
+  attributes = {},
+  setAttributes
+}) => {
+  const [isModalOpen, setIsModalOpen] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)(false);
+  const {
+    currentBlock,
+    parentBlock,
+    innerBlocks
+  } = (0,_wordpress_data__WEBPACK_IMPORTED_MODULE_3__.useSelect)(select => {
+    if (!clientId) return {
+      currentBlock: null,
+      parentBlock: null,
+      innerBlocks: []
+    };
+    const block = select('core/block-editor').getBlock(clientId);
+    const parents = select('core/block-editor').getBlockParents(clientId);
+    const parent = parents && parents.length > 0 ? select('core/block-editor').getBlock(parents[parents.length - 1]) : null;
+    return {
+      currentBlock: block,
+      parentBlock: parent,
+      innerBlocks: block ? block.innerBlocks : []
+    };
+  }, [clientId]);
+  const mainParentClientId = currentBlock?.name === 'bptmb/b-testimonials' ? clientId : parentBlock?.name === 'bptmb/b-testimonials' ? parentBlock.clientId : null;
+  const targetAttributes = mainParentClientId ? currentBlock?.name === 'bptmb/b-testimonials' ? attributes : parentBlock?.attributes || {} : attributes;
+  const isClassic = targetAttributes?.isLegacyBlock || targetAttributes?.useClassicEditor;
+  const handleSwitchToClassic = () => {
+    try {
+      if (mainParentClientId) {
+        // Update parent block attributes to Classic mode
+        (0,_wordpress_data__WEBPACK_IMPORTED_MODULE_3__.dispatch)('core/block-editor').updateBlockAttributes(mainParentClientId, {
+          useClassicEditor: true,
+          isLegacyBlock: true
+        });
+
+        // Remove any child blocks inside main parent
+        const pBlock = (0,_wordpress_data__WEBPACK_IMPORTED_MODULE_3__.dispatch)('core/block-editor').getBlock ? null : null; // safe check
+        const targetChildren = currentBlock?.name === 'bptmb/b-testimonials' ? innerBlocks : parentBlock?.innerBlocks || [];
+        if (targetChildren && targetChildren.length > 0) {
+          targetChildren.forEach(child => {
+            try {
+              (0,_wordpress_data__WEBPACK_IMPORTED_MODULE_3__.dispatch)('core/block-editor').removeBlock(child.clientId);
+            } catch (e) {
+              console.warn('Could not remove child block:', e);
+            }
+          });
+        }
+      } else {
+        // Standalone child block on canvas page: replace with bptmb/b-testimonials in classic mode
+        const newParent = (0,_wordpress_blocks__WEBPACK_IMPORTED_MODULE_4__.createBlock)('bptmb/b-testimonials', {
+          ...(currentBlock?.attributes || {}),
+          useClassicEditor: true,
+          isLegacyBlock: true
+        });
+        (0,_wordpress_data__WEBPACK_IMPORTED_MODULE_3__.dispatch)('core/block-editor').replaceBlock(clientId, newParent);
+      }
+    } catch (err) {
+      console.error('Failed to switch to classic mode:', err);
+    }
+  };
+  const handleSwitchToPlaceholder = () => {
+    try {
+      if (mainParentClientId) {
+        // Update parent block attributes to non-classic mode
+        (0,_wordpress_data__WEBPACK_IMPORTED_MODULE_3__.dispatch)('core/block-editor').updateBlockAttributes(mainParentClientId, {
+          useClassicEditor: false,
+          isLegacyBlock: false
+        });
+
+        // Remove any child blocks inside main parent so placeholder displays
+        const targetChildren = currentBlock?.name === 'bptmb/b-testimonials' ? innerBlocks : parentBlock?.innerBlocks || [];
+        if (targetChildren && targetChildren.length > 0) {
+          targetChildren.forEach(child => {
+            try {
+              (0,_wordpress_data__WEBPACK_IMPORTED_MODULE_3__.dispatch)('core/block-editor').removeBlock(child.clientId);
+            } catch (e) {
+              console.warn('Could not remove child block:', e);
+            }
+          });
+        }
+      } else {
+        // Standalone child block on canvas page: replace with bptmb/b-testimonials in placeholder mode
+        const newParent = (0,_wordpress_blocks__WEBPACK_IMPORTED_MODULE_4__.createBlock)('bptmb/b-testimonials', {
+          ...(currentBlock?.attributes || {}),
+          useClassicEditor: false,
+          isLegacyBlock: false
+        });
+        (0,_wordpress_data__WEBPACK_IMPORTED_MODULE_3__.dispatch)('core/block-editor').replaceBlock(clientId, newParent);
+      }
+    } catch (err) {
+      console.error('Failed to switch to placeholder mode:', err);
+    }
+  };
+  return (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)(react__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_components__WEBPACK_IMPORTED_MODULE_2__.PanelBody, {
+    className: "bPlPanelBody btbSidebarSwitcherPanel",
+    title: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)('Select / Switch Block', 'b-testimonials-block'),
+    initialOpen: true
+  }, (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("div", {
+    className: "btbSidebarSwitcherCard"
+  }, (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("div", {
+    className: "btbSidebarIconWrap"
+  }, (0,_utils_icons__WEBPACK_IMPORTED_MODULE_5__.getLayoutSvgIcon)('layout', 24)), (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("div", {
+    className: "btbSidebarTextWrap"
+  }, (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("h4", {
+    className: "btbSidebarTitle"
+  }, (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)('Change Block Layout', 'b-testimonials-block')), (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("p", {
+    className: "btbSidebarDesc"
+  }, (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)('Click below to open the popup modal and switch to any layout.', 'b-testimonials-block'))), (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_components__WEBPACK_IMPORTED_MODULE_2__.Button, {
+    variant: "secondary",
+    className: "btbSidebarChangeBtn",
+    onClick: () => setIsModalOpen(true)
+  }, (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("span", {
+    style: {
+      marginRight: '6px',
+      display: 'inline-flex',
+      alignItems: 'center'
+    }
+  }, (0,_utils_icons__WEBPACK_IMPORTED_MODULE_5__.getLayoutSvgIcon)('update', 16)), (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)('Change Block / Layout', 'b-testimonials-block')), (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("div", {
+    style: {
+      marginTop: '10px',
+      paddingTop: '8px',
+      borderTop: '1px solid #e2e8f0'
+    }
+  }, isClassic ? (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_components__WEBPACK_IMPORTED_MODULE_2__.Button, {
+    variant: "tertiary",
+    style: {
+      fontSize: '11px',
+      height: 'auto',
+      padding: '4px 0',
+      textDecoration: 'underline'
+    },
+    onClick: handleSwitchToPlaceholder
+  }, (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)('Switch to 40+ Layout Placeholder', 'b-testimonials-block')) : (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_components__WEBPACK_IMPORTED_MODULE_2__.Button, {
+    variant: "tertiary",
+    style: {
+      fontSize: '11px',
+      height: 'auto',
+      padding: '4px 0',
+      textDecoration: 'underline'
+    },
+    onClick: handleSwitchToClassic
+  }, (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)('Switch to Classic Single Block Mode', 'b-testimonials-block'))))), (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)(_BlockSwitcherModal__WEBPACK_IMPORTED_MODULE_6__["default"], {
+    isOpen: isModalOpen,
+    onRequestClose: () => setIsModalOpen(false),
+    clientId: clientId,
+    currentBlockName: currentBlockName
+  }));
+};
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (BlockSwitcher);
+
+/***/ },
+
+/***/ "./src/shared/Components/Common/BlockSwitcherModal.js"
+/*!************************************************************!*\
+  !*** ./src/shared/Components/Common/BlockSwitcherModal.js ***!
+  \************************************************************/
+(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   ALLOWED_CHILD_BLOCKS: () => (/* binding */ ALLOWED_CHILD_BLOCKS),
+/* harmony export */   CHILD_BLOCKS_LIST: () => (/* binding */ CHILD_BLOCKS_LIST),
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "react");
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @wordpress/i18n */ "@wordpress/i18n");
+/* harmony import */ var _wordpress_i18n__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__);
+/* harmony import */ var _wordpress_data__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @wordpress/data */ "@wordpress/data");
+/* harmony import */ var _wordpress_data__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(_wordpress_data__WEBPACK_IMPORTED_MODULE_2__);
+/* harmony import */ var _wordpress_blocks__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @wordpress/blocks */ "@wordpress/blocks");
+/* harmony import */ var _wordpress_blocks__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(_wordpress_blocks__WEBPACK_IMPORTED_MODULE_3__);
+/* harmony import */ var _utils_icons__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../../utils/icons */ "./src/shared/utils/icons.js");
+
+
+
+
+
+
+const CHILD_BLOCKS_LIST = [
+// Original 12 Blocks
+{
+  name: 'bptmb/testimonials-slider',
+  title: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)('Testimonials Slider', 'b-testimonials-block'),
+  category: 'layouts',
+  icon: 'slides',
+  desc: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)('Interactive carousel slider with navigation dots.', 'b-testimonials-block'),
+  badge: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)('Slider', 'b-testimonials-block')
+}, {
+  name: 'bptmb/testimonials-list',
+  title: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)('Testimonials List', 'b-testimonials-block'),
+  category: 'layouts',
+  icon: 'editor-ul',
+  desc: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)('Clean, vertical list representation of reviews.', 'b-testimonials-block')
+}, {
+  name: 'bptmb/testimonials-masonry',
+  title: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)('Testimonials Masonry', 'b-testimonials-block'),
+  category: 'layouts',
+  icon: 'dashboard',
+  desc: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)('Staggered grid layout for variable height cards.', 'b-testimonials-block')
+}, {
+  name: 'bptmb/testimonials-marquee',
+  title: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)('Testimonials Marquee', 'b-testimonials-block'),
+  category: 'layouts',
+  icon: 'update-alt',
+  desc: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)('Smooth infinite ticker tape / scrolling reviews.', 'b-testimonials-block'),
+  badge: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)('New', 'b-testimonials-block')
+}, {
+  name: 'bptmb/rating-summary',
+  title: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)('Rating Summary', 'b-testimonials-block'),
+  category: 'social',
+  icon: 'star-filled',
+  desc: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)('Overall score & star rating distribution summary.', 'b-testimonials-block')
+}, {
+  name: 'bptmb/testimonial-stats',
+  title: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)('Testimonial Stats', 'b-testimonials-block'),
+  category: 'social',
+  icon: 'chart-bar',
+  desc: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)('Key statistics, satisfaction percentages & counters.', 'b-testimonials-block')
+}, {
+  name: 'bptmb/trust-badges',
+  title: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)('Trust Badges', 'b-testimonials-block'),
+  category: 'social',
+  icon: 'shield',
+  desc: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)('Security, guarantee, and award badges.', 'b-testimonials-block')
+}, {
+  name: 'bptmb/client-logos',
+  title: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)('Client Logos', 'b-testimonials-block'),
+  category: 'social',
+  icon: 'groups',
+  desc: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)('Showcase brand and client logos in grid or carousel.', 'b-testimonials-block')
+}, {
+  name: 'bptmb/video-testimonials',
+  title: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)('Video Testimonials', 'b-testimonials-block'),
+  category: 'media',
+  icon: 'video-alt3',
+  desc: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)('Video reviews with lightbox popup playback.', 'b-testimonials-block'),
+  badge: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)('Video', 'b-testimonials-block')
+}, {
+  name: 'bptmb/before-after',
+  title: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)('Before & After', 'b-testimonials-block'),
+  category: 'media',
+  icon: 'image-flip-horizontal',
+  desc: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)('Comparison showcase for results & transformation.', 'b-testimonials-block')
+}, {
+  name: 'bptmb/testimonial-form',
+  title: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)('Testimonial Form', 'b-testimonials-block'),
+  category: 'interactive',
+  icon: 'feedback',
+  desc: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)('Frontend form for collecting customer reviews.', 'b-testimonials-block')
+},
+// 20 New Blocks
+{
+  name: 'bptmb/testimonials-grid-2',
+  title: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)('Centered Cards Grid', 'b-testimonials-block'),
+  category: 'layouts',
+  icon: 'align-center',
+  desc: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)('Sleek centered profile and testimonial card grid.', 'b-testimonials-block'),
+  badge: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)('Popular', 'b-testimonials-block')
+}, {
+  name: 'bptmb/testimonials-grid-3',
+  title: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)('Gradient Border Grid', 'b-testimonials-block'),
+  category: 'layouts',
+  icon: 'grid-view',
+  desc: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)('Modern gradient border cards with star badges.', 'b-testimonials-block')
+}, {
+  name: 'bptmb/testimonials-carousel-2',
+  title: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)('Coverflow Carousel', 'b-testimonials-block'),
+  category: 'layouts',
+  icon: 'columns',
+  desc: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)('Center-focused 3D coverflow carousel slider.', 'b-testimonials-block'),
+  badge: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)('3D', 'b-testimonials-block')
+}, {
+  name: 'bptmb/testimonials-compact',
+  title: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)('Compact Reviews List', 'b-testimonials-block'),
+  category: 'layouts',
+  icon: 'excerpt-view',
+  desc: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)('Space-saving minimal customer testimonial list.', 'b-testimonials-block')
+}, {
+  name: 'bptmb/testimonials-avatar-list',
+  title: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)('Avatar Reviews List', 'b-testimonials-block'),
+  category: 'layouts',
+  icon: 'admin-users',
+  desc: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)('Prominent avatar & customer spotlight review rows.', 'b-testimonials-block')
+}, {
+  name: 'bptmb/testimonials-quote-box',
+  title: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)('Quote Box Showcase', 'b-testimonials-block'),
+  category: 'layouts',
+  icon: 'format-quote',
+  desc: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)('Bold quote mark styling with accent backgrounds.', 'b-testimonials-block')
+}, {
+  name: 'bptmb/testimonials-speech-bubble',
+  title: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)('Speech Bubble Cards', 'b-testimonials-block'),
+  category: 'layouts',
+  icon: 'format-chat',
+  desc: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)('Chat bubble style testimonial cards.', 'b-testimonials-block'),
+  badge: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)('Popular', 'b-testimonials-block')
+}, {
+  name: 'bptmb/testimonials-timeline',
+  title: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)('Customer Journey Timeline', 'b-testimonials-block'),
+  category: 'layouts',
+  icon: 'list-view',
+  desc: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)('Vertical timeline of customer success stories.', 'b-testimonials-block')
+}, {
+  name: 'bptmb/testimonials-card-stack',
+  title: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)('Stacked Review Cards', 'b-testimonials-block'),
+  category: 'layouts',
+  icon: 'index-card',
+  desc: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)('Overlapping stacked review card deck.', 'b-testimonials-block')
+}, {
+  name: 'bptmb/case-study-card',
+  title: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)('Customer Case Study', 'b-testimonials-block'),
+  category: 'layouts',
+  icon: 'welcome-learn-more',
+  desc: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)('Detailed case study card with metrics & quote.', 'b-testimonials-block'),
+  badge: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)('Popular', 'b-testimonials-block')
+}, {
+  name: 'bptmb/google-review-badge',
+  title: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)('Google Reviews Badge', 'b-testimonials-block'),
+  category: 'social',
+  icon: 'google',
+  desc: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)('Official style Google Business score badge.', 'b-testimonials-block'),
+  badge: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)('Badge', 'b-testimonials-block')
+}, {
+  name: 'bptmb/trustpilot-review-badge',
+  title: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)('Trustpilot Score Badge', 'b-testimonials-block'),
+  category: 'social',
+  icon: 'star-filled',
+  desc: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)('Trustpilot style rating & review summary badge.', 'b-testimonials-block'),
+  badge: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)('Badge', 'b-testimonials-block')
+}, {
+  name: 'bptmb/g2-review-badge',
+  title: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)('G2 Review Badge', 'b-testimonials-block'),
+  category: 'social',
+  icon: 'awards',
+  desc: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)('G2 / Capterra software review score badge.', 'b-testimonials-block')
+}, {
+  name: 'bptmb/review-badge-widget',
+  title: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)('Floating Review Badge', 'b-testimonials-block'),
+  category: 'social',
+  icon: 'sticky',
+  desc: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)('Corner / floating trust review badge widget.', 'b-testimonials-block')
+}, {
+  name: 'bptmb/star-rating-bars',
+  title: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)('Star Rating Progress Bars', 'b-testimonials-block'),
+  category: 'social',
+  icon: 'chart-bar',
+  desc: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)('5-star rating breakdown bars & percentage stats.', 'b-testimonials-block')
+}, {
+  name: 'bptmb/social-proof-toast',
+  title: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)('Social Proof Toast', 'b-testimonials-block'),
+  category: 'social',
+  icon: 'testimonial',
+  desc: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)('Live social proof popup notification toast.', 'b-testimonials-block'),
+  badge: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)('New', 'b-testimonials-block')
+}, {
+  name: 'bptmb/audio-testimonials',
+  title: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)('Audio Testimonials', 'b-testimonials-block'),
+  category: 'media',
+  icon: 'controls-play',
+  desc: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)('Voice note & audio review player with wave style.', 'b-testimonials-block'),
+  badge: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)('Audio', 'b-testimonials-block')
+}, {
+  name: 'bptmb/user-feedback-poll',
+  title: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)('Feedback & NPS Poll', 'b-testimonials-block'),
+  category: 'interactive',
+  icon: 'chart-pie',
+  desc: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)('Quick Net Promoter Score (NPS) feedback poll.', 'b-testimonials-block')
+}, {
+  name: 'bptmb/comparison-testimonial-table',
+  title: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)('Comparison Review Table', 'b-testimonials-block'),
+  category: 'interactive',
+  icon: 'table-col-after',
+  desc: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)('Side-by-side customer comparison table.', 'b-testimonials-block')
+}, {
+  name: 'bptmb/faq-testimonial-accordion',
+  title: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)('FAQ Review Accordion', 'b-testimonials-block'),
+  category: 'interactive',
+  icon: 'arrow-down-alt2',
+  desc: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)('Collapsible FAQ & customer feedback accordion.', 'b-testimonials-block')
+},
+// 8 New Blocks (40 Total)
+{
+  name: 'bptmb/testimonials-hero',
+  title: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)('Hero Testimonial Spotlight', 'b-testimonials-block'),
+  category: 'layouts',
+  icon: 'superhero',
+  desc: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)('High-impact hero banner with quote & CTA.', 'b-testimonials-block'),
+  badge: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)('Hero', 'b-testimonials-block')
+}, {
+  name: 'bptmb/testimonials-grid-minimal',
+  title: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)('Minimalist Reviews Grid', 'b-testimonials-block'),
+  category: 'layouts',
+  icon: 'layout',
+  desc: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)('Clean monochrome review cards with subtle hover elevation.', 'b-testimonials-block')
+}, {
+  name: 'bptmb/testimonials-slider-3d',
+  title: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)('3D Flip Perspective Carousel', 'b-testimonials-block'),
+  category: 'layouts',
+  icon: 'update',
+  desc: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)('Interactive 3D perspective flip card carousel slider.', 'b-testimonials-block'),
+  badge: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)('3D', 'b-testimonials-block')
+}, {
+  name: 'bptmb/testimonials-floating-bubble',
+  title: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)('Floating Avatar Bubbles', 'b-testimonials-block'),
+  category: 'social',
+  icon: 'bubbles',
+  desc: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)('Interactive floating customer avatar bubbles with popup tooltips.', 'b-testimonials-block')
+}, {
+  name: 'bptmb/facebook-review-badge',
+  title: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)('Facebook Recommendation Badge', 'b-testimonials-block'),
+  category: 'social',
+  icon: 'facebook',
+  desc: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)('Official style Facebook page recommendation & rating summary badge.', 'b-testimonials-block'),
+  badge: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)('Badge', 'b-testimonials-block')
+}, {
+  name: 'bptmb/capterra-review-badge',
+  title: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)('Capterra Score Badge', 'b-testimonials-block'),
+  category: 'social',
+  icon: 'star-half',
+  desc: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)('Software review rating summary badge styled like Capterra.', 'b-testimonials-block'),
+  badge: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)('Badge', 'b-testimonials-block')
+}, {
+  name: 'bptmb/verified-buyer-badge',
+  title: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)('Verified Buyer Trust Seal', 'b-testimonials-block'),
+  category: 'social',
+  icon: 'yes-alt',
+  desc: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)('E-commerce verified purchase seal & satisfaction guarantee widget.', 'b-testimonials-block')
+}, {
+  name: 'bptmb/testimonials-popup-modal',
+  title: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)('Popup Modal Review Trigger', 'b-testimonials-block'),
+  category: 'interactive',
+  icon: 'external',
+  desc: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)('Clickable badge/button that opens a full review popup modal.', 'b-testimonials-block'),
+  badge: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)('New', 'b-testimonials-block')
+}];
+const ALLOWED_CHILD_BLOCKS = CHILD_BLOCKS_LIST.map(b => b.name);
+const BlockSwitcherModal = ({
+  isOpen,
+  onRequestClose,
+  clientId,
+  currentBlockName
+}) => {
+  const [activeCategory, setActiveCategory] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)('all');
+  const [searchQuery, setSearchQuery] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)('');
+  const {
+    currentBlock,
+    parentBlock,
+    innerBlocks
+  } = (0,_wordpress_data__WEBPACK_IMPORTED_MODULE_2__.useSelect)(select => {
+    if (!clientId) return {
+      currentBlock: null,
+      parentBlock: null,
+      innerBlocks: []
+    };
+    const block = select('core/block-editor').getBlock(clientId);
+    const parents = select('core/block-editor').getBlockParents(clientId);
+    const parent = parents && parents.length > 0 ? select('core/block-editor').getBlock(parents[parents.length - 1]) : null;
+    return {
+      currentBlock: block,
+      parentBlock: parent,
+      innerBlocks: block ? block.innerBlocks : []
+    };
+  }, [clientId]);
+  (0,react__WEBPACK_IMPORTED_MODULE_0__.useEffect)(() => {
+    const handleKeyDown = e => {
+      if (e.key === 'Escape') {
+        onRequestClose();
+      }
+    };
+    if (isOpen) {
+      window.addEventListener('keydown', handleKeyDown);
+    }
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isOpen, onRequestClose]);
+  if (!isOpen) return null;
+  const handleSelectChildBlock = targetBlockName => {
+    onRequestClose();
+    if (!clientId) return;
+    try {
+      const newChildBlock = (0,_wordpress_blocks__WEBPACK_IMPORTED_MODULE_3__.createBlock)(targetBlockName);
+      if (currentBlock && currentBlock.name === 'bptmb/b-testimonials') {
+        (0,_wordpress_data__WEBPACK_IMPORTED_MODULE_2__.dispatch)('core/block-editor').updateBlockAttributes(clientId, {
+          useClassicEditor: false,
+          isLegacyBlock: false
+        });
+        if (innerBlocks && innerBlocks.length > 0) {
+          (0,_wordpress_data__WEBPACK_IMPORTED_MODULE_2__.dispatch)('core/block-editor').replaceBlock(innerBlocks[0].clientId, newChildBlock);
+        } else {
+          (0,_wordpress_data__WEBPACK_IMPORTED_MODULE_2__.dispatch)('core/block-editor').insertBlock(newChildBlock, 0, clientId);
+        }
+      } else if (parentBlock && parentBlock.name === 'bptmb/b-testimonials') {
+        (0,_wordpress_data__WEBPACK_IMPORTED_MODULE_2__.dispatch)('core/block-editor').updateBlockAttributes(parentBlock.clientId, {
+          useClassicEditor: false,
+          isLegacyBlock: false
+        });
+        (0,_wordpress_data__WEBPACK_IMPORTED_MODULE_2__.dispatch)('core/block-editor').replaceBlock(clientId, newChildBlock);
+      } else {
+        (0,_wordpress_data__WEBPACK_IMPORTED_MODULE_2__.dispatch)('core/block-editor').replaceBlock(clientId, newChildBlock);
+      }
+    } catch (err) {
+      console.error('Failed to insert/switch child block:', err);
+    }
+  };
+  const filteredBlocks = CHILD_BLOCKS_LIST.filter(item => {
+    const matchesCategory = activeCategory === 'all' || item.category === activeCategory;
+    const matchesSearch = !searchQuery || item.title.toLowerCase().includes(searchQuery.toLowerCase()) || item.desc.toLowerCase().includes(searchQuery.toLowerCase());
+    return matchesCategory && matchesSearch;
+  });
+  const categories = [{
+    id: 'all',
+    label: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)('All 40 Blocks', 'b-testimonials-block')
+  }, {
+    id: 'layouts',
+    label: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)('Grid & Layouts', 'b-testimonials-block')
+  }, {
+    id: 'social',
+    label: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)('Trust & Badges', 'b-testimonials-block')
+  }, {
+    id: 'media',
+    label: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)('Media & Audio', 'b-testimonials-block')
+  }, {
+    id: 'interactive',
+    label: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)('Forms & Polls', 'b-testimonials-block')
+  }];
+  let activeChildName = '';
+  if (currentBlock) {
+    if (currentBlock.name === 'bptmb/b-testimonials') {
+      activeChildName = innerBlocks?.[0]?.name || '';
+    } else {
+      activeChildName = currentBlock.name;
+    }
+  }
+  if (!activeChildName && currentBlockName) {
+    activeChildName = currentBlockName.startsWith('bptmb/') ? currentBlockName : `bptmb/${currentBlockName}`;
+  }
+  return (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("div", {
+    className: "btb-custom-modal-backdrop",
+    onClick: onRequestClose
+  }, (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("div", {
+    className: "btb-custom-modal-dialog",
+    onClick: e => e.stopPropagation()
+  }, (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("div", {
+    className: "btb-custom-modal-header"
+  }, (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("div", {
+    className: "btb-modal-title-wrap"
+  }, (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("div", {
+    className: "btb-modal-header-icon"
+  }, (0,_utils_icons__WEBPACK_IMPORTED_MODULE_4__.getLayoutSvgIcon)('grid-view', 24, '#ffffff')), (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("div", null, (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("h3", {
+    className: "btb-modal-title"
+  }, (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)('Testimonial Block Switcher', 'b-testimonials-block')), (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("p", {
+    className: "btb-modal-desc"
+  }, (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)('Select from 40+ modern layouts & social proof widgets', 'b-testimonials-block')))), (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("button", {
+    type: "button",
+    className: "btb-modal-close-btn",
+    onClick: onRequestClose,
+    "aria-label": (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)('Close modal', 'b-testimonials-block')
+  }, (0,_utils_icons__WEBPACK_IMPORTED_MODULE_4__.getLayoutSvgIcon)('close', 18))), (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("div", {
+    className: "btb-custom-modal-toolbar"
+  }, (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("div", {
+    className: "btb-modal-cats"
+  }, categories.map(cat => (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("button", {
+    key: cat.id,
+    type: "button",
+    className: `btb-cat-chip ${activeCategory === cat.id ? 'is-active' : ''}`,
+    onClick: () => setActiveCategory(cat.id)
+  }, cat.label))), (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("div", {
+    className: "btb-modal-search-box"
+  }, (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("span", {
+    className: "search-icon"
+  }, (0,_utils_icons__WEBPACK_IMPORTED_MODULE_4__.getLayoutSvgIcon)('search', 16)), (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("input", {
+    type: "text",
+    placeholder: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)('Search layouts…', 'b-testimonials-block'),
+    value: searchQuery,
+    onChange: e => setSearchQuery(e.target.value)
+  }), searchQuery && (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("button", {
+    type: "button",
+    className: "clear-search-btn",
+    onClick: () => setSearchQuery('')
+  }, (0,_utils_icons__WEBPACK_IMPORTED_MODULE_4__.getLayoutSvgIcon)('close', 14)))), (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("div", {
+    className: "btb-custom-modal-grid"
+  }, filteredBlocks.map(item => {
+    const isCurrent = item.name === activeChildName;
+    return (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("div", {
+      key: item.name,
+      className: `btb-modern-card ${isCurrent ? 'is-active' : ''}`,
+      onClick: () => handleSelectChildBlock(item.name)
+    }, (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("div", {
+      className: "btb-modern-card-header"
+    }, (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("div", {
+      className: "btb-modern-icon"
+    }, (0,_utils_icons__WEBPACK_IMPORTED_MODULE_4__.getLayoutSvgIcon)(item.icon, 24)), item.badge && (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("span", {
+      className: "btb-modern-badge"
+    }, item.badge)), (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("div", {
+      className: "btb-modern-card-body"
+    }, (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("h4", {
+      className: "btb-modern-card-title"
+    }, item.title, isCurrent && (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("span", {
+      className: "btb-active-pill"
+    }, (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)('Active', 'b-testimonials-block'))), (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("p", {
+      className: "btb-modern-card-desc"
+    }, item.desc)), (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("div", {
+      className: "btb-modern-card-footer"
+    }, (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("button", {
+      type: "button",
+      className: `btb-modern-select-btn ${isCurrent ? 'is-selected' : ''}`,
+      onClick: e => {
+        e.stopPropagation();
+        handleSelectChildBlock(item.name);
+      }
+    }, isCurrent ? (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)('Currently Selected', 'b-testimonials-block') : (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)('Use This Layout', 'b-testimonials-block'))));
+  }))));
+};
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (BlockSwitcherModal);
+
+/***/ },
+
+/***/ "./src/shared/utils/icons.js"
+/*!***********************************!*\
+  !*** ./src/shared/utils/icons.js ***!
+  \***********************************/
+(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   blockIcon: () => (/* binding */ blockIcon),
+/* harmony export */   getLayoutSvgIcon: () => (/* binding */ getLayoutSvgIcon),
+/* harmony export */   horizontalLineIcon: () => (/* binding */ horizontalLineIcon),
+/* harmony export */   leftQuote: () => (/* binding */ leftQuote),
+/* harmony export */   rightQuote: () => (/* binding */ rightQuote),
+/* harmony export */   star: () => (/* binding */ star),
+/* harmony export */   symbol: () => (/* binding */ symbol),
+/* harmony export */   upload: () => (/* binding */ upload),
+/* harmony export */   verticalLineIcon: () => (/* binding */ verticalLineIcon)
+/* harmony export */ });
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "react");
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
+
+const leftQuote = (color, size) => (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("svg", {
+  xmlns: "http://www.w3.org/2000/svg",
+  fill: color,
+  width: size,
+  height: size,
+  viewBox: "0 0 512 512"
+}, (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("path", {
+  d: "M464 256h-80v-64c0-35.3 28.7-64 64-64h8c13.3 0 24-10.7 24-24V56c0-13.3-10.7-24-24-24h-8c-88.4 0-160 71.6-160 160v240c0 26.5 21.5 48 48 48h128c26.5 0 48-21.5 48-48V304c0-26.5-21.5-48-48-48zm-288 0H96v-64c0-35.3 28.7-64 64-64h8c13.3 0 24-10.7 24-24V56c0-13.3-10.7-24-24-24h-8C71.6 32 0 103.6 0 192v240c0 26.5 21.5 48 48 48h128c26.5 0 48-21.5 48-48V304c0-26.5-21.5-48-48-48z"
+}));
+const rightQuote = (color, size) => (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("svg", {
+  xmlns: "http://www.w3.org/2000/svg",
+  fill: color,
+  width: size,
+  height: size,
+  viewBox: "0 0 512 512"
+}, (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("path", {
+  d: "M464 32H336c-26.5 0-48 21.5-48 48v128c0 26.5 21.5 48 48 48h80v64c0 35.3-28.7 64-64 64h-8c-13.3 0-24 10.7-24 24v48c0 13.3 10.7 24 24 24h8c88.4 0 160-71.6 160-160V80c0-26.5-21.5-48-48-48zm-288 0H48C21.5 32 0 53.5 0 80v128c0 26.5 21.5 48 48 48h80v64c0 35.3-28.7 64-64 64h-8c-13.3 0-24 10.7-24 24v48c0 13.3 10.7 24 24 24h8c88.4 0 160-71.6 160-160V80c0-26.5-21.5-48-48-48z"
+}));
+const symbol = color => (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("svg", {
+  xmlns: "http://www.w3.org/2000/svg",
+  width: "20px",
+  height: "20px",
+  viewBox: "0 0 19 13",
+  fill: color,
+  style: {
+    left: "24px"
+  }
+}, (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("path", {
+  d: "M0.965704 0.000125914H10.3736L19 5.15272e-05C19 5.15272e-05 16.2331 5.15665 10.3736 8.99489C6.68171 11.4132 3.12703 12.3741 1.00222 12.7541C0.488597 12.8459 0.227225 12.1436 0.617463 11.7973C2.03909 10.5355 3.88298 8.3072 3.88294 5.23718C3.88287 9.44134e-05 0.965704 0.000125914 0.965704 0.000125914Z"
+}));
+const upload = (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("svg", {
+  xmlns: "http://www.w3.org/2000/svg",
+  fill: "#000000",
+  width: "20px",
+  height: "20px",
+  viewBox: "0 0 512 512"
+}, (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("path", {
+  d: "M232 280L64 280 64 232 232 232 232 64 280 64 280 232 448 232 448 280 280 280 280 448 232 448 232 280Z"
+}));
+const star = color => (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("svg", {
+  xmlns: "http://www.w3.org/2000/svg",
+  fill: color,
+  width: "15px",
+  height: "15px",
+  viewBox: "0 -32 576 576"
+}, (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("path", {
+  d: "M259.3 17.8L194 150.2 47.9 171.5c-26.2 3.8-36.7 36.1-17.7 54.6l105.7 103-25 145.5c-4.5 26.3 23.2 46 46.4 33.7L288 439.6l130.7 68.7c23.2 12.2 50.9-7.4 46.4-33.7l-25-145.5 105.7-103c19-18.5 8.5-50.8-17.7-54.6L382 150.2 316.7 17.8c-11.7-23.6-45.6-23.9-57.4 0z"
+}));
+const blockIcon = (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("svg", {
+  xmlns: "http://www.w3.org/2000/svg",
+  width: "800px",
+  height: "800px",
+  viewBox: "0 0 20 20"
+}, (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("rect", {
+  x: "0",
+  fill: "none",
+  width: "20",
+  height: "20"
+}), (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("g", null, (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("path", {
+  d: "M4 3h12c.55 0 1.02.2 1.41.59S18 4.45 18 5v7c0 .55-.2 1.02-.59 1.41S16.55 14 16 14h-1l-5 5v-5H4c-.55 0-1.02-.2-1.41-.59S2 12.55 2 12V5c0-.55.2-1.02.59-1.41S3.45 3 4 3zm11 2H4v1h11V5zm1 3H4v1h12V8zm-3 3H4v1h9v-1z"
+})));
+const verticalLineIcon = (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("svg", {
+  xmlns: "http://www.w3.org/2000/svg",
+  width: 24,
+  height: 24,
+  viewBox: "0 0 14.707 14.707"
+}, (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("rect", {
+  x: "6.275",
+  y: "0",
+  width: "2.158",
+  height: "14.707"
+}));
+const horizontalLineIcon = (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("svg", {
+  xmlns: "http://www.w3.org/2000/svg",
+  width: 24,
+  height: 24,
+  viewBox: "0 0 357 357"
+}, (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("path", {
+  d: "M357,204H0v-51h357V204z"
+}));
+const getLayoutSvgIcon = (iconName, size = 22, color = 'currentColor') => {
+  switch (iconName) {
+    case 'slides':
+    case 'carousel':
+      return (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("svg", {
+        width: size,
+        height: size,
+        viewBox: "0 0 24 24",
+        fill: "none",
+        stroke: color,
+        strokeWidth: "2",
+        strokeLinecap: "round",
+        strokeLinejoin: "round"
+      }, (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("rect", {
+        x: "2",
+        y: "5",
+        width: "20",
+        height: "14",
+        rx: "2"
+      }), (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("path", {
+        d: "M8 12l4-4 4 4"
+      }), (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("path", {
+        d: "M12 8v8"
+      }));
+    case 'editor-ul':
+    case 'list':
+      return (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("svg", {
+        width: size,
+        height: size,
+        viewBox: "0 0 24 24",
+        fill: "none",
+        stroke: color,
+        strokeWidth: "2",
+        strokeLinecap: "round",
+        strokeLinejoin: "round"
+      }, (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("line", {
+        x1: "8",
+        y1: "6",
+        x2: "21",
+        y2: "6"
+      }), (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("line", {
+        x1: "8",
+        y1: "12",
+        x2: "21",
+        y2: "12"
+      }), (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("line", {
+        x1: "8",
+        y1: "18",
+        x2: "21",
+        y2: "18"
+      }), (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("line", {
+        x1: "3",
+        y1: "6",
+        x2: "3.01",
+        y2: "6"
+      }), (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("line", {
+        x1: "3",
+        y1: "12",
+        x2: "3.01",
+        y2: "12"
+      }), (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("line", {
+        x1: "3",
+        y1: "18",
+        x2: "3.01",
+        y2: "18"
+      }));
+    case 'dashboard':
+    case 'masonry':
+      return (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("svg", {
+        width: size,
+        height: size,
+        viewBox: "0 0 24 24",
+        fill: "none",
+        stroke: color,
+        strokeWidth: "2",
+        strokeLinecap: "round",
+        strokeLinejoin: "round"
+      }, (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("rect", {
+        x: "3",
+        y: "3",
+        width: "7",
+        height: "9",
+        rx: "1"
+      }), (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("rect", {
+        x: "14",
+        y: "3",
+        width: "7",
+        height: "5",
+        rx: "1"
+      }), (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("rect", {
+        x: "14",
+        y: "12",
+        width: "7",
+        height: "9",
+        rx: "1"
+      }), (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("rect", {
+        x: "3",
+        y: "16",
+        width: "7",
+        height: "5",
+        rx: "1"
+      }));
+    case 'update-alt':
+    case 'update':
+    case 'marquee':
+      return (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("svg", {
+        width: size,
+        height: size,
+        viewBox: "0 0 24 24",
+        fill: "none",
+        stroke: color,
+        strokeWidth: "2",
+        strokeLinecap: "round",
+        strokeLinejoin: "round"
+      }, (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("path", {
+        d: "M21.5 2v6h-6"
+      }), (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("path", {
+        d: "M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"
+      }));
+    case 'star-filled':
+    case 'star-half':
+    case 'rating':
+      return (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("svg", {
+        width: size,
+        height: size,
+        viewBox: "0 0 24 24",
+        fill: color === 'currentColor' ? '#ff9800' : color,
+        stroke: color === 'currentColor' ? '#ff9800' : color,
+        strokeWidth: "1.5"
+      }, (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("polygon", {
+        points: "12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"
+      }));
+    case 'chart-bar':
+    case 'stats':
+      return (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("svg", {
+        width: size,
+        height: size,
+        viewBox: "0 0 24 24",
+        fill: "none",
+        stroke: color,
+        strokeWidth: "2",
+        strokeLinecap: "round",
+        strokeLinejoin: "round"
+      }, (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("line", {
+        x1: "12",
+        y1: "20",
+        x2: "12",
+        y2: "10"
+      }), (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("line", {
+        x1: "18",
+        y1: "20",
+        x2: "18",
+        y2: "4"
+      }), (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("line", {
+        x1: "6",
+        y1: "20",
+        x2: "6",
+        y2: "16"
+      }));
+    case 'shield':
+    case 'yes-alt':
+    case 'verified':
+      return (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("svg", {
+        width: size,
+        height: size,
+        viewBox: "0 0 24 24",
+        fill: "none",
+        stroke: color,
+        strokeWidth: "2",
+        strokeLinecap: "round",
+        strokeLinejoin: "round"
+      }, (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("path", {
+        d: "M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"
+      }), (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("path", {
+        d: "M9 12l2 2 4-4"
+      }));
+    case 'groups':
+    case 'admin-users':
+      return (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("svg", {
+        width: size,
+        height: size,
+        viewBox: "0 0 24 24",
+        fill: "none",
+        stroke: color,
+        strokeWidth: "2",
+        strokeLinecap: "round",
+        strokeLinejoin: "round"
+      }, (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("path", {
+        d: "M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"
+      }), (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("circle", {
+        cx: "9",
+        cy: "7",
+        r: "4"
+      }), (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("path", {
+        d: "M23 21v-2a4 4 0 0 0-3-3.87"
+      }), (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("path", {
+        d: "M16 3.13a4 4 0 0 1 0 7.75"
+      }));
+    case 'video-alt3':
+    case 'video':
+      return (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("svg", {
+        width: size,
+        height: size,
+        viewBox: "0 0 24 24",
+        fill: "none",
+        stroke: color,
+        strokeWidth: "2",
+        strokeLinecap: "round",
+        strokeLinejoin: "round"
+      }, (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("polygon", {
+        points: "23 7 16 12 23 17 23 7"
+      }), (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("rect", {
+        x: "1",
+        y: "5",
+        width: "15",
+        height: "14",
+        rx: "2",
+        ry: "2"
+      }));
+    case 'image-flip-horizontal':
+    case 'before-after':
+      return (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("svg", {
+        width: size,
+        height: size,
+        viewBox: "0 0 24 24",
+        fill: "none",
+        stroke: color,
+        strokeWidth: "2",
+        strokeLinecap: "round",
+        strokeLinejoin: "round"
+      }, (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("rect", {
+        x: "3",
+        y: "3",
+        width: "18",
+        height: "18",
+        rx: "2"
+      }), (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("line", {
+        x1: "12",
+        y1: "3",
+        x2: "12",
+        y2: "21"
+      }), (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("path", {
+        d: "M8 10l-3 3 3 3"
+      }), (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("path", {
+        d: "M16 10l3 3-3 3"
+      }));
+    case 'feedback':
+    case 'form':
+      return (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("svg", {
+        width: size,
+        height: size,
+        viewBox: "0 0 24 24",
+        fill: "none",
+        stroke: color,
+        strokeWidth: "2",
+        strokeLinecap: "round",
+        strokeLinejoin: "round"
+      }, (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("path", {
+        d: "M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"
+      }));
+    case 'align-center':
+    case 'grid-view':
+    case 'grid':
+    case 'layout':
+      return (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("svg", {
+        width: size,
+        height: size,
+        viewBox: "0 0 24 24",
+        fill: "none",
+        stroke: color,
+        strokeWidth: "2",
+        strokeLinecap: "round",
+        strokeLinejoin: "round"
+      }, (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("rect", {
+        x: "3",
+        y: "3",
+        width: "7",
+        height: "7",
+        rx: "1"
+      }), (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("rect", {
+        x: "14",
+        y: "3",
+        width: "7",
+        height: "7",
+        rx: "1"
+      }), (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("rect", {
+        x: "14",
+        y: "14",
+        width: "7",
+        height: "7",
+        rx: "1"
+      }), (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("rect", {
+        x: "3",
+        y: "14",
+        width: "7",
+        height: "7",
+        rx: "1"
+      }));
+    case 'columns':
+      return (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("svg", {
+        width: size,
+        height: size,
+        viewBox: "0 0 24 24",
+        fill: "none",
+        stroke: color,
+        strokeWidth: "2",
+        strokeLinecap: "round",
+        strokeLinejoin: "round"
+      }, (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("rect", {
+        x: "3",
+        y: "3",
+        width: "18",
+        height: "18",
+        rx: "2"
+      }), (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("line", {
+        x1: "9",
+        y1: "3",
+        x2: "9",
+        y2: "21"
+      }), (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("line", {
+        x1: "15",
+        y1: "3",
+        x2: "15",
+        y2: "21"
+      }));
+    case 'excerpt-view':
+    case 'compact':
+      return (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("svg", {
+        width: size,
+        height: size,
+        viewBox: "0 0 24 24",
+        fill: "none",
+        stroke: color,
+        strokeWidth: "2",
+        strokeLinecap: "round",
+        strokeLinejoin: "round"
+      }, (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("rect", {
+        x: "3",
+        y: "4",
+        width: "18",
+        height: "4",
+        rx: "1"
+      }), (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("rect", {
+        x: "3",
+        y: "10",
+        width: "18",
+        height: "4",
+        rx: "1"
+      }), (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("rect", {
+        x: "3",
+        y: "16",
+        width: "18",
+        height: "4",
+        rx: "1"
+      }));
+    case 'format-quote':
+    case 'quote':
+      return (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("svg", {
+        width: size,
+        height: size,
+        viewBox: "0 0 24 24",
+        fill: color === 'currentColor' ? 'currentColor' : color
+      }, (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("path", {
+        d: "M6 17h3l2-4V7H5v6h3zm8 0h3l2-4V7h-6v6h3z"
+      }));
+    case 'format-chat':
+    case 'speech':
+      return (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("svg", {
+        width: size,
+        height: size,
+        viewBox: "0 0 24 24",
+        fill: "none",
+        stroke: color,
+        strokeWidth: "2",
+        strokeLinecap: "round",
+        strokeLinejoin: "round"
+      }, (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("path", {
+        d: "M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"
+      }));
+    case 'list-view':
+    case 'timeline':
+      return (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("svg", {
+        width: size,
+        height: size,
+        viewBox: "0 0 24 24",
+        fill: "none",
+        stroke: color,
+        strokeWidth: "2",
+        strokeLinecap: "round",
+        strokeLinejoin: "round"
+      }, (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("line", {
+        x1: "12",
+        y1: "2",
+        x2: "12",
+        y2: "22"
+      }), (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("circle", {
+        cx: "12",
+        cy: "6",
+        r: "2"
+      }), (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("circle", {
+        cx: "12",
+        cy: "12",
+        r: "2"
+      }), (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("circle", {
+        cx: "12",
+        cy: "18",
+        r: "2"
+      }));
+    case 'index-card':
+    case 'card-stack':
+      return (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("svg", {
+        width: size,
+        height: size,
+        viewBox: "0 0 24 24",
+        fill: "none",
+        stroke: color,
+        strokeWidth: "2",
+        strokeLinecap: "round",
+        strokeLinejoin: "round"
+      }, (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("rect", {
+        x: "2",
+        y: "7",
+        width: "16",
+        height: "14",
+        rx: "2"
+      }), (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("path", {
+        d: "M6 3h14a2 2 0 0 1 2 2v12"
+      }));
+    case 'welcome-learn-more':
+    case 'case-study':
+      return (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("svg", {
+        width: size,
+        height: size,
+        viewBox: "0 0 24 24",
+        fill: "none",
+        stroke: color,
+        strokeWidth: "2",
+        strokeLinecap: "round",
+        strokeLinejoin: "round"
+      }, (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("path", {
+        d: "M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"
+      }), (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("polyline", {
+        points: "14 2 14 8 20 8"
+      }), (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("line", {
+        x1: "16",
+        y1: "13",
+        x2: "8",
+        y2: "13"
+      }), (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("line", {
+        x1: "16",
+        y1: "17",
+        x2: "8",
+        y2: "17"
+      }), (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("polyline", {
+        points: "10 9 9 9 8 9"
+      }));
+    case 'google':
+      return (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("svg", {
+        width: size,
+        height: size,
+        viewBox: "0 0 24 24"
+      }, (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("path", {
+        fill: "#4285F4",
+        d: "M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.665-5.17 3.665-9.17z"
+      }), (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("path", {
+        fill: "#34A853",
+        d: "M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.12 0-5.77-2.1-6.72-4.93H1.26v3.15C3.25 21.35 7.33 24 12 24z"
+      }), (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("path", {
+        fill: "#FBBC05",
+        d: "M5.28 14.27c-.25-.72-.38-1.49-.38-2.27s.13-1.55.38-2.27V6.58H1.26C.46 8.18 0 9.98 0 12s.46 3.82 1.26 5.42l4.02-3.15z"
+      }), (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("path", {
+        fill: "#EA4335",
+        d: "M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.33 0 3.25 2.65 1.26 6.58l4.02 3.15c.95-2.83 3.6-4.98 6.72-4.98z"
+      }));
+    case 'trustpilot':
+      return (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("svg", {
+        width: size,
+        height: size,
+        viewBox: "0 0 24 24",
+        fill: "#00b67a"
+      }, (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("polygon", {
+        points: "12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"
+      }));
+    case 'facebook':
+      return (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("svg", {
+        width: size,
+        height: size,
+        viewBox: "0 0 24 24",
+        fill: "#1877F2"
+      }, (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("path", {
+        d: "M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"
+      }));
+    case 'awards':
+    case 'capterra':
+    case 'g2':
+      return (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("svg", {
+        width: size,
+        height: size,
+        viewBox: "0 0 24 24",
+        fill: "none",
+        stroke: color,
+        strokeWidth: "2",
+        strokeLinecap: "round",
+        strokeLinejoin: "round"
+      }, (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("circle", {
+        cx: "12",
+        cy: "8",
+        r: "7"
+      }), (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("polyline", {
+        points: "8.21 13.89 7 23 12 20 17 23 15.79 13.88"
+      }));
+    case 'sticky':
+    case 'widget':
+      return (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("svg", {
+        width: size,
+        height: size,
+        viewBox: "0 0 24 24",
+        fill: "none",
+        stroke: color,
+        strokeWidth: "2",
+        strokeLinecap: "round",
+        strokeLinejoin: "round"
+      }, (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("path", {
+        d: "M16 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V8z"
+      }), (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("polyline", {
+        points: "15 3 15 9 21 9"
+      }));
+    case 'testimonial':
+    case 'toast':
+      return (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("svg", {
+        width: size,
+        height: size,
+        viewBox: "0 0 24 24",
+        fill: "none",
+        stroke: color,
+        strokeWidth: "2",
+        strokeLinecap: "round",
+        strokeLinejoin: "round"
+      }, (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("rect", {
+        x: "2",
+        y: "4",
+        width: "20",
+        height: "16",
+        rx: "3"
+      }), (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("circle", {
+        cx: "8",
+        cy: "12",
+        r: "2"
+      }), (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("path", {
+        d: "M14 10h4"
+      }), (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("path", {
+        d: "M14 14h3"
+      }));
+    case 'controls-play':
+    case 'audio':
+      return (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("svg", {
+        width: size,
+        height: size,
+        viewBox: "0 0 24 24",
+        fill: "none",
+        stroke: color,
+        strokeWidth: "2",
+        strokeLinecap: "round",
+        strokeLinejoin: "round"
+      }, (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("polygon", {
+        points: "11 5 6 9 2 9 2 15 6 15 11 19 11 5"
+      }), (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("path", {
+        d: "M15.54 8.46a5 5 0 0 1 0 7.07"
+      }), (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("path", {
+        d: "M19.07 4.93a10 10 0 0 1 0 14.14"
+      }));
+    case 'chart-pie':
+    case 'poll':
+      return (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("svg", {
+        width: size,
+        height: size,
+        viewBox: "0 0 24 24",
+        fill: "none",
+        stroke: color,
+        strokeWidth: "2",
+        strokeLinecap: "round",
+        strokeLinejoin: "round"
+      }, (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("path", {
+        d: "M21.21 15.89A10 10 0 1 1 8 2.83"
+      }), (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("path", {
+        d: "M22 12A10 10 0 0 0 12 2v10z"
+      }));
+    case 'table-col-after':
+    case 'table':
+      return (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("svg", {
+        width: size,
+        height: size,
+        viewBox: "0 0 24 24",
+        fill: "none",
+        stroke: color,
+        strokeWidth: "2",
+        strokeLinecap: "round",
+        strokeLinejoin: "round"
+      }, (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("rect", {
+        x: "3",
+        y: "3",
+        width: "18",
+        height: "18",
+        rx: "2"
+      }), (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("line", {
+        x1: "12",
+        y1: "3",
+        x2: "12",
+        y2: "21"
+      }), (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("line", {
+        x1: "3",
+        y1: "9",
+        x2: "21",
+        y2: "9"
+      }), (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("line", {
+        x1: "3",
+        y1: "15",
+        x2: "21",
+        y2: "15"
+      }));
+    case 'arrow-down-alt2':
+    case 'accordion':
+      return (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("svg", {
+        width: size,
+        height: size,
+        viewBox: "0 0 24 24",
+        fill: "none",
+        stroke: color,
+        strokeWidth: "2",
+        strokeLinecap: "round",
+        strokeLinejoin: "round"
+      }, (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("polyline", {
+        points: "6 9 12 15 18 9"
+      }));
+    case 'superhero':
+    case 'hero':
+      return (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("svg", {
+        width: size,
+        height: size,
+        viewBox: "0 0 24 24",
+        fill: "none",
+        stroke: color,
+        strokeWidth: "2",
+        strokeLinecap: "round",
+        strokeLinejoin: "round"
+      }, (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("polygon", {
+        points: "12 2 2 7 12 12 22 7 12 2"
+      }), (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("polyline", {
+        points: "2 17 12 22 22 17"
+      }), (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("polyline", {
+        points: "2 12 12 17 22 12"
+      }));
+    case 'bubbles':
+    case 'floating-bubble':
+      return (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("svg", {
+        width: size,
+        height: size,
+        viewBox: "0 0 24 24",
+        fill: "none",
+        stroke: color,
+        strokeWidth: "2",
+        strokeLinecap: "round",
+        strokeLinejoin: "round"
+      }, (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("circle", {
+        cx: "7.5",
+        cy: "7.5",
+        r: "4.5"
+      }), (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("circle", {
+        cx: "16.5",
+        cy: "16.5",
+        r: "4.5"
+      }), (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("circle", {
+        cx: "17.5",
+        cy: "6.5",
+        r: "2.5"
+      }));
+    case 'external':
+    case 'popup-modal':
+      return (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("svg", {
+        width: size,
+        height: size,
+        viewBox: "0 0 24 24",
+        fill: "none",
+        stroke: color,
+        strokeWidth: "2",
+        strokeLinecap: "round",
+        strokeLinejoin: "round"
+      }, (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("path", {
+        d: "M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"
+      }), (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("polyline", {
+        points: "15 3 21 3 21 9"
+      }), (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("line", {
+        x1: "10",
+        y1: "14",
+        x2: "21",
+        y2: "3"
+      }));
+    case 'search':
+      return (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("svg", {
+        width: size,
+        height: size,
+        viewBox: "0 0 24 24",
+        fill: "none",
+        stroke: color,
+        strokeWidth: "2",
+        strokeLinecap: "round",
+        strokeLinejoin: "round"
+      }, (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("circle", {
+        cx: "11",
+        cy: "11",
+        r: "8"
+      }), (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("line", {
+        x1: "21",
+        y1: "21",
+        x2: "16.65",
+        y2: "16.65"
+      }));
+    case 'close':
+      return (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("svg", {
+        width: size,
+        height: size,
+        viewBox: "0 0 24 24",
+        fill: "none",
+        stroke: color,
+        strokeWidth: "2",
+        strokeLinecap: "round",
+        strokeLinejoin: "round"
+      }, (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("line", {
+        x1: "18",
+        y1: "6",
+        x2: "6",
+        y2: "18"
+      }), (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("line", {
+        x1: "6",
+        y1: "6",
+        x2: "18",
+        y2: "18"
+      }));
+    case 'settings':
+    case 'admin-settings':
+      return (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("svg", {
+        width: size,
+        height: size,
+        viewBox: "0 0 24 24",
+        fill: "none",
+        stroke: color,
+        strokeWidth: "2",
+        strokeLinecap: "round",
+        strokeLinejoin: "round"
+      }, (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("circle", {
+        cx: "12",
+        cy: "12",
+        r: "3"
+      }), (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("path", {
+        d: "M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"
+      }));
+    default:
+      return (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("svg", {
+        width: size,
+        height: size,
+        viewBox: "0 0 24 24",
+        fill: "none",
+        stroke: color,
+        strokeWidth: "2",
+        strokeLinecap: "round",
+        strokeLinejoin: "round"
+      }, (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("rect", {
+        x: "3",
+        y: "3",
+        width: "7",
+        height: "7",
+        rx: "1"
+      }), (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("rect", {
+        x: "14",
+        y: "3",
+        width: "7",
+        height: "7",
+        rx: "1"
+      }), (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("rect", {
+        x: "14",
+        y: "14",
+        width: "7",
+        height: "7",
+        rx: "1"
+      }), (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("rect", {
+        x: "3",
+        y: "14",
+        width: "7",
+        height: "7",
+        rx: "1"
+      }));
+  }
+};
+
+/***/ },
+
+/***/ "./src/blocks/trust-badges/edit.scss"
+/*!*******************************************!*\
+  !*** ./src/blocks/trust-badges/edit.scss ***!
+  \*******************************************/
+(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
+
+__webpack_require__.r(__webpack_exports__);
+// extracted by mini-css-extract-plugin
+
+
+/***/ },
+
+/***/ "./src/shared/styles/trust-badges.scss"
+/*!*********************************************!*\
+  !*** ./src/shared/styles/trust-badges.scss ***!
+  \*********************************************/
+(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
+
+__webpack_require__.r(__webpack_exports__);
+// extracted by mini-css-extract-plugin
+
+
+/***/ },
+
+/***/ "react"
+/*!************************!*\
+  !*** external "React" ***!
+  \************************/
+(module) {
+
+module.exports = window["React"];
+
+/***/ },
+
+/***/ "@wordpress/block-editor"
+/*!*************************************!*\
+  !*** external ["wp","blockEditor"] ***!
+  \*************************************/
+(module) {
+
+module.exports = window["wp"]["blockEditor"];
+
+/***/ },
+
+/***/ "@wordpress/blocks"
+/*!********************************!*\
+  !*** external ["wp","blocks"] ***!
+  \********************************/
+(module) {
+
+module.exports = window["wp"]["blocks"];
+
+/***/ },
+
+/***/ "@wordpress/components"
+/*!************************************!*\
+  !*** external ["wp","components"] ***!
+  \************************************/
+(module) {
+
+module.exports = window["wp"]["components"];
+
+/***/ },
+
+/***/ "@wordpress/data"
+/*!******************************!*\
+  !*** external ["wp","data"] ***!
+  \******************************/
+(module) {
+
+module.exports = window["wp"]["data"];
+
+/***/ },
+
+/***/ "@wordpress/i18n"
+/*!******************************!*\
+  !*** external ["wp","i18n"] ***!
+  \******************************/
+(module) {
+
+module.exports = window["wp"]["i18n"];
+
+/***/ },
+
+/***/ "../../../../../../../Development/dev/node_modules/immer/dist/immer.mjs"
+/*!******************************************************************************!*\
+  !*** ../../../../../../../Development/dev/node_modules/immer/dist/immer.mjs ***!
+  \******************************************************************************/
+(__unused_webpack___webpack_module__, __webpack_exports__, __webpack_require__) {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   Immer: () => (/* binding */ Immer2),
+/* harmony export */   applyPatches: () => (/* binding */ applyPatches),
+/* harmony export */   castDraft: () => (/* binding */ castDraft),
+/* harmony export */   castImmutable: () => (/* binding */ castImmutable),
+/* harmony export */   createDraft: () => (/* binding */ createDraft),
+/* harmony export */   current: () => (/* binding */ current),
+/* harmony export */   enableMapSet: () => (/* binding */ enableMapSet),
+/* harmony export */   enablePatches: () => (/* binding */ enablePatches),
+/* harmony export */   finishDraft: () => (/* binding */ finishDraft),
+/* harmony export */   freeze: () => (/* binding */ freeze),
+/* harmony export */   immerable: () => (/* binding */ DRAFTABLE),
+/* harmony export */   isDraft: () => (/* binding */ isDraft),
+/* harmony export */   isDraftable: () => (/* binding */ isDraftable),
+/* harmony export */   nothing: () => (/* binding */ NOTHING),
+/* harmony export */   original: () => (/* binding */ original),
+/* harmony export */   produce: () => (/* binding */ produce),
+/* harmony export */   produceWithPatches: () => (/* binding */ produceWithPatches),
+/* harmony export */   setAutoFreeze: () => (/* binding */ setAutoFreeze),
+/* harmony export */   setUseStrictIteration: () => (/* binding */ setUseStrictIteration),
+/* harmony export */   setUseStrictShallowCopy: () => (/* binding */ setUseStrictShallowCopy)
+/* harmony export */ });
+// src/utils/env.ts
+var NOTHING = Symbol.for("immer-nothing");
+var DRAFTABLE = Symbol.for("immer-draftable");
+var DRAFT_STATE = Symbol.for("immer-state");
+
+// src/utils/errors.ts
+var errors =  true ? [
+  // All error codes, starting by 0:
+  function(plugin) {
+    return `The plugin for '${plugin}' has not been loaded into Immer. To enable the plugin, import and call \`enable${plugin}()\` when initializing your application.`;
+  },
+  function(thing) {
+    return `produce can only be called on things that are draftable: plain objects, arrays, Map, Set or classes that are marked with '[immerable]: true'. Got '${thing}'`;
+  },
+  "This object has been frozen and should not be mutated",
+  function(data) {
+    return "Cannot use a proxy that has been revoked. Did you pass an object from inside an immer function to an async process? " + data;
+  },
+  "An immer producer returned a new value *and* modified its draft. Either return a new value *or* modify the draft.",
+  "Immer forbids circular references",
+  "The first or second argument to `produce` must be a function",
+  "The third argument to `produce` must be a function or undefined",
+  "First argument to `createDraft` must be a plain object, an array, or an immerable object",
+  "First argument to `finishDraft` must be a draft returned by `createDraft`",
+  function(thing) {
+    return `'current' expects a draft, got: ${thing}`;
+  },
+  "Object.defineProperty() cannot be used on an Immer draft",
+  "Object.setPrototypeOf() cannot be used on an Immer draft",
+  "Immer only supports deleting array indices",
+  "Immer only supports setting array indices and the 'length' property",
+  function(thing) {
+    return `'original' expects a draft, got: ${thing}`;
+  }
+  // Note: if more errors are added, the errorOffset in Patches.ts should be increased
+  // See Patches.ts for additional errors
+] : 0;
+function die(error, ...args) {
+  if (true) {
+    const e = errors[error];
+    const msg = typeof e === "function" ? e.apply(null, args) : e;
+    throw new Error(`[Immer] ${msg}`);
+  }
+  // removed by dead control flow
+
+}
+
+// src/utils/common.ts
+var getPrototypeOf = Object.getPrototypeOf;
+function isDraft(value) {
+  return !!value && !!value[DRAFT_STATE];
+}
+function isDraftable(value) {
+  if (!value)
+    return false;
+  return isPlainObject(value) || Array.isArray(value) || !!value[DRAFTABLE] || !!value.constructor?.[DRAFTABLE] || isMap(value) || isSet(value);
+}
+var objectCtorString = Object.prototype.constructor.toString();
+var cachedCtorStrings = /* @__PURE__ */ new WeakMap();
+function isPlainObject(value) {
+  if (!value || typeof value !== "object")
+    return false;
+  const proto = Object.getPrototypeOf(value);
+  if (proto === null || proto === Object.prototype)
+    return true;
+  const Ctor = Object.hasOwnProperty.call(proto, "constructor") && proto.constructor;
+  if (Ctor === Object)
+    return true;
+  if (typeof Ctor !== "function")
+    return false;
+  let ctorString = cachedCtorStrings.get(Ctor);
+  if (ctorString === void 0) {
+    ctorString = Function.toString.call(Ctor);
+    cachedCtorStrings.set(Ctor, ctorString);
+  }
+  return ctorString === objectCtorString;
+}
+function original(value) {
+  if (!isDraft(value))
+    die(15, value);
+  return value[DRAFT_STATE].base_;
+}
+function each(obj, iter, strict = true) {
+  if (getArchtype(obj) === 0 /* Object */) {
+    const keys = strict ? Reflect.ownKeys(obj) : Object.keys(obj);
+    keys.forEach((key) => {
+      iter(key, obj[key], obj);
+    });
+  } else {
+    obj.forEach((entry, index) => iter(index, entry, obj));
+  }
+}
+function getArchtype(thing) {
+  const state = thing[DRAFT_STATE];
+  return state ? state.type_ : Array.isArray(thing) ? 1 /* Array */ : isMap(thing) ? 2 /* Map */ : isSet(thing) ? 3 /* Set */ : 0 /* Object */;
+}
+function has(thing, prop) {
+  return getArchtype(thing) === 2 /* Map */ ? thing.has(prop) : Object.prototype.hasOwnProperty.call(thing, prop);
+}
+function get(thing, prop) {
+  return getArchtype(thing) === 2 /* Map */ ? thing.get(prop) : thing[prop];
+}
+function set(thing, propOrOldValue, value) {
+  const t = getArchtype(thing);
+  if (t === 2 /* Map */)
+    thing.set(propOrOldValue, value);
+  else if (t === 3 /* Set */) {
+    thing.add(value);
+  } else
+    thing[propOrOldValue] = value;
+}
+function is(x, y) {
+  if (x === y) {
+    return x !== 0 || 1 / x === 1 / y;
+  } else {
+    return x !== x && y !== y;
+  }
+}
+function isMap(target) {
+  return target instanceof Map;
+}
+function isSet(target) {
+  return target instanceof Set;
+}
+function latest(state) {
+  return state.copy_ || state.base_;
+}
+function shallowCopy(base, strict) {
+  if (isMap(base)) {
+    return new Map(base);
+  }
+  if (isSet(base)) {
+    return new Set(base);
+  }
+  if (Array.isArray(base))
+    return Array.prototype.slice.call(base);
+  const isPlain = isPlainObject(base);
+  if (strict === true || strict === "class_only" && !isPlain) {
+    const descriptors = Object.getOwnPropertyDescriptors(base);
+    delete descriptors[DRAFT_STATE];
+    let keys = Reflect.ownKeys(descriptors);
+    for (let i = 0; i < keys.length; i++) {
+      const key = keys[i];
+      const desc = descriptors[key];
+      if (desc.writable === false) {
+        desc.writable = true;
+        desc.configurable = true;
+      }
+      if (desc.get || desc.set)
+        descriptors[key] = {
+          configurable: true,
+          writable: true,
+          // could live with !!desc.set as well here...
+          enumerable: desc.enumerable,
+          value: base[key]
+        };
+    }
+    return Object.create(getPrototypeOf(base), descriptors);
+  } else {
+    const proto = getPrototypeOf(base);
+    if (proto !== null && isPlain) {
+      return { ...base };
+    }
+    const obj = Object.create(proto);
+    return Object.assign(obj, base);
+  }
+}
+function freeze(obj, deep = false) {
+  if (isFrozen(obj) || isDraft(obj) || !isDraftable(obj))
+    return obj;
+  if (getArchtype(obj) > 1) {
+    Object.defineProperties(obj, {
+      set: dontMutateMethodOverride,
+      add: dontMutateMethodOverride,
+      clear: dontMutateMethodOverride,
+      delete: dontMutateMethodOverride
+    });
+  }
+  Object.freeze(obj);
+  if (deep)
+    Object.values(obj).forEach((value) => freeze(value, true));
+  return obj;
+}
+function dontMutateFrozenCollections() {
+  die(2);
+}
+var dontMutateMethodOverride = {
+  value: dontMutateFrozenCollections
+};
+function isFrozen(obj) {
+  if (obj === null || typeof obj !== "object")
+    return true;
+  return Object.isFrozen(obj);
+}
+
+// src/utils/plugins.ts
+var plugins = {};
+function getPlugin(pluginKey) {
+  const plugin = plugins[pluginKey];
+  if (!plugin) {
+    die(0, pluginKey);
+  }
+  return plugin;
+}
+function loadPlugin(pluginKey, implementation) {
+  if (!plugins[pluginKey])
+    plugins[pluginKey] = implementation;
+}
+
+// src/core/scope.ts
+var currentScope;
+function getCurrentScope() {
+  return currentScope;
+}
+function createScope(parent_, immer_) {
+  return {
+    drafts_: [],
+    parent_,
+    immer_,
+    // Whenever the modified draft contains a draft from another scope, we
+    // need to prevent auto-freezing so the unowned draft can be finalized.
+    canAutoFreeze_: true,
+    unfinalizedDrafts_: 0
+  };
+}
+function usePatchesInScope(scope, patchListener) {
+  if (patchListener) {
+    getPlugin("Patches");
+    scope.patches_ = [];
+    scope.inversePatches_ = [];
+    scope.patchListener_ = patchListener;
+  }
+}
+function revokeScope(scope) {
+  leaveScope(scope);
+  scope.drafts_.forEach(revokeDraft);
+  scope.drafts_ = null;
+}
+function leaveScope(scope) {
+  if (scope === currentScope) {
+    currentScope = scope.parent_;
+  }
+}
+function enterScope(immer2) {
+  return currentScope = createScope(currentScope, immer2);
+}
+function revokeDraft(draft) {
+  const state = draft[DRAFT_STATE];
+  if (state.type_ === 0 /* Object */ || state.type_ === 1 /* Array */)
+    state.revoke_();
+  else
+    state.revoked_ = true;
+}
+
+// src/core/finalize.ts
+function processResult(result, scope) {
+  scope.unfinalizedDrafts_ = scope.drafts_.length;
+  const baseDraft = scope.drafts_[0];
+  const isReplaced = result !== void 0 && result !== baseDraft;
+  if (isReplaced) {
+    if (baseDraft[DRAFT_STATE].modified_) {
+      revokeScope(scope);
+      die(4);
+    }
+    if (isDraftable(result)) {
+      result = finalize(scope, result);
+      if (!scope.parent_)
+        maybeFreeze(scope, result);
+    }
+    if (scope.patches_) {
+      getPlugin("Patches").generateReplacementPatches_(
+        baseDraft[DRAFT_STATE].base_,
+        result,
+        scope.patches_,
+        scope.inversePatches_
+      );
+    }
+  } else {
+    result = finalize(scope, baseDraft, []);
+  }
+  revokeScope(scope);
+  if (scope.patches_) {
+    scope.patchListener_(scope.patches_, scope.inversePatches_);
+  }
+  return result !== NOTHING ? result : void 0;
+}
+function finalize(rootScope, value, path) {
+  if (isFrozen(value))
+    return value;
+  const useStrictIteration = rootScope.immer_.shouldUseStrictIteration();
+  const state = value[DRAFT_STATE];
+  if (!state) {
+    each(
+      value,
+      (key, childValue) => finalizeProperty(rootScope, state, value, key, childValue, path),
+      useStrictIteration
+    );
+    return value;
+  }
+  if (state.scope_ !== rootScope)
+    return value;
+  if (!state.modified_) {
+    maybeFreeze(rootScope, state.base_, true);
+    return state.base_;
+  }
+  if (!state.finalized_) {
+    state.finalized_ = true;
+    state.scope_.unfinalizedDrafts_--;
+    const result = state.copy_;
+    let resultEach = result;
+    let isSet2 = false;
+    if (state.type_ === 3 /* Set */) {
+      resultEach = new Set(result);
+      result.clear();
+      isSet2 = true;
+    }
+    each(
+      resultEach,
+      (key, childValue) => finalizeProperty(
+        rootScope,
+        state,
+        result,
+        key,
+        childValue,
+        path,
+        isSet2
+      ),
+      useStrictIteration
+    );
+    maybeFreeze(rootScope, result, false);
+    if (path && rootScope.patches_) {
+      getPlugin("Patches").generatePatches_(
+        state,
+        path,
+        rootScope.patches_,
+        rootScope.inversePatches_
+      );
+    }
+  }
+  return state.copy_;
+}
+function finalizeProperty(rootScope, parentState, targetObject, prop, childValue, rootPath, targetIsSet) {
+  if (childValue == null) {
+    return;
+  }
+  if (typeof childValue !== "object" && !targetIsSet) {
+    return;
+  }
+  const childIsFrozen = isFrozen(childValue);
+  if (childIsFrozen && !targetIsSet) {
+    return;
+  }
+  if ( true && childValue === targetObject)
+    die(5);
+  if (isDraft(childValue)) {
+    const path = rootPath && parentState && parentState.type_ !== 3 /* Set */ && // Set objects are atomic since they have no keys.
+    !has(parentState.assigned_, prop) ? rootPath.concat(prop) : void 0;
+    const res = finalize(rootScope, childValue, path);
+    set(targetObject, prop, res);
+    if (isDraft(res)) {
+      rootScope.canAutoFreeze_ = false;
+    } else
+      return;
+  } else if (targetIsSet) {
+    targetObject.add(childValue);
+  }
+  if (isDraftable(childValue) && !childIsFrozen) {
+    if (!rootScope.immer_.autoFreeze_ && rootScope.unfinalizedDrafts_ < 1) {
+      return;
+    }
+    if (parentState && parentState.base_ && parentState.base_[prop] === childValue && childIsFrozen) {
+      return;
+    }
+    finalize(rootScope, childValue);
+    if ((!parentState || !parentState.scope_.parent_) && typeof prop !== "symbol" && (isMap(targetObject) ? targetObject.has(prop) : Object.prototype.propertyIsEnumerable.call(targetObject, prop)))
+      maybeFreeze(rootScope, childValue);
+  }
+}
+function maybeFreeze(scope, value, deep = false) {
+  if (!scope.parent_ && scope.immer_.autoFreeze_ && scope.canAutoFreeze_) {
+    freeze(value, deep);
+  }
+}
+
+// src/core/proxy.ts
+function createProxyProxy(base, parent) {
+  const isArray = Array.isArray(base);
+  const state = {
+    type_: isArray ? 1 /* Array */ : 0 /* Object */,
+    // Track which produce call this is associated with.
+    scope_: parent ? parent.scope_ : getCurrentScope(),
+    // True for both shallow and deep changes.
+    modified_: false,
+    // Used during finalization.
+    finalized_: false,
+    // Track which properties have been assigned (true) or deleted (false).
+    assigned_: {},
+    // The parent draft state.
+    parent_: parent,
+    // The base state.
+    base_: base,
+    // The base proxy.
+    draft_: null,
+    // set below
+    // The base copy with any updated values.
+    copy_: null,
+    // Called by the `produce` function.
+    revoke_: null,
+    isManual_: false
+  };
+  let target = state;
+  let traps = objectTraps;
+  if (isArray) {
+    target = [state];
+    traps = arrayTraps;
+  }
+  const { revoke, proxy } = Proxy.revocable(target, traps);
+  state.draft_ = proxy;
+  state.revoke_ = revoke;
+  return proxy;
+}
+var objectTraps = {
+  get(state, prop) {
+    if (prop === DRAFT_STATE)
+      return state;
+    const source = latest(state);
+    if (!has(source, prop)) {
+      return readPropFromProto(state, source, prop);
+    }
+    const value = source[prop];
+    if (state.finalized_ || !isDraftable(value)) {
+      return value;
+    }
+    if (value === peek(state.base_, prop)) {
+      prepareCopy(state);
+      return state.copy_[prop] = createProxy(value, state);
+    }
+    return value;
+  },
+  has(state, prop) {
+    return prop in latest(state);
+  },
+  ownKeys(state) {
+    return Reflect.ownKeys(latest(state));
+  },
+  set(state, prop, value) {
+    const desc = getDescriptorFromProto(latest(state), prop);
+    if (desc?.set) {
+      desc.set.call(state.draft_, value);
+      return true;
+    }
+    if (!state.modified_) {
+      const current2 = peek(latest(state), prop);
+      const currentState = current2?.[DRAFT_STATE];
+      if (currentState && currentState.base_ === value) {
+        state.copy_[prop] = value;
+        state.assigned_[prop] = false;
+        return true;
+      }
+      if (is(value, current2) && (value !== void 0 || has(state.base_, prop)))
+        return true;
+      prepareCopy(state);
+      markChanged(state);
+    }
+    if (state.copy_[prop] === value && // special case: handle new props with value 'undefined'
+    (value !== void 0 || prop in state.copy_) || // special case: NaN
+    Number.isNaN(value) && Number.isNaN(state.copy_[prop]))
+      return true;
+    state.copy_[prop] = value;
+    state.assigned_[prop] = true;
+    return true;
+  },
+  deleteProperty(state, prop) {
+    if (peek(state.base_, prop) !== void 0 || prop in state.base_) {
+      state.assigned_[prop] = false;
+      prepareCopy(state);
+      markChanged(state);
+    } else {
+      delete state.assigned_[prop];
+    }
+    if (state.copy_) {
+      delete state.copy_[prop];
+    }
+    return true;
+  },
+  // Note: We never coerce `desc.value` into an Immer draft, because we can't make
+  // the same guarantee in ES5 mode.
+  getOwnPropertyDescriptor(state, prop) {
+    const owner = latest(state);
+    const desc = Reflect.getOwnPropertyDescriptor(owner, prop);
+    if (!desc)
+      return desc;
+    return {
+      writable: true,
+      configurable: state.type_ !== 1 /* Array */ || prop !== "length",
+      enumerable: desc.enumerable,
+      value: owner[prop]
+    };
+  },
+  defineProperty() {
+    die(11);
+  },
+  getPrototypeOf(state) {
+    return getPrototypeOf(state.base_);
+  },
+  setPrototypeOf() {
+    die(12);
+  }
+};
+var arrayTraps = {};
+each(objectTraps, (key, fn) => {
+  arrayTraps[key] = function() {
+    arguments[0] = arguments[0][0];
+    return fn.apply(this, arguments);
+  };
+});
+arrayTraps.deleteProperty = function(state, prop) {
+  if ( true && isNaN(parseInt(prop)))
+    die(13);
+  return arrayTraps.set.call(this, state, prop, void 0);
+};
+arrayTraps.set = function(state, prop, value) {
+  if ( true && prop !== "length" && isNaN(parseInt(prop)))
+    die(14);
+  return objectTraps.set.call(this, state[0], prop, value, state[0]);
+};
+function peek(draft, prop) {
+  const state = draft[DRAFT_STATE];
+  const source = state ? latest(state) : draft;
+  return source[prop];
+}
+function readPropFromProto(state, source, prop) {
+  const desc = getDescriptorFromProto(source, prop);
+  return desc ? `value` in desc ? desc.value : (
+    // This is a very special case, if the prop is a getter defined by the
+    // prototype, we should invoke it with the draft as context!
+    desc.get?.call(state.draft_)
+  ) : void 0;
+}
+function getDescriptorFromProto(source, prop) {
+  if (!(prop in source))
+    return void 0;
+  let proto = getPrototypeOf(source);
+  while (proto) {
+    const desc = Object.getOwnPropertyDescriptor(proto, prop);
+    if (desc)
+      return desc;
+    proto = getPrototypeOf(proto);
+  }
+  return void 0;
+}
+function markChanged(state) {
+  if (!state.modified_) {
+    state.modified_ = true;
+    if (state.parent_) {
+      markChanged(state.parent_);
+    }
+  }
+}
+function prepareCopy(state) {
+  if (!state.copy_) {
+    state.copy_ = shallowCopy(
+      state.base_,
+      state.scope_.immer_.useStrictShallowCopy_
+    );
+  }
+}
+
+// src/core/immerClass.ts
+var Immer2 = class {
+  constructor(config) {
+    this.autoFreeze_ = true;
+    this.useStrictShallowCopy_ = false;
+    this.useStrictIteration_ = true;
+    /**
+     * The `produce` function takes a value and a "recipe function" (whose
+     * return value often depends on the base state). The recipe function is
+     * free to mutate its first argument however it wants. All mutations are
+     * only ever applied to a __copy__ of the base state.
+     *
+     * Pass only a function to create a "curried producer" which relieves you
+     * from passing the recipe function every time.
+     *
+     * Only plain objects and arrays are made mutable. All other objects are
+     * considered uncopyable.
+     *
+     * Note: This function is __bound__ to its `Immer` instance.
+     *
+     * @param {any} base - the initial state
+     * @param {Function} recipe - function that receives a proxy of the base state as first argument and which can be freely modified
+     * @param {Function} patchListener - optional function that will be called with all the patches produced here
+     * @returns {any} a new state, or the initial state if nothing was modified
+     */
+    this.produce = (base, recipe, patchListener) => {
+      if (typeof base === "function" && typeof recipe !== "function") {
+        const defaultBase = recipe;
+        recipe = base;
+        const self = this;
+        return function curriedProduce(base2 = defaultBase, ...args) {
+          return self.produce(base2, (draft) => recipe.call(this, draft, ...args));
+        };
+      }
+      if (typeof recipe !== "function")
+        die(6);
+      if (patchListener !== void 0 && typeof patchListener !== "function")
+        die(7);
+      let result;
+      if (isDraftable(base)) {
+        const scope = enterScope(this);
+        const proxy = createProxy(base, void 0);
+        let hasError = true;
+        try {
+          result = recipe(proxy);
+          hasError = false;
+        } finally {
+          if (hasError)
+            revokeScope(scope);
+          else
+            leaveScope(scope);
+        }
+        usePatchesInScope(scope, patchListener);
+        return processResult(result, scope);
+      } else if (!base || typeof base !== "object") {
+        result = recipe(base);
+        if (result === void 0)
+          result = base;
+        if (result === NOTHING)
+          result = void 0;
+        if (this.autoFreeze_)
+          freeze(result, true);
+        if (patchListener) {
+          const p = [];
+          const ip = [];
+          getPlugin("Patches").generateReplacementPatches_(base, result, p, ip);
+          patchListener(p, ip);
+        }
+        return result;
+      } else
+        die(1, base);
+    };
+    this.produceWithPatches = (base, recipe) => {
+      if (typeof base === "function") {
+        return (state, ...args) => this.produceWithPatches(state, (draft) => base(draft, ...args));
+      }
+      let patches, inversePatches;
+      const result = this.produce(base, recipe, (p, ip) => {
+        patches = p;
+        inversePatches = ip;
+      });
+      return [result, patches, inversePatches];
+    };
+    if (typeof config?.autoFreeze === "boolean")
+      this.setAutoFreeze(config.autoFreeze);
+    if (typeof config?.useStrictShallowCopy === "boolean")
+      this.setUseStrictShallowCopy(config.useStrictShallowCopy);
+    if (typeof config?.useStrictIteration === "boolean")
+      this.setUseStrictIteration(config.useStrictIteration);
+  }
+  createDraft(base) {
+    if (!isDraftable(base))
+      die(8);
+    if (isDraft(base))
+      base = current(base);
+    const scope = enterScope(this);
+    const proxy = createProxy(base, void 0);
+    proxy[DRAFT_STATE].isManual_ = true;
+    leaveScope(scope);
+    return proxy;
+  }
+  finishDraft(draft, patchListener) {
+    const state = draft && draft[DRAFT_STATE];
+    if (!state || !state.isManual_)
+      die(9);
+    const { scope_: scope } = state;
+    usePatchesInScope(scope, patchListener);
+    return processResult(void 0, scope);
+  }
+  /**
+   * Pass true to automatically freeze all copies created by Immer.
+   *
+   * By default, auto-freezing is enabled.
+   */
+  setAutoFreeze(value) {
+    this.autoFreeze_ = value;
+  }
+  /**
+   * Pass true to enable strict shallow copy.
+   *
+   * By default, immer does not copy the object descriptors such as getter, setter and non-enumrable properties.
+   */
+  setUseStrictShallowCopy(value) {
+    this.useStrictShallowCopy_ = value;
+  }
+  /**
+   * Pass false to use faster iteration that skips non-enumerable properties
+   * but still handles symbols for compatibility.
+   *
+   * By default, strict iteration is enabled (includes all own properties).
+   */
+  setUseStrictIteration(value) {
+    this.useStrictIteration_ = value;
+  }
+  shouldUseStrictIteration() {
+    return this.useStrictIteration_;
+  }
+  applyPatches(base, patches) {
+    let i;
+    for (i = patches.length - 1; i >= 0; i--) {
+      const patch = patches[i];
+      if (patch.path.length === 0 && patch.op === "replace") {
+        base = patch.value;
+        break;
+      }
+    }
+    if (i > -1) {
+      patches = patches.slice(i + 1);
+    }
+    const applyPatchesImpl = getPlugin("Patches").applyPatches_;
+    if (isDraft(base)) {
+      return applyPatchesImpl(base, patches);
+    }
+    return this.produce(
+      base,
+      (draft) => applyPatchesImpl(draft, patches)
+    );
+  }
+};
+function createProxy(value, parent) {
+  const draft = isMap(value) ? getPlugin("MapSet").proxyMap_(value, parent) : isSet(value) ? getPlugin("MapSet").proxySet_(value, parent) : createProxyProxy(value, parent);
+  const scope = parent ? parent.scope_ : getCurrentScope();
+  scope.drafts_.push(draft);
+  return draft;
+}
+
+// src/core/current.ts
+function current(value) {
+  if (!isDraft(value))
+    die(10, value);
+  return currentImpl(value);
+}
+function currentImpl(value) {
+  if (!isDraftable(value) || isFrozen(value))
+    return value;
+  const state = value[DRAFT_STATE];
+  let copy;
+  let strict = true;
+  if (state) {
+    if (!state.modified_)
+      return state.base_;
+    state.finalized_ = true;
+    copy = shallowCopy(value, state.scope_.immer_.useStrictShallowCopy_);
+    strict = state.scope_.immer_.shouldUseStrictIteration();
+  } else {
+    copy = shallowCopy(value, true);
+  }
+  each(
+    copy,
+    (key, childValue) => {
+      set(copy, key, currentImpl(childValue));
+    },
+    strict
+  );
+  if (state) {
+    state.finalized_ = false;
+  }
+  return copy;
+}
+
+// src/plugins/patches.ts
+function enablePatches() {
+  const errorOffset = 16;
+  if (true) {
+    errors.push(
+      'Sets cannot have "replace" patches.',
+      function(op) {
+        return "Unsupported patch operation: " + op;
+      },
+      function(path) {
+        return "Cannot apply patch, path doesn't resolve: " + path;
+      },
+      "Patching reserved attributes like __proto__, prototype and constructor is not allowed"
+    );
+  }
+  const REPLACE = "replace";
+  const ADD = "add";
+  const REMOVE = "remove";
+  function generatePatches_(state, basePath, patches, inversePatches) {
+    switch (state.type_) {
+      case 0 /* Object */:
+      case 2 /* Map */:
+        return generatePatchesFromAssigned(
+          state,
+          basePath,
+          patches,
+          inversePatches
+        );
+      case 1 /* Array */:
+        return generateArrayPatches(state, basePath, patches, inversePatches);
+      case 3 /* Set */:
+        return generateSetPatches(
+          state,
+          basePath,
+          patches,
+          inversePatches
+        );
+    }
+  }
+  function generateArrayPatches(state, basePath, patches, inversePatches) {
+    let { base_, assigned_ } = state;
+    let copy_ = state.copy_;
+    if (copy_.length < base_.length) {
+      ;
+      [base_, copy_] = [copy_, base_];
+      [patches, inversePatches] = [inversePatches, patches];
+    }
+    for (let i = 0; i < base_.length; i++) {
+      if (assigned_[i] && copy_[i] !== base_[i]) {
+        const path = basePath.concat([i]);
+        patches.push({
+          op: REPLACE,
+          path,
+          // Need to maybe clone it, as it can in fact be the original value
+          // due to the base/copy inversion at the start of this function
+          value: clonePatchValueIfNeeded(copy_[i])
+        });
+        inversePatches.push({
+          op: REPLACE,
+          path,
+          value: clonePatchValueIfNeeded(base_[i])
+        });
+      }
+    }
+    for (let i = base_.length; i < copy_.length; i++) {
+      const path = basePath.concat([i]);
+      patches.push({
+        op: ADD,
+        path,
+        // Need to maybe clone it, as it can in fact be the original value
+        // due to the base/copy inversion at the start of this function
+        value: clonePatchValueIfNeeded(copy_[i])
+      });
+    }
+    for (let i = copy_.length - 1; base_.length <= i; --i) {
+      const path = basePath.concat([i]);
+      inversePatches.push({
+        op: REMOVE,
+        path
+      });
+    }
+  }
+  function generatePatchesFromAssigned(state, basePath, patches, inversePatches) {
+    const { base_, copy_ } = state;
+    each(state.assigned_, (key, assignedValue) => {
+      const origValue = get(base_, key);
+      const value = get(copy_, key);
+      const op = !assignedValue ? REMOVE : has(base_, key) ? REPLACE : ADD;
+      if (origValue === value && op === REPLACE)
+        return;
+      const path = basePath.concat(key);
+      patches.push(op === REMOVE ? { op, path } : { op, path, value });
+      inversePatches.push(
+        op === ADD ? { op: REMOVE, path } : op === REMOVE ? { op: ADD, path, value: clonePatchValueIfNeeded(origValue) } : { op: REPLACE, path, value: clonePatchValueIfNeeded(origValue) }
+      );
+    });
+  }
+  function generateSetPatches(state, basePath, patches, inversePatches) {
+    let { base_, copy_ } = state;
+    let i = 0;
+    base_.forEach((value) => {
+      if (!copy_.has(value)) {
+        const path = basePath.concat([i]);
+        patches.push({
+          op: REMOVE,
+          path,
+          value
+        });
+        inversePatches.unshift({
+          op: ADD,
+          path,
+          value
+        });
+      }
+      i++;
+    });
+    i = 0;
+    copy_.forEach((value) => {
+      if (!base_.has(value)) {
+        const path = basePath.concat([i]);
+        patches.push({
+          op: ADD,
+          path,
+          value
+        });
+        inversePatches.unshift({
+          op: REMOVE,
+          path,
+          value
+        });
+      }
+      i++;
+    });
+  }
+  function generateReplacementPatches_(baseValue, replacement, patches, inversePatches) {
+    patches.push({
+      op: REPLACE,
+      path: [],
+      value: replacement === NOTHING ? void 0 : replacement
+    });
+    inversePatches.push({
+      op: REPLACE,
+      path: [],
+      value: baseValue
+    });
+  }
+  function applyPatches_(draft, patches) {
+    patches.forEach((patch) => {
+      const { path, op } = patch;
+      let base = draft;
+      for (let i = 0; i < path.length - 1; i++) {
+        const parentType = getArchtype(base);
+        let p = path[i];
+        if (typeof p !== "string" && typeof p !== "number") {
+          p = "" + p;
+        }
+        if ((parentType === 0 /* Object */ || parentType === 1 /* Array */) && (p === "__proto__" || p === "constructor"))
+          die(errorOffset + 3);
+        if (typeof base === "function" && p === "prototype")
+          die(errorOffset + 3);
+        base = get(base, p);
+        if (typeof base !== "object")
+          die(errorOffset + 2, path.join("/"));
+      }
+      const type = getArchtype(base);
+      const value = deepClonePatchValue(patch.value);
+      const key = path[path.length - 1];
+      switch (op) {
+        case REPLACE:
+          switch (type) {
+            case 2 /* Map */:
+              return base.set(key, value);
+            case 3 /* Set */:
+              die(errorOffset);
+            default:
+              return base[key] = value;
+          }
+        case ADD:
+          switch (type) {
+            case 1 /* Array */:
+              return key === "-" ? base.push(value) : base.splice(key, 0, value);
+            case 2 /* Map */:
+              return base.set(key, value);
+            case 3 /* Set */:
+              return base.add(value);
+            default:
+              return base[key] = value;
+          }
+        case REMOVE:
+          switch (type) {
+            case 1 /* Array */:
+              return base.splice(key, 1);
+            case 2 /* Map */:
+              return base.delete(key);
+            case 3 /* Set */:
+              return base.delete(patch.value);
+            default:
+              return delete base[key];
+          }
+        default:
+          die(errorOffset + 1, op);
+      }
+    });
+    return draft;
+  }
+  function deepClonePatchValue(obj) {
+    if (!isDraftable(obj))
+      return obj;
+    if (Array.isArray(obj))
+      return obj.map(deepClonePatchValue);
+    if (isMap(obj))
+      return new Map(
+        Array.from(obj.entries()).map(([k, v]) => [k, deepClonePatchValue(v)])
+      );
+    if (isSet(obj))
+      return new Set(Array.from(obj).map(deepClonePatchValue));
+    const cloned = Object.create(getPrototypeOf(obj));
+    for (const key in obj)
+      cloned[key] = deepClonePatchValue(obj[key]);
+    if (has(obj, DRAFTABLE))
+      cloned[DRAFTABLE] = obj[DRAFTABLE];
+    return cloned;
+  }
+  function clonePatchValueIfNeeded(obj) {
+    if (isDraft(obj)) {
+      return deepClonePatchValue(obj);
+    } else
+      return obj;
+  }
+  loadPlugin("Patches", {
+    applyPatches_,
+    generatePatches_,
+    generateReplacementPatches_
+  });
+}
+
+// src/plugins/mapset.ts
+function enableMapSet() {
+  class DraftMap extends Map {
+    constructor(target, parent) {
+      super();
+      this[DRAFT_STATE] = {
+        type_: 2 /* Map */,
+        parent_: parent,
+        scope_: parent ? parent.scope_ : getCurrentScope(),
+        modified_: false,
+        finalized_: false,
+        copy_: void 0,
+        assigned_: void 0,
+        base_: target,
+        draft_: this,
+        isManual_: false,
+        revoked_: false
+      };
+    }
+    get size() {
+      return latest(this[DRAFT_STATE]).size;
+    }
+    has(key) {
+      return latest(this[DRAFT_STATE]).has(key);
+    }
+    set(key, value) {
+      const state = this[DRAFT_STATE];
+      assertUnrevoked(state);
+      if (!latest(state).has(key) || latest(state).get(key) !== value) {
+        prepareMapCopy(state);
+        markChanged(state);
+        state.assigned_.set(key, true);
+        state.copy_.set(key, value);
+        state.assigned_.set(key, true);
+      }
+      return this;
+    }
+    delete(key) {
+      if (!this.has(key)) {
+        return false;
+      }
+      const state = this[DRAFT_STATE];
+      assertUnrevoked(state);
+      prepareMapCopy(state);
+      markChanged(state);
+      if (state.base_.has(key)) {
+        state.assigned_.set(key, false);
+      } else {
+        state.assigned_.delete(key);
+      }
+      state.copy_.delete(key);
+      return true;
+    }
+    clear() {
+      const state = this[DRAFT_STATE];
+      assertUnrevoked(state);
+      if (latest(state).size) {
+        prepareMapCopy(state);
+        markChanged(state);
+        state.assigned_ = /* @__PURE__ */ new Map();
+        each(state.base_, (key) => {
+          state.assigned_.set(key, false);
+        });
+        state.copy_.clear();
+      }
+    }
+    forEach(cb, thisArg) {
+      const state = this[DRAFT_STATE];
+      latest(state).forEach((_value, key, _map) => {
+        cb.call(thisArg, this.get(key), key, this);
+      });
+    }
+    get(key) {
+      const state = this[DRAFT_STATE];
+      assertUnrevoked(state);
+      const value = latest(state).get(key);
+      if (state.finalized_ || !isDraftable(value)) {
+        return value;
+      }
+      if (value !== state.base_.get(key)) {
+        return value;
+      }
+      const draft = createProxy(value, state);
+      prepareMapCopy(state);
+      state.copy_.set(key, draft);
+      return draft;
+    }
+    keys() {
+      return latest(this[DRAFT_STATE]).keys();
+    }
+    values() {
+      const iterator = this.keys();
+      return {
+        [Symbol.iterator]: () => this.values(),
+        next: () => {
+          const r = iterator.next();
+          if (r.done)
+            return r;
+          const value = this.get(r.value);
+          return {
+            done: false,
+            value
+          };
+        }
+      };
+    }
+    entries() {
+      const iterator = this.keys();
+      return {
+        [Symbol.iterator]: () => this.entries(),
+        next: () => {
+          const r = iterator.next();
+          if (r.done)
+            return r;
+          const value = this.get(r.value);
+          return {
+            done: false,
+            value: [r.value, value]
+          };
+        }
+      };
+    }
+    [(DRAFT_STATE, Symbol.iterator)]() {
+      return this.entries();
+    }
+  }
+  function proxyMap_(target, parent) {
+    return new DraftMap(target, parent);
+  }
+  function prepareMapCopy(state) {
+    if (!state.copy_) {
+      state.assigned_ = /* @__PURE__ */ new Map();
+      state.copy_ = new Map(state.base_);
+    }
+  }
+  class DraftSet extends Set {
+    constructor(target, parent) {
+      super();
+      this[DRAFT_STATE] = {
+        type_: 3 /* Set */,
+        parent_: parent,
+        scope_: parent ? parent.scope_ : getCurrentScope(),
+        modified_: false,
+        finalized_: false,
+        copy_: void 0,
+        base_: target,
+        draft_: this,
+        drafts_: /* @__PURE__ */ new Map(),
+        revoked_: false,
+        isManual_: false
+      };
+    }
+    get size() {
+      return latest(this[DRAFT_STATE]).size;
+    }
+    has(value) {
+      const state = this[DRAFT_STATE];
+      assertUnrevoked(state);
+      if (!state.copy_) {
+        return state.base_.has(value);
+      }
+      if (state.copy_.has(value))
+        return true;
+      if (state.drafts_.has(value) && state.copy_.has(state.drafts_.get(value)))
+        return true;
+      return false;
+    }
+    add(value) {
+      const state = this[DRAFT_STATE];
+      assertUnrevoked(state);
+      if (!this.has(value)) {
+        prepareSetCopy(state);
+        markChanged(state);
+        state.copy_.add(value);
+      }
+      return this;
+    }
+    delete(value) {
+      if (!this.has(value)) {
+        return false;
+      }
+      const state = this[DRAFT_STATE];
+      assertUnrevoked(state);
+      prepareSetCopy(state);
+      markChanged(state);
+      return state.copy_.delete(value) || (state.drafts_.has(value) ? state.copy_.delete(state.drafts_.get(value)) : (
+        /* istanbul ignore next */
+        false
+      ));
+    }
+    clear() {
+      const state = this[DRAFT_STATE];
+      assertUnrevoked(state);
+      if (latest(state).size) {
+        prepareSetCopy(state);
+        markChanged(state);
+        state.copy_.clear();
+      }
+    }
+    values() {
+      const state = this[DRAFT_STATE];
+      assertUnrevoked(state);
+      prepareSetCopy(state);
+      return state.copy_.values();
+    }
+    entries() {
+      const state = this[DRAFT_STATE];
+      assertUnrevoked(state);
+      prepareSetCopy(state);
+      return state.copy_.entries();
+    }
+    keys() {
+      return this.values();
+    }
+    [(DRAFT_STATE, Symbol.iterator)]() {
+      return this.values();
+    }
+    forEach(cb, thisArg) {
+      const iterator = this.values();
+      let result = iterator.next();
+      while (!result.done) {
+        cb.call(thisArg, result.value, result.value, this);
+        result = iterator.next();
+      }
+    }
+  }
+  function proxySet_(target, parent) {
+    return new DraftSet(target, parent);
+  }
+  function prepareSetCopy(state) {
+    if (!state.copy_) {
+      state.copy_ = /* @__PURE__ */ new Set();
+      state.base_.forEach((value) => {
+        if (isDraftable(value)) {
+          const draft = createProxy(value, state);
+          state.drafts_.set(value, draft);
+          state.copy_.add(draft);
+        } else {
+          state.copy_.add(value);
+        }
+      });
+    }
+  }
+  function assertUnrevoked(state) {
+    if (state.revoked_)
+      die(3, JSON.stringify(latest(state)));
+  }
+  loadPlugin("MapSet", { proxyMap_, proxySet_ });
+}
+
+// src/immer.ts
+var immer = new Immer2();
+var produce = immer.produce;
+var produceWithPatches = /* @__PURE__ */ immer.produceWithPatches.bind(
+  immer
+);
+var setAutoFreeze = /* @__PURE__ */ immer.setAutoFreeze.bind(immer);
+var setUseStrictShallowCopy = /* @__PURE__ */ immer.setUseStrictShallowCopy.bind(
+  immer
+);
+var setUseStrictIteration = /* @__PURE__ */ immer.setUseStrictIteration.bind(
+  immer
+);
+var applyPatches = /* @__PURE__ */ immer.applyPatches.bind(immer);
+var createDraft = /* @__PURE__ */ immer.createDraft.bind(immer);
+var finishDraft = /* @__PURE__ */ immer.finishDraft.bind(immer);
+function castDraft(value) {
+  return value;
+}
+function castImmutable(value) {
+  return value;
+}
+
+//# sourceMappingURL=immer.mjs.map
+
+/***/ },
+
+/***/ "./src/blocks/trust-badges/block.json"
+/*!********************************************!*\
+  !*** ./src/blocks/trust-badges/block.json ***!
+  \********************************************/
+(module) {
+
+module.exports = /*#__PURE__*/JSON.parse('{"$schema":"https://schemas.wp.org/trunk/block.json","apiVersion":3,"category":"bplugins","parent":["bptmb/b-testimonials"],"textdomain":"b-testimonials-block","supports":{"align":["wide","full"],"html":false},"editorScript":["file:./index.js"],"editorStyle":"file:./index.css","style":["file:./index.css","file:./view.css"],"viewScript":["file:./view.js"],"render":"file:./render.php","name":"bptmb/trust-badges","title":"Trust Badges","description":"A row of trust badges with a title and subtitle.","keywords":["trust","badges","guarantee","features"],"attributes":{"align":{"type":"string","default":"wide"},"cId":{"type":"string","default":""},"items":{"type":"array","default":[{"img":{"url":""},"title":"Verified reviews","subtitle":"100% authentic"},{"img":{"url":""},"title":"Money-back","subtitle":"30-day guarantee"},{"img":{"url":""},"title":"Secure","subtitle":"SSL protected"}]},"columns":{"type":"object","default":{"desktop":3,"tablet":3,"mobile":1}},"columnGap":{"type":"string","default":"30px"},"rowGap":{"type":"string","default":"30px"},"layout":{"type":"string","default":"trust-badges"}}}');
+
+/***/ }
+
+/******/ 	});
+/************************************************************************/
+/******/ 	// The module cache
+/******/ 	const __webpack_module_cache__ = {};
+/******/ 	
+/******/ 	// The require function
+/******/ 	function __webpack_require__(moduleId) {
+/******/ 		// Check if module is in cache
+/******/ 		const cachedModule = __webpack_module_cache__[moduleId];
+/******/ 		if (cachedModule !== undefined) {
+/******/ 			return cachedModule.exports;
+/******/ 		}
+/******/ 		// Create a new module (and put it into the cache)
+/******/ 		const module = __webpack_module_cache__[moduleId] = {
+/******/ 			// no module.id needed
+/******/ 			// no module.loaded needed
+/******/ 			exports: {}
+/******/ 		};
+/******/ 	
+/******/ 		// Execute the module function
+/******/ 		if (!(moduleId in __webpack_modules__)) {
+/******/ 			delete __webpack_module_cache__[moduleId];
+/******/ 			const e = new Error("Cannot find module '" + moduleId + "'");
+/******/ 			e.code = 'MODULE_NOT_FOUND';
+/******/ 			throw e;
+/******/ 		}
+/******/ 		__webpack_modules__[moduleId](module, module.exports, __webpack_require__);
+/******/ 	
+/******/ 		// Return the exports of the module
+/******/ 		return module.exports;
+/******/ 	}
+/******/ 	
+/************************************************************************/
+/******/ 	/* webpack/runtime/compat get default export */
+/******/ 	(() => {
+/******/ 		// getDefaultExport function for compatibility with non-harmony modules
+/******/ 		__webpack_require__.n = (module) => {
+/******/ 			const getter = module && module.__esModule ?
+/******/ 				() => (module['default']) :
+/******/ 				() => (module);
+/******/ 			__webpack_require__.d(getter, { a: getter });
+/******/ 			return getter;
+/******/ 		};
+/******/ 	})();
+/******/ 	
+/******/ 	/* webpack/runtime/define property getters */
+/******/ 	(() => {
+/******/ 		// define getter/value functions for harmony exports
+/******/ 		__webpack_require__.d = (exports, definition) => {
+/******/ 			if(Array.isArray(definition)) {
+/******/ 				var i = 0;
+/******/ 				while(i < definition.length) {
+/******/ 					var key = definition[i++];
+/******/ 					var binding = definition[i++];
+/******/ 					if(!__webpack_require__.o(exports, key)) {
+/******/ 						if(binding === 0) {
+/******/ 							Object.defineProperty(exports, key, { enumerable: true, value: definition[i++] });
+/******/ 						} else {
+/******/ 							Object.defineProperty(exports, key, { enumerable: true, get: binding });
+/******/ 						}
+/******/ 					} else if(binding === 0) { i++; }
+/******/ 				}
+/******/ 			} else {
+/******/ 				for(var key in definition) {
+/******/ 					if(__webpack_require__.o(definition, key) && !__webpack_require__.o(exports, key)) {
+/******/ 						Object.defineProperty(exports, key, { enumerable: true, get: definition[key] });
+/******/ 					}
+/******/ 				}
+/******/ 			}
+/******/ 		};
+/******/ 	})();
+/******/ 	
+/******/ 	/* webpack/runtime/hasOwnProperty shorthand */
+/******/ 	(() => {
+/******/ 		__webpack_require__.o = (obj, prop) => (Object.hasOwn(obj, prop))
+/******/ 	})();
+/******/ 	
+/******/ 	/* webpack/runtime/make namespace object */
+/******/ 	(() => {
+/******/ 		// define __esModule on exports
+/******/ 		__webpack_require__.r = (exports) => {
+/******/ 			if(Symbol.toStringTag) {
+/******/ 				Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
+/******/ 			}
+/******/ 			Object.defineProperty(exports, '__esModule', { value: true });
+/******/ 		};
+/******/ 	})();
+/******/ 	
+/************************************************************************/
+let __webpack_exports__ = {};
+// This entry needs to be wrapped in an IIFE because it needs to be isolated against other modules in the chunk.
+(() => {
+/*!******************************************!*\
+  !*** ./src/blocks/trust-badges/index.js ***!
+  \******************************************/
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _wordpress_blocks__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @wordpress/blocks */ "@wordpress/blocks");
+/* harmony import */ var _wordpress_blocks__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_wordpress_blocks__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _block_json__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./block.json */ "./src/blocks/trust-badges/block.json");
+/* harmony import */ var _edit__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./edit */ "./src/blocks/trust-badges/edit.js");
+/* harmony import */ var _shared_utils_icons__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../../shared/utils/icons */ "./src/shared/utils/icons.js");
+
+
+
+
+(0,_wordpress_blocks__WEBPACK_IMPORTED_MODULE_0__.registerBlockType)(_block_json__WEBPACK_IMPORTED_MODULE_1__, {
+  icon: _shared_utils_icons__WEBPACK_IMPORTED_MODULE_3__.blockIcon,
+  edit: _edit__WEBPACK_IMPORTED_MODULE_2__["default"]
+});
+})();
+
+/******/ })()
+;
+//# sourceMappingURL=index.js.map

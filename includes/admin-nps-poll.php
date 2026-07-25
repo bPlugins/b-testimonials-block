@@ -148,6 +148,7 @@ function bpbtb_handle_nps_poll_submit( $request ) {
 	return new WP_REST_Response(
 		[
 			'success' => true,
+			/* translators: %d: rating score selected by user */
 			'message' => sprintf( __( 'Thank you for your feedback! You selected mark %d.', 'b-testimonials-block' ), $mark ),
 			'mark'    => $mark,
 		],
@@ -188,6 +189,7 @@ add_action( 'admin_menu', 'bpbtb_register_nps_poll_admin_menu' );
  */
 if ( ! function_exists( 'bpbtb_handle_nps_poll_admin_actions' ) ) {
 function bpbtb_handle_nps_poll_admin_actions() {
+	// phpcs:ignore WordPress.Security.NonceVerification.Recommended
 	$page = isset( $_GET['page'] ) ? sanitize_key( wp_unslash( $_GET['page'] ) ) : '';
 	if ( 'bpbtb-nps-poll' !== $page || ! current_user_can( 'manage_options' ) ) {
 		return;
@@ -232,6 +234,7 @@ function bpbtb_render_nps_poll_admin_page() {
 	$stats = bpbtb_get_nps_poll_stats();
 	$votes = bpbtb_get_nps_poll_votes();
 
+	// phpcs:ignore WordPress.Security.NonceVerification.Recommended
 	$msg = isset( $_GET['msg'] ) ? sanitize_key( wp_unslash( $_GET['msg'] ) ) : '';
 	?>
 	<style>

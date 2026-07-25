@@ -1,15 +1,15 @@
-=== B Testimonials Block – Showcase Customer Reviews, Ratings, Badges & Video Testimonials ===
+=== B Testimonials Block ===
 Contributors: bplugins, abuhayat, btechnologies
 Donate link: https://www.buymeacoffee.com/abuhayat
 Tags: testimonials, review, rating, block, Gutenberg block
 Requires at least: 6.5
-Tested up to: 6.7
+Tested up to: 7.0
 Stable tag: 1.0.3
 Requires PHP: 7.2
 License: GPLv3 or later
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
-Boost your website credibility and social proof with B Testimonials Block, effortlessly showcasing customer ratings, reviews, video testimonials, trust badges, and feedback forms.
+Boost website credibility and social proof with B Testimonials Block, showcasing customer ratings, reviews, video testimonials, and badges.
 
 == Description ==
 

@@ -9,7 +9,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-07-25T05:26:05+00:00\n"
+"POT-Creation-Date: 2026-07-25T05:49:09+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: b-testimonials-block\n"
@@ -26,7 +26,7 @@ msgstr ""
 
 #. Author of the plugin
 #: b-testimonials-block.php
-#: b-testimonials-block.php:142
+#: b-testimonials-block.php:133
 msgid "bPlugins"
 msgstr ""
 
@@ -44,14 +44,15 @@ msgstr ""
 msgid "No mark selected."
 msgstr ""
 
-#: includes/admin-nps-poll.php:151
+#. translators: %d: rating score selected by user
+#: includes/admin-nps-poll.php:152
 #, php-format
 msgid "Thank you for your feedback! You selected mark %d."
 msgstr ""
 
-#: includes/admin-nps-poll.php:176
 #: includes/admin-nps-poll.php:177
-#: includes/admin-nps-poll.php:417
+#: includes/admin-nps-poll.php:178
+#: includes/admin-nps-poll.php:420
 #: build/blocks/audio-testimonials/index.js:1
 #: build/blocks/before-after/index.js:1
 #: build/blocks/capterra-review-badge/index.js:1
@@ -95,104 +96,104 @@ msgstr ""
 msgid "Feedback & NPS Poll"
 msgstr ""
 
-#: includes/admin-nps-poll.php:408
+#: includes/admin-nps-poll.php:411
 msgid "Poll response entry deleted."
 msgstr ""
 
-#: includes/admin-nps-poll.php:410
+#: includes/admin-nps-poll.php:413
 msgid "All poll response entries cleared."
 msgstr ""
 
-#: includes/admin-nps-poll.php:420
+#: includes/admin-nps-poll.php:423
 msgid "Track and analyze all visitor Net Promoter Score (NPS) marks submitted on your site."
 msgstr ""
 
-#: includes/admin-nps-poll.php:424
+#: includes/admin-nps-poll.php:427
 msgid "Are you sure you want to clear all poll responses?"
 msgstr ""
 
-#: includes/admin-nps-poll.php:425
+#: includes/admin-nps-poll.php:428
 msgid "Clear All Responses"
 msgstr ""
 
-#: includes/admin-nps-poll.php:434
+#: includes/admin-nps-poll.php:437
 msgid "Net Promoter Score (NPS)"
 msgstr ""
 
-#: includes/admin-nps-poll.php:438
+#: includes/admin-nps-poll.php:441
 msgid "Total Marks Selected"
 msgstr ""
 
-#: includes/admin-nps-poll.php:442
+#: includes/admin-nps-poll.php:445
 msgid "Average Selected Mark"
 msgstr ""
 
-#: includes/admin-nps-poll.php:446
+#: includes/admin-nps-poll.php:449
 msgid "Promoters (Marks 9-10)"
 msgstr ""
 
-#: includes/admin-nps-poll.php:452
+#: includes/admin-nps-poll.php:455
 msgid "Selected Marks Breakdown"
 msgstr ""
 
-#: includes/admin-nps-poll.php:453
+#: includes/admin-nps-poll.php:456
 msgid "Number of times each specific mark score was selected by visitors."
 msgstr ""
 
-#: includes/admin-nps-poll.php:471
+#: includes/admin-nps-poll.php:474
 msgid "votes"
 msgstr ""
 
-#: includes/admin-nps-poll.php:481
+#: includes/admin-nps-poll.php:484
 msgid "Individual Submissions Log"
 msgstr ""
 
-#: includes/admin-nps-poll.php:487
+#: includes/admin-nps-poll.php:490
 msgid "Mark"
 msgstr ""
 
-#: includes/admin-nps-poll.php:488
+#: includes/admin-nps-poll.php:491
 msgid "Category"
 msgstr ""
 
-#: includes/admin-nps-poll.php:489
+#: includes/admin-nps-poll.php:492
 msgid "Page / Source"
 msgstr ""
 
-#: includes/admin-nps-poll.php:490
+#: includes/admin-nps-poll.php:493
 msgid "Submitted Date"
 msgstr ""
 
-#: includes/admin-nps-poll.php:491
-#: includes/admin-submissions.php:612
+#: includes/admin-nps-poll.php:494
+#: includes/admin-submissions.php:618
 msgid "Actions"
 msgstr ""
 
-#: includes/admin-nps-poll.php:498
+#: includes/admin-nps-poll.php:501
 msgid "No Feedback & NPS Poll marks submitted yet."
 msgstr ""
 
-#: includes/admin-nps-poll.php:504
+#: includes/admin-nps-poll.php:507
 msgid "Promoter"
 msgstr ""
 
-#: includes/admin-nps-poll.php:504
+#: includes/admin-nps-poll.php:507
 msgid "Passive"
 msgstr ""
 
-#: includes/admin-nps-poll.php:504
+#: includes/admin-nps-poll.php:507
 msgid "Detractor"
 msgstr ""
 
-#: includes/admin-nps-poll.php:525
+#: includes/admin-nps-poll.php:528
 msgid "N/A"
 msgstr ""
 
-#: includes/admin-nps-poll.php:530
+#: includes/admin-nps-poll.php:533
 msgid "Delete this vote entry?"
 msgstr ""
 
-#: includes/admin-nps-poll.php:531
+#: includes/admin-nps-poll.php:534
 msgid "Delete"
 msgstr ""
 
@@ -224,88 +225,88 @@ msgstr ""
 msgid "Security check failed."
 msgstr ""
 
-#: includes/admin-submissions.php:520
+#: includes/admin-submissions.php:522
 msgid "Customer Submissions & Feedback"
 msgstr ""
 
-#: includes/admin-submissions.php:523
+#: includes/admin-submissions.php:525
 msgid "Review, approve, and manage customer reviews submitted from your website frontend."
 msgstr ""
 
-#: includes/admin-submissions.php:530
+#: includes/admin-submissions.php:532
 msgid "Pending"
 msgstr ""
 
-#: includes/admin-submissions.php:534
-#: includes/admin-submissions.php:573
-#: includes/admin-submissions.php:647
+#: includes/admin-submissions.php:536
+#: includes/admin-submissions.php:579
+#: includes/admin-submissions.php:653
 msgid "Approved"
 msgstr ""
 
-#: includes/admin-submissions.php:538
+#: includes/admin-submissions.php:540
 msgid "Total"
 msgstr ""
 
-#: includes/admin-submissions.php:549
+#: includes/admin-submissions.php:555
 msgid "Testimonial submission approved and published successfully!"
 msgstr ""
 
-#: includes/admin-submissions.php:551
+#: includes/admin-submissions.php:557
 msgid "Submission moved to trash."
 msgstr ""
 
-#: includes/admin-submissions.php:553
+#: includes/admin-submissions.php:559
 msgid "Submission permanently deleted."
 msgstr ""
 
-#: includes/admin-submissions.php:555
+#: includes/admin-submissions.php:561
 msgid "Bulk action completed successfully."
 msgstr ""
 
-#: includes/admin-submissions.php:569
-#: includes/admin-submissions.php:645
+#: includes/admin-submissions.php:575
+#: includes/admin-submissions.php:651
 msgid "Pending Review"
 msgstr ""
 
-#: includes/admin-submissions.php:577
+#: includes/admin-submissions.php:583
 msgid "All Submissions"
 msgstr ""
 
-#: includes/admin-submissions.php:581
+#: includes/admin-submissions.php:587
 msgid "Trash"
 msgstr ""
 
-#: includes/admin-submissions.php:588
+#: includes/admin-submissions.php:594
 msgid "Bulk Actions"
 msgstr ""
 
-#: includes/admin-submissions.php:590
+#: includes/admin-submissions.php:596
 msgid "Approve & Publish"
 msgstr ""
 
-#: includes/admin-submissions.php:591
+#: includes/admin-submissions.php:597
 msgid "Move to Trash"
 msgstr ""
 
-#: includes/admin-submissions.php:593
-#: includes/admin-submissions.php:682
+#: includes/admin-submissions.php:599
+#: includes/admin-submissions.php:688
 msgid "Delete Permanently"
 msgstr ""
 
-#: includes/admin-submissions.php:596
+#: includes/admin-submissions.php:602
 msgid "Apply"
 msgstr ""
 
-#: includes/admin-submissions.php:606
+#: includes/admin-submissions.php:612
 #: build/blocks/testimonial-form/index.js:1
 msgid "Photo"
 msgstr ""
 
-#: includes/admin-submissions.php:607
+#: includes/admin-submissions.php:613
 msgid "Customer"
 msgstr ""
 
-#: includes/admin-submissions.php:608
+#: includes/admin-submissions.php:614
 #: includes/cpt.php:206
 #: build/blocks/audio-testimonials/index.js:1
 #: build/blocks/capterra-review-badge/index.js:1
@@ -345,15 +346,15 @@ msgstr ""
 msgid "Rating"
 msgstr ""
 
-#: includes/admin-submissions.php:609
+#: includes/admin-submissions.php:615
 msgid "Designation / Email"
 msgstr ""
 
-#: includes/admin-submissions.php:610
+#: includes/admin-submissions.php:616
 msgid "Feedback Content"
 msgstr ""
 
-#: includes/admin-submissions.php:611
+#: includes/admin-submissions.php:617
 #: build/blocks/audio-testimonials/index.js:1
 #: build/blocks/capterra-review-badge/index.js:1
 #: build/blocks/case-study-card/index.js:1
@@ -390,23 +391,23 @@ msgstr ""
 msgid "Date"
 msgstr ""
 
-#: includes/admin-submissions.php:675
+#: includes/admin-submissions.php:681
 msgid "Approve"
 msgstr ""
 
-#: includes/admin-submissions.php:678
+#: includes/admin-submissions.php:684
 msgid "Reject"
 msgstr ""
 
-#: includes/admin-submissions.php:685
+#: includes/admin-submissions.php:691
 msgid "✓ Published"
 msgstr ""
 
-#: includes/admin-submissions.php:695
+#: includes/admin-submissions.php:701
 msgid "No customer submissions found."
 msgstr ""
 
-#: includes/admin-submissions.php:696
+#: includes/admin-submissions.php:702
 msgid "Submissions received from frontend form blocks will show up here."
 msgstr ""
 

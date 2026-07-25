@@ -6,7 +6,7 @@
  * Author: bPlugins
  * Author URI: http://bplugins.com
  * Requires at least: 6.5
- * Requires PHP: 7.1
+ * Requires PHP: 7.2
  * License: GPLv3
  * License URI: https://www.gnu.org/licenses/gpl-3.0.txt
  * Text Domain: b-testimonials-block
@@ -52,6 +52,7 @@ class BPBTB_Testimonials_Block{
         delete_option( 'bpbtb_activation_redirect' );
 
         // Don't redirect on bulk activate or WP-CLI.
+        // phpcs:ignore WordPress.Security.NonceVerification.Recommended
         $activate_multi = isset( $_GET['activate-multi'] ) ? sanitize_text_field( wp_unslash( $_GET['activate-multi'] ) ) : '';
         if ( wp_doing_ajax() || ( defined( 'WP_CLI' ) && WP_CLI ) || ! empty( $activate_multi ) ) {
             return;

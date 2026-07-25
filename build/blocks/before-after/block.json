@@ -71,6 +71,10 @@
     "accentColor": {
       "type": "string",
       "default": "#ffffff"
+    },
+    "layout": {
+      "type": "string",
+      "default": "before-after"
     }
   }
 }

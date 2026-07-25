@@ -12,56 +12,54 @@ import Slider from './Slider';
 import Marquee from './Marquee';
 import BeforeAfterSlider from '../BeforeAfterSlider';
 
-import { getStar, getVideoEmbed } from '../../../utils/functions';
-import Image from '../Image';
-import RatingIcon from '../ratingIcon';
+import { getVideoEmbed } from '../../../utils/functions';
 
-const VideoCard = ( { item, accentColor } ) => {
-	const [ isPlaying, setIsPlaying ] = useState( false );
-	const embedHtml = item?.videoUrl ? getVideoEmbed( item.videoUrl ) : '';
+const VideoCard = ({ item, accentColor }) => {
+    const [isPlaying, setIsPlaying] = useState(false);
+    const embedHtml = item?.videoUrl ? getVideoEmbed(item.videoUrl) : '';
 
-	return (
-		<div className="video-item">
-			<div
-				className={ `video-frame ${ isPlaying ? 'is-playing' : '' }` }
-				style={ ! isPlaying && item?.poster?.url ? { backgroundImage: `url(${ item.poster.url })` } : undefined }
-				data-embed={ embedHtml }
-				onClick={ () => {
-					if ( embedHtml ) {
-						setIsPlaying( true );
-					}
-				} }
-				tabIndex={ 0 }
-				role="button"
-				onKeyDown={ ( e ) => {
-					if ( ( e.key === 'Enter' || e.key === ' ' ) && embedHtml ) {
-						e.preventDefault();
-						setIsPlaying( true );
-					}
-				} }
-			>
-				{ isPlaying ? (
-					<div
-						className="video-embed-container"
-						style={ { width: '100%', height: '100%', position: 'absolute', inset: 0 } }
-						dangerouslySetInnerHTML={ { __html: embedHtml } }
-					/>
-				) : (
-					<span className="video-play" style={ accentColor ? { color: accentColor } : undefined }>
-						<svg viewBox="0 0 24 24" width="26" height="26" fill="currentColor">
-							<path d="M8 5v14l11-7z" />
-						</svg>
-					</span>
-				) }
-			</div>
-			<div className="video-meta">
-				{ item?.name && <h3 className="name">{ item.name }</h3> }
-				{ ( item?.deg || item?.company ) && (
-					<p className="deg">{ [ item?.deg, item?.company ].filter( Boolean ).join( ', ' ) }</p>
-				) }
-			</div>
-		</div>
-	);
+    return (
+        <div className="video-item">
+            <div
+                className={`video-frame ${isPlaying ? 'is-playing' : ''}`}
+                style={!isPlaying && item?.poster?.url ? { backgroundImage: `url(${item.poster.url})` } : undefined}
+                data-embed={embedHtml}
+                onClick={() => {
+                    if (embedHtml) {
+                        setIsPlaying(true);
+                    }
+                }}
+                tabIndex={0}
+                role="button"
+                onKeyDown={(e) => {
+                    if ((e.key === 'Enter' || e.key === ' ') && embedHtml) {
+                        e.preventDefault();
+                        setIsPlaying(true);
+                    }
+                }}
+            >
+                {isPlaying ? (
+                    <div
+                        className="video-embed-container"
+                        style={{ width: '100%', height: '100%', position: 'absolute', inset: 0 }}
+                        dangerouslySetInnerHTML={{ __html: embedHtml }}
+                    />
+                ) : (
+                    <span className="video-play" style={accentColor ? { color: accentColor } : undefined}>
+                        <svg viewBox="0 0 24 24" width="26" height="26" fill="currentColor">
+                            <path d="M8 5v14l11-7z" />
+                        </svg>
+                    </span>
+                )}
+            </div>
+            <div className="video-meta">
+                {item?.name && <h3 className="name">{item.name}</h3>}
+                {(item?.deg || item?.company) && (
+                    <p className="deg">{[item?.deg, item?.company].filter(Boolean).join(', ')}</p>
+                )}
+            </div>
+        </div>
+    );
 };
 
 const SocialProofToast = ({ items = [], bt, bd, isBackend, activeIndex }) => {
@@ -168,7 +166,7 @@ const Layout = ({ itemsEls = [], ToolbarButton, MediaUpload, MediaUploadCheck, a
         return (
             <div className="btb-badge-card btb-google-badge">
                 <div className="btb-badge-header">
-                    <svg className="btb-badge-brand-logo" viewBox="0 0 24 24" width="36" height="36"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.1c-.22-.66-.35-1.36-.35-2.1s.13-1.44.35-2.1V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.62z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/></svg>
+                    <svg className="btb-badge-brand-logo" viewBox="0 0 24 24" width="36" height="36"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" /><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" /><path fill="#FBBC05" d="M5.84 14.1c-.22-.66-.35-1.36-.35-2.1s.13-1.44.35-2.1V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.62z" /><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z" /></svg>
                     <div className="btb-badge-info">
                         <h4 className="btb-badge-title">{bt || 'Google Reviews'}</h4>
                         <div className="btb-badge-rating">
@@ -188,7 +186,7 @@ const Layout = ({ itemsEls = [], ToolbarButton, MediaUpload, MediaUploadCheck, a
         return (
             <div className="btb-badge-card btb-capterra-badge">
                 <div className="btb-badge-header">
-                    <svg className="btb-badge-brand-logo" viewBox="0 0 24 24" width="36" height="36"><path fill="#FF9D28" d="M2 2h9v9H2z"/><path fill="#68C5ED" d="M13 2h9v9h-9z"/><path fill="#044D80" d="M2 13h9v9H2z"/><path fill="#E54747" d="M13 13h9v9h-9z"/></svg>
+                    <svg className="btb-badge-brand-logo" viewBox="0 0 24 24" width="36" height="36"><path fill="#FF9D28" d="M2 2h9v9H2z" /><path fill="#68C5ED" d="M13 2h9v9h-9z" /><path fill="#044D80" d="M2 13h9v9H2z" /><path fill="#E54747" d="M13 13h9v9h-9z" /></svg>
                     <div className="btb-badge-info">
                         <h4 className="btb-badge-title">{bt || 'Capterra Rating'}</h4>
                         <div className="btb-badge-rating">
@@ -208,7 +206,7 @@ const Layout = ({ itemsEls = [], ToolbarButton, MediaUpload, MediaUploadCheck, a
         return (
             <div className="btb-badge-card btb-facebook-badge">
                 <div className="btb-badge-header">
-                    <svg className="btb-badge-brand-logo" viewBox="0 0 24 24" width="36" height="36"><path fill="#1877F2" d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+                    <svg className="btb-badge-brand-logo" viewBox="0 0 24 24" width="36" height="36"><path fill="#1877F2" d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" /></svg>
                     <div className="btb-badge-info">
                         <h4 className="btb-badge-title">{bt || 'Facebook Reviews'}</h4>
                         <div className="btb-badge-rating">
@@ -228,7 +226,7 @@ const Layout = ({ itemsEls = [], ToolbarButton, MediaUpload, MediaUploadCheck, a
         return (
             <div className="btb-badge-card btb-trustpilot-badge">
                 <div className="btb-badge-header">
-                    <svg className="btb-badge-brand-logo" viewBox="0 0 24 24" width="36" height="36"><path fill="#00B67A" d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
+                    <svg className="btb-badge-brand-logo" viewBox="0 0 24 24" width="36" height="36"><path fill="#00B67A" d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" /></svg>
                     <div className="btb-badge-info">
                         <h4 className="btb-badge-title">{bt || 'Trustpilot Score'}</h4>
                         <div className="btb-badge-rating">
@@ -248,7 +246,7 @@ const Layout = ({ itemsEls = [], ToolbarButton, MediaUpload, MediaUploadCheck, a
         return (
             <div className="btb-badge-card btb-g2-badge">
                 <div className="btb-badge-header">
-                    <svg className="btb-badge-brand-logo" viewBox="0 0 24 24" width="36" height="36"><circle cx="12" cy="12" r="11" fill="#FF492C"/><text x="12" y="16" textAnchor="middle" fill="#fff" fontSize="12" fontWeight="bold">G2</text></svg>
+                    <svg className="btb-badge-brand-logo" viewBox="0 0 24 24" width="36" height="36"><circle cx="12" cy="12" r="11" fill="#FF492C" /><text x="12" y="16" textAnchor="middle" fill="#fff" fontSize="12" fontWeight="bold">G2</text></svg>
                     <div className="btb-badge-info">
                         <h4 className="btb-badge-title">{bt || 'G2 High Performer'}</h4>
                         <div className="btb-badge-rating">
@@ -266,7 +264,7 @@ const Layout = ({ itemsEls = [], ToolbarButton, MediaUpload, MediaUploadCheck, a
         return (
             <div className="btb-badge-card btb-verified-badge">
                 <div className="btb-badge-header">
-                    <svg className="btb-badge-brand-logo" viewBox="0 0 24 24" width="36" height="36"><path fill="#4527a4" d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm-2 16l-4-4 1.41-1.41L10 14.17l6.59-6.59L18 9l-8 8z"/></svg>
+                    <svg className="btb-badge-brand-logo" viewBox="0 0 24 24" width="36" height="36"><path fill="#4527a4" d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm-2 16l-4-4 1.41-1.41L10 14.17l6.59-6.59L18 9l-8 8z" /></svg>
                     <div className="btb-badge-info">
                         <h4 className="btb-badge-title">{bt || '100% Verified Reviews'}</h4>
                         <p className="btb-badge-desc">{bd || 'All customer testimonials are authenticated & verified.'}</p>
@@ -282,7 +280,7 @@ const Layout = ({ itemsEls = [], ToolbarButton, MediaUpload, MediaUploadCheck, a
         return (
             <div className="btb-badge-card btb-review-widget">
                 <div className="btb-badge-header">
-                    <svg className="btb-badge-brand-logo" viewBox="0 0 24 24" width="36" height="36"><path fill="#4527a4" d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
+                    <svg className="btb-badge-brand-logo" viewBox="0 0 24 24" width="36" height="36"><path fill="#4527a4" d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" /></svg>
                     <div className="btb-badge-info">
                         <h4 className="btb-badge-title">{bt || 'Customer Reviews'}</h4>
                         <div className="btb-badge-rating">
@@ -300,19 +298,19 @@ const Layout = ({ itemsEls = [], ToolbarButton, MediaUpload, MediaUploadCheck, a
         return (
             <div className="btb-trust-badges-grid">
                 <div className="btb-trust-item">
-                    <svg viewBox="0 0 24 24" width="32" height="32"><path fill="#4527a4" d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4z"/></svg>
+                    <svg viewBox="0 0 24 24" width="32" height="32"><path fill="#4527a4" d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4z" /></svg>
                     <span>{bt || 'Secure & Verified'}</span>
                 </div>
                 <div className="btb-trust-item">
-                    <svg viewBox="0 0 24 24" width="32" height="32"><path fill="#34A853" d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
+                    <svg viewBox="0 0 24 24" width="32" height="32"><path fill="#34A853" d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z" /></svg>
                     <span>{bd || 'Money-Back Guarantee'}</span>
                 </div>
                 <div className="btb-trust-item">
-                    <svg viewBox="0 0 24 24" width="32" height="32"><path fill="#FF9D28" d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
+                    <svg viewBox="0 0 24 24" width="32" height="32"><path fill="#FF9D28" d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" /></svg>
                     <span>{bs || '5-Star Support'}</span>
                 </div>
                 <div className="btb-trust-item">
-                    <svg viewBox="0 0 24 24" width="32" height="32"><path fill="#1877F2" d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
+                    <svg viewBox="0 0 24 24" width="32" height="32"><path fill="#1877F2" d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" /></svg>
                     <span>{bc || 'Trusted by 10K+ Users'}</span>
                 </div>
             </div>
@@ -375,8 +373,8 @@ const Layout = ({ itemsEls = [], ToolbarButton, MediaUpload, MediaUploadCheck, a
 
         const rows = [5, 4, 3, 2, 1].map(s => {
             const count = computedStats.counts[s];
-            const pct = computedStats.total > 0 
-                ? Math.round((count / computedStats.total) * 100) 
+            const pct = computedStats.total > 0
+                ? Math.round((count / computedStats.total) * 100)
                 : (attributes[`star${s}Pct`] ?? defaultPcts[s]);
             return { star: s, pct, count };
         });
@@ -614,9 +612,9 @@ const Layout = ({ itemsEls = [], ToolbarButton, MediaUpload, MediaUploadCheck, a
                 {items.map((item, index) => (
                     <div key={index} className="btb-audio-card">
                         <div className="btb-audio-player">
-                            <svg viewBox="0 0 24 24" width="40" height="40"><circle cx="12" cy="12" r="11" fill="#4527a4" opacity="0.1"/><path fill="#4527a4" d="M10 8.64L15.27 12 10 15.36V8.64M8 5v14l11-7L8 5z"/></svg>
+                            <svg viewBox="0 0 24 24" width="40" height="40"><circle cx="12" cy="12" r="11" fill="#4527a4" opacity="0.1" /><path fill="#4527a4" d="M10 8.64L15.27 12 10 15.36V8.64M8 5v14l11-7L8 5z" /></svg>
                             <div className="btb-audio-wave">
-                                {[35,55,25,65,45,70,30,60,40,50].map((h,i) => <div key={i} className="btb-wave-bar" style={{height: `${h}%`}}></div>)}
+                                {[35, 55, 25, 65, 45, 70, 30, 60, 40, 50].map((h, i) => <div key={i} className="btb-wave-bar" style={{ height: `${h}%` }}></div>)}
                             </div>
                         </div>
                         {themeSelect(item, index)}
@@ -696,13 +694,17 @@ const Layout = ({ itemsEls = [], ToolbarButton, MediaUpload, MediaUploadCheck, a
     }
 
     if (layout === 'client-logos') {
+        const logoItems = items.length > 0 ? items : (attributes.logos || []);
         return (
             <div className={`btb-client-logos columns-${desktop} columns-tablet-${tablet} columns-mobile-${mobile}`}>
-                {items.map((item, index) => (
-                    <div key={index} className="btb-logo-item">
-                        <img src={item.img?.url || 'https://templates.bplugins.com/wp-content/uploads/2025/02/p-29.png'} alt={item.name} />
-                    </div>
-                ))}
+                {logoItems.map((item, index) => {
+                    const imgEl = <img src={item.img?.url || 'https://templates.bplugins.com/wp-content/uploads/2025/02/p-29.png'} alt={item.name || item.img?.alt || ''} />;
+                    return (
+                        <div key={index} className="btb-logo-item">
+                            {item.link ? <a href={item.link} target="_blank" rel="noopener noreferrer">{imgEl}</a> : imgEl}
+                        </div>
+                    );
+                })}
             </div>
         );
     }
@@ -810,7 +812,7 @@ const Layout = ({ itemsEls = [], ToolbarButton, MediaUpload, MediaUploadCheck, a
                         const pos = totalItems > 0 ? (index - activeIdx + totalItems) % totalItems : 0;
                         const isTop = pos === 0;
                         const isVisibleBehind = pos > 0 && pos <= 2;
-                        
+
                         return (
                             <div
                                 key={index}

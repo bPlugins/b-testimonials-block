@@ -97,7 +97,7 @@ const Edit = props => {
 		return () => { active = false; };
 	}, [isCpt, query?.number, query?.orderBy, query?.order]);
 
-	const blockProps = useBlockProps({ className: isMainParentBlock ? 'bTestimonialsMainBlock' : 'bTestimonials' });
+	const blockProps = useBlockProps({ className: 'bTestimonials' + (isMainParentBlock ? ' bTestimonialsMainBlock' : '') });
 
 	// Main Parent Block Rendering with InnerBlocks if sub-blocks exist
 	if (isMainParentBlock && innerBlocks?.length > 0) {

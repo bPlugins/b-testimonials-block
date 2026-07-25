@@ -27,11 +27,19 @@ class BPBTB_Testimonials_Block{
         $this->load_classes();
 
         add_action('init', [$this, 'onInit']);
+        add_action('wp_enqueue_scripts', [$this, 'enqueue_assets']);
         add_filter('block_categories_all', [$this, 'register_block_category']);
 
         // Redirect to Demo & Help page on first activation.
         register_activation_hook( __FILE__, [ $this, 'on_activation' ] );
         add_action( 'admin_init', [ $this, 'maybe_redirect_after_activation' ] );
+    }
+
+    /**
+     * Enqueue Dashicons stylesheet for frontend icon rendering.
+     */
+    public function enqueue_assets() {
+        wp_enqueue_style( 'dashicons' );
     }
 
     /**

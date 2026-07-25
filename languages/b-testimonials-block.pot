@@ -9,7 +9,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-07-25T01:58:21+00:00\n"
+"POT-Creation-Date: 2026-07-25T02:57:06+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: b-testimonials-block\n"
@@ -26,7 +26,7 @@ msgstr ""
 
 #. Author of the plugin
 #: b-testimonials-block.php
-#: b-testimonials-block.php:115
+#: b-testimonials-block.php:140
 msgid "bPlugins"
 msgstr ""
 
@@ -35,23 +35,23 @@ msgstr ""
 msgid "http://bplugins.com"
 msgstr ""
 
-#: includes/admin-menu.php:54
 #: includes/admin-menu.php:55
+#: includes/admin-menu.php:56
 msgid "Demo & Help"
 msgstr ""
 
-#: includes/admin-nps-poll.php:117
+#: includes/admin-nps-poll.php:124
 msgid "No mark selected."
 msgstr ""
 
-#: includes/admin-nps-poll.php:144
+#: includes/admin-nps-poll.php:151
 #, php-format
 msgid "Thank you for your feedback! You selected mark %d."
 msgstr ""
 
-#: includes/admin-nps-poll.php:167
-#: includes/admin-nps-poll.php:168
-#: includes/admin-nps-poll.php:404
+#: includes/admin-nps-poll.php:176
+#: includes/admin-nps-poll.php:177
+#: includes/admin-nps-poll.php:417
 #: build/blocks/audio-testimonials/index.js:1
 #: build/blocks/before-after/index.js:1
 #: build/blocks/capterra-review-badge/index.js:1
@@ -95,218 +95,218 @@ msgstr ""
 msgid "Feedback & NPS Poll"
 msgstr ""
 
-#: includes/admin-nps-poll.php:395
+#: includes/admin-nps-poll.php:408
 msgid "Poll response entry deleted."
 msgstr ""
 
-#: includes/admin-nps-poll.php:397
+#: includes/admin-nps-poll.php:410
 msgid "All poll response entries cleared."
 msgstr ""
 
-#: includes/admin-nps-poll.php:407
+#: includes/admin-nps-poll.php:420
 msgid "Track and analyze all visitor Net Promoter Score (NPS) marks submitted on your site."
 msgstr ""
 
-#: includes/admin-nps-poll.php:411
+#: includes/admin-nps-poll.php:424
 msgid "Are you sure you want to clear all poll responses?"
 msgstr ""
 
-#: includes/admin-nps-poll.php:412
+#: includes/admin-nps-poll.php:425
 msgid "Clear All Responses"
 msgstr ""
 
-#: includes/admin-nps-poll.php:421
+#: includes/admin-nps-poll.php:434
 msgid "Net Promoter Score (NPS)"
 msgstr ""
 
-#: includes/admin-nps-poll.php:425
+#: includes/admin-nps-poll.php:438
 msgid "Total Marks Selected"
 msgstr ""
 
-#: includes/admin-nps-poll.php:429
+#: includes/admin-nps-poll.php:442
 msgid "Average Selected Mark"
 msgstr ""
 
-#: includes/admin-nps-poll.php:433
+#: includes/admin-nps-poll.php:446
 msgid "Promoters (Marks 9-10)"
 msgstr ""
 
-#: includes/admin-nps-poll.php:439
+#: includes/admin-nps-poll.php:452
 msgid "Selected Marks Breakdown"
 msgstr ""
 
-#: includes/admin-nps-poll.php:440
+#: includes/admin-nps-poll.php:453
 msgid "Number of times each specific mark score was selected by visitors."
 msgstr ""
 
-#: includes/admin-nps-poll.php:458
+#: includes/admin-nps-poll.php:471
 msgid "votes"
 msgstr ""
 
-#: includes/admin-nps-poll.php:468
+#: includes/admin-nps-poll.php:481
 msgid "Individual Submissions Log"
 msgstr ""
 
-#: includes/admin-nps-poll.php:474
+#: includes/admin-nps-poll.php:487
 msgid "Mark"
 msgstr ""
 
-#: includes/admin-nps-poll.php:475
+#: includes/admin-nps-poll.php:488
 msgid "Category"
 msgstr ""
 
-#: includes/admin-nps-poll.php:476
+#: includes/admin-nps-poll.php:489
 msgid "Page / Source"
 msgstr ""
 
-#: includes/admin-nps-poll.php:477
+#: includes/admin-nps-poll.php:490
 msgid "Submitted Date"
 msgstr ""
 
-#: includes/admin-nps-poll.php:478
-#: includes/admin-submissions.php:603
+#: includes/admin-nps-poll.php:491
+#: includes/admin-submissions.php:612
 msgid "Actions"
 msgstr ""
 
-#: includes/admin-nps-poll.php:485
+#: includes/admin-nps-poll.php:498
 msgid "No Feedback & NPS Poll marks submitted yet."
 msgstr ""
 
-#: includes/admin-nps-poll.php:491
+#: includes/admin-nps-poll.php:504
 msgid "Promoter"
 msgstr ""
 
-#: includes/admin-nps-poll.php:491
+#: includes/admin-nps-poll.php:504
 msgid "Passive"
 msgstr ""
 
-#: includes/admin-nps-poll.php:491
+#: includes/admin-nps-poll.php:504
 msgid "Detractor"
 msgstr ""
 
-#: includes/admin-nps-poll.php:512
+#: includes/admin-nps-poll.php:525
 msgid "N/A"
 msgstr ""
 
-#: includes/admin-nps-poll.php:517
+#: includes/admin-nps-poll.php:530
 msgid "Delete this vote entry?"
 msgstr ""
 
-#: includes/admin-nps-poll.php:518
+#: includes/admin-nps-poll.php:531
 msgid "Delete"
 msgstr ""
 
-#: includes/admin-submissions.php:41
+#: includes/admin-submissions.php:44
 msgid "User Submissions"
 msgstr ""
 
-#: includes/admin-submissions.php:42
+#: includes/admin-submissions.php:45
 msgid "Submissions"
 msgstr ""
 
-#: includes/admin-submissions.php:70
+#: includes/admin-submissions.php:75
 msgid "B Testimonials Block:"
 msgstr ""
 
 #. translators: %d: number of pending submissions
-#: includes/admin-submissions.php:74
+#: includes/admin-submissions.php:79
 #, php-format
 msgid "You have %d pending customer submission awaiting review."
 msgid_plural "You have %d pending customer submissions awaiting review."
 msgstr[0] ""
 msgstr[1] ""
 
-#: includes/admin-submissions.php:80
+#: includes/admin-submissions.php:85
 msgid "View Submissions"
 msgstr ""
 
-#: includes/admin-submissions.php:108
+#: includes/admin-submissions.php:115
 msgid "Security check failed."
 msgstr ""
 
-#: includes/admin-submissions.php:511
+#: includes/admin-submissions.php:520
 msgid "Customer Submissions & Feedback"
 msgstr ""
 
-#: includes/admin-submissions.php:514
+#: includes/admin-submissions.php:523
 msgid "Review, approve, and manage customer reviews submitted from your website frontend."
 msgstr ""
 
-#: includes/admin-submissions.php:521
+#: includes/admin-submissions.php:530
 msgid "Pending"
 msgstr ""
 
-#: includes/admin-submissions.php:525
-#: includes/admin-submissions.php:564
-#: includes/admin-submissions.php:638
+#: includes/admin-submissions.php:534
+#: includes/admin-submissions.php:573
+#: includes/admin-submissions.php:647
 msgid "Approved"
 msgstr ""
 
-#: includes/admin-submissions.php:529
+#: includes/admin-submissions.php:538
 msgid "Total"
 msgstr ""
 
-#: includes/admin-submissions.php:540
+#: includes/admin-submissions.php:549
 msgid "Testimonial submission approved and published successfully!"
 msgstr ""
 
-#: includes/admin-submissions.php:542
+#: includes/admin-submissions.php:551
 msgid "Submission moved to trash."
 msgstr ""
 
-#: includes/admin-submissions.php:544
+#: includes/admin-submissions.php:553
 msgid "Submission permanently deleted."
 msgstr ""
 
-#: includes/admin-submissions.php:546
+#: includes/admin-submissions.php:555
 msgid "Bulk action completed successfully."
 msgstr ""
 
-#: includes/admin-submissions.php:560
-#: includes/admin-submissions.php:636
+#: includes/admin-submissions.php:569
+#: includes/admin-submissions.php:645
 msgid "Pending Review"
 msgstr ""
 
-#: includes/admin-submissions.php:568
+#: includes/admin-submissions.php:577
 msgid "All Submissions"
 msgstr ""
 
-#: includes/admin-submissions.php:572
+#: includes/admin-submissions.php:581
 msgid "Trash"
 msgstr ""
 
-#: includes/admin-submissions.php:579
+#: includes/admin-submissions.php:588
 msgid "Bulk Actions"
 msgstr ""
 
-#: includes/admin-submissions.php:581
+#: includes/admin-submissions.php:590
 msgid "Approve & Publish"
 msgstr ""
 
-#: includes/admin-submissions.php:582
+#: includes/admin-submissions.php:591
 msgid "Move to Trash"
 msgstr ""
 
-#: includes/admin-submissions.php:584
-#: includes/admin-submissions.php:673
+#: includes/admin-submissions.php:593
+#: includes/admin-submissions.php:682
 msgid "Delete Permanently"
 msgstr ""
 
-#: includes/admin-submissions.php:587
+#: includes/admin-submissions.php:596
 msgid "Apply"
 msgstr ""
 
-#: includes/admin-submissions.php:597
+#: includes/admin-submissions.php:606
 #: build/blocks/testimonial-form/index.js:1
 msgid "Photo"
 msgstr ""
 
-#: includes/admin-submissions.php:598
+#: includes/admin-submissions.php:607
 msgid "Customer"
 msgstr ""
 
-#: includes/admin-submissions.php:599
-#: includes/cpt.php:195
+#: includes/admin-submissions.php:608
+#: includes/cpt.php:206
 #: build/blocks/audio-testimonials/index.js:1
 #: build/blocks/capterra-review-badge/index.js:1
 #: build/blocks/case-study-card/index.js:1
@@ -345,15 +345,15 @@ msgstr ""
 msgid "Rating"
 msgstr ""
 
-#: includes/admin-submissions.php:600
+#: includes/admin-submissions.php:609
 msgid "Designation / Email"
 msgstr ""
 
-#: includes/admin-submissions.php:601
+#: includes/admin-submissions.php:610
 msgid "Feedback Content"
 msgstr ""
 
-#: includes/admin-submissions.php:602
+#: includes/admin-submissions.php:611
 #: build/blocks/audio-testimonials/index.js:1
 #: build/blocks/capterra-review-badge/index.js:1
 #: build/blocks/case-study-card/index.js:1
@@ -390,81 +390,81 @@ msgstr ""
 msgid "Date"
 msgstr ""
 
-#: includes/admin-submissions.php:666
+#: includes/admin-submissions.php:675
 msgid "Approve"
 msgstr ""
 
-#: includes/admin-submissions.php:669
+#: includes/admin-submissions.php:678
 msgid "Reject"
 msgstr ""
 
-#: includes/admin-submissions.php:676
+#: includes/admin-submissions.php:685
 msgid "✓ Published"
 msgstr ""
 
-#: includes/admin-submissions.php:686
+#: includes/admin-submissions.php:695
 msgid "No customer submissions found."
 msgstr ""
 
-#: includes/admin-submissions.php:687
+#: includes/admin-submissions.php:696
 msgid "Submissions received from frontend form blocks will show up here."
 msgstr ""
 
-#: includes/cpt.php:20
-#: includes/cpt.php:31
+#: includes/cpt.php:21
+#: includes/cpt.php:32
 msgid "Testimonials"
 msgstr ""
 
-#: includes/cpt.php:21
+#: includes/cpt.php:22
 msgid "Testimonial"
 msgstr ""
 
-#: includes/cpt.php:22
+#: includes/cpt.php:23
 msgid "Add New"
 msgstr ""
 
-#: includes/cpt.php:23
+#: includes/cpt.php:24
 msgid "Add New Testimonial"
 msgstr ""
 
-#: includes/cpt.php:24
+#: includes/cpt.php:25
 msgid "Edit Testimonial"
 msgstr ""
 
-#: includes/cpt.php:25
+#: includes/cpt.php:26
 msgid "New Testimonial"
 msgstr ""
 
-#: includes/cpt.php:26
+#: includes/cpt.php:27
 msgid "View Testimonial"
 msgstr ""
 
-#: includes/cpt.php:27
+#: includes/cpt.php:28
 msgid "Search Testimonials"
 msgstr ""
 
-#: includes/cpt.php:28
+#: includes/cpt.php:29
 msgid "No testimonials found"
 msgstr ""
 
-#: includes/cpt.php:29
+#: includes/cpt.php:30
 msgid "No testimonials found in Trash"
 msgstr ""
 
-#: includes/cpt.php:30
+#: includes/cpt.php:31
 msgid "All Testimonials"
 msgstr ""
 
-#: includes/cpt.php:112
+#: includes/cpt.php:117
 msgid "Testimonial Details"
 msgstr ""
 
-#: includes/cpt.php:135
+#: includes/cpt.php:142
 msgid "Rating (1–5)"
 msgstr ""
 
-#: includes/cpt.php:139
-#: includes/cpt.php:194
+#: includes/cpt.php:146
+#: includes/cpt.php:205
 #: build/blocks/audio-testimonials/index.js:1
 #: build/blocks/capterra-review-badge/index.js:1
 #: build/blocks/case-study-card/index.js:1
@@ -503,29 +503,29 @@ msgstr ""
 msgid "Designation"
 msgstr ""
 
-#: includes/cpt.php:143
+#: includes/cpt.php:150
 #: build/blocks/testimonial-form/index.js:1
 #: build/blocks/video-testimonials/index.js:1
 msgid "Company"
 msgstr ""
 
-#: includes/cpt.php:146
+#: includes/cpt.php:153
 msgid "Use the title for the person's name, the content for the review, and the featured image for their photo."
 msgstr ""
 
-#: includes/form.php:56
+#: includes/form.php:61
 msgid "Please provide your name and a review."
 msgstr ""
 
-#: includes/form.php:73
+#: includes/form.php:78
 msgid "Security check failed. Please refresh the page and try again."
 msgstr ""
 
-#: includes/form.php:93
+#: includes/form.php:98
 msgid "Could not save your testimonial. Please try again later."
 msgstr ""
 
-#: includes/form.php:147
+#: includes/form.php:152
 msgid "Thank you! Your testimonial has been submitted and is awaiting review."
 msgstr ""
 

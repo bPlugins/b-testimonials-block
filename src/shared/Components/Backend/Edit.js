@@ -21,13 +21,14 @@ import TestimonialsView from '../Common/TestimonialsView';
 import { upload } from '../../utils/icons';
 import { htmlTagsStrip } from '../../utils/functions';
 
-const mapCptPost = ( post ) => ( {
-	img: { url: post?._embedded?.[ 'wp:featuredmedia' ]?.[ 0 ]?.source_url || '' },
+const mapCptPost = (post) => ({
+	img: { url: post?._embedded?.['wp:featuredmedia']?.[0]?.source_url || '' },
 	name: post?.title?.rendered || '',
 	deg: post?.meta?.bpbtb_designation || '',
 	reviewText: post?.content?.rendered || '',
-	rating: Number( post?.meta?.bpbtb_rating ) || 5,
-} );
+	rating: Number(post?.meta?.bpbtb_rating) || 5,
+});
+import useIframeAssetSync from '../../../../../bpl-tools/hooks/useIframeAssetSync.js';
 
 const Edit = props => {
 	const { attributes = {}, setAttributes, clientId, isSelected, name } = props;
@@ -47,6 +48,8 @@ const Edit = props => {
 		icon: true,
 		...(rawElements || {})
 	};
+
+	useIframeAssetSync(['bptmb-b-testimonials-editor-style-css', 'bptmb-b-testimonials-editor-script-js']);
 
 	const DEFAULT_TESTIMONIAL = {
 		img: { url: 'https://templates.bplugins.com/wp-content/uploads/2025/02/p-29.png' },
@@ -101,7 +104,7 @@ const Edit = props => {
 		if (!innerBlocks?.length) {
 			return (
 				<div {...blockProps}>
-					<Settings attributes={attributes} setAttributes={setAttributes} updateItem={() => {}} activeIndex={activeIndex} setActiveIndex={setActiveIndex} clientId={clientId} currentBlockName={name} />
+					<Settings attributes={attributes} setAttributes={setAttributes} updateItem={() => { }} activeIndex={activeIndex} setActiveIndex={setActiveIndex} clientId={clientId} currentBlockName={name} />
 					<BlockPlaceholder clientId={clientId} currentBlockName={name} />
 					<InnerBlocks
 						templateLock={false}
@@ -114,7 +117,7 @@ const Edit = props => {
 
 		return (
 			<div {...blockProps}>
-				<Settings attributes={attributes} setAttributes={setAttributes} updateItem={() => {}} activeIndex={activeIndex} setActiveIndex={setActiveIndex} clientId={clientId} currentBlockName={name} />
+				<Settings attributes={attributes} setAttributes={setAttributes} updateItem={() => { }} activeIndex={activeIndex} setActiveIndex={setActiveIndex} clientId={clientId} currentBlockName={name} />
 				<InnerBlocks
 					templateLock={false}
 					allowedBlocks={ALLOWED_CHILD_BLOCKS}

@@ -15,6 +15,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * Register the submission route.
  */
+if ( ! function_exists( 'bpbtb_register_form_route' ) ) {
 function bpbtb_register_form_route() {
 	register_rest_route(
 		'bptmb/v1',
@@ -26,6 +27,7 @@ function bpbtb_register_form_route() {
 		]
 	);
 }
+}
 add_action( 'rest_api_init', 'bpbtb_register_form_route' );
 
 /**
@@ -33,8 +35,10 @@ add_action( 'rest_api_init', 'bpbtb_register_form_route' );
  *
  * @return string
  */
+if ( ! function_exists( 'bpbtb_form_nonce_action' ) ) {
 function bpbtb_form_nonce_action() {
 	return 'bpbtb_testimonial_submit';
+}
 }
 
 /**
@@ -43,6 +47,7 @@ function bpbtb_form_nonce_action() {
  * @param WP_REST_Request $request Request.
  * @return WP_REST_Response
  */
+if ( ! function_exists( 'bpbtb_handle_form_submit' ) ) {
 function bpbtb_handle_form_submit( $request ) {
 	$params = $request->get_params();
 
@@ -148,4 +153,5 @@ function bpbtb_handle_form_submit( $request ) {
 		],
 		200
 	);
+}
 }

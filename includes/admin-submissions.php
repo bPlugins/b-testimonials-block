@@ -17,14 +17,17 @@ if ( ! defined( 'ABSPATH' ) ) {
  *
  * @return int
  */
+if ( ! function_exists( 'bpbtb_get_pending_submissions_count' ) ) {
 function bpbtb_get_pending_submissions_count() {
 	$count_posts = wp_count_posts( 'testimonial' );
 	return isset( $count_posts->pending ) ? (int) $count_posts->pending : 0;
+}
 }
 
 /**
  * Add "Submissions" submenu item under Testimonials in the WP admin menu.
  */
+if ( ! function_exists( 'bpbtb_register_admin_submissions_menu' ) ) {
 function bpbtb_register_admin_submissions_menu() {
 	$pending_count = bpbtb_get_pending_submissions_count();
 	$badge         = '';
@@ -45,11 +48,13 @@ function bpbtb_register_admin_submissions_menu() {
 		'bpbtb_render_admin_submissions_page'
 	);
 }
+}
 add_action( 'admin_menu', 'bpbtb_register_admin_submissions_menu' );
 
 /**
  * Display top dashboard notice when there are pending customer submissions.
  */
+if ( ! function_exists( 'bpbtb_pending_submissions_notice' ) ) {
 function bpbtb_pending_submissions_notice() {
 	if ( ! current_user_can( 'manage_options' ) ) {
 		return;
@@ -84,11 +89,13 @@ function bpbtb_pending_submissions_notice() {
 		<?php
 	}
 }
+}
 add_action( 'admin_notices', 'bpbtb_pending_submissions_notice' );
 
 /**
  * Handle submission action GET requests (Approve, Trash, Delete).
  */
+if ( ! function_exists( 'bpbtb_handle_admin_submission_actions' ) ) {
 function bpbtb_handle_admin_submission_actions() {
 	$page = isset( $_GET['page'] ) ? sanitize_key( wp_unslash( $_GET['page'] ) ) : '';
 	if ( 'bpbtb-submissions' !== $page ) {
@@ -149,11 +156,13 @@ function bpbtb_handle_admin_submission_actions() {
 		exit;
 	}
 }
+}
 add_action( 'admin_init', 'bpbtb_handle_admin_submission_actions' );
 
 /**
  * Render the Ultra-Modern Admin Submissions Dashboard Page.
  */
+if ( ! function_exists( 'bpbtb_render_admin_submissions_page' ) ) {
 function bpbtb_render_admin_submissions_page() {
 	if ( ! current_user_can( 'manage_options' ) ) {
 		return;
@@ -694,4 +703,5 @@ function bpbtb_render_admin_submissions_page() {
 		</form>
 	</div>
 	<?php
+}
 }

@@ -15,6 +15,8 @@
 // ABS PATH
 if ( ! defined('ABSPATH') ) { exit; }
 
+if ( ! class_exists( 'BPBTB_Testimonials_Block' ) ) {
+
 class BPBTB_Testimonials_Block{
 
     private static $instance;
@@ -72,9 +74,24 @@ class BPBTB_Testimonials_Block{
     private function define_constants() {
         $http_host = isset( $_SERVER['HTTP_HOST'] ) ? sanitize_text_field( wp_unslash( $_SERVER['HTTP_HOST'] ) ) : '';
         // Constant
-        define( 'BPBTB_PLUGIN_VERSION', 'localhost' === $http_host ? time() : '1.0.3' );
-        define( 'BPBTB_ASSETS_DIR', plugin_dir_url( __FILE__ ) . 'assets/' );
-        define( 'BPBTB_DIR', plugin_dir_url( __FILE__ ) );
+        if ( ! defined( 'BPBTB_PLUGIN_VERSION' ) ) {
+            define( 'BPBTB_PLUGIN_VERSION', 'localhost' === $http_host ? time() : '1.0.3' );
+        }
+        if ( ! defined( 'BTB_PLUGIN_VERSION' ) ) {
+            define( 'BTB_PLUGIN_VERSION', BPBTB_PLUGIN_VERSION );
+        }
+        if ( ! defined( 'BPBTB_ASSETS_DIR' ) ) {
+            define( 'BPBTB_ASSETS_DIR', plugin_dir_url( __FILE__ ) . 'assets/' );
+        }
+        if ( ! defined( 'BTB_ASSETS_DIR' ) ) {
+            define( 'BTB_ASSETS_DIR', BPBTB_ASSETS_DIR );
+        }
+        if ( ! defined( 'BPBTB_DIR' ) ) {
+            define( 'BPBTB_DIR', plugin_dir_url( __FILE__ ) );
+        }
+        if ( ! defined( 'BTB_DIR' ) ) {
+            define( 'BTB_DIR', BPBTB_DIR );
+        }
     }
 
     private function load_classes() {
@@ -121,3 +138,4 @@ class BPBTB_Testimonials_Block{
      
 }
 BPBTB_Testimonials_Block::get_instance();
+}

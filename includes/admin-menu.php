@@ -12,6 +12,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
+if ( ! class_exists( 'BPBTB_Admin_Menu' ) ) {
 class BPBTB_Admin_Menu {
 
 	public function __construct() {
@@ -74,3 +75,4 @@ class BPBTB_Admin_Menu {
 }
 
 new BPBTB_Admin_Menu();
+}

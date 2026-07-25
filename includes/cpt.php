@@ -15,6 +15,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * Register the `testimonial` post type and its meta fields.
  */
+if ( ! function_exists( 'bpbtb_register_testimonial_cpt' ) ) {
 function bpbtb_register_testimonial_cpt() {
 	$labels = [
 		'name'               => __( 'Testimonials', 'b-testimonials-block' ),
@@ -88,6 +89,7 @@ function bpbtb_register_testimonial_cpt() {
 		]
 	);
 }
+}
 add_action( 'init', 'bpbtb_register_testimonial_cpt' );
 
 /**
@@ -98,14 +100,17 @@ add_action( 'init', 'bpbtb_register_testimonial_cpt' );
  * @param string $type Post type being edited.
  * @return bool
  */
+if ( ! function_exists( 'bpbtb_testimonial_classic_editor' ) ) {
 function bpbtb_testimonial_classic_editor( $use, $type ) {
 	return 'testimonial' === $type ? false : $use;
+}
 }
 add_filter( 'use_block_editor_for_post_type', 'bpbtb_testimonial_classic_editor', 10, 2 );
 
 /**
  * Register the details meta box.
  */
+if ( ! function_exists( 'bpbtb_testimonial_meta_box' ) ) {
 function bpbtb_testimonial_meta_box() {
 	add_meta_box(
 		'bpbtb_testimonial_details',
@@ -116,6 +121,7 @@ function bpbtb_testimonial_meta_box() {
 		'high'
 	);
 }
+}
 add_action( 'add_meta_boxes', 'bpbtb_testimonial_meta_box' );
 
 /**
@@ -123,6 +129,7 @@ add_action( 'add_meta_boxes', 'bpbtb_testimonial_meta_box' );
  *
  * @param WP_Post $post Current post.
  */
+if ( ! function_exists( 'bpbtb_testimonial_meta_box_cb' ) ) {
 function bpbtb_testimonial_meta_box_cb( $post ) {
 	wp_nonce_field( 'bpbtb_save_testimonial', 'bpbtb_testimonial_nonce' );
 
@@ -146,12 +153,14 @@ function bpbtb_testimonial_meta_box_cb( $post ) {
 	<p class="description"><?php esc_html_e( 'Use the title for the person\'s name, the content for the review, and the featured image for their photo.', 'b-testimonials-block' ); ?></p>
 	<?php
 }
+}
 
 /**
  * Save the details meta box.
  *
  * @param int $post_id Post ID.
  */
+if ( ! function_exists( 'bpbtb_save_testimonial_meta' ) ) {
 function bpbtb_save_testimonial_meta( $post_id ) {
 	if ( ! isset( $_POST['bpbtb_testimonial_nonce'] ) || ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['bpbtb_testimonial_nonce'] ) ), 'bpbtb_save_testimonial' ) ) {
 		return;
@@ -178,6 +187,7 @@ function bpbtb_save_testimonial_meta( $post_id ) {
 		update_post_meta( $post_id, 'bpbtb_company', sanitize_text_field( wp_unslash( $_POST['bpbtb_company'] ) ) );
 	}
 }
+}
 add_action( 'save_post_testimonial', 'bpbtb_save_testimonial_meta' );
 
 /**
@@ -186,6 +196,7 @@ add_action( 'save_post_testimonial', 'bpbtb_save_testimonial_meta' );
  * @param array $cols Columns.
  * @return array
  */
+if ( ! function_exists( 'bpbtb_testimonial_columns' ) ) {
 function bpbtb_testimonial_columns( $cols ) {
 	$new = [];
 	foreach ( $cols as $key => $label ) {
@@ -197,6 +208,7 @@ function bpbtb_testimonial_columns( $cols ) {
 	}
 	return $new;
 }
+}
 add_filter( 'manage_testimonial_posts_columns', 'bpbtb_testimonial_columns' );
 
 /**
@@ -205,6 +217,7 @@ add_filter( 'manage_testimonial_posts_columns', 'bpbtb_testimonial_columns' );
  * @param string $col     Column key.
  * @param int    $post_id Post ID.
  */
+if ( ! function_exists( 'bpbtb_testimonial_column_content' ) ) {
 function bpbtb_testimonial_column_content( $col, $post_id ) {
 	if ( 'bpbtb_rating' === $col ) {
 		$rating = (int) get_post_meta( $post_id, 'bpbtb_rating', true );
@@ -212,6 +225,7 @@ function bpbtb_testimonial_column_content( $col, $post_id ) {
 	} elseif ( 'bpbtb_designation' === $col ) {
 		echo esc_html( (string) get_post_meta( $post_id, 'bpbtb_designation', true ) );
 	}
+}
 }
 add_action( 'manage_testimonial_posts_custom_column', 'bpbtb_testimonial_column_content', 10, 2 );
 
@@ -221,6 +235,7 @@ add_action( 'manage_testimonial_posts_custom_column', 'bpbtb_testimonial_column_
  * @param array $q Query options: number, orderBy, order.
  * @return array
  */
+if ( ! function_exists( 'bpbtb_get_testimonial_items' ) ) {
 function bpbtb_get_testimonial_items( $q = [] ) {
 	$number   = isset( $q['number'] ) ? absint( $q['number'] ) : 6;
 	$order_by = isset( $q['orderBy'] ) ? sanitize_key( $q['orderBy'] ) : 'date';
@@ -255,6 +270,7 @@ function bpbtb_get_testimonial_items( $q = [] ) {
 
 	return $items;
 }
+}
 
 /**
  * Swap in testimonials from the CPT when a block's data source is set to "cpt".
@@ -262,6 +278,7 @@ function bpbtb_get_testimonial_items( $q = [] ) {
  * @param array $attributes Block attributes.
  * @return array
  */
+if ( ! function_exists( 'bpbtb_prepare_block_items' ) ) {
 function bpbtb_prepare_block_items( $attributes ) {
 	$source = isset( $attributes['dataSource'] ) ? $attributes['dataSource'] : 'manual';
 
@@ -273,4 +290,5 @@ function bpbtb_prepare_block_items( $attributes ) {
 	$attributes['items'] = bpbtb_get_testimonial_items( $query );
 
 	return $attributes;
+}
 }

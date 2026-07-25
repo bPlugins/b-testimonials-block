@@ -15,6 +15,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * Register REST API route for NPS Poll submissions.
  */
+if ( ! function_exists( 'bpbtb_register_nps_poll_route' ) ) {
 function bpbtb_register_nps_poll_route() {
 	register_rest_route(
 		'bptmb/v1',
@@ -26,6 +27,7 @@ function bpbtb_register_nps_poll_route() {
 		]
 	);
 }
+}
 add_action( 'rest_api_init', 'bpbtb_register_nps_poll_route' );
 
 /**
@@ -33,9 +35,11 @@ add_action( 'rest_api_init', 'bpbtb_register_nps_poll_route' );
  *
  * @return array
  */
+if ( ! function_exists( 'bpbtb_get_nps_poll_votes' ) ) {
 function bpbtb_get_nps_poll_votes() {
 	$votes = get_option( 'bpbtb_nps_poll_votes', [] );
 	return is_array( $votes ) ? $votes : [];
+}
 }
 
 /**
@@ -43,6 +47,7 @@ function bpbtb_get_nps_poll_votes() {
  *
  * @return array
  */
+if ( ! function_exists( 'bpbtb_get_nps_poll_stats' ) ) {
 function bpbtb_get_nps_poll_stats() {
 	$votes = bpbtb_get_nps_poll_votes();
 	$total = count( $votes );
@@ -100,6 +105,7 @@ function bpbtb_get_nps_poll_stats() {
 		'nps_score'     => $nps_score,
 	];
 }
+}
 
 /**
  * Handle REST API submission for NPS Poll.
@@ -107,6 +113,7 @@ function bpbtb_get_nps_poll_stats() {
  * @param WP_REST_Request $request
  * @return WP_REST_Response
  */
+if ( ! function_exists( 'bpbtb_handle_nps_poll_submit' ) ) {
 function bpbtb_handle_nps_poll_submit( $request ) {
 	$params = $request->get_params();
 
@@ -147,10 +154,12 @@ function bpbtb_handle_nps_poll_submit( $request ) {
 		200
 	);
 }
+}
 
 /**
  * Register "Feedback & NPS Poll" admin submenu under Testimonials.
  */
+if ( ! function_exists( 'bpbtb_register_nps_poll_admin_menu' ) ) {
 function bpbtb_register_nps_poll_admin_menu() {
 	$stats = bpbtb_get_nps_poll_stats();
 	$badge = '';
@@ -171,11 +180,13 @@ function bpbtb_register_nps_poll_admin_menu() {
 		'bpbtb_render_nps_poll_admin_page'
 	);
 }
+}
 add_action( 'admin_menu', 'bpbtb_register_nps_poll_admin_menu' );
 
 /**
  * Handle Admin Actions (Delete entry, Clear all).
  */
+if ( ! function_exists( 'bpbtb_handle_nps_poll_admin_actions' ) ) {
 function bpbtb_handle_nps_poll_admin_actions() {
 	$page = isset( $_GET['page'] ) ? sanitize_key( wp_unslash( $_GET['page'] ) ) : '';
 	if ( 'bpbtb-nps-poll' !== $page || ! current_user_can( 'manage_options' ) ) {
@@ -206,11 +217,13 @@ function bpbtb_handle_nps_poll_admin_actions() {
 		}
 	}
 }
+}
 add_action( 'admin_init', 'bpbtb_handle_nps_poll_admin_actions' );
 
 /**
  * Render Feedback & NPS Poll Admin Dashboard Page.
  */
+if ( ! function_exists( 'bpbtb_render_nps_poll_admin_page' ) ) {
 function bpbtb_render_nps_poll_admin_page() {
 	if ( ! current_user_can( 'manage_options' ) ) {
 		return;
@@ -526,4 +539,5 @@ function bpbtb_render_nps_poll_admin_page() {
 		</div>
 	</div>
 	<?php
+}
 }

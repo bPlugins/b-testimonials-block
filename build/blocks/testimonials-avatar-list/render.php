@@ -3,10 +3,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-if ( ! empty( trim( $content ) ) ) {
-	echo $content;
-	return;
-}
+
 
 if ( function_exists( 'bpbtb_prepare_block_items' ) ) {
 	$attributes = bpbtb_prepare_block_items( $attributes );

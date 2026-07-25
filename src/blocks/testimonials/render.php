@@ -3,9 +3,14 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-if ( ! empty( trim( $content ) ) ) {
-	echo $content;
-	return;
+
+
+if ( ! empty( $content ) ) {
+	$clean_content = trim( str_replace( [ '<div class="wp-block-bptmb-testimonials">', '</div>' ], '', $content ) );
+	if ( ! empty( $clean_content ) ) {
+		echo $content;
+		return;
+	}
 }
 
 if ( function_exists( 'bpbtb_prepare_block_items' ) ) {
@@ -15,7 +20,8 @@ if ( function_exists( 'bpbtb_prepare_block_items' ) ) {
 $btb_align     = $attributes['align'] ?? 'wide';
 $btb_c_id      = $attributes['cId'] ?? '';
 $btb_extra_cls = $attributes['className'] ?? '';
-$btb_classes   = trim( 'bTestimonials wp-block-bptmb-testimonials ' . $btb_extra_cls . ' align' . $btb_align );
+$btb_classes   = trim( 'bTestimonials wp-block-bptmb-testimonials wp-block-bptmb-b-testimonials ' . $btb_extra_cls . ' align' . $btb_align );
 ?>
 
 <div class="<?php echo esc_attr( $btb_classes ); ?>" id="btbTestimonialsDir-<?php echo esc_attr( $btb_c_id ); ?>" data-attributes="<?php echo esc_attr( wp_json_encode( $attributes ) ); ?>"></div>
+

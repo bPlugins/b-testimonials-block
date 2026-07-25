@@ -425,18 +425,22 @@ html {
 			&.btb-coverflow-layout,
 			&.btb-slider-3d-layout {
 				display: flex;
+				perspective: 1000px;
 
 				.swiper {
 					padding: 20px 28px 45px 28px;
 					overflow: hidden;
+					perspective: 1000px;
 
 					.swiper-wrapper {
 						display: flex;
 						height: 100% !important;
+						transform-style: preserve-3d;
 
 						.swiper-slide {
 							height: auto !important;
-							transition: transform 0.3s ease, opacity 0.3s ease;
+							transition: opacity 0.3s ease;
+							transform-style: preserve-3d;
 
 							.single {
 								height: 100%;

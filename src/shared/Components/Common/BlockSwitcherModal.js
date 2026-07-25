@@ -28,13 +28,6 @@ export const CHILD_BLOCKS_LIST = [
 		desc: __('Staggered grid layout for variable height cards.', 'b-testimonials-block'),
 	},
 	{
-		name: 'bptmb/testimonials-single',
-		title: __('Single Testimonial', 'b-testimonials-block'),
-		category: 'layouts',
-		icon: 'format-quote',
-		desc: __('Hero/Featured single testimonial highlight.', 'b-testimonials-block'),
-	},
-	{
 		name: 'bptmb/testimonials-marquee',
 		title: __('Testimonials Marquee', 'b-testimonials-block'),
 		category: 'layouts',

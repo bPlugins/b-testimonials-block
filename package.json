@@ -12,12 +12,12 @@
 		"format": "wp-scripts format",
 		"start": "wp-scripts start --webpack-copy-php",
 		"build": "wp-scripts build --webpack-copy-php",
-		"i18n-pot": "wp i18n make-pot . languages/smart-modal.pot --exclude=\"src\" && cp ./languages/smart-modal.pot ./languages/smart-modal-en_US.po",
+		"i18n-pot": "wp i18n make-pot . languages/b-testimonials-block.pot --exclude=\"src\" && cp ./languages/b-testimonials-block.pot ./languages/b-testimonials-block-en_US.po",
 		"i18n-json": "wp i18n make-json languages/ --no-purge",
 		"i18n-mo": "wp i18n make-mo languages/",
 		"i18n": "npm run i18n-pot && npm run i18n-json && npm run i18n-mo",
-		"plugin-zip": "wp-scripts plugin-zip",
-		"bundle": "npm run lint && npm run build && npm run i18n && npm run plugin-zip"
+		"find-ds": "find . -name '.DS_Store' -delete",
+		"zip": "npm run build && npm run i18n && npm run find-ds && rm -f b-testimonials-block.zip && zip -r b-testimonials-block.zip b-testimonials-block.php includes assets build languages readme.txt -x '*.DS_Store'"
 	},
 	"dependencies": {
 		"immer": "^9.0.21",

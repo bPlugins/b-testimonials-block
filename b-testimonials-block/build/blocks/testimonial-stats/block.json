@@ -1,0 +1,98 @@
+{
+  "$schema": "https://schemas.wp.org/trunk/block.json",
+  "apiVersion": 3,
+  "category": "bplugins",
+  "parent": [
+    "bptmb/b-testimonials"
+  ],
+  "textdomain": "b-testimonials-block",
+  "supports": {
+    "align": [
+      "wide",
+      "full"
+    ],
+    "html": false
+  },
+  "editorScript": [
+    "file:./index.js"
+  ],
+  "editorStyle": "file:./index.css",
+  "style": [
+    "file:./index.css",
+    "file:./view.css"
+  ],
+  "viewScript": [
+    "file:./view.js"
+  ],
+  "render": "file:./render.php",
+  "name": "bptmb/testimonial-stats",
+  "title": "Testimonial Stats",
+  "description": "Animated stat counters for social proof.",
+  "keywords": [
+    "stats",
+    "counter",
+    "numbers",
+    "social proof"
+  ],
+  "attributes": {
+    "align": {
+      "type": "string",
+      "default": "wide"
+    },
+    "cId": {
+      "type": "string",
+      "default": ""
+    },
+    "items": {
+      "type": "array",
+      "default": [
+        {
+          "number": 5000,
+          "prefix": "",
+          "suffix": "+",
+          "label": "Happy clients"
+        },
+        {
+          "number": 4.9,
+          "prefix": "",
+          "suffix": "/5",
+          "label": "Average rating"
+        },
+        {
+          "number": 98,
+          "prefix": "",
+          "suffix": "%",
+          "label": "Would recommend"
+        }
+      ]
+    },
+    "columns": {
+      "type": "object",
+      "default": {
+        "desktop": 3,
+        "tablet": 3,
+        "mobile": 1
+      }
+    },
+    "columnGap": {
+      "type": "string",
+      "default": "30px"
+    },
+    "rowGap": {
+      "type": "string",
+      "default": "30px"
+    },
+    "accentColor": {
+      "type": "string",
+      "default": "#0575e6"
+    },
+    "animate": {
+      "type": "boolean",
+      "default": true
+    },
+    "layout": {
+      "type": "string",
+      "default": "testimonial-stats"
+    }
+  }
+}

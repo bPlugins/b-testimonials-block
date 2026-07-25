@@ -1,2 +1,65 @@
-.btb-logo-row{align-items:center;border-bottom:1px solid #f0f0f0;display:flex;gap:8px;margin-bottom:12px;padding-bottom:12px}.btb-logo-row .btb-logo-pick{height:auto;min-height:40px}.btb-logo-row .btb-logo-pick img{display:block;max-height:36px;max-width:90px}.btb-logo-row>.components-base-control{flex:1}
-.bClientLogos .logos-grid{align-items:center;display:grid;gap:var(--row-gap,30px) var(--col-gap,30px);grid-template-columns:repeat(var(--cols-d,4),1fr)}.bClientLogos .logo-item{align-items:center;display:flex;justify-content:center}.bClientLogos .logo-item img{height:var(--logo-h,60px);max-width:100%;-o-object-fit:contain;object-fit:contain;width:auto}.bClientLogos .is-grayscale .logo-item img{filter:grayscale(1);opacity:.7;transition:filter .25s ease,opacity .25s ease}.bClientLogos .is-grayscale .logo-item img:hover{filter:grayscale(0);opacity:1}@media(max-width:768px){.bClientLogos .logos-grid{grid-template-columns:repeat(var(--cols-t,3),1fr)}}@media(max-width:576px){.bClientLogos .logos-grid{grid-template-columns:repeat(var(--cols-m,2),1fr)}}
+/*!*******************************************************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** css ../../../../../../../Development/dev/node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[4].use[1]!../../../../../../../Development/dev/node_modules/postcss-loader/dist/cjs.js??ruleSet[1].rules[4].use[2]!../../../../../../../Development/dev/node_modules/sass-loader/dist/cjs.js??ruleSet[1].rules[4].use[3]!./src/blocks/client-logos/edit.scss ***!
+  \*******************************************************************************************************************************************************************************************************************************************************************************************************************************************************************/
+.btb-logo-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid #f0f0f0;
+}
+.btb-logo-row .btb-logo-pick {
+  height: auto;
+  min-height: 40px;
+}
+.btb-logo-row .btb-logo-pick img {
+  max-width: 90px;
+  max-height: 36px;
+  display: block;
+}
+.btb-logo-row > .components-base-control {
+  flex: 1;
+}
+/*!**************************************************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** css ../../../../../../../Development/dev/node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[4].use[1]!../../../../../../../Development/dev/node_modules/postcss-loader/dist/cjs.js??ruleSet[1].rules[4].use[2]!../../../../../../../Development/dev/node_modules/sass-loader/dist/cjs.js??ruleSet[1].rules[4].use[3]!./src/shared/styles/logos.scss ***!
+  \**************************************************************************************************************************************************************************************************************************************************************************************************************************************************************/
+.bClientLogos .logos-grid {
+  display: grid;
+  gap: var(--row-gap, 30px) var(--col-gap, 30px);
+  grid-template-columns: repeat(var(--cols-d, 4), 1fr);
+  align-items: center;
+}
+.bClientLogos .logo-item {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.bClientLogos .logo-item img {
+  height: var(--logo-h, 60px);
+  width: auto;
+  max-width: 100%;
+  -o-object-fit: contain;
+     object-fit: contain;
+}
+.bClientLogos .is-grayscale .logo-item img {
+  filter: grayscale(1);
+  opacity: 0.7;
+  transition: filter 0.25s ease, opacity 0.25s ease;
+}
+.bClientLogos .is-grayscale .logo-item img:hover {
+  filter: grayscale(0);
+  opacity: 1;
+}
+@media (max-width: 768px) {
+  .bClientLogos .logos-grid {
+    grid-template-columns: repeat(var(--cols-t, 3), 1fr);
+  }
+}
+@media (max-width: 576px) {
+  .bClientLogos .logos-grid {
+    grid-template-columns: repeat(var(--cols-m, 2), 1fr);
+  }
+}
+
+/*# sourceMappingURL=index.css.map*/

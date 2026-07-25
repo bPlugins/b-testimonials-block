@@ -99,6 +99,7 @@ const Layout = ({ itemsEls = [], ToolbarButton, MediaUpload, MediaUploadCheck, a
 
     const [selectedAvatarIdx, setSelectedAvatarIdx] = useState(0);
     const [cardStackIdx, setCardStackIdx] = useState(0);
+    const [activeModalItem, setActiveModalItem] = useState(null);
     const itemProps = { attributes, setActiveIndex, activeIndex, updateItem, isBackend, __, RichText, MediaUpload, MediaUploadCheck, ToolbarButton };
 
     // Dynamic badge attributes (from block.json / sidebar settings)
@@ -543,7 +544,7 @@ const Layout = ({ itemsEls = [], ToolbarButton, MediaUpload, MediaUploadCheck, a
                     ))}
                 </div>
                 <div className="btb-avatar-detail">
-                    <p className="btb-avatar-review">"{activeItem.reviewText}"</p>
+                    <p className="btb-avatar-review">&quot;{activeItem.reviewText}&quot;</p>
                     <h4 className="btb-avatar-name">{activeItem.name}</h4>
                     <span className="btb-avatar-deg">{activeItem.deg}</span>
                 </div>
@@ -687,7 +688,34 @@ const Layout = ({ itemsEls = [], ToolbarButton, MediaUpload, MediaUploadCheck, a
     }
 
     if (layout === 'testimonials-popup-modal') {
-        return renderItemsGrid('btb-popup-modal-grid');
+        return (
+            <div className="btb-popup-modal-wrapper">
+                <div className={`layoutSection btb-popup-modal-grid ${theme} columns-${desktop} columns-tablet-${tablet} columns-mobile-${mobile} ${isBackend ? 'is-editing' : ''}`}>
+                    {items.map((item, index) => (
+                        <div key={index} className="btb-popup-modal-card-trigger" onClick={() => setActiveModalItem(item)} style={{ cursor: 'pointer' }}>
+                            {themeSelect(item, index)}
+                        </div>
+                    ))}
+                </div>
+
+                {activeModalItem && (
+                    <div className="btb-modal-overlay" onClick={() => setActiveModalItem(null)} style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(4px)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 999999, padding: '20px' }}>
+                        <div className="btb-modal-content-box" onClick={e => e.stopPropagation()} style={{ background: '#fff', borderRadius: '16px', maxWidth: '540px', width: '100%', padding: '28px', position: 'relative', boxShadow: '0 20px 40px rgba(0,0,0,0.2)', animation: 'btbToastSlide 0.3s ease' }}>
+                            <button type="button" onClick={() => setActiveModalItem(null)} style={{ position: 'absolute', top: '16px', right: '16px', background: 'none', border: 'none', fontSize: '24px', cursor: 'pointer', color: '#64748b', lineHeight: 1 }}>×</button>
+                            <div style={{ display: 'flex', gap: '16px', alignItems: 'center', marginBottom: '18px' }}>
+                                <img src={activeModalItem.img?.url || 'https://templates.bplugins.com/wp-content/uploads/2025/02/p-29.png'} alt={activeModalItem.name || ''} style={{ width: '60px', height: '60px', borderRadius: '50%', objectFit: 'cover' }} />
+                                <div>
+                                    <h3 style={{ margin: 0, fontSize: '18px', fontWeight: 700, color: '#0f172a' }}>{activeModalItem.name || 'John Doe'}</h3>
+                                    <span style={{ fontSize: '13px', color: '#64748b' }}>{activeModalItem.deg || ''}</span>
+                                    <div style={{ color: '#f59e0b', fontSize: '16px', marginTop: '4px' }}>{'★'.repeat(activeModalItem.rating || 5)}</div>
+                                </div>
+                            </div>
+                            <p style={{ margin: 0, fontSize: '15px', color: '#334155', lineHeight: '1.6', fontStyle: 'italic' }}>&quot;{activeModalItem.reviewText || ''}&quot;</p>
+                        </div>
+                    </div>
+                )}
+            </div>
+        );
     }
 
     if (layout === 'testimonials-floating-bubble') {
@@ -699,7 +727,7 @@ const Layout = ({ itemsEls = [], ToolbarButton, MediaUpload, MediaUploadCheck, a
                             <img src={item.img?.url || 'https://templates.bplugins.com/wp-content/uploads/2025/02/p-29.png'} alt={item.name} />
                         </div>
                         <div className="btb-bubble-content">
-                            <p>{(item.reviewText || '').substring(0, 80)}</p>
+                            <p>{item.reviewText || ''}</p>
                             <span className="btb-bubble-name">{item.name}</span>
                         </div>
                     </div>

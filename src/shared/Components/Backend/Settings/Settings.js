@@ -6,8 +6,13 @@ import { PanelBody, PanelRow, TabPanel, TextControl, SelectControl, RangeControl
 import { produce } from 'immer';
 
 // Settings Components
-import { Label, ColorControl, InlineDetailMediaUpload, Typography, } from '../../../../../../bpl-tools/Components';
-import { BDevice, BorderControl, ShadowControl } from '../../../../../../bpl-tools/Components/Deprecated';
+import Label from '../../../../../../bpl-tools/Components/Label/Label';
+import { ColorControl } from '../../../../../../bpl-tools/Components/ColorControl/ColorControl';
+import { InlineDetailMediaUpload } from '../../../../../../bpl-tools/Components/MediaControl/MediaControl';
+import Typography from '../../../../../../bpl-tools/Components/Typography/Typography';
+import BDevice from '../../../../../../bpl-tools/Components/Deprecated/BDevice/BDevice';
+import BorderControl from '../../../../../../bpl-tools/Components/Deprecated/BorderControl/BorderControl';
+import ShadowControl from '../../../../../../bpl-tools/Components/Deprecated/ShadowControl/ShadowControl';
 
 import { gearIcon } from '../../../../../../bpl-tools/utils/icons';
 import { tabController } from '../../../../../../bpl-tools/utils/functions';
@@ -74,9 +79,12 @@ const Settings = ({ attributes = {}, setAttributes, updateItem, activeIndex, set
         'star-rating-bars',
         'before-after',
         'testimonial-stats',
-        'comparison-testimonial-table'
+        'comparison-testimonial-table',
+        'faq-testimonial-accordion',
+        'testimonials-avatar-list',
+        'testimonials-card-stack'
     ];
-    const isSingleTestimonial = currentBlockName === 'bptmb/testimonials-single' || layout === 'single' || layout === 'testimonials-single';
+    const isSingleTestimonial = layout === 'single' || layout === 'testimonials-single';
     const isSingleItemBlock = singleItemBlocks.includes(layout) || isSingleTestimonial;
     const isCaseStudy = layout === 'case-study-card';
 
@@ -519,6 +527,262 @@ const Settings = ({ attributes = {}, setAttributes, updateItem, activeIndex, set
                                             style={{ width: '100%', justifyContent: 'center' }}
                                         >
                                             <Dashicon icon='plus' />{__('Add New Row', 'b-testimonials-block')}
+                                        </Button>
+                                    </>
+                                )}
+                                {layout === 'faq-testimonial-accordion' && (
+                                    <>
+                                        <hr style={{ margin: '15px 0', borderColor: '#e2e8f0' }} />
+                                        <Label>{__('FAQ Questions & Answers:', 'b-testimonials-block')}</Label>
+                                        {items.map((faqItem, faqIdx) => (
+                                            <div key={faqIdx} className='mt10 btb-section-card' style={{ border: '1px solid #e2e8f0', borderRadius: '8px', padding: '12px', background: '#f8fafc' }}>
+                                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                                    <strong style={{ fontSize: '12px', color: '#334155' }}>{__(`FAQ ${faqIdx + 1}`, 'b-testimonials-block')}</strong>
+                                                    <div style={{ display: 'flex', gap: '4px' }}>
+                                                        <Button
+                                                            isSmall
+                                                            variant='secondary'
+                                                            onClick={() => {
+                                                                const newItems = [...items.slice(0, faqIdx + 1), { ...items[faqIdx] }, ...items.slice(faqIdx + 1)];
+                                                                setAttributes({ items: newItems });
+                                                            }}
+                                                            title={__('Duplicate Question', 'b-testimonials-block')}
+                                                        >
+                                                            <Dashicon icon='admin-page' />
+                                                        </Button>
+                                                        {items.length > 1 && (
+                                                            <Button
+                                                                isDestructive
+                                                                isSmall
+                                                                variant='tertiary'
+                                                                onClick={() => {
+                                                                    const newItems = items.filter((_, i) => i !== faqIdx);
+                                                                    setAttributes({ items: newItems });
+                                                                }}
+                                                                title={__('Remove Question', 'b-testimonials-block')}
+                                                            >
+                                                                <Dashicon icon='no' />
+                                                            </Button>
+                                                        )}
+                                                    </div>
+                                                </div>
+
+                                                <TextControl
+                                                    className='mt5'
+                                                    label={__('Question Text', 'b-testimonials-block')}
+                                                    value={faqItem.name ?? ''}
+                                                    onChange={val => {
+                                                        const newItems = produce(items, draft => { draft[faqIdx].name = val; });
+                                                        setAttributes({ items: newItems });
+                                                    }}
+                                                />
+
+                                                <TextareaControl
+                                                    className='mt5'
+                                                    label={__('Answer Content', 'b-testimonials-block')}
+                                                    value={faqItem.reviewText ?? ''}
+                                                    onChange={val => {
+                                                        const newItems = produce(items, draft => { draft[faqIdx].reviewText = val; });
+                                                        setAttributes({ items: newItems });
+                                                    }}
+                                                />
+
+                                                <TextControl
+                                                    className='mt5'
+                                                    label={__('Author / Subtext (Optional)', 'b-testimonials-block')}
+                                                    value={faqItem.deg ?? ''}
+                                                    onChange={val => {
+                                                        const newItems = produce(items, draft => { draft[faqIdx].deg = val; });
+                                                        setAttributes({ items: newItems });
+                                                    }}
+                                                />
+                                            </div>
+                                        ))}
+
+                                        <Button
+                                            className='mt15'
+                                            variant='secondary'
+                                            onClick={() => {
+                                                const newItems = [...items, { name: 'What is your refund policy?', reviewText: 'We offer a 30-day money-back guarantee with no questions asked.', deg: 'Customer Support' }];
+                                                setAttributes({ items: newItems });
+                                            }}
+                                            style={{ width: '100%', justifyContent: 'center' }}
+                                        >
+                                            <Dashicon icon='plus' />{__('Add New Question', 'b-testimonials-block')}
+                                        </Button>
+                                    </>
+                                )}
+                                {layout === 'testimonials-avatar-list' && (
+                                    <>
+                                        <hr style={{ margin: '15px 0', borderColor: '#e2e8f0' }} />
+                                        <Label>{__('Avatar Testimonial Items:', 'b-testimonials-block')}</Label>
+                                        {items.map((avItem, avIdx) => (
+                                            <div key={avIdx} className='mt10 btb-section-card' style={{ border: '1px solid #e2e8f0', borderRadius: '8px', padding: '12px', background: '#f8fafc' }}>
+                                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                                    <strong style={{ fontSize: '12px', color: '#334155' }}>{__(`Avatar ${avIdx + 1}`, 'b-testimonials-block')}</strong>
+                                                    <div style={{ display: 'flex', gap: '4px' }}>
+                                                        <Button
+                                                            isSmall
+                                                            variant='secondary'
+                                                            onClick={() => {
+                                                                const newItems = [...items.slice(0, avIdx + 1), { ...items[avIdx] }, ...items.slice(avIdx + 1)];
+                                                                setAttributes({ items: newItems });
+                                                            }}
+                                                            title={__('Duplicate Avatar', 'b-testimonials-block')}
+                                                        >
+                                                            <Dashicon icon='admin-page' />
+                                                        </Button>
+                                                        {items.length > 1 && (
+                                                            <Button
+                                                                isDestructive
+                                                                isSmall
+                                                                variant='tertiary'
+                                                                onClick={() => {
+                                                                    const newItems = items.filter((_, i) => i !== avIdx);
+                                                                    setAttributes({ items: newItems });
+                                                                }}
+                                                                title={__('Remove Avatar', 'b-testimonials-block')}
+                                                            >
+                                                                <Dashicon icon='no' />
+                                                            </Button>
+                                                        )}
+                                                    </div>
+                                                </div>
+
+                                                <Label className='mt5'>{__('Avatar Image:', 'b-testimonials-block')}</Label>
+                                                <InlineDetailMediaUpload
+                                                    value={avItem.img || {}}
+                                                    type={['image']}
+                                                    onChange={val => {
+                                                        const newItems = produce(items, draft => { draft[avIdx].img = val; });
+                                                        setAttributes({ items: newItems });
+                                                    }}
+                                                />
+
+                                                <TextControl
+                                                    className='mt5'
+                                                    label={__('Name', 'b-testimonials-block')}
+                                                    value={avItem.name ?? ''}
+                                                    onChange={val => {
+                                                        const newItems = produce(items, draft => { draft[avIdx].name = val; });
+                                                        setAttributes({ items: newItems });
+                                                    }}
+                                                />
+
+                                                <TextControl
+                                                    className='mt5'
+                                                    label={__('Designation', 'b-testimonials-block')}
+                                                    value={avItem.deg ?? ''}
+                                                    onChange={val => {
+                                                        const newItems = produce(items, draft => { draft[avIdx].deg = val; });
+                                                        setAttributes({ items: newItems });
+                                                    }}
+                                                />
+
+                                                <TextareaControl
+                                                    className='mt5'
+                                                    label={__('Review Text', 'b-testimonials-block')}
+                                                    value={avItem.reviewText ?? ''}
+                                                    onChange={val => {
+                                                        const newItems = produce(items, draft => { draft[avIdx].reviewText = val; });
+                                                        setAttributes({ items: newItems });
+                                                    }}
+                                                />
+                                            </div>
+                                        ))}
+
+                                        <Button
+                                            className='mt15'
+                                            variant='secondary'
+                                            onClick={() => {
+                                                const newItems = [...items, { img: { url: 'https://templates.bplugins.com/wp-content/uploads/2025/02/p-29.png' }, name: 'John Doe', deg: 'Developer', reviewText: 'Fantastic product and smooth experience.' }];
+                                                setAttributes({ items: newItems });
+                                            }}
+                                            style={{ width: '100%', justifyContent: 'center' }}
+                                        >
+                                            <Dashicon icon='plus' />{__('Add New Avatar Item', 'b-testimonials-block')}
+                                        </Button>
+                                    </>
+                                )}
+                                {layout === 'testimonials-card-stack' && (
+                                    <>
+                                        <hr style={{ margin: '15px 0', borderColor: '#e2e8f0' }} />
+                                        <Label>{__('Stacked Cards Management:', 'b-testimonials-block')}</Label>
+                                        {items.map((stkItem, stkIdx) => (
+                                            <div key={stkIdx} className='mt10 btb-section-card' style={{ border: '1px solid #e2e8f0', borderRadius: '8px', padding: '12px', background: '#f8fafc' }}>
+                                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                                    <strong style={{ fontSize: '12px', color: '#334155' }}>{__(`Card ${stkIdx + 1}`, 'b-testimonials-block')}</strong>
+                                                    <div style={{ display: 'flex', gap: '4px' }}>
+                                                        <Button
+                                                            isSmall
+                                                            variant='secondary'
+                                                            onClick={() => {
+                                                                const newItems = [...items.slice(0, stkIdx + 1), { ...items[stkIdx] }, ...items.slice(stkIdx + 1)];
+                                                                setAttributes({ items: newItems });
+                                                            }}
+                                                            title={__('Duplicate Card', 'b-testimonials-block')}
+                                                        >
+                                                            <Dashicon icon='admin-page' />
+                                                        </Button>
+                                                        {items.length > 1 && (
+                                                            <Button
+                                                                isDestructive
+                                                                isSmall
+                                                                variant='tertiary'
+                                                                onClick={() => {
+                                                                    const newItems = items.filter((_, i) => i !== stkIdx);
+                                                                    setAttributes({ items: newItems });
+                                                                }}
+                                                                title={__('Remove Card', 'b-testimonials-block')}
+                                                            >
+                                                                <Dashicon icon='no' />
+                                                            </Button>
+                                                        )}
+                                                    </div>
+                                                </div>
+
+                                                <TextControl
+                                                    className='mt5'
+                                                    label={__('Name', 'b-testimonials-block')}
+                                                    value={stkItem.name ?? ''}
+                                                    onChange={val => {
+                                                        const newItems = produce(items, draft => { draft[stkIdx].name = val; });
+                                                        setAttributes({ items: newItems });
+                                                    }}
+                                                />
+
+                                                <TextControl
+                                                    className='mt5'
+                                                    label={__('Designation', 'b-testimonials-block')}
+                                                    value={stkItem.deg ?? ''}
+                                                    onChange={val => {
+                                                        const newItems = produce(items, draft => { draft[stkIdx].deg = val; });
+                                                        setAttributes({ items: newItems });
+                                                    }}
+                                                />
+
+                                                <TextareaControl
+                                                    className='mt5'
+                                                    label={__('Review Text', 'b-testimonials-block')}
+                                                    value={stkItem.reviewText ?? ''}
+                                                    onChange={val => {
+                                                        const newItems = produce(items, draft => { draft[stkIdx].reviewText = val; });
+                                                        setAttributes({ items: newItems });
+                                                    }}
+                                                />
+                                            </div>
+                                        ))}
+
+                                        <Button
+                                            className='mt15'
+                                            variant='secondary'
+                                            onClick={() => {
+                                                const newItems = [...items, { name: 'John Doe', deg: 'Developer', reviewText: 'Excellent service and top quality output.' }];
+                                                setAttributes({ items: newItems });
+                                            }}
+                                            style={{ width: '100%', justifyContent: 'center' }}
+                                        >
+                                            <Dashicon icon='plus' />{__('Add New Stack Card', 'b-testimonials-block')}
                                         </Button>
                                     </>
                                 )}

@@ -1,0 +1,125 @@
+{
+  "$schema": "https://schemas.wp.org/trunk/block.json",
+  "apiVersion": 3,
+  "name": "bptmb/star-rating-bars",
+  "title": "Star Rating Progress Bars",
+  "description": "5-star rating breakdown bars & percentage stats.",
+  "category": "bplugins",
+  "parent": [
+    "bptmb/b-testimonials"
+  ],
+  "keywords": [
+    "testimonials",
+    "star-rating-bars"
+  ],
+  "textdomain": "b-testimonials-block",
+  "attributes": {
+    "align": {
+      "type": "string",
+      "default": "wide"
+    },
+    "cId": {
+      "type": "string",
+      "default": ""
+    },
+    "items": {
+      "type": "array",
+      "default": [
+        {
+          "img": {
+            "url": "https://templates.bplugins.com/wp-content/uploads/2025/02/p-29.png"
+          },
+          "name": "John Doe",
+          "deg": "Developer",
+          "reviewText": "It is a long-established fact that a reader will be distracted by the readable content of a page when looking at its layout",
+          "rating": 5
+        },
+        {
+          "img": {
+            "url": "https://templates.bplugins.com/wp-content/uploads/2025/02/p-29.png"
+          },
+          "name": "Jane Smith",
+          "deg": "Designer",
+          "reviewText": "Great experience working with this plugin!",
+          "rating": 5
+        },
+        {
+          "img": {
+            "url": "https://templates.bplugins.com/wp-content/uploads/2025/02/p-29.png"
+          },
+          "name": "Alex Johnson",
+          "deg": "Manager",
+          "reviewText": "Solid functionality and easy setup.",
+          "rating": 4
+        }
+      ]
+    },
+    "elements": {
+      "type": "object",
+      "default": {
+        "name": true,
+        "deg": true,
+        "reviewText": true
+      }
+    },
+    "columns": {
+      "type": "object",
+      "default": {
+        "desktop": 3,
+        "tablet": 2,
+        "mobile": 1
+      }
+    },
+    "layout": {
+      "type": "string",
+      "default": "star-rating-bars"
+    },
+    "dataSource": {
+      "type": "string",
+      "default": "manual"
+    },
+    "query": {
+      "type": "object",
+      "default": {}
+    },
+    "badgeTitle": {
+      "type": "string",
+      "default": "Rating Breakdown"
+    },
+    "star5Count": {
+      "type": "string",
+      "default": ""
+    },
+    "star4Count": {
+      "type": "string",
+      "default": ""
+    },
+    "star3Count": {
+      "type": "string",
+      "default": ""
+    },
+    "star2Count": {
+      "type": "string",
+      "default": ""
+    },
+    "star1Count": {
+      "type": "string",
+      "default": ""
+    }
+  },
+  "supports": {
+    "align": [
+      "wide",
+      "full"
+    ],
+    "html": false
+  },
+  "editorScript": "file:./index.js",
+  "editorStyle": "file:./index.css",
+  "render": "file:./render.php",
+  "viewScript": "file:./view.js",
+  "style": [
+    "file:./index.css",
+    "file:./view.css"
+  ]
+}

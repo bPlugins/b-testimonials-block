@@ -105,6 +105,11 @@ const BeforeAfterSlider = ({ attributes = {} }) => {
 					className="ba-handle"
 					style={{ borderColor: accentColor }}
 					tabIndex={0}
+					role="slider"
+					aria-valuenow={Math.round(pos)}
+					aria-valuemin={0}
+					aria-valuemax={100}
+					aria-label="Before after slider handle"
 					onKeyDown={handleKeyDown}
 				>
 					<span className="ba-handle-line" style={{ background: accentColor }} />

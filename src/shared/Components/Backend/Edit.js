@@ -94,11 +94,13 @@ const Edit = props => {
 		return () => { active = false; };
 	}, [isCpt, query?.number, query?.orderBy, query?.order]);
 
+	const blockProps = useBlockProps({ className: isMainParentBlock ? 'bTestimonialsMainBlock' : 'bTestimonials' });
+
 	// Main Parent Block Rendering with InnerBlocks
 	if (isMainParentBlock) {
 		if (!innerBlocks?.length) {
 			return (
-				<div {...useBlockProps({ className: 'bTestimonialsMainBlock' })}>
+				<div {...blockProps}>
 					<Settings attributes={attributes} setAttributes={setAttributes} updateItem={() => {}} activeIndex={activeIndex} setActiveIndex={setActiveIndex} clientId={clientId} currentBlockName={name} />
 					<BlockPlaceholder clientId={clientId} currentBlockName={name} />
 					<InnerBlocks
@@ -111,7 +113,7 @@ const Edit = props => {
 		}
 
 		return (
-			<div {...useBlockProps({ className: 'bTestimonialsMainBlock' })}>
+			<div {...blockProps}>
 				<Settings attributes={attributes} setAttributes={setAttributes} updateItem={() => {}} activeIndex={activeIndex} setActiveIndex={setActiveIndex} clientId={clientId} currentBlockName={name} />
 				<InnerBlocks
 					templateLock={false}
@@ -157,7 +159,7 @@ const Edit = props => {
 	return <>
 		<Settings attributes={attributes} setAttributes={setAttributes} updateItem={updateItem} activeIndex={activeIndex} setActiveIndex={setActiveIndex} clientId={clientId} currentBlockName={name} />
 
-		<div {...useBlockProps({ className: 'bTestimonials' })} id={`btbTestimonialsDir-${clientId}`}>
+		<div {...blockProps} id={`btbTestimonialsDir-${clientId}`}>
 			{isCpt ? (
 				cptItems.length
 					? <TestimonialsView attributes={{ ...attributes, items: cptItems }} clientId={clientId} />

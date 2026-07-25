@@ -1,5 +1,9 @@
 import '../../shared/styles/frontend.scss';
-import '../../shared/view';
-document.addEventListener('DOMContentLoaded', () => {
-	// 3D Flip Perspective Carousel frontend script
-});
+import { initTestimonials } from '../../shared/view';
+
+if ( document.readyState === 'loading' ) {
+	document.addEventListener( 'DOMContentLoaded', () => initTestimonials() );
+} else {
+	initTestimonials();
+}
+

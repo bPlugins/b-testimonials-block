@@ -1,0 +1,2507 @@
+# Copyright (C) 2026 bPlugins
+# This file is distributed under the GPLv3.
+msgid ""
+msgstr ""
+"Project-Id-Version: B Testimonials Block 1.0.3\n"
+"Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/b-testimonials-block\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"POT-Creation-Date: 2026-07-25T01:34:00+00:00\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"X-Generator: WP-CLI 2.12.0\n"
+"X-Domain: b-testimonials-block\n"
+
+#. Plugin Name of the plugin
+#: b-testimonials-block.php
+msgid "B Testimonials Block"
+msgstr ""
+
+#. Description of the plugin
+#: b-testimonials-block.php
+msgid "Boost your website's credibility with b testimonials block, effortlessly showcasing customer ratings and reviews.."
+msgstr ""
+
+#. Author of the plugin
+#: b-testimonials-block.php
+#: b-testimonials-block.php:115
+msgid "bPlugins"
+msgstr ""
+
+#. Author URI of the plugin
+#: b-testimonials-block.php
+msgid "http://bplugins.com"
+msgstr ""
+
+#: includes/admin-menu.php:54
+#: includes/admin-menu.php:55
+msgid "Demo & Help"
+msgstr ""
+
+#: includes/admin-nps-poll.php:117
+msgid "No mark selected."
+msgstr ""
+
+#: includes/admin-nps-poll.php:144
+#, php-format
+msgid "Thank you for your feedback! You selected mark %d."
+msgstr ""
+
+#: includes/admin-nps-poll.php:167
+#: includes/admin-nps-poll.php:168
+#: includes/admin-nps-poll.php:404
+#: build/blocks/before-after/index.js:1
+#: build/blocks/client-logos/index.js:1
+#: build/blocks/rating-summary/index.js:1
+#: build/blocks/testimonial-form/index.js:1
+#: build/blocks/testimonial-stats/index.js:1
+#: build/blocks/trust-badges/index.js:1
+#: build/blocks/video-testimonials/index.js:1
+msgid "Feedback & NPS Poll"
+msgstr ""
+
+#: includes/admin-nps-poll.php:395
+msgid "Poll response entry deleted."
+msgstr ""
+
+#: includes/admin-nps-poll.php:397
+msgid "All poll response entries cleared."
+msgstr ""
+
+#: includes/admin-nps-poll.php:407
+msgid "Track and analyze all visitor Net Promoter Score (NPS) marks submitted on your site."
+msgstr ""
+
+#: includes/admin-nps-poll.php:411
+msgid "Are you sure you want to clear all poll responses?"
+msgstr ""
+
+#: includes/admin-nps-poll.php:412
+msgid "Clear All Responses"
+msgstr ""
+
+#: includes/admin-nps-poll.php:421
+msgid "Net Promoter Score (NPS)"
+msgstr ""
+
+#: includes/admin-nps-poll.php:425
+msgid "Total Marks Selected"
+msgstr ""
+
+#: includes/admin-nps-poll.php:429
+msgid "Average Selected Mark"
+msgstr ""
+
+#: includes/admin-nps-poll.php:433
+msgid "Promoters (Marks 9-10)"
+msgstr ""
+
+#: includes/admin-nps-poll.php:439
+msgid "Selected Marks Breakdown"
+msgstr ""
+
+#: includes/admin-nps-poll.php:440
+msgid "Number of times each specific mark score was selected by visitors."
+msgstr ""
+
+#: includes/admin-nps-poll.php:458
+msgid "votes"
+msgstr ""
+
+#: includes/admin-nps-poll.php:468
+msgid "Individual Submissions Log"
+msgstr ""
+
+#: includes/admin-nps-poll.php:474
+msgid "Mark"
+msgstr ""
+
+#: includes/admin-nps-poll.php:475
+msgid "Category"
+msgstr ""
+
+#: includes/admin-nps-poll.php:476
+msgid "Page / Source"
+msgstr ""
+
+#: includes/admin-nps-poll.php:477
+msgid "Submitted Date"
+msgstr ""
+
+#: includes/admin-nps-poll.php:478
+#: includes/admin-submissions.php:603
+msgid "Actions"
+msgstr ""
+
+#: includes/admin-nps-poll.php:485
+msgid "No Feedback & NPS Poll marks submitted yet."
+msgstr ""
+
+#: includes/admin-nps-poll.php:491
+msgid "Promoter"
+msgstr ""
+
+#: includes/admin-nps-poll.php:491
+msgid "Passive"
+msgstr ""
+
+#: includes/admin-nps-poll.php:491
+msgid "Detractor"
+msgstr ""
+
+#: includes/admin-nps-poll.php:512
+msgid "N/A"
+msgstr ""
+
+#: includes/admin-nps-poll.php:517
+msgid "Delete this vote entry?"
+msgstr ""
+
+#: includes/admin-nps-poll.php:518
+msgid "Delete"
+msgstr ""
+
+#: includes/admin-submissions.php:41
+msgid "User Submissions"
+msgstr ""
+
+#: includes/admin-submissions.php:42
+msgid "Submissions"
+msgstr ""
+
+#: includes/admin-submissions.php:70
+msgid "B Testimonials Block:"
+msgstr ""
+
+#. translators: %d: number of pending submissions
+#: includes/admin-submissions.php:74
+#, php-format
+msgid "You have %d pending customer submission awaiting review."
+msgid_plural "You have %d pending customer submissions awaiting review."
+msgstr[0] ""
+msgstr[1] ""
+
+#: includes/admin-submissions.php:80
+msgid "View Submissions"
+msgstr ""
+
+#: includes/admin-submissions.php:108
+msgid "Security check failed."
+msgstr ""
+
+#: includes/admin-submissions.php:511
+msgid "Customer Submissions & Feedback"
+msgstr ""
+
+#: includes/admin-submissions.php:514
+msgid "Review, approve, and manage customer reviews submitted from your website frontend."
+msgstr ""
+
+#: includes/admin-submissions.php:521
+msgid "Pending"
+msgstr ""
+
+#: includes/admin-submissions.php:525
+#: includes/admin-submissions.php:564
+#: includes/admin-submissions.php:638
+msgid "Approved"
+msgstr ""
+
+#: includes/admin-submissions.php:529
+msgid "Total"
+msgstr ""
+
+#: includes/admin-submissions.php:540
+msgid "Testimonial submission approved and published successfully!"
+msgstr ""
+
+#: includes/admin-submissions.php:542
+msgid "Submission moved to trash."
+msgstr ""
+
+#: includes/admin-submissions.php:544
+msgid "Submission permanently deleted."
+msgstr ""
+
+#: includes/admin-submissions.php:546
+msgid "Bulk action completed successfully."
+msgstr ""
+
+#: includes/admin-submissions.php:560
+#: includes/admin-submissions.php:636
+msgid "Pending Review"
+msgstr ""
+
+#: includes/admin-submissions.php:568
+msgid "All Submissions"
+msgstr ""
+
+#: includes/admin-submissions.php:572
+msgid "Trash"
+msgstr ""
+
+#: includes/admin-submissions.php:579
+msgid "Bulk Actions"
+msgstr ""
+
+#: includes/admin-submissions.php:581
+msgid "Approve & Publish"
+msgstr ""
+
+#: includes/admin-submissions.php:582
+msgid "Move to Trash"
+msgstr ""
+
+#: includes/admin-submissions.php:584
+#: includes/admin-submissions.php:673
+msgid "Delete Permanently"
+msgstr ""
+
+#: includes/admin-submissions.php:587
+msgid "Apply"
+msgstr ""
+
+#: includes/admin-submissions.php:597
+#: build/blocks/testimonial-form/index.js:1
+msgid "Photo"
+msgstr ""
+
+#: includes/admin-submissions.php:598
+msgid "Customer"
+msgstr ""
+
+#: includes/admin-submissions.php:599
+#: includes/cpt.php:195
+#: build/blocks/rating-summary/index.js:1
+#: build/blocks/testimonial-form/index.js:1
+msgid "Rating"
+msgstr ""
+
+#: includes/admin-submissions.php:600
+msgid "Designation / Email"
+msgstr ""
+
+#: includes/admin-submissions.php:601
+msgid "Feedback Content"
+msgstr ""
+
+#: includes/admin-submissions.php:602
+msgid "Date"
+msgstr ""
+
+#: includes/admin-submissions.php:666
+msgid "Approve"
+msgstr ""
+
+#: includes/admin-submissions.php:669
+msgid "Reject"
+msgstr ""
+
+#: includes/admin-submissions.php:676
+msgid "✓ Published"
+msgstr ""
+
+#: includes/admin-submissions.php:686
+msgid "No customer submissions found."
+msgstr ""
+
+#: includes/admin-submissions.php:687
+msgid "Submissions received from frontend form blocks will show up here."
+msgstr ""
+
+#: includes/cpt.php:20
+#: includes/cpt.php:31
+msgid "Testimonials"
+msgstr ""
+
+#: includes/cpt.php:21
+msgid "Testimonial"
+msgstr ""
+
+#: includes/cpt.php:22
+msgid "Add New"
+msgstr ""
+
+#: includes/cpt.php:23
+msgid "Add New Testimonial"
+msgstr ""
+
+#: includes/cpt.php:24
+msgid "Edit Testimonial"
+msgstr ""
+
+#: includes/cpt.php:25
+msgid "New Testimonial"
+msgstr ""
+
+#: includes/cpt.php:26
+msgid "View Testimonial"
+msgstr ""
+
+#: includes/cpt.php:27
+msgid "Search Testimonials"
+msgstr ""
+
+#: includes/cpt.php:28
+msgid "No testimonials found"
+msgstr ""
+
+#: includes/cpt.php:29
+msgid "No testimonials found in Trash"
+msgstr ""
+
+#: includes/cpt.php:30
+msgid "All Testimonials"
+msgstr ""
+
+#: includes/cpt.php:112
+msgid "Testimonial Details"
+msgstr ""
+
+#: includes/cpt.php:135
+msgid "Rating (1–5)"
+msgstr ""
+
+#: includes/cpt.php:139
+#: includes/cpt.php:194
+#: build/blocks/testimonial-form/index.js:1
+#: build/blocks/video-testimonials/index.js:1
+msgid "Designation"
+msgstr ""
+
+#: includes/cpt.php:143
+#: build/blocks/testimonial-form/index.js:1
+#: build/blocks/video-testimonials/index.js:1
+msgid "Company"
+msgstr ""
+
+#: includes/cpt.php:146
+msgid "Use the title for the person's name, the content for the review, and the featured image for their photo."
+msgstr ""
+
+#: includes/form.php:56
+msgid "Please provide your name and a review."
+msgstr ""
+
+#: includes/form.php:73
+msgid "Security check failed. Please refresh the page and try again."
+msgstr ""
+
+#: includes/form.php:93
+msgid "Could not save your testimonial. Please try again later."
+msgstr ""
+
+#: includes/form.php:147
+msgid "Thank you! Your testimonial has been submitted and is awaiting review."
+msgstr ""
+
+#: build/blocks/before-after/index.js:1
+#: build/blocks/client-logos/index.js:1
+#: build/blocks/rating-summary/index.js:1
+#: build/blocks/testimonial-form/index.js:1
+#: build/blocks/testimonial-stats/index.js:1
+#: build/blocks/trust-badges/index.js:1
+#: build/blocks/video-testimonials/index.js:1
+msgid "Testimonials Slider"
+msgstr ""
+
+#: build/blocks/before-after/index.js:1
+#: build/blocks/client-logos/index.js:1
+#: build/blocks/rating-summary/index.js:1
+#: build/blocks/testimonial-form/index.js:1
+#: build/blocks/testimonial-stats/index.js:1
+#: build/blocks/trust-badges/index.js:1
+#: build/blocks/video-testimonials/index.js:1
+msgid "Interactive carousel slider with navigation dots."
+msgstr ""
+
+#: build/blocks/before-after/index.js:1
+#: build/blocks/client-logos/index.js:1
+#: build/blocks/rating-summary/index.js:1
+#: build/blocks/testimonial-form/index.js:1
+#: build/blocks/testimonial-stats/index.js:1
+#: build/blocks/trust-badges/index.js:1
+#: build/blocks/video-testimonials/index.js:1
+msgid "Slider"
+msgstr ""
+
+#: build/blocks/before-after/index.js:1
+#: build/blocks/client-logos/index.js:1
+#: build/blocks/rating-summary/index.js:1
+#: build/blocks/testimonial-form/index.js:1
+#: build/blocks/testimonial-stats/index.js:1
+#: build/blocks/trust-badges/index.js:1
+#: build/blocks/video-testimonials/index.js:1
+msgid "Testimonials List"
+msgstr ""
+
+#: build/blocks/before-after/index.js:1
+#: build/blocks/client-logos/index.js:1
+#: build/blocks/rating-summary/index.js:1
+#: build/blocks/testimonial-form/index.js:1
+#: build/blocks/testimonial-stats/index.js:1
+#: build/blocks/trust-badges/index.js:1
+#: build/blocks/video-testimonials/index.js:1
+msgid "Clean, vertical list representation of reviews."
+msgstr ""
+
+#: build/blocks/before-after/index.js:1
+#: build/blocks/client-logos/index.js:1
+#: build/blocks/rating-summary/index.js:1
+#: build/blocks/testimonial-form/index.js:1
+#: build/blocks/testimonial-stats/index.js:1
+#: build/blocks/trust-badges/index.js:1
+#: build/blocks/video-testimonials/index.js:1
+msgid "Testimonials Masonry"
+msgstr ""
+
+#: build/blocks/before-after/index.js:1
+#: build/blocks/client-logos/index.js:1
+#: build/blocks/rating-summary/index.js:1
+#: build/blocks/testimonial-form/index.js:1
+#: build/blocks/testimonial-stats/index.js:1
+#: build/blocks/trust-badges/index.js:1
+#: build/blocks/video-testimonials/index.js:1
+msgid "Staggered grid layout for variable height cards."
+msgstr ""
+
+#: build/blocks/before-after/index.js:1
+#: build/blocks/client-logos/index.js:1
+#: build/blocks/rating-summary/index.js:1
+#: build/blocks/testimonial-form/index.js:1
+#: build/blocks/testimonial-stats/index.js:1
+#: build/blocks/trust-badges/index.js:1
+#: build/blocks/video-testimonials/index.js:1
+msgid "Testimonials Marquee"
+msgstr ""
+
+#: build/blocks/before-after/index.js:1
+#: build/blocks/client-logos/index.js:1
+#: build/blocks/rating-summary/index.js:1
+#: build/blocks/testimonial-form/index.js:1
+#: build/blocks/testimonial-stats/index.js:1
+#: build/blocks/trust-badges/index.js:1
+#: build/blocks/video-testimonials/index.js:1
+msgid "Smooth infinite ticker tape / scrolling reviews."
+msgstr ""
+
+#: build/blocks/before-after/index.js:1
+#: build/blocks/client-logos/index.js:1
+#: build/blocks/rating-summary/index.js:1
+#: build/blocks/testimonial-form/index.js:1
+#: build/blocks/testimonial-stats/index.js:1
+#: build/blocks/trust-badges/index.js:1
+#: build/blocks/video-testimonials/index.js:1
+msgid "New"
+msgstr ""
+
+#: build/blocks/before-after/index.js:1
+#: build/blocks/client-logos/index.js:1
+#: build/blocks/rating-summary/index.js:1
+#: build/blocks/testimonial-form/index.js:1
+#: build/blocks/testimonial-stats/index.js:1
+#: build/blocks/trust-badges/index.js:1
+#: build/blocks/video-testimonials/index.js:1
+msgid "Rating Summary"
+msgstr ""
+
+#: build/blocks/before-after/index.js:1
+#: build/blocks/client-logos/index.js:1
+#: build/blocks/rating-summary/index.js:1
+#: build/blocks/testimonial-form/index.js:1
+#: build/blocks/testimonial-stats/index.js:1
+#: build/blocks/trust-badges/index.js:1
+#: build/blocks/video-testimonials/index.js:1
+msgid "Overall score & star rating distribution summary."
+msgstr ""
+
+#: build/blocks/before-after/index.js:1
+#: build/blocks/client-logos/index.js:1
+#: build/blocks/rating-summary/index.js:1
+#: build/blocks/testimonial-form/index.js:1
+#: build/blocks/testimonial-stats/index.js:1
+#: build/blocks/trust-badges/index.js:1
+#: build/blocks/video-testimonials/index.js:1
+msgid "Testimonial Stats"
+msgstr ""
+
+#: build/blocks/before-after/index.js:1
+#: build/blocks/client-logos/index.js:1
+#: build/blocks/rating-summary/index.js:1
+#: build/blocks/testimonial-form/index.js:1
+#: build/blocks/testimonial-stats/index.js:1
+#: build/blocks/trust-badges/index.js:1
+#: build/blocks/video-testimonials/index.js:1
+msgid "Key statistics, satisfaction percentages & counters."
+msgstr ""
+
+#: build/blocks/before-after/index.js:1
+#: build/blocks/client-logos/index.js:1
+#: build/blocks/rating-summary/index.js:1
+#: build/blocks/testimonial-form/index.js:1
+#: build/blocks/testimonial-stats/index.js:1
+#: build/blocks/trust-badges/index.js:1
+#: build/blocks/video-testimonials/index.js:1
+msgid "Trust Badges"
+msgstr ""
+
+#: build/blocks/before-after/index.js:1
+#: build/blocks/client-logos/index.js:1
+#: build/blocks/rating-summary/index.js:1
+#: build/blocks/testimonial-form/index.js:1
+#: build/blocks/testimonial-stats/index.js:1
+#: build/blocks/trust-badges/index.js:1
+#: build/blocks/video-testimonials/index.js:1
+msgid "Security, guarantee, and award badges."
+msgstr ""
+
+#: build/blocks/before-after/index.js:1
+#: build/blocks/client-logos/index.js:1
+#: build/blocks/rating-summary/index.js:1
+#: build/blocks/testimonial-form/index.js:1
+#: build/blocks/testimonial-stats/index.js:1
+#: build/blocks/trust-badges/index.js:1
+#: build/blocks/video-testimonials/index.js:1
+msgid "Client Logos"
+msgstr ""
+
+#: build/blocks/before-after/index.js:1
+#: build/blocks/client-logos/index.js:1
+#: build/blocks/rating-summary/index.js:1
+#: build/blocks/testimonial-form/index.js:1
+#: build/blocks/testimonial-stats/index.js:1
+#: build/blocks/trust-badges/index.js:1
+#: build/blocks/video-testimonials/index.js:1
+msgid "Showcase brand and client logos in grid or carousel."
+msgstr ""
+
+#: build/blocks/before-after/index.js:1
+#: build/blocks/client-logos/index.js:1
+#: build/blocks/rating-summary/index.js:1
+#: build/blocks/testimonial-form/index.js:1
+#: build/blocks/testimonial-stats/index.js:1
+#: build/blocks/trust-badges/index.js:1
+#: build/blocks/video-testimonials/index.js:1
+msgid "Video Testimonials"
+msgstr ""
+
+#: build/blocks/before-after/index.js:1
+#: build/blocks/client-logos/index.js:1
+#: build/blocks/rating-summary/index.js:1
+#: build/blocks/testimonial-form/index.js:1
+#: build/blocks/testimonial-stats/index.js:1
+#: build/blocks/trust-badges/index.js:1
+#: build/blocks/video-testimonials/index.js:1
+msgid "Video reviews with lightbox popup playback."
+msgstr ""
+
+#: build/blocks/before-after/index.js:1
+#: build/blocks/client-logos/index.js:1
+#: build/blocks/rating-summary/index.js:1
+#: build/blocks/testimonial-form/index.js:1
+#: build/blocks/testimonial-stats/index.js:1
+#: build/blocks/trust-badges/index.js:1
+#: build/blocks/video-testimonials/index.js:1
+msgid "Video"
+msgstr ""
+
+#: build/blocks/before-after/index.js:1
+#: build/blocks/client-logos/index.js:1
+#: build/blocks/rating-summary/index.js:1
+#: build/blocks/testimonial-form/index.js:1
+#: build/blocks/testimonial-stats/index.js:1
+#: build/blocks/trust-badges/index.js:1
+#: build/blocks/video-testimonials/index.js:1
+msgid "Before & After"
+msgstr ""
+
+#: build/blocks/before-after/index.js:1
+#: build/blocks/client-logos/index.js:1
+#: build/blocks/rating-summary/index.js:1
+#: build/blocks/testimonial-form/index.js:1
+#: build/blocks/testimonial-stats/index.js:1
+#: build/blocks/trust-badges/index.js:1
+#: build/blocks/video-testimonials/index.js:1
+msgid "Comparison showcase for results & transformation."
+msgstr ""
+
+#: build/blocks/before-after/index.js:1
+#: build/blocks/client-logos/index.js:1
+#: build/blocks/rating-summary/index.js:1
+#: build/blocks/testimonial-form/index.js:1
+#: build/blocks/testimonial-stats/index.js:1
+#: build/blocks/trust-badges/index.js:1
+#: build/blocks/video-testimonials/index.js:1
+msgid "Testimonial Form"
+msgstr ""
+
+#: build/blocks/before-after/index.js:1
+#: build/blocks/client-logos/index.js:1
+#: build/blocks/rating-summary/index.js:1
+#: build/blocks/testimonial-form/index.js:1
+#: build/blocks/testimonial-stats/index.js:1
+#: build/blocks/trust-badges/index.js:1
+#: build/blocks/video-testimonials/index.js:1
+msgid "Frontend form for collecting customer reviews."
+msgstr ""
+
+#: build/blocks/before-after/index.js:1
+#: build/blocks/client-logos/index.js:1
+#: build/blocks/rating-summary/index.js:1
+#: build/blocks/testimonial-form/index.js:1
+#: build/blocks/testimonial-stats/index.js:1
+#: build/blocks/trust-badges/index.js:1
+#: build/blocks/video-testimonials/index.js:1
+msgid "Centered Cards Grid"
+msgstr ""
+
+#: build/blocks/before-after/index.js:1
+#: build/blocks/client-logos/index.js:1
+#: build/blocks/rating-summary/index.js:1
+#: build/blocks/testimonial-form/index.js:1
+#: build/blocks/testimonial-stats/index.js:1
+#: build/blocks/trust-badges/index.js:1
+#: build/blocks/video-testimonials/index.js:1
+msgid "Sleek centered profile and testimonial card grid."
+msgstr ""
+
+#: build/blocks/before-after/index.js:1
+#: build/blocks/client-logos/index.js:1
+#: build/blocks/rating-summary/index.js:1
+#: build/blocks/testimonial-form/index.js:1
+#: build/blocks/testimonial-stats/index.js:1
+#: build/blocks/trust-badges/index.js:1
+#: build/blocks/video-testimonials/index.js:1
+msgid "Popular"
+msgstr ""
+
+#: build/blocks/before-after/index.js:1
+#: build/blocks/client-logos/index.js:1
+#: build/blocks/rating-summary/index.js:1
+#: build/blocks/testimonial-form/index.js:1
+#: build/blocks/testimonial-stats/index.js:1
+#: build/blocks/trust-badges/index.js:1
+#: build/blocks/video-testimonials/index.js:1
+msgid "Gradient Border Grid"
+msgstr ""
+
+#: build/blocks/before-after/index.js:1
+#: build/blocks/client-logos/index.js:1
+#: build/blocks/rating-summary/index.js:1
+#: build/blocks/testimonial-form/index.js:1
+#: build/blocks/testimonial-stats/index.js:1
+#: build/blocks/trust-badges/index.js:1
+#: build/blocks/video-testimonials/index.js:1
+msgid "Modern gradient border cards with star badges."
+msgstr ""
+
+#: build/blocks/before-after/index.js:1
+#: build/blocks/client-logos/index.js:1
+#: build/blocks/rating-summary/index.js:1
+#: build/blocks/testimonial-form/index.js:1
+#: build/blocks/testimonial-stats/index.js:1
+#: build/blocks/trust-badges/index.js:1
+#: build/blocks/video-testimonials/index.js:1
+msgid "Coverflow Carousel"
+msgstr ""
+
+#: build/blocks/before-after/index.js:1
+#: build/blocks/client-logos/index.js:1
+#: build/blocks/rating-summary/index.js:1
+#: build/blocks/testimonial-form/index.js:1
+#: build/blocks/testimonial-stats/index.js:1
+#: build/blocks/trust-badges/index.js:1
+#: build/blocks/video-testimonials/index.js:1
+msgid "Center-focused 3D coverflow carousel slider."
+msgstr ""
+
+#: build/blocks/before-after/index.js:1
+#: build/blocks/client-logos/index.js:1
+#: build/blocks/rating-summary/index.js:1
+#: build/blocks/testimonial-form/index.js:1
+#: build/blocks/testimonial-stats/index.js:1
+#: build/blocks/trust-badges/index.js:1
+#: build/blocks/video-testimonials/index.js:1
+msgid "3D"
+msgstr ""
+
+#: build/blocks/before-after/index.js:1
+#: build/blocks/client-logos/index.js:1
+#: build/blocks/rating-summary/index.js:1
+#: build/blocks/testimonial-form/index.js:1
+#: build/blocks/testimonial-stats/index.js:1
+#: build/blocks/trust-badges/index.js:1
+#: build/blocks/video-testimonials/index.js:1
+msgid "Compact Reviews List"
+msgstr ""
+
+#: build/blocks/before-after/index.js:1
+#: build/blocks/client-logos/index.js:1
+#: build/blocks/rating-summary/index.js:1
+#: build/blocks/testimonial-form/index.js:1
+#: build/blocks/testimonial-stats/index.js:1
+#: build/blocks/trust-badges/index.js:1
+#: build/blocks/video-testimonials/index.js:1
+msgid "Space-saving minimal customer testimonial list."
+msgstr ""
+
+#: build/blocks/before-after/index.js:1
+#: build/blocks/client-logos/index.js:1
+#: build/blocks/rating-summary/index.js:1
+#: build/blocks/testimonial-form/index.js:1
+#: build/blocks/testimonial-stats/index.js:1
+#: build/blocks/trust-badges/index.js:1
+#: build/blocks/video-testimonials/index.js:1
+msgid "Avatar Reviews List"
+msgstr ""
+
+#: build/blocks/before-after/index.js:1
+#: build/blocks/client-logos/index.js:1
+#: build/blocks/rating-summary/index.js:1
+#: build/blocks/testimonial-form/index.js:1
+#: build/blocks/testimonial-stats/index.js:1
+#: build/blocks/trust-badges/index.js:1
+#: build/blocks/video-testimonials/index.js:1
+msgid "Prominent avatar & customer spotlight review rows."
+msgstr ""
+
+#: build/blocks/before-after/index.js:1
+#: build/blocks/client-logos/index.js:1
+#: build/blocks/rating-summary/index.js:1
+#: build/blocks/testimonial-form/index.js:1
+#: build/blocks/testimonial-stats/index.js:1
+#: build/blocks/trust-badges/index.js:1
+#: build/blocks/video-testimonials/index.js:1
+msgid "Quote Box Showcase"
+msgstr ""
+
+#: build/blocks/before-after/index.js:1
+#: build/blocks/client-logos/index.js:1
+#: build/blocks/rating-summary/index.js:1
+#: build/blocks/testimonial-form/index.js:1
+#: build/blocks/testimonial-stats/index.js:1
+#: build/blocks/trust-badges/index.js:1
+#: build/blocks/video-testimonials/index.js:1
+msgid "Bold quote mark styling with accent backgrounds."
+msgstr ""
+
+#: build/blocks/before-after/index.js:1
+#: build/blocks/client-logos/index.js:1
+#: build/blocks/rating-summary/index.js:1
+#: build/blocks/testimonial-form/index.js:1
+#: build/blocks/testimonial-stats/index.js:1
+#: build/blocks/trust-badges/index.js:1
+#: build/blocks/video-testimonials/index.js:1
+msgid "Speech Bubble Cards"
+msgstr ""
+
+#: build/blocks/before-after/index.js:1
+#: build/blocks/client-logos/index.js:1
+#: build/blocks/rating-summary/index.js:1
+#: build/blocks/testimonial-form/index.js:1
+#: build/blocks/testimonial-stats/index.js:1
+#: build/blocks/trust-badges/index.js:1
+#: build/blocks/video-testimonials/index.js:1
+msgid "Chat bubble style testimonial cards."
+msgstr ""
+
+#: build/blocks/before-after/index.js:1
+#: build/blocks/client-logos/index.js:1
+#: build/blocks/rating-summary/index.js:1
+#: build/blocks/testimonial-form/index.js:1
+#: build/blocks/testimonial-stats/index.js:1
+#: build/blocks/trust-badges/index.js:1
+#: build/blocks/video-testimonials/index.js:1
+msgid "Customer Journey Timeline"
+msgstr ""
+
+#: build/blocks/before-after/index.js:1
+#: build/blocks/client-logos/index.js:1
+#: build/blocks/rating-summary/index.js:1
+#: build/blocks/testimonial-form/index.js:1
+#: build/blocks/testimonial-stats/index.js:1
+#: build/blocks/trust-badges/index.js:1
+#: build/blocks/video-testimonials/index.js:1
+msgid "Vertical timeline of customer success stories."
+msgstr ""
+
+#: build/blocks/before-after/index.js:1
+#: build/blocks/client-logos/index.js:1
+#: build/blocks/rating-summary/index.js:1
+#: build/blocks/testimonial-form/index.js:1
+#: build/blocks/testimonial-stats/index.js:1
+#: build/blocks/trust-badges/index.js:1
+#: build/blocks/video-testimonials/index.js:1
+msgid "Stacked Review Cards"
+msgstr ""
+
+#: build/blocks/before-after/index.js:1
+#: build/blocks/client-logos/index.js:1
+#: build/blocks/rating-summary/index.js:1
+#: build/blocks/testimonial-form/index.js:1
+#: build/blocks/testimonial-stats/index.js:1
+#: build/blocks/trust-badges/index.js:1
+#: build/blocks/video-testimonials/index.js:1
+msgid "Overlapping stacked review card deck."
+msgstr ""
+
+#: build/blocks/before-after/index.js:1
+#: build/blocks/client-logos/index.js:1
+#: build/blocks/rating-summary/index.js:1
+#: build/blocks/testimonial-form/index.js:1
+#: build/blocks/testimonial-stats/index.js:1
+#: build/blocks/trust-badges/index.js:1
+#: build/blocks/video-testimonials/index.js:1
+msgid "Customer Case Study"
+msgstr ""
+
+#: build/blocks/before-after/index.js:1
+#: build/blocks/client-logos/index.js:1
+#: build/blocks/rating-summary/index.js:1
+#: build/blocks/testimonial-form/index.js:1
+#: build/blocks/testimonial-stats/index.js:1
+#: build/blocks/trust-badges/index.js:1
+#: build/blocks/video-testimonials/index.js:1
+msgid "Detailed case study card with metrics & quote."
+msgstr ""
+
+#: build/blocks/before-after/index.js:1
+#: build/blocks/client-logos/index.js:1
+#: build/blocks/rating-summary/index.js:1
+#: build/blocks/testimonial-form/index.js:1
+#: build/blocks/testimonial-stats/index.js:1
+#: build/blocks/trust-badges/index.js:1
+#: build/blocks/video-testimonials/index.js:1
+msgid "Pro"
+msgstr ""
+
+#: build/blocks/before-after/index.js:1
+#: build/blocks/client-logos/index.js:1
+#: build/blocks/rating-summary/index.js:1
+#: build/blocks/testimonial-form/index.js:1
+#: build/blocks/testimonial-stats/index.js:1
+#: build/blocks/trust-badges/index.js:1
+#: build/blocks/video-testimonials/index.js:1
+msgid "Google Reviews Badge"
+msgstr ""
+
+#: build/blocks/before-after/index.js:1
+#: build/blocks/client-logos/index.js:1
+#: build/blocks/rating-summary/index.js:1
+#: build/blocks/testimonial-form/index.js:1
+#: build/blocks/testimonial-stats/index.js:1
+#: build/blocks/trust-badges/index.js:1
+#: build/blocks/video-testimonials/index.js:1
+msgid "Official style Google Business score badge."
+msgstr ""
+
+#: build/blocks/before-after/index.js:1
+#: build/blocks/client-logos/index.js:1
+#: build/blocks/rating-summary/index.js:1
+#: build/blocks/testimonial-form/index.js:1
+#: build/blocks/testimonial-stats/index.js:1
+#: build/blocks/trust-badges/index.js:1
+#: build/blocks/video-testimonials/index.js:1
+msgid "Badge"
+msgstr ""
+
+#: build/blocks/before-after/index.js:1
+#: build/blocks/client-logos/index.js:1
+#: build/blocks/rating-summary/index.js:1
+#: build/blocks/testimonial-form/index.js:1
+#: build/blocks/testimonial-stats/index.js:1
+#: build/blocks/trust-badges/index.js:1
+#: build/blocks/video-testimonials/index.js:1
+msgid "Trustpilot Score Badge"
+msgstr ""
+
+#: build/blocks/before-after/index.js:1
+#: build/blocks/client-logos/index.js:1
+#: build/blocks/rating-summary/index.js:1
+#: build/blocks/testimonial-form/index.js:1
+#: build/blocks/testimonial-stats/index.js:1
+#: build/blocks/trust-badges/index.js:1
+#: build/blocks/video-testimonials/index.js:1
+msgid "Trustpilot style rating & review summary badge."
+msgstr ""
+
+#: build/blocks/before-after/index.js:1
+#: build/blocks/client-logos/index.js:1
+#: build/blocks/rating-summary/index.js:1
+#: build/blocks/testimonial-form/index.js:1
+#: build/blocks/testimonial-stats/index.js:1
+#: build/blocks/trust-badges/index.js:1
+#: build/blocks/video-testimonials/index.js:1
+msgid "G2 Review Badge"
+msgstr ""
+
+#: build/blocks/before-after/index.js:1
+#: build/blocks/client-logos/index.js:1
+#: build/blocks/rating-summary/index.js:1
+#: build/blocks/testimonial-form/index.js:1
+#: build/blocks/testimonial-stats/index.js:1
+#: build/blocks/trust-badges/index.js:1
+#: build/blocks/video-testimonials/index.js:1
+msgid "G2 / Capterra software review score badge."
+msgstr ""
+
+#: build/blocks/before-after/index.js:1
+#: build/blocks/client-logos/index.js:1
+#: build/blocks/rating-summary/index.js:1
+#: build/blocks/testimonial-form/index.js:1
+#: build/blocks/testimonial-stats/index.js:1
+#: build/blocks/trust-badges/index.js:1
+#: build/blocks/video-testimonials/index.js:1
+msgid "Floating Review Badge"
+msgstr ""
+
+#: build/blocks/before-after/index.js:1
+#: build/blocks/client-logos/index.js:1
+#: build/blocks/rating-summary/index.js:1
+#: build/blocks/testimonial-form/index.js:1
+#: build/blocks/testimonial-stats/index.js:1
+#: build/blocks/trust-badges/index.js:1
+#: build/blocks/video-testimonials/index.js:1
+msgid "Corner / floating trust review badge widget."
+msgstr ""
+
+#: build/blocks/before-after/index.js:1
+#: build/blocks/client-logos/index.js:1
+#: build/blocks/rating-summary/index.js:1
+#: build/blocks/testimonial-form/index.js:1
+#: build/blocks/testimonial-stats/index.js:1
+#: build/blocks/trust-badges/index.js:1
+#: build/blocks/video-testimonials/index.js:1
+msgid "Star Rating Progress Bars"
+msgstr ""
+
+#: build/blocks/before-after/index.js:1
+#: build/blocks/client-logos/index.js:1
+#: build/blocks/rating-summary/index.js:1
+#: build/blocks/testimonial-form/index.js:1
+#: build/blocks/testimonial-stats/index.js:1
+#: build/blocks/trust-badges/index.js:1
+#: build/blocks/video-testimonials/index.js:1
+msgid "5-star rating breakdown bars & percentage stats."
+msgstr ""
+
+#: build/blocks/before-after/index.js:1
+#: build/blocks/client-logos/index.js:1
+#: build/blocks/rating-summary/index.js:1
+#: build/blocks/testimonial-form/index.js:1
+#: build/blocks/testimonial-stats/index.js:1
+#: build/blocks/trust-badges/index.js:1
+#: build/blocks/video-testimonials/index.js:1
+msgid "Social Proof Toast"
+msgstr ""
+
+#: build/blocks/before-after/index.js:1
+#: build/blocks/client-logos/index.js:1
+#: build/blocks/rating-summary/index.js:1
+#: build/blocks/testimonial-form/index.js:1
+#: build/blocks/testimonial-stats/index.js:1
+#: build/blocks/trust-badges/index.js:1
+#: build/blocks/video-testimonials/index.js:1
+msgid "Live social proof popup notification toast."
+msgstr ""
+
+#: build/blocks/before-after/index.js:1
+#: build/blocks/client-logos/index.js:1
+#: build/blocks/rating-summary/index.js:1
+#: build/blocks/testimonial-form/index.js:1
+#: build/blocks/testimonial-stats/index.js:1
+#: build/blocks/trust-badges/index.js:1
+#: build/blocks/video-testimonials/index.js:1
+msgid "Audio Testimonials"
+msgstr ""
+
+#: build/blocks/before-after/index.js:1
+#: build/blocks/client-logos/index.js:1
+#: build/blocks/rating-summary/index.js:1
+#: build/blocks/testimonial-form/index.js:1
+#: build/blocks/testimonial-stats/index.js:1
+#: build/blocks/trust-badges/index.js:1
+#: build/blocks/video-testimonials/index.js:1
+msgid "Voice note & audio review player with wave style."
+msgstr ""
+
+#: build/blocks/before-after/index.js:1
+#: build/blocks/client-logos/index.js:1
+#: build/blocks/rating-summary/index.js:1
+#: build/blocks/testimonial-form/index.js:1
+#: build/blocks/testimonial-stats/index.js:1
+#: build/blocks/trust-badges/index.js:1
+#: build/blocks/video-testimonials/index.js:1
+msgid "Audio"
+msgstr ""
+
+#: build/blocks/before-after/index.js:1
+#: build/blocks/client-logos/index.js:1
+#: build/blocks/rating-summary/index.js:1
+#: build/blocks/testimonial-form/index.js:1
+#: build/blocks/testimonial-stats/index.js:1
+#: build/blocks/trust-badges/index.js:1
+#: build/blocks/video-testimonials/index.js:1
+msgid "Quick Net Promoter Score (NPS) feedback poll."
+msgstr ""
+
+#: build/blocks/before-after/index.js:1
+#: build/blocks/client-logos/index.js:1
+#: build/blocks/rating-summary/index.js:1
+#: build/blocks/testimonial-form/index.js:1
+#: build/blocks/testimonial-stats/index.js:1
+#: build/blocks/trust-badges/index.js:1
+#: build/blocks/video-testimonials/index.js:1
+msgid "Comparison Review Table"
+msgstr ""
+
+#: build/blocks/before-after/index.js:1
+#: build/blocks/client-logos/index.js:1
+#: build/blocks/rating-summary/index.js:1
+#: build/blocks/testimonial-form/index.js:1
+#: build/blocks/testimonial-stats/index.js:1
+#: build/blocks/trust-badges/index.js:1
+#: build/blocks/video-testimonials/index.js:1
+msgid "Side-by-side customer comparison table."
+msgstr ""
+
+#: build/blocks/before-after/index.js:1
+#: build/blocks/client-logos/index.js:1
+#: build/blocks/rating-summary/index.js:1
+#: build/blocks/testimonial-form/index.js:1
+#: build/blocks/testimonial-stats/index.js:1
+#: build/blocks/trust-badges/index.js:1
+#: build/blocks/video-testimonials/index.js:1
+msgid "FAQ Review Accordion"
+msgstr ""
+
+#: build/blocks/before-after/index.js:1
+#: build/blocks/client-logos/index.js:1
+#: build/blocks/rating-summary/index.js:1
+#: build/blocks/testimonial-form/index.js:1
+#: build/blocks/testimonial-stats/index.js:1
+#: build/blocks/trust-badges/index.js:1
+#: build/blocks/video-testimonials/index.js:1
+msgid "Collapsible FAQ & customer feedback accordion."
+msgstr ""
+
+#: build/blocks/before-after/index.js:1
+#: build/blocks/client-logos/index.js:1
+#: build/blocks/rating-summary/index.js:1
+#: build/blocks/testimonial-form/index.js:1
+#: build/blocks/testimonial-stats/index.js:1
+#: build/blocks/trust-badges/index.js:1
+#: build/blocks/video-testimonials/index.js:1
+msgid "Hero Testimonial Spotlight"
+msgstr ""
+
+#: build/blocks/before-after/index.js:1
+#: build/blocks/client-logos/index.js:1
+#: build/blocks/rating-summary/index.js:1
+#: build/blocks/testimonial-form/index.js:1
+#: build/blocks/testimonial-stats/index.js:1
+#: build/blocks/trust-badges/index.js:1
+#: build/blocks/video-testimonials/index.js:1
+msgid "High-impact hero banner with quote & CTA."
+msgstr ""
+
+#: build/blocks/before-after/index.js:1
+#: build/blocks/client-logos/index.js:1
+#: build/blocks/rating-summary/index.js:1
+#: build/blocks/testimonial-form/index.js:1
+#: build/blocks/testimonial-stats/index.js:1
+#: build/blocks/trust-badges/index.js:1
+#: build/blocks/video-testimonials/index.js:1
+msgid "Hero"
+msgstr ""
+
+#: build/blocks/before-after/index.js:1
+#: build/blocks/client-logos/index.js:1
+#: build/blocks/rating-summary/index.js:1
+#: build/blocks/testimonial-form/index.js:1
+#: build/blocks/testimonial-stats/index.js:1
+#: build/blocks/trust-badges/index.js:1
+#: build/blocks/video-testimonials/index.js:1
+msgid "Minimalist Reviews Grid"
+msgstr ""
+
+#: build/blocks/before-after/index.js:1
+#: build/blocks/client-logos/index.js:1
+#: build/blocks/rating-summary/index.js:1
+#: build/blocks/testimonial-form/index.js:1
+#: build/blocks/testimonial-stats/index.js:1
+#: build/blocks/trust-badges/index.js:1
+#: build/blocks/video-testimonials/index.js:1
+msgid "Clean monochrome review cards with subtle hover elevation."
+msgstr ""
+
+#: build/blocks/before-after/index.js:1
+#: build/blocks/client-logos/index.js:1
+#: build/blocks/rating-summary/index.js:1
+#: build/blocks/testimonial-form/index.js:1
+#: build/blocks/testimonial-stats/index.js:1
+#: build/blocks/trust-badges/index.js:1
+#: build/blocks/video-testimonials/index.js:1
+msgid "3D Flip Perspective Carousel"
+msgstr ""
+
+#: build/blocks/before-after/index.js:1
+#: build/blocks/client-logos/index.js:1
+#: build/blocks/rating-summary/index.js:1
+#: build/blocks/testimonial-form/index.js:1
+#: build/blocks/testimonial-stats/index.js:1
+#: build/blocks/trust-badges/index.js:1
+#: build/blocks/video-testimonials/index.js:1
+msgid "Interactive 3D perspective flip card carousel slider."
+msgstr ""
+
+#: build/blocks/before-after/index.js:1
+#: build/blocks/client-logos/index.js:1
+#: build/blocks/rating-summary/index.js:1
+#: build/blocks/testimonial-form/index.js:1
+#: build/blocks/testimonial-stats/index.js:1
+#: build/blocks/trust-badges/index.js:1
+#: build/blocks/video-testimonials/index.js:1
+msgid "Floating Avatar Bubbles"
+msgstr ""
+
+#: build/blocks/before-after/index.js:1
+#: build/blocks/client-logos/index.js:1
+#: build/blocks/rating-summary/index.js:1
+#: build/blocks/testimonial-form/index.js:1
+#: build/blocks/testimonial-stats/index.js:1
+#: build/blocks/trust-badges/index.js:1
+#: build/blocks/video-testimonials/index.js:1
+msgid "Interactive floating customer avatar bubbles with popup tooltips."
+msgstr ""
+
+#: build/blocks/before-after/index.js:1
+#: build/blocks/client-logos/index.js:1
+#: build/blocks/rating-summary/index.js:1
+#: build/blocks/testimonial-form/index.js:1
+#: build/blocks/testimonial-stats/index.js:1
+#: build/blocks/trust-badges/index.js:1
+#: build/blocks/video-testimonials/index.js:1
+msgid "Facebook Recommendation Badge"
+msgstr ""
+
+#: build/blocks/before-after/index.js:1
+#: build/blocks/client-logos/index.js:1
+#: build/blocks/rating-summary/index.js:1
+#: build/blocks/testimonial-form/index.js:1
+#: build/blocks/testimonial-stats/index.js:1
+#: build/blocks/trust-badges/index.js:1
+#: build/blocks/video-testimonials/index.js:1
+msgid "Official style Facebook page recommendation & rating summary badge."
+msgstr ""
+
+#: build/blocks/before-after/index.js:1
+#: build/blocks/client-logos/index.js:1
+#: build/blocks/rating-summary/index.js:1
+#: build/blocks/testimonial-form/index.js:1
+#: build/blocks/testimonial-stats/index.js:1
+#: build/blocks/trust-badges/index.js:1
+#: build/blocks/video-testimonials/index.js:1
+msgid "Capterra Score Badge"
+msgstr ""
+
+#: build/blocks/before-after/index.js:1
+#: build/blocks/client-logos/index.js:1
+#: build/blocks/rating-summary/index.js:1
+#: build/blocks/testimonial-form/index.js:1
+#: build/blocks/testimonial-stats/index.js:1
+#: build/blocks/trust-badges/index.js:1
+#: build/blocks/video-testimonials/index.js:1
+msgid "Software review rating summary badge styled like Capterra."
+msgstr ""
+
+#: build/blocks/before-after/index.js:1
+#: build/blocks/client-logos/index.js:1
+#: build/blocks/rating-summary/index.js:1
+#: build/blocks/testimonial-form/index.js:1
+#: build/blocks/testimonial-stats/index.js:1
+#: build/blocks/trust-badges/index.js:1
+#: build/blocks/video-testimonials/index.js:1
+msgid "Verified Buyer Trust Seal"
+msgstr ""
+
+#: build/blocks/before-after/index.js:1
+#: build/blocks/client-logos/index.js:1
+#: build/blocks/rating-summary/index.js:1
+#: build/blocks/testimonial-form/index.js:1
+#: build/blocks/testimonial-stats/index.js:1
+#: build/blocks/trust-badges/index.js:1
+#: build/blocks/video-testimonials/index.js:1
+msgid "E-commerce verified purchase seal & satisfaction guarantee widget."
+msgstr ""
+
+#: build/blocks/before-after/index.js:1
+#: build/blocks/client-logos/index.js:1
+#: build/blocks/rating-summary/index.js:1
+#: build/blocks/testimonial-form/index.js:1
+#: build/blocks/testimonial-stats/index.js:1
+#: build/blocks/trust-badges/index.js:1
+#: build/blocks/video-testimonials/index.js:1
+msgid "Popup Modal Review Trigger"
+msgstr ""
+
+#: build/blocks/before-after/index.js:1
+#: build/blocks/client-logos/index.js:1
+#: build/blocks/rating-summary/index.js:1
+#: build/blocks/testimonial-form/index.js:1
+#: build/blocks/testimonial-stats/index.js:1
+#: build/blocks/trust-badges/index.js:1
+#: build/blocks/video-testimonials/index.js:1
+msgid "Clickable badge/button that opens a full review popup modal."
+msgstr ""
+
+#: build/blocks/before-after/index.js:1
+#: build/blocks/client-logos/index.js:1
+#: build/blocks/rating-summary/index.js:1
+#: build/blocks/testimonial-form/index.js:1
+#: build/blocks/testimonial-stats/index.js:1
+#: build/blocks/trust-badges/index.js:1
+#: build/blocks/video-testimonials/index.js:1
+msgid "All 40 Blocks"
+msgstr ""
+
+#: build/blocks/before-after/index.js:1
+#: build/blocks/client-logos/index.js:1
+#: build/blocks/rating-summary/index.js:1
+#: build/blocks/testimonial-form/index.js:1
+#: build/blocks/testimonial-stats/index.js:1
+#: build/blocks/trust-badges/index.js:1
+#: build/blocks/video-testimonials/index.js:1
+msgid "Grid & Layouts"
+msgstr ""
+
+#: build/blocks/before-after/index.js:1
+#: build/blocks/client-logos/index.js:1
+#: build/blocks/rating-summary/index.js:1
+#: build/blocks/testimonial-form/index.js:1
+#: build/blocks/testimonial-stats/index.js:1
+#: build/blocks/trust-badges/index.js:1
+#: build/blocks/video-testimonials/index.js:1
+msgid "Trust & Badges"
+msgstr ""
+
+#: build/blocks/before-after/index.js:1
+#: build/blocks/client-logos/index.js:1
+#: build/blocks/rating-summary/index.js:1
+#: build/blocks/testimonial-form/index.js:1
+#: build/blocks/testimonial-stats/index.js:1
+#: build/blocks/trust-badges/index.js:1
+#: build/blocks/video-testimonials/index.js:1
+msgid "Media & Audio"
+msgstr ""
+
+#: build/blocks/before-after/index.js:1
+#: build/blocks/client-logos/index.js:1
+#: build/blocks/rating-summary/index.js:1
+#: build/blocks/testimonial-form/index.js:1
+#: build/blocks/testimonial-stats/index.js:1
+#: build/blocks/trust-badges/index.js:1
+#: build/blocks/video-testimonials/index.js:1
+msgid "Forms & Polls"
+msgstr ""
+
+#: build/blocks/before-after/index.js:1
+#: build/blocks/client-logos/index.js:1
+#: build/blocks/rating-summary/index.js:1
+#: build/blocks/testimonial-form/index.js:1
+#: build/blocks/testimonial-stats/index.js:1
+#: build/blocks/trust-badges/index.js:1
+#: build/blocks/video-testimonials/index.js:1
+msgid "Testimonial Block Switcher"
+msgstr ""
+
+#: build/blocks/before-after/index.js:1
+#: build/blocks/client-logos/index.js:1
+#: build/blocks/rating-summary/index.js:1
+#: build/blocks/testimonial-form/index.js:1
+#: build/blocks/testimonial-stats/index.js:1
+#: build/blocks/trust-badges/index.js:1
+#: build/blocks/video-testimonials/index.js:1
+msgid "Select from 40+ modern layouts & social proof widgets"
+msgstr ""
+
+#: build/blocks/before-after/index.js:1
+#: build/blocks/client-logos/index.js:1
+#: build/blocks/rating-summary/index.js:1
+#: build/blocks/testimonial-form/index.js:1
+#: build/blocks/testimonial-stats/index.js:1
+#: build/blocks/trust-badges/index.js:1
+#: build/blocks/video-testimonials/index.js:1
+msgid "Close modal"
+msgstr ""
+
+#: build/blocks/before-after/index.js:1
+#: build/blocks/client-logos/index.js:1
+#: build/blocks/rating-summary/index.js:1
+#: build/blocks/testimonial-form/index.js:1
+#: build/blocks/testimonial-stats/index.js:1
+#: build/blocks/trust-badges/index.js:1
+#: build/blocks/video-testimonials/index.js:1
+msgid "Search layouts…"
+msgstr ""
+
+#: build/blocks/before-after/index.js:1
+#: build/blocks/client-logos/index.js:1
+#: build/blocks/rating-summary/index.js:1
+#: build/blocks/testimonial-form/index.js:1
+#: build/blocks/testimonial-stats/index.js:1
+#: build/blocks/trust-badges/index.js:1
+#: build/blocks/video-testimonials/index.js:1
+msgid "Active"
+msgstr ""
+
+#: build/blocks/before-after/index.js:1
+#: build/blocks/client-logos/index.js:1
+#: build/blocks/rating-summary/index.js:1
+#: build/blocks/testimonial-form/index.js:1
+#: build/blocks/testimonial-stats/index.js:1
+#: build/blocks/trust-badges/index.js:1
+#: build/blocks/video-testimonials/index.js:1
+msgid "Currently Selected"
+msgstr ""
+
+#: build/blocks/before-after/index.js:1
+#: build/blocks/client-logos/index.js:1
+#: build/blocks/rating-summary/index.js:1
+#: build/blocks/testimonial-form/index.js:1
+#: build/blocks/testimonial-stats/index.js:1
+#: build/blocks/trust-badges/index.js:1
+#: build/blocks/video-testimonials/index.js:1
+msgid "Use This Layout"
+msgstr ""
+
+#: build/blocks/before-after/index.js:1
+#: build/blocks/client-logos/index.js:1
+#: build/blocks/rating-summary/index.js:1
+#: build/blocks/testimonial-form/index.js:1
+#: build/blocks/testimonial-stats/index.js:1
+#: build/blocks/trust-badges/index.js:1
+#: build/blocks/video-testimonials/index.js:1
+msgid "Select / Switch Block"
+msgstr ""
+
+#: build/blocks/before-after/index.js:1
+#: build/blocks/client-logos/index.js:1
+#: build/blocks/rating-summary/index.js:1
+#: build/blocks/testimonial-form/index.js:1
+#: build/blocks/testimonial-stats/index.js:1
+#: build/blocks/trust-badges/index.js:1
+#: build/blocks/video-testimonials/index.js:1
+msgid "Change Block Layout"
+msgstr ""
+
+#: build/blocks/before-after/index.js:1
+#: build/blocks/client-logos/index.js:1
+#: build/blocks/rating-summary/index.js:1
+#: build/blocks/testimonial-form/index.js:1
+#: build/blocks/testimonial-stats/index.js:1
+#: build/blocks/trust-badges/index.js:1
+#: build/blocks/video-testimonials/index.js:1
+msgid "Click below to open the popup modal and switch to any layout."
+msgstr ""
+
+#: build/blocks/before-after/index.js:1
+#: build/blocks/client-logos/index.js:1
+#: build/blocks/rating-summary/index.js:1
+#: build/blocks/testimonial-form/index.js:1
+#: build/blocks/testimonial-stats/index.js:1
+#: build/blocks/trust-badges/index.js:1
+#: build/blocks/video-testimonials/index.js:1
+msgid "Change Block / Layout"
+msgstr ""
+
+#: build/blocks/before-after/index.js:1
+msgid "Change"
+msgstr ""
+
+#: build/blocks/before-after/index.js:1
+msgid "Set"
+msgstr ""
+
+#: build/blocks/before-after/index.js:1
+msgid "Images"
+msgstr ""
+
+#: build/blocks/before-after/index.js:1
+msgid "before image"
+msgstr ""
+
+#: build/blocks/before-after/index.js:1
+msgid "after image"
+msgstr ""
+
+#: build/blocks/before-after/index.js:1
+msgid "Before label"
+msgstr ""
+
+#: build/blocks/before-after/index.js:1
+msgid "After label"
+msgstr ""
+
+#: build/blocks/before-after/index.js:1
+msgid "Start position (%)"
+msgstr ""
+
+#: build/blocks/before-after/index.js:1
+#: build/blocks/rating-summary/index.js:1
+#: build/blocks/testimonial-form/index.js:1
+#: build/blocks/testimonial-stats/index.js:1
+#: build/blocks/video-testimonials/index.js:1
+msgid "Color"
+msgstr ""
+
+#: build/blocks/before-after/index.js:1
+msgid "Handle color"
+msgstr ""
+
+#: build/blocks/before-after/index.js:1
+msgid "Select a before and after image in the block settings."
+msgstr ""
+
+#: build/blocks/client-logos/index.js:1
+#: build/blocks/testimonial-stats/index.js:1
+#: build/blocks/trust-badges/index.js:1
+#: build/blocks/video-testimonials/index.js:1
+msgid "Layout"
+msgstr ""
+
+#: build/blocks/client-logos/index.js:1
+#: build/blocks/testimonial-stats/index.js:1
+#: build/blocks/trust-badges/index.js:1
+#: build/blocks/video-testimonials/index.js:1
+msgid "Columns (Desktop)"
+msgstr ""
+
+#: build/blocks/client-logos/index.js:1
+#: build/blocks/testimonial-stats/index.js:1
+#: build/blocks/trust-badges/index.js:1
+#: build/blocks/video-testimonials/index.js:1
+msgid "Columns (Tablet)"
+msgstr ""
+
+#: build/blocks/client-logos/index.js:1
+#: build/blocks/testimonial-stats/index.js:1
+#: build/blocks/trust-badges/index.js:1
+#: build/blocks/video-testimonials/index.js:1
+msgid "Columns (Mobile)"
+msgstr ""
+
+#: build/blocks/client-logos/index.js:1
+#: build/blocks/testimonial-stats/index.js:1
+#: build/blocks/trust-badges/index.js:1
+#: build/blocks/video-testimonials/index.js:1
+msgid "Column gap"
+msgstr ""
+
+#: build/blocks/client-logos/index.js:1
+#: build/blocks/testimonial-stats/index.js:1
+#: build/blocks/trust-badges/index.js:1
+#: build/blocks/video-testimonials/index.js:1
+msgid "Row gap"
+msgstr ""
+
+#: build/blocks/client-logos/index.js:1
+msgid "Style"
+msgstr ""
+
+#: build/blocks/client-logos/index.js:1
+msgid "Logo height (px)"
+msgstr ""
+
+#: build/blocks/client-logos/index.js:1
+msgid "Grayscale (color on hover)"
+msgstr ""
+
+#: build/blocks/client-logos/index.js:1
+msgid "Logos"
+msgstr ""
+
+#: build/blocks/client-logos/index.js:1
+msgid "Select image"
+msgstr ""
+
+#: build/blocks/client-logos/index.js:1
+msgid "Link (optional)"
+msgstr ""
+
+#: build/blocks/client-logos/index.js:1
+#: build/blocks/testimonial-stats/index.js:1
+#: build/blocks/trust-badges/index.js:1
+#: build/blocks/video-testimonials/index.js:1
+msgid "Remove"
+msgstr ""
+
+#: build/blocks/client-logos/index.js:1
+msgid "Add logo"
+msgstr ""
+
+#: build/blocks/rating-summary/index.js:1
+msgid "Out of"
+msgstr ""
+
+#: build/blocks/rating-summary/index.js:1
+msgid "Show review count"
+msgstr ""
+
+#: build/blocks/rating-summary/index.js:1
+msgid "Review count"
+msgstr ""
+
+#: build/blocks/rating-summary/index.js:1
+msgid "Count text"
+msgstr ""
+
+#: build/blocks/rating-summary/index.js:1
+msgid "Use {count} for the number."
+msgstr ""
+
+#: build/blocks/rating-summary/index.js:1
+msgid "Stacked layout"
+msgstr ""
+
+#: build/blocks/rating-summary/index.js:1
+msgid "Star color"
+msgstr ""
+
+#: build/blocks/testimonial-form/index.js:1
+msgid "Email"
+msgstr ""
+
+#: build/blocks/testimonial-form/index.js:1
+msgid "Photo upload"
+msgstr ""
+
+#: build/blocks/testimonial-form/index.js:1
+msgid "Form"
+msgstr ""
+
+#: build/blocks/testimonial-form/index.js:1
+#: build/blocks/trust-badges/index.js:1
+msgid "Title"
+msgstr ""
+
+#: build/blocks/testimonial-form/index.js:1
+msgid "Button text"
+msgstr ""
+
+#: build/blocks/testimonial-form/index.js:1
+msgid "Success message"
+msgstr ""
+
+#: build/blocks/testimonial-form/index.js:1
+msgid "Fields"
+msgstr ""
+
+#: build/blocks/testimonial-form/index.js:1
+msgid "Name and Review are always shown and required."
+msgstr ""
+
+#: build/blocks/testimonial-form/index.js:1
+msgid "Note: photo upload allows anonymous image uploads. Submissions stay pending until you approve them."
+msgstr ""
+
+#: build/blocks/testimonial-form/index.js:1
+msgid "Accent (button)"
+msgstr ""
+
+#: build/blocks/testimonial-form/index.js:1
+#: build/blocks/video-testimonials/index.js:1
+msgid "Name"
+msgstr ""
+
+#: build/blocks/testimonial-form/index.js:1
+msgid "Review"
+msgstr ""
+
+#: build/blocks/testimonial-stats/index.js:1
+msgid "Animate count"
+msgstr ""
+
+#: build/blocks/testimonial-stats/index.js:1
+msgid "Number color"
+msgstr ""
+
+#: build/blocks/testimonial-stats/index.js:1
+msgid "Stats"
+msgstr ""
+
+#: build/blocks/testimonial-stats/index.js:1
+msgid "Number"
+msgstr ""
+
+#: build/blocks/testimonial-stats/index.js:1
+msgid "Prefix"
+msgstr ""
+
+#: build/blocks/testimonial-stats/index.js:1
+msgid "Suffix"
+msgstr ""
+
+#: build/blocks/testimonial-stats/index.js:1
+msgid "Label"
+msgstr ""
+
+#: build/blocks/testimonial-stats/index.js:1
+msgid "Add stat"
+msgstr ""
+
+#: build/blocks/trust-badges/index.js:1
+msgid "Badges"
+msgstr ""
+
+#: build/blocks/trust-badges/index.js:1
+msgid "Select icon"
+msgstr ""
+
+#: build/blocks/trust-badges/index.js:1
+msgid "Subtitle"
+msgstr ""
+
+#: build/blocks/trust-badges/index.js:1
+msgid "Add badge"
+msgstr ""
+
+#: build/blocks/video-testimonials/index.js:1
+msgid "Play button"
+msgstr ""
+
+#: build/blocks/video-testimonials/index.js:1
+msgid "Videos"
+msgstr ""
+
+#: build/blocks/video-testimonials/index.js:1
+msgid "Video URL"
+msgstr ""
+
+#: build/blocks/video-testimonials/index.js:1
+msgid "Change poster"
+msgstr ""
+
+#: build/blocks/video-testimonials/index.js:1
+msgid "Set poster image"
+msgstr ""
+
+#: build/blocks/video-testimonials/index.js:1
+msgid "Add video"
+msgstr ""
+
+#: build/blocks/audio-testimonials/block.json
+msgctxt "block title"
+msgid "Audio Testimonials"
+msgstr ""
+
+#: build/blocks/audio-testimonials/block.json
+msgctxt "block description"
+msgid "Voice note & audio review player with wave style."
+msgstr ""
+
+#: build/blocks/audio-testimonials/block.json
+#: build/blocks/capterra-review-badge/block.json
+#: build/blocks/case-study-card/block.json
+#: build/blocks/comparison-testimonial-table/block.json
+#: build/blocks/facebook-review-badge/block.json
+#: build/blocks/faq-testimonial-accordion/block.json
+#: build/blocks/g2-review-badge/block.json
+#: build/blocks/google-review-badge/block.json
+#: build/blocks/review-badge-widget/block.json
+#: build/blocks/social-proof-toast/block.json
+#: build/blocks/star-rating-bars/block.json
+#: build/blocks/testimonials-avatar-list/block.json
+#: build/blocks/testimonials-card-stack/block.json
+#: build/blocks/testimonials-carousel-2/block.json
+#: build/blocks/testimonials-compact/block.json
+#: build/blocks/testimonials-floating-bubble/block.json
+#: build/blocks/testimonials-grid-2/block.json
+#: build/blocks/testimonials-grid-3/block.json
+#: build/blocks/testimonials-grid-minimal/block.json
+#: build/blocks/testimonials-hero/block.json
+#: build/blocks/testimonials-list/block.json
+#: build/blocks/testimonials-marquee/block.json
+#: build/blocks/testimonials-masonry/block.json
+#: build/blocks/testimonials-popup-modal/block.json
+#: build/blocks/testimonials-quote-box/block.json
+#: build/blocks/testimonials-slider-3d/block.json
+#: build/blocks/testimonials-slider/block.json
+#: build/blocks/testimonials-speech-bubble/block.json
+#: build/blocks/testimonials-timeline/block.json
+#: build/blocks/testimonials/block.json
+#: build/blocks/trustpilot-review-badge/block.json
+#: build/blocks/user-feedback-poll/block.json
+#: build/blocks/verified-buyer-badge/block.json
+#: build/blocks/video-testimonials/block.json
+msgctxt "block keyword"
+msgid "testimonials"
+msgstr ""
+
+#: build/blocks/audio-testimonials/block.json
+msgctxt "block keyword"
+msgid "audio-testimonials"
+msgstr ""
+
+#: build/blocks/before-after/block.json
+msgctxt "block title"
+msgid "Before / After"
+msgstr ""
+
+#: build/blocks/before-after/block.json
+msgctxt "block description"
+msgid "An interactive before/after image comparison slider."
+msgstr ""
+
+#: build/blocks/before-after/block.json
+msgctxt "block keyword"
+msgid "before"
+msgstr ""
+
+#: build/blocks/before-after/block.json
+msgctxt "block keyword"
+msgid "after"
+msgstr ""
+
+#: build/blocks/before-after/block.json
+msgctxt "block keyword"
+msgid "comparison"
+msgstr ""
+
+#: build/blocks/before-after/block.json
+#: build/blocks/testimonials-slider-3d/block.json
+#: build/blocks/testimonials-slider/block.json
+msgctxt "block keyword"
+msgid "slider"
+msgstr ""
+
+#: build/blocks/before-after/block.json
+msgctxt "block keyword"
+msgid "image"
+msgstr ""
+
+#: build/blocks/capterra-review-badge/block.json
+msgctxt "block title"
+msgid "Capterra Score Badge"
+msgstr ""
+
+#: build/blocks/capterra-review-badge/block.json
+msgctxt "block description"
+msgid "Software review rating summary badge styled like Capterra."
+msgstr ""
+
+#: build/blocks/capterra-review-badge/block.json
+msgctxt "block keyword"
+msgid "capterra"
+msgstr ""
+
+#: build/blocks/capterra-review-badge/block.json
+#: build/blocks/facebook-review-badge/block.json
+#: build/blocks/verified-buyer-badge/block.json
+msgctxt "block keyword"
+msgid "badge"
+msgstr ""
+
+#: build/blocks/capterra-review-badge/block.json
+#: build/blocks/facebook-review-badge/block.json
+#: build/blocks/testimonials-grid-minimal/block.json
+#: build/blocks/testimonials-hero/block.json
+#: build/blocks/testimonials-list/block.json
+#: build/blocks/testimonials-marquee/block.json
+#: build/blocks/testimonials-masonry/block.json
+#: build/blocks/testimonials-slider/block.json
+#: build/blocks/video-testimonials/block.json
+msgctxt "block keyword"
+msgid "reviews"
+msgstr ""
+
+#: build/blocks/case-study-card/block.json
+msgctxt "block title"
+msgid "Customer Case Study"
+msgstr ""
+
+#: build/blocks/case-study-card/block.json
+msgctxt "block description"
+msgid "Detailed case study card with metrics & quote."
+msgstr ""
+
+#: build/blocks/case-study-card/block.json
+msgctxt "block keyword"
+msgid "case-study-card"
+msgstr ""
+
+#: build/blocks/client-logos/block.json
+msgctxt "block title"
+msgid "Client Logos"
+msgstr ""
+
+#: build/blocks/client-logos/block.json
+msgctxt "block description"
+msgid "Show a trusted-by grid of client or partner logos."
+msgstr ""
+
+#: build/blocks/client-logos/block.json
+msgctxt "block keyword"
+msgid "logos"
+msgstr ""
+
+#: build/blocks/client-logos/block.json
+msgctxt "block keyword"
+msgid "clients"
+msgstr ""
+
+#: build/blocks/client-logos/block.json
+msgctxt "block keyword"
+msgid "trusted by"
+msgstr ""
+
+#: build/blocks/client-logos/block.json
+msgctxt "block keyword"
+msgid "brands"
+msgstr ""
+
+#: build/blocks/comparison-testimonial-table/block.json
+msgctxt "block title"
+msgid "Comparison Review Table"
+msgstr ""
+
+#: build/blocks/comparison-testimonial-table/block.json
+msgctxt "block description"
+msgid "Side-by-side customer comparison table."
+msgstr ""
+
+#: build/blocks/comparison-testimonial-table/block.json
+msgctxt "block keyword"
+msgid "comparison-testimonial-table"
+msgstr ""
+
+#: build/blocks/facebook-review-badge/block.json
+msgctxt "block title"
+msgid "Facebook Recommendation Badge"
+msgstr ""
+
+#: build/blocks/facebook-review-badge/block.json
+msgctxt "block description"
+msgid "Official style Facebook page recommendation & rating summary badge."
+msgstr ""
+
+#: build/blocks/facebook-review-badge/block.json
+msgctxt "block keyword"
+msgid "facebook"
+msgstr ""
+
+#: build/blocks/faq-testimonial-accordion/block.json
+msgctxt "block title"
+msgid "FAQ Review Accordion"
+msgstr ""
+
+#: build/blocks/faq-testimonial-accordion/block.json
+msgctxt "block description"
+msgid "Collapsible FAQ & customer feedback accordion."
+msgstr ""
+
+#: build/blocks/faq-testimonial-accordion/block.json
+msgctxt "block keyword"
+msgid "faq-testimonial-accordion"
+msgstr ""
+
+#: build/blocks/g2-review-badge/block.json
+msgctxt "block title"
+msgid "G2 Review Badge"
+msgstr ""
+
+#: build/blocks/g2-review-badge/block.json
+msgctxt "block description"
+msgid "G2 / Capterra software review score badge."
+msgstr ""
+
+#: build/blocks/g2-review-badge/block.json
+msgctxt "block keyword"
+msgid "g2-review-badge"
+msgstr ""
+
+#: build/blocks/google-review-badge/block.json
+msgctxt "block title"
+msgid "Google Reviews Badge"
+msgstr ""
+
+#: build/blocks/google-review-badge/block.json
+msgctxt "block description"
+msgid "Official style Google Business score badge."
+msgstr ""
+
+#: build/blocks/google-review-badge/block.json
+msgctxt "block keyword"
+msgid "google-review-badge"
+msgstr ""
+
+#: build/blocks/rating-summary/block.json
+msgctxt "block title"
+msgid "Rating Summary"
+msgstr ""
+
+#: build/blocks/rating-summary/block.json
+msgctxt "block description"
+msgid "Show an aggregate star rating with a review count."
+msgstr ""
+
+#: build/blocks/rating-summary/block.json
+#: build/blocks/testimonials/block.json
+msgctxt "block keyword"
+msgid "rating"
+msgstr ""
+
+#: build/blocks/rating-summary/block.json
+msgctxt "block keyword"
+msgid "stars"
+msgstr ""
+
+#: build/blocks/rating-summary/block.json
+msgctxt "block keyword"
+msgid "summary"
+msgstr ""
+
+#: build/blocks/rating-summary/block.json
+msgctxt "block keyword"
+msgid "aggregate"
+msgstr ""
+
+#: build/blocks/review-badge-widget/block.json
+msgctxt "block title"
+msgid "Floating Review Badge"
+msgstr ""
+
+#: build/blocks/review-badge-widget/block.json
+msgctxt "block description"
+msgid "Corner / floating trust review badge widget."
+msgstr ""
+
+#: build/blocks/review-badge-widget/block.json
+msgctxt "block keyword"
+msgid "review-badge-widget"
+msgstr ""
+
+#: build/blocks/social-proof-toast/block.json
+msgctxt "block title"
+msgid "Social Proof Toast"
+msgstr ""
+
+#: build/blocks/social-proof-toast/block.json
+msgctxt "block description"
+msgid "Live social proof popup notification toast."
+msgstr ""
+
+#: build/blocks/social-proof-toast/block.json
+msgctxt "block keyword"
+msgid "social-proof-toast"
+msgstr ""
+
+#: build/blocks/star-rating-bars/block.json
+msgctxt "block title"
+msgid "Star Rating Progress Bars"
+msgstr ""
+
+#: build/blocks/star-rating-bars/block.json
+msgctxt "block description"
+msgid "5-star rating breakdown bars & percentage stats."
+msgstr ""
+
+#: build/blocks/star-rating-bars/block.json
+msgctxt "block keyword"
+msgid "star-rating-bars"
+msgstr ""
+
+#: build/blocks/testimonial-form/block.json
+msgctxt "block title"
+msgid "Testimonial Form"
+msgstr ""
+
+#: build/blocks/testimonial-form/block.json
+msgctxt "block description"
+msgid "Let visitors submit their own testimonials. Submissions are saved as pending for review."
+msgstr ""
+
+#: build/blocks/testimonial-form/block.json
+msgctxt "block keyword"
+msgid "testimonial"
+msgstr ""
+
+#: build/blocks/testimonial-form/block.json
+msgctxt "block keyword"
+msgid "form"
+msgstr ""
+
+#: build/blocks/testimonial-form/block.json
+msgctxt "block keyword"
+msgid "submit"
+msgstr ""
+
+#: build/blocks/testimonial-form/block.json
+msgctxt "block keyword"
+msgid "review"
+msgstr ""
+
+#: build/blocks/testimonial-stats/block.json
+msgctxt "block title"
+msgid "Testimonial Stats"
+msgstr ""
+
+#: build/blocks/testimonial-stats/block.json
+msgctxt "block description"
+msgid "Animated stat counters for social proof."
+msgstr ""
+
+#: build/blocks/testimonial-stats/block.json
+msgctxt "block keyword"
+msgid "stats"
+msgstr ""
+
+#: build/blocks/testimonial-stats/block.json
+msgctxt "block keyword"
+msgid "counter"
+msgstr ""
+
+#: build/blocks/testimonial-stats/block.json
+msgctxt "block keyword"
+msgid "numbers"
+msgstr ""
+
+#: build/blocks/testimonial-stats/block.json
+msgctxt "block keyword"
+msgid "social proof"
+msgstr ""
+
+#: build/blocks/testimonials-avatar-list/block.json
+msgctxt "block title"
+msgid "Avatar Reviews List"
+msgstr ""
+
+#: build/blocks/testimonials-avatar-list/block.json
+msgctxt "block description"
+msgid "Prominent avatar & customer spotlight review rows."
+msgstr ""
+
+#: build/blocks/testimonials-avatar-list/block.json
+msgctxt "block keyword"
+msgid "testimonials-avatar-list"
+msgstr ""
+
+#: build/blocks/testimonials-card-stack/block.json
+msgctxt "block title"
+msgid "Stacked Review Cards"
+msgstr ""
+
+#: build/blocks/testimonials-card-stack/block.json
+msgctxt "block description"
+msgid "Overlapping stacked review card deck."
+msgstr ""
+
+#: build/blocks/testimonials-card-stack/block.json
+msgctxt "block keyword"
+msgid "testimonials-card-stack"
+msgstr ""
+
+#: build/blocks/testimonials-carousel-2/block.json
+msgctxt "block title"
+msgid "Coverflow Carousel"
+msgstr ""
+
+#: build/blocks/testimonials-carousel-2/block.json
+msgctxt "block description"
+msgid "Center-focused 3D coverflow carousel slider."
+msgstr ""
+
+#: build/blocks/testimonials-carousel-2/block.json
+msgctxt "block keyword"
+msgid "testimonials-carousel-2"
+msgstr ""
+
+#: build/blocks/testimonials-compact/block.json
+msgctxt "block title"
+msgid "Compact Reviews List"
+msgstr ""
+
+#: build/blocks/testimonials-compact/block.json
+msgctxt "block description"
+msgid "Space-saving minimal customer testimonial list."
+msgstr ""
+
+#: build/blocks/testimonials-compact/block.json
+msgctxt "block keyword"
+msgid "testimonials-compact"
+msgstr ""
+
+#: build/blocks/testimonials-floating-bubble/block.json
+msgctxt "block title"
+msgid "Floating Avatar Bubbles"
+msgstr ""
+
+#: build/blocks/testimonials-floating-bubble/block.json
+msgctxt "block description"
+msgid "Interactive floating customer avatar bubbles with popup quote tooltips."
+msgstr ""
+
+#: build/blocks/testimonials-floating-bubble/block.json
+msgctxt "block keyword"
+msgid "floating"
+msgstr ""
+
+#: build/blocks/testimonials-floating-bubble/block.json
+msgctxt "block keyword"
+msgid "bubble"
+msgstr ""
+
+#: build/blocks/testimonials-floating-bubble/block.json
+msgctxt "block keyword"
+msgid "avatar"
+msgstr ""
+
+#: build/blocks/testimonials-grid-2/block.json
+msgctxt "block title"
+msgid "Centered Cards Grid"
+msgstr ""
+
+#: build/blocks/testimonials-grid-2/block.json
+msgctxt "block description"
+msgid "Sleek centered profile and testimonial card grid."
+msgstr ""
+
+#: build/blocks/testimonials-grid-2/block.json
+msgctxt "block keyword"
+msgid "testimonials-grid-2"
+msgstr ""
+
+#: build/blocks/testimonials-grid-3/block.json
+msgctxt "block title"
+msgid "Gradient Border Grid"
+msgstr ""
+
+#: build/blocks/testimonials-grid-3/block.json
+msgctxt "block description"
+msgid "Modern gradient border cards with star badges."
+msgstr ""
+
+#: build/blocks/testimonials-grid-3/block.json
+msgctxt "block keyword"
+msgid "testimonials-grid-3"
+msgstr ""
+
+#: build/blocks/testimonials-grid-minimal/block.json
+msgctxt "block title"
+msgid "Minimalist Reviews Grid"
+msgstr ""
+
+#: build/blocks/testimonials-grid-minimal/block.json
+msgctxt "block description"
+msgid "Clean monochrome review cards with subtle hover elevation & star ratings."
+msgstr ""
+
+#: build/blocks/testimonials-grid-minimal/block.json
+#: build/blocks/testimonials-masonry/block.json
+msgctxt "block keyword"
+msgid "grid"
+msgstr ""
+
+#: build/blocks/testimonials-grid-minimal/block.json
+msgctxt "block keyword"
+msgid "minimal"
+msgstr ""
+
+#: build/blocks/testimonials-hero/block.json
+msgctxt "block title"
+msgid "Hero Testimonial Spotlight"
+msgstr ""
+
+#: build/blocks/testimonials-hero/block.json
+msgctxt "block description"
+msgid "High-impact banner layout featuring prominent customer quote, photo backdrop, and call-to-action details."
+msgstr ""
+
+#: build/blocks/testimonials-hero/block.json
+msgctxt "block keyword"
+msgid "hero"
+msgstr ""
+
+#: build/blocks/testimonials-hero/block.json
+msgctxt "block keyword"
+msgid "spotlight"
+msgstr ""
+
+#: build/blocks/testimonials-list/block.json
+msgctxt "block title"
+msgid "Testimonials List"
+msgstr ""
+
+#: build/blocks/testimonials-list/block.json
+msgctxt "block description"
+msgid "List customer testimonials one per full-width row."
+msgstr ""
+
+#: build/blocks/testimonials-list/block.json
+msgctxt "block keyword"
+msgid "list"
+msgstr ""
+
+#: build/blocks/testimonials-marquee/block.json
+msgctxt "block title"
+msgid "Testimonials Marquee"
+msgstr ""
+
+#: build/blocks/testimonials-marquee/block.json
+msgctxt "block description"
+msgid "A continuously scrolling wall of customer testimonials."
+msgstr ""
+
+#: build/blocks/testimonials-marquee/block.json
+msgctxt "block keyword"
+msgid "marquee"
+msgstr ""
+
+#: build/blocks/testimonials-marquee/block.json
+msgctxt "block keyword"
+msgid "wall of love"
+msgstr ""
+
+#: build/blocks/testimonials-marquee/block.json
+msgctxt "block keyword"
+msgid "scroll"
+msgstr ""
+
+#: build/blocks/testimonials-masonry/block.json
+msgctxt "block title"
+msgid "Testimonials Masonry"
+msgstr ""
+
+#: build/blocks/testimonials-masonry/block.json
+msgctxt "block description"
+msgid "Display customer testimonials in a Pinterest-style masonry grid."
+msgstr ""
+
+#: build/blocks/testimonials-masonry/block.json
+msgctxt "block keyword"
+msgid "masonry"
+msgstr ""
+
+#: build/blocks/testimonials-popup-modal/block.json
+msgctxt "block title"
+msgid "Popup Modal Review Trigger"
+msgstr ""
+
+#: build/blocks/testimonials-popup-modal/block.json
+msgctxt "block description"
+msgid "Clickable badge/button that opens a full review popup modal."
+msgstr ""
+
+#: build/blocks/testimonials-popup-modal/block.json
+msgctxt "block keyword"
+msgid "popup"
+msgstr ""
+
+#: build/blocks/testimonials-popup-modal/block.json
+msgctxt "block keyword"
+msgid "modal"
+msgstr ""
+
+#: build/blocks/testimonials-popup-modal/block.json
+msgctxt "block keyword"
+msgid "trigger"
+msgstr ""
+
+#: build/blocks/testimonials-quote-box/block.json
+msgctxt "block title"
+msgid "Quote Box Showcase"
+msgstr ""
+
+#: build/blocks/testimonials-quote-box/block.json
+msgctxt "block description"
+msgid "Bold quote mark styling with accent backgrounds."
+msgstr ""
+
+#: build/blocks/testimonials-quote-box/block.json
+msgctxt "block keyword"
+msgid "testimonials-quote-box"
+msgstr ""
+
+#: build/blocks/testimonials-slider-3d/block.json
+msgctxt "block title"
+msgid "3D Flip Perspective Carousel"
+msgstr ""
+
+#: build/blocks/testimonials-slider-3d/block.json
+msgctxt "block description"
+msgid "Interactive 3D perspective flip card carousel slider."
+msgstr ""
+
+#: build/blocks/testimonials-slider-3d/block.json
+msgctxt "block keyword"
+msgid "3d"
+msgstr ""
+
+#: build/blocks/testimonials-slider-3d/block.json
+#: build/blocks/testimonials-slider/block.json
+msgctxt "block keyword"
+msgid "carousel"
+msgstr ""
+
+#: build/blocks/testimonials-slider/block.json
+msgctxt "block title"
+msgid "Testimonials Slider"
+msgstr ""
+
+#: build/blocks/testimonials-slider/block.json
+msgctxt "block description"
+msgid "Showcase customer testimonials in a touch-friendly slider / carousel."
+msgstr ""
+
+#: build/blocks/testimonials-speech-bubble/block.json
+msgctxt "block title"
+msgid "Speech Bubble Cards"
+msgstr ""
+
+#: build/blocks/testimonials-speech-bubble/block.json
+msgctxt "block description"
+msgid "Chat bubble style testimonial cards."
+msgstr ""
+
+#: build/blocks/testimonials-speech-bubble/block.json
+msgctxt "block keyword"
+msgid "testimonials-speech-bubble"
+msgstr ""
+
+#: build/blocks/testimonials-timeline/block.json
+msgctxt "block title"
+msgid "Customer Journey Timeline"
+msgstr ""
+
+#: build/blocks/testimonials-timeline/block.json
+msgctxt "block description"
+msgid "Vertical timeline of customer success stories."
+msgstr ""
+
+#: build/blocks/testimonials-timeline/block.json
+msgctxt "block keyword"
+msgid "testimonials-timeline"
+msgstr ""
+
+#: build/blocks/testimonials/block.json
+msgctxt "block title"
+msgid "B Testimonials Block"
+msgstr ""
+
+#: build/blocks/testimonials/block.json
+msgctxt "block description"
+msgid "Boost your website's credibility with b testimonials block, effortlessly showcasing customer ratings and reviews."
+msgstr ""
+
+#: build/blocks/testimonials/block.json
+msgctxt "block keyword"
+msgid "block"
+msgstr ""
+
+#: build/blocks/trust-badges/block.json
+msgctxt "block title"
+msgid "Trust Badges"
+msgstr ""
+
+#: build/blocks/trust-badges/block.json
+msgctxt "block description"
+msgid "A row of trust badges with a title and subtitle."
+msgstr ""
+
+#: build/blocks/trust-badges/block.json
+#: build/blocks/verified-buyer-badge/block.json
+msgctxt "block keyword"
+msgid "trust"
+msgstr ""
+
+#: build/blocks/trust-badges/block.json
+msgctxt "block keyword"
+msgid "badges"
+msgstr ""
+
+#: build/blocks/trust-badges/block.json
+msgctxt "block keyword"
+msgid "guarantee"
+msgstr ""
+
+#: build/blocks/trust-badges/block.json
+msgctxt "block keyword"
+msgid "features"
+msgstr ""
+
+#: build/blocks/trustpilot-review-badge/block.json
+msgctxt "block title"
+msgid "Trustpilot Score Badge"
+msgstr ""
+
+#: build/blocks/trustpilot-review-badge/block.json
+msgctxt "block description"
+msgid "Trustpilot style rating & review summary badge."
+msgstr ""
+
+#: build/blocks/trustpilot-review-badge/block.json
+msgctxt "block keyword"
+msgid "trustpilot-review-badge"
+msgstr ""
+
+#: build/blocks/user-feedback-poll/block.json
+msgctxt "block title"
+msgid "Feedback & NPS Poll"
+msgstr ""
+
+#: build/blocks/user-feedback-poll/block.json
+msgctxt "block description"
+msgid "Quick Net Promoter Score (NPS) feedback poll."
+msgstr ""
+
+#: build/blocks/user-feedback-poll/block.json
+msgctxt "block keyword"
+msgid "user-feedback-poll"
+msgstr ""
+
+#: build/blocks/verified-buyer-badge/block.json
+msgctxt "block title"
+msgid "Verified Buyer Trust Seal"
+msgstr ""
+
+#: build/blocks/verified-buyer-badge/block.json
+msgctxt "block description"
+msgid "E-commerce verified purchase seal & satisfaction guarantee widget."
+msgstr ""
+
+#: build/blocks/verified-buyer-badge/block.json
+msgctxt "block keyword"
+msgid "verified"
+msgstr ""
+
+#: build/blocks/verified-buyer-badge/block.json
+msgctxt "block keyword"
+msgid "buyer"
+msgstr ""
+
+#: build/blocks/video-testimonials/block.json
+msgctxt "block title"
+msgid "Video Testimonials"
+msgstr ""
+
+#: build/blocks/video-testimonials/block.json
+msgctxt "block description"
+msgid "Showcase video testimonials with click-to-play (YouTube, Vimeo or MP4)."
+msgstr ""
+
+#: build/blocks/video-testimonials/block.json
+msgctxt "block keyword"
+msgid "video"
+msgstr ""
+
+#: build/blocks/video-testimonials/block.json
+msgctxt "block keyword"
+msgid "youtube"
+msgstr ""
+
+#: build/blocks/video-testimonials/block.json
+msgctxt "block keyword"
+msgid "vimeo"
+msgstr ""

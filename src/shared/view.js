@@ -29,4 +29,8 @@ export const initTestimonials = ( selector = '.bTestimonials' ) => {
 };
 
 // Auto-initialise once the DOM is ready.
-document.addEventListener( 'DOMContentLoaded', () => initTestimonials() );
+if ( document.readyState === 'loading' ) {
+	document.addEventListener( 'DOMContentLoaded', () => initTestimonials() );
+} else {
+	initTestimonials();
+}

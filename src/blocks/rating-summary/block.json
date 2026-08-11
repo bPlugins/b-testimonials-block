@@ -66,6 +66,22 @@
 			"type": "string",
 			"default": "wide"
 		},
+		"blockWidth": {
+			"type": "object",
+			"default": {
+				"desktop": "",
+				"tablet": "",
+				"mobile": ""
+			}
+		},
+		"cardHeight": {
+			"type": "object",
+			"default": {
+				"desktop": "",
+				"tablet": "",
+				"mobile": ""
+			}
+		},
 		"cId": {
 			"type": "string",
 			"default": ""
@@ -168,6 +184,10 @@
 		"stacked": {
 			"type": "boolean",
 			"default": false
+		},
+		"cardMargin": {
+			"type": "object",
+			"default": {}
 		}
 	}
 }

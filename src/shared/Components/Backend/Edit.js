@@ -13,6 +13,13 @@ import ExpandButton from '../Common/ExpandButton';
 import BlockPlaceholder from '../Common/BlockPlaceholder';
 import { ALLOWED_CHILD_BLOCKS } from '../Common/BlockSwitcherModal';
 
+// The layout stylesheet was previously imported only from each block's view.js,
+// so none of it reached the editor: no `.layoutSection` grid, no `columns-N`
+// tracks, and nothing at all for the masonry, marquee, slider or coverflow
+// arrangements. That is why those three looked broken in the editor while being
+// correct on the frontend. Imported before editor.scss so editor-only tweaks
+// still win.
+import '../../styles/frontend.scss';
 import '../../styles/editor.scss';
 import Settings from './Settings/Settings';
 import Style from '../Common/Style';
@@ -20,6 +27,7 @@ import Layout from '../Common/Layout/Layout';
 import TestimonialsView from '../Common/TestimonialsView';
 import { upload } from '../../utils/icons';
 import { clickable } from '../../utils/a11y';
+import usePreviewDevice from '../../utils/usePreviewDevice';
 
 const mapCptPost = (post) => ({
 	img: { url: post?._embedded?.['wp:featuredmedia']?.[0]?.source_url || '' },
@@ -72,6 +80,8 @@ const Edit = props => {
 	useEffect(() => { clientId && setAttributes({ cId: clientId.substring(0, 10) }); }, [clientId, setAttributes]); // Set & Update clientId to cId
 
 	useEffect(() => tabController(), [isSelected]);
+
+	const previewDevice = usePreviewDevice();
 	const [activeIndex, setActiveIndex] = useState(0);
 
 	// Fetch testimonials from the CPT for the editor preview when that source is active.
@@ -189,7 +199,7 @@ const Edit = props => {
 		<div {...blockProps} id={`btbTestimonialsDir-${clientId}`}>
 			{isCpt ? (
 				cptItems.length
-					? <TestimonialsView attributes={{ ...attributes, items: cptItems }} clientId={clientId} />
+					? <TestimonialsView attributes={{ ...attributes, items: cptItems }} clientId={clientId} isBackend={true} previewDevice={previewDevice} />
 					: <p className="btbCptNotice">{cptLoading
 						? __('Loading testimonials…', 'b-testimonials-block')
 						: __('No testimonials found. Add some under the Testimonials menu, or switch Content Source to Manual.', 'b-testimonials-block')}</p>
@@ -197,7 +207,7 @@ const Edit = props => {
 				<Style attributes={attributes} clientId={clientId} />
 
 				<div className="btbTestimonialsDir">
-					<Layout itemsEls={itemsEls} ToolbarButton={ToolbarButton} MediaUpload={MediaUpload} MediaUploadCheck={MediaUploadCheck} isBackend={true} attributes={attributes} activeIndex={activeIndex} setActiveIndex={setActiveIndex} updateItem={updateItem} __={__} RichText={RichText} />
+					<Layout itemsEls={itemsEls} ToolbarButton={ToolbarButton} MediaUpload={MediaUpload} MediaUploadCheck={MediaUploadCheck} isBackend={true} previewDevice={previewDevice} attributes={attributes} activeIndex={activeIndex} setActiveIndex={setActiveIndex} updateItem={updateItem} __={__} RichText={RichText} />
 				</div>
 			</>}
 		</div>

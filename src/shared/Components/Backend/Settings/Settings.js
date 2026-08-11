@@ -18,11 +18,11 @@ import ShadowControl from '../../../../../../bpl-tools/Components/Deprecated/Sha
 
 import { gearIcon } from '../../../../../../bpl-tools/utils/icons';
 import { tabController } from '../../../../../../bpl-tools/utils/functions';
-import { emUnit, perUnit, pxUnit } from '../../../../../../bpl-tools/utils/options';
+import { emUnit, perUnit, pxUnit, vhUnit, vwUnit } from '../../../../../../bpl-tools/utils/options';
 
 import { checkTheme } from '../../.././utils/functions';
-import { rendersReviewText } from '../../../utils/layoutFeatures';
-import { layoutOpt, generalStyleTabs, themeOpt } from './../../../utils/options';
+import { rendersReviewText, resolveArrangement, supportsArrangement } from '../../../utils/layoutFeatures';
+import { arrangementOpt, generalStyleTabs, themeOpt } from './../../../utils/options';
 import BlockSwitcher from '../../Common/BlockSwitcher';
 
 const Settings = ({ attributes = {}, setAttributes, updateItem, activeIndex, setActiveIndex, clientId, currentBlockName }) => {
@@ -30,6 +30,11 @@ const Settings = ({ attributes = {}, setAttributes, updateItem, activeIndex, set
         columns = { desktop: 3, tablet: 2, mobile: 1 },
         columnGap = '30px',
         rowGap = '40px',
+        // Both empty per device by default, so an untouched block keeps taking
+        // its width from the theme's layout and its height from its content.
+        blockWidth = {},
+        cardHeight = {},
+        cardMargin = {},
         layout = 'default',
         theme = 'default',
         items = [],
@@ -68,7 +73,12 @@ const Settings = ({ attributes = {}, setAttributes, updateItem, activeIndex, set
     };
 
     const [device, setDevice] = useState('desktop');
-    const { autoPlay = true, mouseWheel = true, navigation = true } = (slider && typeof slider === 'object') ? slider : {};
+    const {
+        autoPlay = true, mouseWheel = true, navigation = true,
+        // Arrow styling. Left undefined on purpose so Style.js emits nothing and
+        // Swiper's own defaults stand until the user actually picks something.
+        navSize, navOffset, navColor, navHoverColor, navBg, navHoverBg, navBorder
+    } = (slider && typeof slider === 'object') ? slider : {};
 
     const singleItemBlocks = [
         'verified-buyer-badge',
@@ -92,6 +102,13 @@ const Settings = ({ attributes = {}, setAttributes, updateItem, activeIndex, set
     const isSingleTestimonial = layout === 'single' || layout === 'testimonials-single';
     const isSingleItemBlock = singleItemBlocks.includes(layout) || isSingleTestimonial;
     const isCaseStudy = layout === 'case-study-card';
+
+    // Whether this block's card list can be rearranged, and which arrangement is
+    // currently in effect (falling back to `layout` for posts saved before the
+    // attribute existed).
+    const canArrange = supportsArrangement(layout);
+    const arrangement = resolveArrangement(attributes);
+    const isSliderArrangement = ['slider', 'slider-3d', 'coverflow'].includes(arrangement);
 
     // The excerpt cut and the Expand/Less toggle belong to the review text, so
     // they follow whether the layout prints it -- not how many items it shows.
@@ -966,10 +983,19 @@ const Settings = ({ attributes = {}, setAttributes, updateItem, activeIndex, set
 
                     {(!isSingleItemBlock || isSingleTestimonial) && (
                         <PanelBody className='bPlPanelBody' title={__('Layout', 'b-testimonials-block')} initialOpen={false}>
-                            <PanelRow>
-                                <Label className="mt0 mb0">{__('Layout:', 'b-testimonials-block')}</Label>
-                                <SelectControl value={layout} onChange={val => setAttributes({ layout: val })} options={layoutOpt} />
-                            </PanelRow>
+                            {/* Writes `arrangement`, not `layout`. Setting `layout` here
+                                used to swap the block's identity: on a quote box it
+                                replaced the class its whole look depends on, and on a
+                                timeline or hero it converted the block outright with no
+                                way back, because those values are not even in the list.
+                                Shown only for layouts that reach the arrangement switch
+                                -- the rest return their own markup before it. */}
+                            {canArrange && (
+                                <PanelRow>
+                                    <Label className="mt0 mb0">{__('Arrangement:', 'b-testimonials-block')}</Label>
+                                    <SelectControl value={arrangement} onChange={val => setAttributes({ arrangement: val })} options={arrangementOpt} />
+                                </PanelRow>
+                            )}
 
                             <PanelRow>
                                 <Label className="mt0 mb0">{__('Theme:', 'b-testimonials-block')}</Label>
@@ -988,33 +1014,80 @@ const Settings = ({ attributes = {}, setAttributes, updateItem, activeIndex, set
 
                             <UnitControl className='mt20' label={__('Column Gap:', 'b-testimonials-block')} labelPosition='left' value={columnGap} onChange={val => setAttributes({ columnGap: val })} units={[pxUnit(30), perUnit(3), emUnit(2)]} isResetValueOnUnitChange={true} />
 
-                            {layout !== "slider" && <UnitControl className='mt20' label={__('Row Gap:', 'b-testimonials-block')} labelPosition='left' value={rowGap} onChange={val => setAttributes({ rowGap: val })} units={[pxUnit(40), perUnit(3), emUnit(2.5)]} isResetValueOnUnitChange={true} />}
+                            {!isSliderArrangement && <UnitControl className='mt20' label={__('Row Gap:', 'b-testimonials-block')} labelPosition='left' value={rowGap} onChange={val => setAttributes({ rowGap: val })} units={[pxUnit(40), perUnit(3), emUnit(2.5)]} isResetValueOnUnitChange={true} />}
 
                         </PanelBody>
                     )}
 
-                    {layout === 'slider' && <PanelBody className='bPlPanelBody' title={__('Slider', 'b-testimonials-block')} initialOpen={false}>
-                        {/* <PanelRow>
-							<Label className="mt0 mb0">{__('Height', 'b-testimonials-block')}</Label>
-							<NumberControl value={height} onChange={val => updateObject('slider', 'height', val)} />
-						</PanelRow> */}
-
+                    {isSliderArrangement && <PanelBody className='bPlPanelBody' title={__('Slider', 'b-testimonials-block')} initialOpen={false}>
+                        {/* Slider Height used to be commented out here, reading a
+                            `height` variable that is no longer destructured. Card
+                            Height in the Style tab covers it and works for grids
+                            too, so it is gone rather than revived. */}
                         <ToggleControl className='mt10' label={__('AutoPlay', 'b-testimonials-block')} labelPosition='left' checked={autoPlay} onChange={val => updateObject('slider', 'autoPlay', val)} />
 
                         <ToggleControl className='mt10' label={__('MouseWheel', 'b-testimonials-block')} labelPosition='left' checked={mouseWheel} onChange={val => updateObject('slider', 'mouseWheel', val)} />
 
                         <ToggleControl className='mt10' label={__('Navigation', 'b-testimonials-block')} labelPosition='left' checked={navigation} onChange={val => updateObject('slider', 'navigation', val)} />
+
+                        {/* Arrow styling. Hidden when navigation is off, since
+                            there is no arrow to style. Every one of these is
+                            reset-able back to Swiper's default rather than to a
+                            value of ours, so "no opinion" stays expressible. */}
+                        {navigation && <>
+                            <RangeControl className='mt20' label={__('Arrow Size', 'b-testimonials-block')} value={navSize} onChange={val => updateObject('slider', 'navSize', val)} min={16} max={80} step={1} allowReset resetFallbackValue={undefined} />
+
+                            {/* Inset only. The slider clips its own overflow --
+                                that is what keeps the off-screen slides hidden --
+                                so an arrow pushed past the edge is cut in half
+                                rather than sitting outside. */}
+                            <RangeControl label={__('Distance From Edge', 'b-testimonials-block')} value={navOffset} onChange={val => updateObject('slider', 'navOffset', val)} min={0} max={60} step={1} allowReset resetFallbackValue={undefined} help={__('Moves the arrows inward from the slider edge.', 'b-testimonials-block')} />
+
+                            <ColorControl className='mt10' label={__('Arrow Color:', 'b-testimonials-block')} value={navColor} onChange={val => updateObject('slider', 'navColor', val)} />
+
+                            <ColorControl className='mt10' label={__('Arrow Hover Color:', 'b-testimonials-block')} value={navHoverColor} onChange={val => updateObject('slider', 'navHoverColor', val)} />
+
+                            <ColorControl className='mt10' label={__('Arrow Background:', 'b-testimonials-block')} value={navBg} onChange={val => updateObject('slider', 'navBg', val)} />
+
+                            <ColorControl className='mt10' label={__('Arrow Hover Background:', 'b-testimonials-block')} value={navHoverBg} onChange={val => updateObject('slider', 'navHoverBg', val)} />
+
+                            <BorderControl className='mt20' label={__('Arrow Border:', 'b-testimonials-block')} value={navBorder} onChange={val => updateObject('slider', 'navBorder', val)} />
+                        </>}
                     </PanelBody>}
                 </>}
 
                 {'style' === tab.name && <>
                     <ColorsPanel attributes={attributes} setAttributes={setAttributes} layout={layout} />
 
+                    <PanelBody className='bPlPanelBody' title={__('Width & Height', 'b-testimonials-block')} initialOpen={false}>
+                        {/* Shares the device switch with the Layout panel, so the
+                            device you are editing does not silently differ between
+                            the two tabs. */}
+                        <PanelRow>
+                            <Label mt='0'>{__('Device:', 'b-testimonials-block')}</Label>
+                            <BDevice device={device} onChange={val => setDevice(val)} />
+                        </PanelRow>
+
+                        {/* max-width, not width: a hard width would overflow a
+                            container narrower than the value on small screens. */}
+                        <UnitControl className='mt20' label={__('Block Width:', 'b-testimonials-block')} labelPosition='left' value={blockWidth?.[device] || ''} onChange={val => updateObject('blockWidth', device, val)} units={[pxUnit(1200), perUnit(100), emUnit(60), vwUnit(100)]} isResetValueOnUnitChange={true} help={__('Maximum width. Leave empty to follow the theme.', 'b-testimonials-block')} />
+
+                        {/* min-height, so a card that needs more room still grows
+                            rather than clipping its review text. */}
+                        <UnitControl className='mt20' label={__('Card Height:', 'b-testimonials-block')} labelPosition='left' value={cardHeight?.[device] || ''} onChange={val => updateObject('cardHeight', device, val)} units={[pxUnit(320), emUnit(20), vhUnit(50)]} isResetValueOnUnitChange={true} help={__('Minimum height, for evening up ragged cards.', 'b-testimonials-block')} />
+                    </PanelBody>
+
                     <PanelBody className='bPlPanelBody' title={__('Card', 'b-testimonials-block')} initialOpen={false} >
 
                         <ColorControl className="mb10" label={__('Background Color', 'b-testimonials-block')} value={background} onChange={val => setAttributes({ background: val })} />
 
                         <BoxControl label={__('Padding', 'b-testimonials-block')} values={padding} onChange={val => setAttributes({ padding: val })} resetValues={{ top: "5px", right: "10px", bottom: "5px", left: "10px" }} units={[pxUnit(3), emUnit(2)]} />
+
+                        {/* Resets to nothing rather than to a value of ours: the
+                            gap between cards is already set by Column/Row Gap in
+                            the Layout panel, so a default margin here would fight
+                            it. This is for nudging cards, not spacing them. */}
+                        <BoxControl label={__('Margin', 'b-testimonials-block')} values={cardMargin} onChange={val => setAttributes({ cardMargin: val })} resetValues={{ top: "", right: "", bottom: "", left: "" }} units={[pxUnit(3), emUnit(2), perUnit(2)]} />
 
                         <BorderControl className='' label={__('Border', 'b-testimonials-block')} value={border}
                             onChange={(val) => setAttributes({ border: val })} />
@@ -1073,7 +1146,7 @@ const Settings = ({ attributes = {}, setAttributes, updateItem, activeIndex, set
                         </PanelBody>
                     )}
 
-                    {(layout === 'theme_2' || layout === 'masonry') &&
+                    {(theme === 'theme_2' || 'masonry' === arrangement) &&
                         <PanelBody className='bPlPanelBody' title={__('Top', 'b-testimonials-block')} initialOpen={false} >
 
                             <ColorControl className="mb10" label={__('Background Color', 'b-testimonials-block')} value={grid2Bg} onChange={val => setAttributes({ grid2Bg: val })} />

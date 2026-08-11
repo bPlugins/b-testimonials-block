@@ -59,6 +59,22 @@
       "type": "string",
       "default": "wide"
     },
+    "blockWidth": {
+      "type": "object",
+      "default": {
+        "desktop": "",
+        "tablet": "",
+        "mobile": ""
+      }
+    },
+    "cardHeight": {
+      "type": "object",
+      "default": {
+        "desktop": "",
+        "tablet": "",
+        "mobile": ""
+      }
+    },
     "cId": {
       "type": "string",
       "default": ""
@@ -92,6 +108,10 @@
     "layout": {
       "type": "string",
       "default": "testimonial-form"
+    },
+    "cardMargin": {
+      "type": "object",
+      "default": {}
     }
   },
   "supports": {

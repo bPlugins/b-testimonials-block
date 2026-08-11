@@ -47,6 +47,22 @@
       "type": "string",
       "default": "wide"
     },
+    "blockWidth": {
+      "type": "object",
+      "default": {
+        "desktop": "",
+        "tablet": "",
+        "mobile": ""
+      }
+    },
+    "cardHeight": {
+      "type": "object",
+      "default": {
+        "desktop": "",
+        "tablet": "",
+        "mobile": ""
+      }
+    },
     "cId": {
       "type": "string",
       "default": ""
@@ -107,6 +123,10 @@
     "layout": {
       "type": "string",
       "default": "client-logos"
+    },
+    "cardMargin": {
+      "type": "object",
+      "default": {}
     }
   },
   "supports": {

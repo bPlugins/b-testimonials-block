@@ -52,7 +52,12 @@ const ViewReviewText = ({
   );
 };
 
-const TestimonialsView = ({ attributes, clientId }) => {
+const TestimonialsView = ({
+  attributes,
+  clientId,
+  isBackend = false,
+  previewDevice = "Desktop",
+}) => {
   const cId = clientId ?? attributes.cId;
   // textLength needs a default here: without one, slice(0, undefined) returns
   // the whole string and `contentLength > undefined` is false, so the text
@@ -88,7 +93,12 @@ const TestimonialsView = ({ attributes, clientId }) => {
       <Style attributes={attributes} clientId={cId} />
 
       <div className="btbTestimonialsDir">
-        <Layout attributes={attributes} itemsEls={itemsEls} />
+        <Layout
+          attributes={attributes}
+          itemsEls={itemsEls}
+          isBackend={isBackend}
+          previewDevice={previewDevice}
+        />
       </div>
     </>
   );

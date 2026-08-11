@@ -14,6 +14,9 @@
   ],
   "textdomain": "b-testimonials-block",
   "attributes": {
+    "arrangement": {
+      "type": "string"
+    },
     "borderWidth": {
       "type": "number"
     },
@@ -160,6 +163,10 @@
         "left": "15px"
       }
     },
+    "cardMargin": {
+      "type": "object",
+      "default": {}
+    },
     "border": {
       "type": "object",
       "default": {
@@ -253,6 +260,22 @@
       "type": "string",
       "default": "wide"
     },
+    "blockWidth": {
+      "type": "object",
+      "default": {
+        "desktop": "",
+        "tablet": "",
+        "mobile": ""
+      }
+    },
+    "cardHeight": {
+      "type": "object",
+      "default": {
+        "desktop": "",
+        "tablet": "",
+        "mobile": ""
+      }
+    },
     "cId": {
       "type": "string",
       "default": ""
@@ -290,6 +313,14 @@
     "layout": {
       "type": "string",
       "default": "testimonials-speech-bubble"
+    },
+    "slider": {
+      "type": "object",
+      "default": {
+        "autoPlay": true,
+        "mouseWheel": true,
+        "navigation": true
+      }
     },
     "theme": {
       "type": "string",

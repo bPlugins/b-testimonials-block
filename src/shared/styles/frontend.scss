@@ -1,5 +1,7 @@
-$primaryColor: #382C8D;
+@use './devices' as *;
 @use './before-after.scss' as *;
+
+$primaryColor: #382C8D;
 
 // Fractional star ratings: a grey star with the coloured one clipped over it.
 .btbStar {
@@ -56,13 +58,15 @@ $primaryColor: #382C8D;
 	}
 }
 
-// Common CSS
-html {
-	scroll-behavior: smooth;
-}
-
 // Block Directory
 .bTestimonials {
+	// Was a bare `html { scroll-behavior: smooth; }` at the root of this file.
+	// This stylesheet is now loaded in the editor too, and the editor canvas is
+	// only iframed when every registered block is apiVersion 3 -- so a global
+	// html rule would reach the wp-admin page itself. Scoped to the block, where
+	// it still does its job for the scrollable marquee.
+	scroll-behavior: smooth;
+
 	* {
 		box-sizing: border-box;
 	}
@@ -462,12 +466,17 @@ html {
 					animation-play-state: paused;
 				}
 
-				// In the editor keep it static & scrollable so cards stay editable.
+				// The editor runs the same animation as the frontend. Hovering
+				// pauses it (rule above), and that is what keeps cards clickable --
+				// freezing the track outright meant the editor never showed what
+				// the block actually does.
 				&.is-editing {
-					overflow-x: auto;
-
-					.marquee-track {
-						animation: none;
+					// Only the first group is editable. Without this the seamless
+					// copy renders a second editable field bound to the same
+					// attribute, so a click could land on either one.
+					.marquee-group-dupe {
+						pointer-events: none;
+						user-select: none;
 					}
 				}
 			}
@@ -483,12 +492,17 @@ html {
 			&.btb-coverflow-layout,
 			&.btb-slider-3d-layout {
 				display: flex;
-				perspective: 1000px;
 
+				// No `perspective` here, and none on .swiper below.
+				//
+				// Swiper adds a `.swiper-3d` class whenever a 3D effect is on and
+				// declares `perspective: 1200px` itself. This file used to set
+				// `perspective: 1000px` on BOTH this wrapper and .swiper -- and the
+				// nested one outranks `.swiper-3d`, so coverflow was projected
+				// through two stacked viewing frustums and came out looking flat.
 				.swiper {
 					padding: 20px 28px 45px 28px;
 					overflow: hidden;
-					perspective: 1000px;
 
 					.swiper-wrapper {
 						display: flex;
@@ -504,18 +518,19 @@ html {
 								height: 100%;
 							}
 						}
-
-						.swiper-slide:not(.swiper-slide-active) {
-							opacity: 0.75;
-						}
 					}
 
+					// Swiper positions these from --swiper-navigation-sides-offset,
+					// but these nested selectors outrank its own rule, so they have
+					// to read the variable too or the "Distance From Edge" control
+					// would be silently overridden. The 0 fallback keeps the
+					// flush-to-edge default these had before it was adjustable.
 					.swiper-button-prev {
-						left: 0;
+						left: var(--swiper-navigation-sides-offset, 0px);
 					}
 
 					.swiper-button-next {
-						right: 0;
+						right: var(--swiper-navigation-sides-offset, 0px);
 					}
 
 					.swiper-pagination {
@@ -534,6 +549,16 @@ html {
 					}
 				}
 
+			}
+
+			// Dimming the neighbours suits the flat slider, but on coverflow it
+			// fights the effect: the rotation is what separates the side slides,
+			// and washing them out is most of why they read as grey slivers.
+			&.slider-layout,
+			&.btb-slider-layout {
+				.swiper-slide:not(.swiper-slide-active) {
+					opacity: 0.75;
+				}
 			}
 
 			&.slider-layout.theme_1,
@@ -560,7 +585,7 @@ html {
 	}
 }
 
-@media (max-width: 768px) {
+@media (max-width: $tablet-max) {
 	@for $i from 1 through 12 {
 		.columns-tablet-#{$i} {
 			grid-template-columns: repeat(#{$i}, 1fr);
@@ -568,7 +593,7 @@ html {
 	}
 }
 
-@media (max-width: 576px) {
+@media (max-width: $mobile-max) {
 	@for $i from 1 through 12 {
 		.columns-mobile-#{$i} {
 			grid-template-columns: repeat(#{$i}, 1fr);
@@ -652,8 +677,8 @@ html {
 /* --- Trust Badges Grid --- */
 .btb-trust-badges-grid {
 	display: grid;
-	grid-template-columns: repeat(4, 1fr);
-	gap: 16px;
+	grid-template-columns: repeat(var(--cols-d, 4), 1fr);
+	gap: var(--row-gap, 16px) var(--col-gap, 16px);
 
 	.btb-trust-item {
 		display: flex;
@@ -671,7 +696,8 @@ html {
 		box-shadow: 0 2px 10px rgba(0,0,0,0.03);
 	}
 
-	@media (max-width: 768px) { grid-template-columns: repeat(2, 1fr); }
+	@media (max-width: $tablet-max) { grid-template-columns: repeat(var(--cols-t, 2), 1fr); }
+	@media (max-width: $mobile-max) { grid-template-columns: repeat(var(--cols-m, 1), 1fr); }
 }
 
 /* --- Testimonial Form (Category E) --- */
@@ -772,7 +798,7 @@ html {
 
 /* --- Testimonial Stats (Category E) --- */
 .btb-stats-grid {
-	display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px;
+	display: grid; grid-template-columns: repeat(var(--cols-d, 4), 1fr); gap: var(--row-gap, 16px) var(--col-gap, 16px);
 
 	.btb-stat-card {
 		background: var(--btb-surface, #fff); border: var(--btb-border-width, 1px) solid var(--btb-border, #e2e8f0); border-radius: 14px;
@@ -780,7 +806,8 @@ html {
 		.btb-stat-number { font-size: 32px; font-weight: 800; color: var(--btb-accent, #382C8D); display: block; }
 		.btb-stat-label { font-size: 13px; color: var(--btb-muted, #64748b); margin-top: 4px; }
 	}
-	@media (max-width: 768px) { grid-template-columns: repeat(2, 1fr); }
+	@media (max-width: $tablet-max) { grid-template-columns: repeat(var(--cols-t, 2), 1fr); }
+	@media (max-width: $mobile-max) { grid-template-columns: repeat(var(--cols-m, 1), 1fr); }
 }
 
 /* --- Social Proof Toast (Category E) --- */

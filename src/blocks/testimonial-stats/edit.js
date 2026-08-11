@@ -1,15 +1,21 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { __ } from '@wordpress/i18n';
 import { useBlockProps, InspectorControls } from '@wordpress/block-editor';
-import { PanelBody, RangeControl, TextControl, ToggleControl, Button, Dashicon } from '@wordpress/components';
+import { PanelBody, RangeControl, TextControl, ToggleControl, Button, Dashicon, PanelRow, __experimentalUnitControl as UnitControl } from '@wordpress/components';
 import { produce } from 'immer';
 import BlockSwitcher from '../../shared/Components/Common/BlockSwitcher';
+import usePreviewDevice, { colsForDevice } from '../../shared/utils/usePreviewDevice';
+import Label from '../../../../bpl-tools/Components/Label/Label';
+import BDevice from '../../../../bpl-tools/Components/Deprecated/BDevice/BDevice';
+import { emUnit, perUnit, pxUnit } from '../../../../bpl-tools/utils/options';
 import ColorsPanel from '../../shared/Components/Backend/Settings/ColorsPanel';
 import Style from '../../shared/Components/Common/Style';
 import { ColorControl } from '../../../../bpl-tools/Components/ColorControl/ColorControl';
 
 import './edit.scss';
 import '../../shared/styles/stats.scss';
+
+const COLUMN_MAX = { desktop: 6, tablet: 4, mobile: 2 };
 
 const gridVars = ( { columns, columnGap, rowGap, accentColor } ) => ( {
 	'--cols-d': columns?.desktop || 3,
@@ -22,6 +28,11 @@ const gridVars = ( { columns, columnGap, rowGap, accentColor } ) => ( {
 
 const Edit = ( { attributes, setAttributes, clientId } ) => {
 	const { items = [], columns, columnGap, rowGap, accentColor, animate } = attributes;
+
+	// The device buttons only produce a real viewport when the editor canvas
+	// is iframed, which one apiVersion 2 block anywhere on the site disables.
+	const [ device, setDevice ] = useState( 'desktop' );
+	const previewDevice = usePreviewDevice();
 
 	useEffect( () => {
 		clientId && setAttributes( { cId: clientId.substring( 0, 10 ) } );
@@ -38,11 +49,15 @@ const Edit = ( { attributes, setAttributes, clientId } ) => {
 				<BlockSwitcher clientId={ clientId } />
 				<ColorsPanel attributes={ attributes } setAttributes={ setAttributes } />
 				<PanelBody className="bPlPanelBody" title={ __( 'Layout', 'b-testimonials-block' ) }>
-					<RangeControl label={ __( 'Columns (Desktop)', 'b-testimonials-block' ) } value={ columns?.desktop } onChange={ ( v ) => setColumn( 'desktop', v ) } min={ 1 } max={ 6 } />
-					<RangeControl label={ __( 'Columns (Tablet)', 'b-testimonials-block' ) } value={ columns?.tablet } onChange={ ( v ) => setColumn( 'tablet', v ) } min={ 1 } max={ 4 } />
-					<RangeControl label={ __( 'Columns (Mobile)', 'b-testimonials-block' ) } value={ columns?.mobile } onChange={ ( v ) => setColumn( 'mobile', v ) } min={ 1 } max={ 2 } />
-					<TextControl label={ __( 'Column gap', 'b-testimonials-block' ) } value={ columnGap } onChange={ ( v ) => setAttributes( { columnGap: v } ) } />
-					<TextControl label={ __( 'Row gap', 'b-testimonials-block' ) } value={ rowGap } onChange={ ( v ) => setAttributes( { rowGap: v } ) } />
+					{/* One responsive control behind the bpl-tools device switch, as the
+					    shared Settings panel does, instead of three stacked ranges. */}
+					<PanelRow>
+						<Label mt="0">{ __( 'Columns:', 'b-testimonials-block' ) }</Label>
+						<BDevice device={ device } onChange={ ( d ) => setDevice( d ) } />
+					</PanelRow>
+					<RangeControl value={ columns?.[ device ] } onChange={ ( v ) => setColumn( device, v ) } min={ 1 } max={ COLUMN_MAX[ device ] } step={ 1 } beforeIcon="grid-view" />
+					<UnitControl className="mt20" label={ __( 'Column Gap:', 'b-testimonials-block' ) } labelPosition="left" value={ columnGap } onChange={ ( v ) => setAttributes( { columnGap: v } ) } units={ [ pxUnit( 30 ), perUnit( 3 ), emUnit( 2 ) ] } isResetValueOnUnitChange={ true } />
+					<UnitControl className="mt20" label={ __( 'Row Gap:', 'b-testimonials-block' ) } labelPosition="left" value={ rowGap } onChange={ ( v ) => setAttributes( { rowGap: v } ) } units={ [ pxUnit( 40 ), perUnit( 3 ), emUnit( 2.5 ) ] } isResetValueOnUnitChange={ true } />
 					<ToggleControl label={ __( 'Animate count', 'b-testimonials-block' ) } checked={ animate } onChange={ ( v ) => setAttributes( { animate: v } ) } />
 				</PanelBody>
 
@@ -69,7 +84,7 @@ const Edit = ( { attributes, setAttributes, clientId } ) => {
 
 			<div { ...useBlockProps( { className: 'bTestimonialStats', id: `btbTestimonialsDir-${ clientId }` } ) }>
 				<Style attributes={ attributes } clientId={ clientId } />
-				<div className="stats-grid" style={ gridVars( attributes ) }>
+				<div className="stats-grid" style={ { ...gridVars( attributes ), '--cols-d': colsForDevice( attributes.columns, previewDevice, 3 ) } }>
 					{ items.map( ( item, i ) => (
 						<div className="stat-item" key={ i }>
 							<div className="stat-value" style={ { color: accentColor } }>

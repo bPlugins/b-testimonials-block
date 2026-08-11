@@ -138,6 +138,10 @@
         "left": "15px"
       }
     },
+    "cardMargin": {
+      "type": "object",
+      "default": {}
+    },
     "border": {
       "type": "object",
       "default": {
@@ -230,6 +234,22 @@
     "align": {
       "type": "string",
       "default": "wide"
+    },
+    "blockWidth": {
+      "type": "object",
+      "default": {
+        "desktop": "",
+        "tablet": "",
+        "mobile": ""
+      }
+    },
+    "cardHeight": {
+      "type": "object",
+      "default": {
+        "desktop": "",
+        "tablet": "",
+        "mobile": ""
+      }
     },
     "cId": {
       "type": "string",

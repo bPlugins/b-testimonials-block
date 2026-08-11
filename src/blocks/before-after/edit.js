@@ -1,18 +1,9 @@
 import { useEffect } from "react";
 import { __ } from "@wordpress/i18n";
-import {
-  useBlockProps,
-  InspectorControls,
-  MediaUpload,
-  MediaUploadCheck,
-} from "@wordpress/block-editor";
-import {
-  PanelBody,
-  RangeControl,
-  TextControl,
-  Button,
-} from "@wordpress/components";
+import { useBlockProps, InspectorControls } from "@wordpress/block-editor";
+import { PanelBody, RangeControl, TextControl } from "@wordpress/components";
 import BlockSwitcher from "../../shared/Components/Common/BlockSwitcher";
+import { InlineDetailMediaUpload } from '../../../../bpl-tools/Components/MediaControl/MediaControl';
 import ColorsPanel from "../../shared/Components/Backend/Settings/ColorsPanel";
 import Style from "../../shared/Components/Common/Style";
 import { ColorControl } from "../../../../bpl-tools/Components/ColorControl/ColorControl";
@@ -34,23 +25,14 @@ const Edit = ({ attributes, setAttributes, clientId }) => {
     clientId && setAttributes({ cId: clientId.substring(0, 10) });
   }, [clientId, setAttributes]);
 
+  // bpl-tools picker: same { id, url, alt } shape as before, and it accepts a
+  // pasted URL as well as a library pick.
   const pickButton = (label, value, key) => (
-    <MediaUploadCheck>
-      <MediaUpload
-        allowedTypes={["image"]}
-        value={value}
-        onSelect={(m) =>
-          setAttributes({ [key]: { id: m.id, url: m.url, alt: m.alt } })
-        }
-        render={({ open }) => (
-          <Button variant="secondary" onClick={open}>
-            {value?.url
-              ? `${__("Change", "b-testimonials-block")} ${label}`
-              : `${__("Set", "b-testimonials-block")} ${label}`}
-          </Button>
-        )}
-      />
-    </MediaUploadCheck>
+    <InlineDetailMediaUpload
+      label={label}
+      value={value}
+      onChange={(val) => setAttributes({ [key]: val })}
+    />
   );
 
   return (

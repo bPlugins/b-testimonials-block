@@ -66,6 +66,22 @@
 			"type": "string",
 			"default": "wide"
 		},
+		"blockWidth": {
+			"type": "object",
+			"default": {
+				"desktop": "",
+				"tablet": "",
+				"mobile": ""
+			}
+		},
+		"cardHeight": {
+			"type": "object",
+			"default": {
+				"desktop": "",
+				"tablet": "",
+				"mobile": ""
+			}
+		},
 		"cId": {
 			"type": "string",
 			"default": ""
@@ -117,6 +133,10 @@
 			"default": "trust-badges"
 		},
 		"customIcons": {
+			"type": "object",
+			"default": {}
+		},
+		"cardMargin": {
 			"type": "object",
 			"default": {}
 		}

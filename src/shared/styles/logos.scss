@@ -1,3 +1,4 @@
+@use './devices' as *;
 .bClientLogos {
 	.logos-grid {
 		display: grid;
@@ -30,13 +31,13 @@
 		}
 	}
 
-	@media ( max-width: 768px ) {
+	@media ( max-width: $tablet-max ) {
 		.logos-grid {
 			grid-template-columns: repeat(var(--cols-t, 3), 1fr);
 		}
 	}
 
-	@media ( max-width: 576px ) {
+	@media ( max-width: $mobile-max ) {
 		.logos-grid {
 			grid-template-columns: repeat(var(--cols-m, 2), 1fr);
 		}

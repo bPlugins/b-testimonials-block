@@ -1,15 +1,22 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { __ } from '@wordpress/i18n';
-import { useBlockProps, InspectorControls, MediaUpload, MediaUploadCheck } from '@wordpress/block-editor';
-import { PanelBody, RangeControl, TextControl, Button, Dashicon } from '@wordpress/components';
+import { useBlockProps, InspectorControls } from '@wordpress/block-editor';
+import { PanelBody, RangeControl, TextControl, Button, Dashicon, PanelRow, __experimentalUnitControl as UnitControl } from '@wordpress/components';
 import { produce } from 'immer';
 import BlockSwitcher from '../../shared/Components/Common/BlockSwitcher';
+import { InlineDetailMediaUpload } from '../../../../bpl-tools/Components/MediaControl/MediaControl';
+import usePreviewDevice, { colsForDevice } from '../../shared/utils/usePreviewDevice';
+import Label from '../../../../bpl-tools/Components/Label/Label';
+import BDevice from '../../../../bpl-tools/Components/Deprecated/BDevice/BDevice';
+import { emUnit, perUnit, pxUnit } from '../../../../bpl-tools/utils/options';
 import ColorsPanel from '../../shared/Components/Backend/Settings/ColorsPanel';
 import Style from '../../shared/Components/Common/Style';
 import IconSettings from '../../shared/Components/Backend/Settings/IconSettings';
 
 import './edit.scss';
 import '../../shared/styles/trust-badges.scss';
+
+const COLUMN_MAX = { desktop: 6, tablet: 4, mobile: 2 };
 
 const gridVars = ( { columns, columnGap, rowGap } ) => ( {
 	'--cols-d': columns?.desktop || 3,
@@ -21,6 +28,11 @@ const gridVars = ( { columns, columnGap, rowGap } ) => ( {
 
 const Edit = ( { attributes, setAttributes, clientId } ) => {
 	const { items = [], columns, columnGap, rowGap } = attributes;
+
+	// The device buttons only produce a real viewport when the editor canvas
+	// is iframed, which one apiVersion 2 block anywhere on the site disables.
+	const [ device, setDevice ] = useState( 'desktop' );
+	const previewDevice = usePreviewDevice();
 
 	useEffect( () => {
 		clientId && setAttributes( { cId: clientId.substring( 0, 10 ) } );
@@ -38,28 +50,25 @@ const Edit = ( { attributes, setAttributes, clientId } ) => {
 				<ColorsPanel attributes={ attributes } setAttributes={ setAttributes } />
 				<IconSettings attributes={ attributes } setAttributes={ setAttributes } />
 				<PanelBody className="bPlPanelBody" title={ __( 'Layout', 'b-testimonials-block' ) }>
-					<RangeControl label={ __( 'Columns (Desktop)', 'b-testimonials-block' ) } value={ columns?.desktop } onChange={ ( v ) => setColumn( 'desktop', v ) } min={ 1 } max={ 6 } />
-					<RangeControl label={ __( 'Columns (Tablet)', 'b-testimonials-block' ) } value={ columns?.tablet } onChange={ ( v ) => setColumn( 'tablet', v ) } min={ 1 } max={ 4 } />
-					<RangeControl label={ __( 'Columns (Mobile)', 'b-testimonials-block' ) } value={ columns?.mobile } onChange={ ( v ) => setColumn( 'mobile', v ) } min={ 1 } max={ 2 } />
-					<TextControl label={ __( 'Column gap', 'b-testimonials-block' ) } value={ columnGap } onChange={ ( v ) => setAttributes( { columnGap: v } ) } />
-					<TextControl label={ __( 'Row gap', 'b-testimonials-block' ) } value={ rowGap } onChange={ ( v ) => setAttributes( { rowGap: v } ) } />
+					{/* One responsive control behind the bpl-tools device switch, as the
+					    shared Settings panel does, instead of three stacked ranges. */}
+					<PanelRow>
+						<Label mt="0">{ __( 'Columns:', 'b-testimonials-block' ) }</Label>
+						<BDevice device={ device } onChange={ ( d ) => setDevice( d ) } />
+					</PanelRow>
+					<RangeControl value={ columns?.[ device ] } onChange={ ( v ) => setColumn( device, v ) } min={ 1 } max={ COLUMN_MAX[ device ] } step={ 1 } beforeIcon="grid-view" />
+					<UnitControl className="mt20" label={ __( 'Column Gap:', 'b-testimonials-block' ) } labelPosition="left" value={ columnGap } onChange={ ( v ) => setAttributes( { columnGap: v } ) } units={ [ pxUnit( 30 ), perUnit( 3 ), emUnit( 2 ) ] } isResetValueOnUnitChange={ true } />
+					<UnitControl className="mt20" label={ __( 'Row Gap:', 'b-testimonials-block' ) } labelPosition="left" value={ rowGap } onChange={ ( v ) => setAttributes( { rowGap: v } ) } units={ [ pxUnit( 40 ), perUnit( 3 ), emUnit( 2.5 ) ] } isResetValueOnUnitChange={ true } />
 				</PanelBody>
 
 				<PanelBody className="bPlPanelBody" title={ __( 'Badges', 'b-testimonials-block' ) } initialOpen={ false }>
 					{ items.map( ( item, i ) => (
 						<div key={ i } className="btb-badge-row">
-							<MediaUploadCheck>
-								<MediaUpload
-									allowedTypes={ [ 'image' ] }
-									value={ item?.img }
-									onSelect={ ( m ) => updateItem( i, 'img', { id: m.id, url: m.url, alt: m.alt } ) }
-									render={ ( { open } ) => (
-										<Button variant="secondary" onClick={ open } className="btb-badge-pick">
-											{ item?.img?.url ? <img src={ item.img.url } alt="" /> : __( 'Select icon', 'b-testimonials-block' ) }
-										</Button>
-									) }
-								/>
-							</MediaUploadCheck>
+							<InlineDetailMediaUpload
+								label={ __( 'Icon', 'b-testimonials-block' ) }
+								value={ item?.img }
+								onChange={ ( val ) => updateItem( i, 'img', val ) }
+							/>
 							<TextControl label={ __( 'Title', 'b-testimonials-block' ) } value={ item?.title || '' } onChange={ ( v ) => updateItem( i, 'title', v ) } />
 							<TextControl label={ __( 'Subtitle', 'b-testimonials-block' ) } value={ item?.subtitle || '' } onChange={ ( v ) => updateItem( i, 'subtitle', v ) } />
 							<Button isDestructive onClick={ () => removeItem( i ) }><Dashicon icon="trash" /> { __( 'Remove', 'b-testimonials-block' ) }</Button>
@@ -72,7 +81,7 @@ const Edit = ( { attributes, setAttributes, clientId } ) => {
 
 			<div { ...useBlockProps( { className: 'bTrustBadges', id: `btbTestimonialsDir-${ clientId }` } ) }>
 				<Style attributes={ attributes } clientId={ clientId } />
-				<div className="badges-grid" style={ gridVars( attributes ) }>
+				<div className="badges-grid" style={ { ...gridVars( attributes ), '--cols-d': colsForDevice( attributes.columns, previewDevice, 3 ) } }>
 					{ items.map( ( item, i ) => (
 						<div className="badge-item" key={ i }>
 							{ item?.img?.url && <img className="badge-icon" src={ item.img.url } alt={ item?.img?.alt || '' } /> }

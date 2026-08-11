@@ -2,12 +2,23 @@ import { __ } from '@wordpress/i18n';
 
 import { verticalLineIcon, horizontalLineIcon } from './icons';
 
-export const layoutOpt = [
+/**
+ * The arrangements a card list can take.
+ *
+ * The last two are Swiper effects rather than separate renderers -- Layout.js
+ * sends all three slider cases down the same branch -- but they are arrangements
+ * a block can be switched to, so they belong in the list. Leaving them out left
+ * a 3D Slider or Coverflow block showing a blank select, because its own value
+ * matched no option.
+ */
+export const arrangementOpt = [
 	{ label: __('Default', 'b-testimonials-block'), value: 'default' },
 	{ label: __('Slider', 'b-testimonials-block'), value: 'slider' },
 	{ label: __('Masonry', 'b-testimonials-block'), value: 'masonry' },
 	{ label: __('List', 'b-testimonials-block'), value: 'list' },
 	{ label: __('Marquee', 'b-testimonials-block'), value: 'marquee' },
+	{ label: __('3D Slider', 'b-testimonials-block'), value: 'slider-3d' },
+	{ label: __('Coverflow', 'b-testimonials-block'), value: 'coverflow' },
 ]
 
 export const themeOpt = [

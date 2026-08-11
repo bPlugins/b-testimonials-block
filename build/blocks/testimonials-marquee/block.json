@@ -17,6 +17,9 @@
   ],
   "textdomain": "b-testimonials-block",
   "attributes": {
+    "arrangement": {
+      "type": "string"
+    },
     "expandedTypo": {
       "type": "object"
     },
@@ -119,6 +122,22 @@
       "type": "string",
       "default": "wide"
     },
+    "blockWidth": {
+      "type": "object",
+      "default": {
+        "desktop": "",
+        "tablet": "",
+        "mobile": ""
+      }
+    },
+    "cardHeight": {
+      "type": "object",
+      "default": {
+        "desktop": "",
+        "tablet": "",
+        "mobile": ""
+      }
+    },
     "cId": {
       "type": "string",
       "default": ""
@@ -126,6 +145,14 @@
     "layout": {
       "type": "string",
       "default": "marquee"
+    },
+    "slider": {
+      "type": "object",
+      "default": {
+        "autoPlay": true,
+        "mouseWheel": true,
+        "navigation": true
+      }
     },
     "theme": {
       "type": "string",
@@ -186,6 +213,10 @@
         "bottom": "10px",
         "left": "15px"
       }
+    },
+    "cardMargin": {
+      "type": "object",
+      "default": {}
     },
     "border": {
       "type": "object",

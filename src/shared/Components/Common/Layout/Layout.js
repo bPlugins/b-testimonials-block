@@ -17,6 +17,7 @@ import { clickable, editorClickable } from "../../../utils/a11y";
 import { BRAND_COLOR } from "../../../utils/icons";
 import BlockIcon from "../BlockIcon";
 import { getIcon } from "../../../utils/blockIcons";
+import { ARRANGEMENTS, resolveArrangement } from "../../../utils/layoutFeatures";
 
 const VideoCard = ({ item, accentColor, playIcon = {} }) => {
   const [isPlaying, setIsPlaying] = useState(false);
@@ -140,6 +141,7 @@ const Layout = ({
   activeIndex = 0,
   updateItem,
   isBackend = false,
+  previewDevice = "Desktop",
   __,
   RichText,
 }) => {
@@ -158,6 +160,26 @@ const Layout = ({
   } = columns && typeof columns === "object"
     ? columns
     : { desktop: 3, tablet: 2, mobile: 1 };
+
+  // The column count to render at the "base" size.
+  //
+  // On the front end that is always the desktop value, with the media queries
+  // taking over at narrower widths. In the editor it has to follow the device
+  // buttons directly, because those only produce a real viewport when the
+  // canvas is iframed -- and WordPress iframes it only when every registered
+  // block is apiVersion 3. A single v2 block from any other active plugin
+  // disables iframing for the whole editor, and then @media keeps measuring the
+  // browser window, so the tablet and mobile rules never fire no matter which
+  // device is selected. Resolving the count here works either way: when the
+  // canvas *is* iframed the media queries agree with this value.
+  const previewCols =
+    isBackend && "Tablet" === previewDevice
+      ? tablet
+      : isBackend && "Mobile" === previewDevice
+        ? mobile
+        : desktop;
+
+  const arrangement = resolveArrangement(attributes);
 
   const [selectedAvatarIdx, setSelectedAvatarIdx] = useState(0);
   const [cardStackIdx, setCardStackIdx] = useState(0);
@@ -522,8 +544,19 @@ const Layout = ({
       },
     ];
 
+    // The Columns and Gap controls only reached this block's editor preview --
+    // the front end grid was a fixed repeat(4, 1fr). Same custom properties the
+    // video layout uses, so both honour the inspector.
     return (
-      <div className="btb-trust-badges-grid">
+      <div
+        className="btb-trust-badges-grid"
+        style={{
+          "--cols-d": previewCols || 3,
+          "--cols-t": tablet || 3,
+          "--cols-m": mobile || 1,
+          "--col-gap": columnGap || "16px",
+          "--row-gap": rowGap || "16px",
+        }}>
         {trustItems.map((it) => (
           <div className="btb-trust-item" key={it.slot}>
             <BlockIcon
@@ -733,7 +766,15 @@ const Layout = ({
     const stat4Label = attributes.stat4Label || "5-Star Reviews";
 
     return (
-      <div className="btb-stats-grid">
+      <div
+        className="btb-stats-grid"
+        style={{
+          "--cols-d": previewCols || 3,
+          "--cols-t": tablet || 3,
+          "--cols-m": mobile || 1,
+          "--col-gap": columnGap || "16px",
+          "--row-gap": rowGap || "16px",
+        }}>
         <div className="btb-stat-card">
           <span className="btb-stat-number">{stat1Num}</span>
           <span className="btb-stat-label">{stat1Label}</span>
@@ -918,7 +959,7 @@ const Layout = ({
   if (layout === "audio-testimonials") {
     return (
       <div
-        className={`layoutSection btb-audio-layout ${theme} columns-${desktop} columns-tablet-${tablet} columns-mobile-${mobile}`}>
+        className={`layoutSection btb-audio-layout ${theme} columns-${previewCols} columns-tablet-${tablet} columns-mobile-${mobile}`}>
         {items.map((item, index) => (
           <div key={index} className="btb-audio-card">
             <div className="btb-audio-player">
@@ -953,7 +994,7 @@ const Layout = ({
 
   if (layout === "video-testimonials") {
     const videoGridVars = {
-      "--cols-d": desktop || 3,
+      "--cols-d": previewCols || 3,
       "--cols-t": tablet || 2,
       "--cols-m": mobile || 1,
       "--col-gap": columnGap || "30px",
@@ -984,7 +1025,7 @@ const Layout = ({
   if (layout === "case-study-card") {
     return (
       <div
-        className={`btb-case-study-grid columns-${desktop} columns-tablet-${tablet} columns-mobile-${mobile}`}>
+        className={`btb-case-study-grid columns-${previewCols} columns-tablet-${tablet} columns-mobile-${mobile}`}>
         {items.map((item, index) => {
           const sections = item.sections || [
             {
@@ -1045,7 +1086,7 @@ const Layout = ({
     const logoItems = items.length > 0 ? items : attributes.logos || [];
     return (
       <div
-        className={`btb-client-logos columns-${desktop} columns-tablet-${tablet} columns-mobile-${mobile}`}>
+        className={`btb-client-logos columns-${previewCols} columns-tablet-${tablet} columns-mobile-${mobile}`}>
         {logoItems.map((item, index) => {
           const imgEl = (
             <img
@@ -1084,7 +1125,7 @@ const Layout = ({
         <div className="btb-hero-card">{themeSelect(heroItem, 0)}</div>
         {items.length > 1 && (
           <div
-            className={`btb-hero-grid columns-${desktop} columns-tablet-${tablet} columns-mobile-${mobile}`}>
+            className={`btb-hero-grid columns-${previewCols} columns-tablet-${tablet} columns-mobile-${mobile}`}>
             {items.slice(1).map((item, index) => themeSelect(item, index + 1))}
           </div>
         )}
@@ -1096,7 +1137,7 @@ const Layout = ({
     return (
       <div className="btb-popup-modal-wrapper">
         <div
-          className={`layoutSection btb-popup-modal-grid ${theme} columns-${desktop} columns-tablet-${tablet} columns-mobile-${mobile} ${
+          className={`layoutSection btb-popup-modal-grid ${theme} columns-${previewCols} columns-tablet-${tablet} columns-mobile-${mobile} ${
             isBackend ? "is-editing" : ""
           }`}>
           {items.map((item, index) => (
@@ -1351,26 +1392,70 @@ const Layout = ({
   //  CATEGORY A: Standard layouts (existing switch logic, fixed)
   // ================================================================
 
+  // The block keeps its own identity classes; the arrangement adds its own on
+  // top. The one exception is a layout that only ever named an arrangement
+  // (default/slider/masonry/list/marquee) -- once an explicit arrangement is
+  // chosen, keeping the old class would let two arrangements style the same
+  // element, e.g. marquee's overflow rules wrapping a Swiper.
+  const identityClasses =
+    ARRANGEMENTS.includes(layout) && arrangement !== layout
+      ? []
+      : [`${layout}-layout`, `btb-${layout}-layout`];
+
+  const sectionClasses = [
+    "layoutSection",
+    ...identityClasses,
+    // Deduped: for a block whose layout already names its arrangement, the two
+    // produce the same class.
+    ...(identityClasses.includes(`${arrangement}-layout`)
+      ? []
+      : [`${arrangement}-layout`]),
+    theme,
+    `columns-${previewCols}`,
+    `columns-tablet-${tablet}`,
+    `columns-mobile-${mobile}`,
+    isBackend ? "is-editing" : "",
+  ]
+    .filter(Boolean)
+    .join(" ");
+
   return (
-    <div
-      className={`layoutSection ${layout}-layout btb-${layout}-layout ${theme} columns-${desktop} columns-tablet-${tablet} columns-mobile-${mobile} ${
-        isBackend ? "is-editing" : ""
-      }`}>
+    <div className={sectionClasses}>
       {(() => {
-        switch (layout) {
-          case "masonry":
+        switch (arrangement) {
+          case "masonry": {
+            const masonryItems = items.map((item, index) =>
+              themeSelect(item, index),
+            );
+
+            // In the editor the count comes from the device buttons: this
+            // measures the window, so inside a non-iframed canvas it would
+            // report the desktop width whichever device is selected.
+            if (isBackend) {
+              return (
+                <Masonry
+                  columnsCount={previewCols}
+                  gutter={`${rowGap} ${columnGap}`}>
+                  {masonryItems}
+                </Masonry>
+              );
+            }
+
+            // Breakpoints are min-width here, so they are the CSS max-widths in
+            // _devices.scss plus one, keeping this in step with the stylesheets.
             return (
               <ResponsiveMasonry
                 columnsCountBreakPoints={{
                   0: mobile,
-                  576: tablet,
-                  768: desktop,
+                  641: tablet,
+                  1025: desktop,
                 }}>
-                <Masonry columnsCount={3} gutter={`${rowGap} ${columnGap}`}>
-                  {items.map((item, index) => themeSelect(item, index))}
+                <Masonry columnsCount={desktop} gutter={`${rowGap} ${columnGap}`}>
+                  {masonryItems}
                 </Masonry>
               </ResponsiveMasonry>
             );
+          }
           case "slider":
           case "slider-3d":
           case "coverflow":
@@ -1379,6 +1464,9 @@ const Layout = ({
                 attributes={attributes}
                 itemsEls={itemsEls}
                 itemProps={itemProps}
+                isBackend={isBackend}
+                previewCols={previewCols}
+                arrangement={arrangement}
               />
             );
           case "marquee":
@@ -1387,7 +1475,6 @@ const Layout = ({
                 items={items}
                 themeSelect={themeSelect}
                 columnGap={columnGap}
-                isBackend={isBackend}
               />
             );
           // All other testimonial-items layouts: quote-box, speech-bubble, compact, list, etc.

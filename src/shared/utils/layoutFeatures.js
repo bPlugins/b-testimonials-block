@@ -51,3 +51,59 @@ export const NO_REVIEW_TEXT_LAYOUTS = [
  */
 export const rendersReviewText = (layout) =>
   !NO_REVIEW_TEXT_LAYOUTS.includes(layout);
+
+/**
+ * The five interchangeable arrangements of a card list.
+ */
+export const ARRANGEMENTS = ["default", "slider", "masonry", "list", "marquee"];
+
+/**
+ * Layouts that can be arranged.
+ *
+ * `layout` used to carry two different things: which branch renders, and the
+ * wrapper class that produces the visual style. That is why the old Layout
+ * select was destructive -- choosing "Marquee" on a quote box swapped its
+ * identity class away along with the arrangement. `arrangement` now carries the
+ * second job on its own.
+ *
+ * Only layouts that reach the arrangement switch belong here. The rest (audio,
+ * timeline, hero, popup, avatar list, case study, floating bubble, client logos,
+ * video, toast and the single-item badges) return their own markup first, so an
+ * arrangement could not apply to them without rewriting each renderer.
+ */
+export const ARRANGEABLE_LAYOUTS = [
+  ...ARRANGEMENTS,
+  // Slider variants: an identity and an arrangement at once.
+  "slider-3d",
+  "coverflow",
+  // CSS-only variations of the default card list.
+  "testimonials-quote-box",
+  "testimonials-speech-bubble",
+  "testimonials-compact",
+];
+
+export const supportsArrangement = (layout) =>
+  ARRANGEABLE_LAYOUTS.includes(layout);
+
+/**
+ * The arrangement to render.
+ *
+ * Falls back to `layout` when that already names an arrangement, so posts saved
+ * before this attribute existed keep rendering exactly as they did.
+ *
+ * @param {Object} attributes Block attributes.
+ * @return {string} One of ARRANGEMENTS, or a slider variant.
+ */
+export const resolveArrangement = (attributes = {}) => {
+  const { arrangement, layout = "default" } = attributes;
+
+  if (arrangement) {
+    return arrangement;
+  }
+
+  return ARRANGEMENTS.includes(layout) ||
+    "slider-3d" === layout ||
+    "coverflow" === layout
+    ? layout
+    : "default";
+};

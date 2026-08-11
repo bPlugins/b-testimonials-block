@@ -13,33 +13,65 @@ import ThemeFour from '../Themes/ThemeFour';
 import ThemeFive from '../Themes/ThemeFive';
 import ThemeSix from '../Themes/ThemeSix';
 
-const Slider = ({ attributes = {}, itemsEls = [], itemProps = {} }) => {
+const Slider = ({ attributes = {}, itemsEls = [], itemProps = {}, isBackend = false, previewCols = 0, arrangement = '' }) => {
 	const { items = [], slider = {}, columnGap = '30px', theme = 'default', columns = {}, layout } = attributes || {};
 	const { desktop = 3, tablet = 2, mobile = 1 } = (columns && typeof columns === 'object') ? columns : { desktop: 3, tablet: 2, mobile: 1 };
 	const { autoPlay = true, mouseWheel = true, navigation = true } = (slider && typeof slider === 'object') ? slider : { autoPlay: true, mouseWheel: true, navigation: true };
 
-	const is3D = layout === 'slider-3d';
-	const isCoverflow = layout === 'coverflow' || is3D;
+	// Read from the arrangement, so a slider-3d block set to a plain slider gets
+	// a plain slider instead of keeping the coverflow effect from its layout.
+	const effective = arrangement || layout;
+	const is3D = effective === 'slider-3d';
+	const isCoverflow = effective === 'coverflow' || is3D;
 	const spaceBetweenVal = parseInt( columnGap, 10 ) || 30;
 
 	return (
 		<Swiper
-			key={ `${ layout }-${ theme }-${ items.length }-${ spaceBetweenVal }` }
+			// previewCols is part of the key so switching device in the editor
+			// remounts Swiper: it caches resolved breakpoint params internally and
+			// would otherwise keep the previous slidesPerView.
+			key={ `${ layout }-${ theme }-${ items.length }-${ spaceBetweenVal }-${ previewCols }` }
 			modules={ [ Navigation, A11y, Autoplay, Mousewheel, Pagination, EffectCoverflow ] }
 			effect={ isCoverflow ? 'coverflow' : undefined }
-			coverflowEffect={ isCoverflow ? {
-				rotate: is3D ? 50 : 35,
+			// Both arrangements run Swiper's coverflow engine, but they are two
+			// different looks rather than two settings of one look. They used to
+			// differ only by rotate 50/35 and depth 150/100, which reads as noise:
+			// picking 3D Slider over Coverflow appeared to do nothing.
+			//
+			// Coverflow keeps the classic angled fan. 3D Slider drops the rotation
+			// entirely and leans on depth and scale instead, so the side slides
+			// recede straight back rather than tilting -- a distinct silhouette
+			// from the same module, with no extra effect to bundle.
+			coverflowEffect={ isCoverflow ? ( is3D ? {
+				rotate: 0,
 				stretch: 0,
-				depth: is3D ? 150 : 100,
+				depth: 300,
+				scale: 0.85,
+				modifier: 2,
+				slideShadows: true,
+			} : {
+				rotate: 50,
+				stretch: 0,
+				depth: 100,
+				scale: 1,
 				modifier: 1,
 				slideShadows: true,
-			} : undefined }
+			} ) : undefined }
 			centeredSlides={ isCoverflow }
 			grabCursor={ true }
 			loop={ items.length > 2 }
-			spaceBetween={ spaceBetweenVal }
-			slidesPerView={ mobile }
-			breakpoints={ { 576: { slidesPerView: tablet }, 768: { slidesPerView: desktop } } }
+			// Coverflow overlaps its slides on purpose -- that overlap is the
+			// effect. A gap between them holds the side slides away from the
+			// centre one and flattens it into a plain slider that happens to be
+			// rotated, so the column gap is not applied here.
+			spaceBetween={ isCoverflow ? 0 : spaceBetweenVal }
+			// In the editor follow the device buttons directly: Swiper's
+			// breakpoints measure the window by default, so inside a non-iframed
+			// canvas they report the desktop width whichever device is picked.
+			slidesPerView={ isBackend ? ( previewCols || desktop ) : mobile }
+			// min-width breakpoints, so these are the CSS max-widths in
+			// _devices.scss plus one -- keeps the slider in step with the grids.
+			breakpoints={ isBackend ? undefined : { 641: { slidesPerView: tablet }, 1025: { slidesPerView: desktop } } }
 			autoplay={ autoPlay ? { delay: 3000, disableOnInteraction: false } : false }
 			mousewheel={ mouseWheel }
 			navigation={ navigation }

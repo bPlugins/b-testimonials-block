@@ -115,6 +115,10 @@
 				"left": "15px"
 			}
 		},
+		"cardMargin": {
+			"type": "object",
+			"default": {}
+		},
 		"border": {
 			"type": "object",
 			"default": {
@@ -208,6 +212,22 @@
 			"type": "string",
 			"default": "wide"
 		},
+		"blockWidth": {
+			"type": "object",
+			"default": {
+				"desktop": "",
+				"tablet": "",
+				"mobile": ""
+			}
+		},
+		"cardHeight": {
+			"type": "object",
+			"default": {
+				"desktop": "",
+				"tablet": "",
+				"mobile": ""
+			}
+		},
 		"cId": {
 			"type": "string",
 			"default": ""
@@ -276,11 +296,26 @@
 			"type": "string",
 			"default": "Rating Breakdown"
 		},
-		"star5Count": { "type": "string", "default": "" },
-		"star4Count": { "type": "string", "default": "" },
-		"star3Count": { "type": "string", "default": "" },
-		"star2Count": { "type": "string", "default": "" },
-		"star1Count": { "type": "string", "default": "" }
+		"star5Count": {
+			"type": "string",
+			"default": ""
+		},
+		"star4Count": {
+			"type": "string",
+			"default": ""
+		},
+		"star3Count": {
+			"type": "string",
+			"default": ""
+		},
+		"star2Count": {
+			"type": "string",
+			"default": ""
+		},
+		"star1Count": {
+			"type": "string",
+			"default": ""
+		}
 	},
 	"supports": {
 		"align": [

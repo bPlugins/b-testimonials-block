@@ -1,14 +1,21 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { __ } from '@wordpress/i18n';
-import { useBlockProps, InspectorControls, MediaUpload, MediaUploadCheck } from '@wordpress/block-editor';
-import { PanelBody, RangeControl, ToggleControl, TextControl, Button, Dashicon } from '@wordpress/components';
+import { useBlockProps, InspectorControls } from '@wordpress/block-editor';
+import { PanelBody, RangeControl, ToggleControl, TextControl, Button, Dashicon, PanelRow, __experimentalUnitControl as UnitControl } from '@wordpress/components';
 import { produce } from 'immer';
 import BlockSwitcher from '../../shared/Components/Common/BlockSwitcher';
+import { InlineDetailMediaUpload } from '../../../../bpl-tools/Components/MediaControl/MediaControl';
+import usePreviewDevice, { colsForDevice } from '../../shared/utils/usePreviewDevice';
+import Label from '../../../../bpl-tools/Components/Label/Label';
+import BDevice from '../../../../bpl-tools/Components/Deprecated/BDevice/BDevice';
+import { emUnit, perUnit, pxUnit } from '../../../../bpl-tools/utils/options';
 import ColorsPanel from '../../shared/Components/Backend/Settings/ColorsPanel';
 import Style from '../../shared/Components/Common/Style';
 
 import './edit.scss';
 import '../../shared/styles/logos.scss';
+
+const COLUMN_MAX = { desktop: 8, tablet: 6, mobile: 4 };
 
 const gridVars = ( { columns, columnGap, rowGap, logoHeight } ) => ( {
 	'--cols-d': columns?.desktop || 4,
@@ -21,6 +28,11 @@ const gridVars = ( { columns, columnGap, rowGap, logoHeight } ) => ( {
 
 const Edit = ( { attributes, setAttributes, clientId } ) => {
 	const { logos = [], columns, columnGap, rowGap, logoHeight, grayscale } = attributes;
+
+	// The device buttons only produce a real viewport when the editor canvas
+	// is iframed, which one apiVersion 2 block anywhere on the site disables.
+	const [ device, setDevice ] = useState( 'desktop' );
+	const previewDevice = usePreviewDevice();
 
 	useEffect( () => {
 		clientId && setAttributes( { cId: clientId.substring( 0, 10 ) } );
@@ -42,11 +54,15 @@ const Edit = ( { attributes, setAttributes, clientId } ) => {
 				<BlockSwitcher clientId={ clientId } />
 				<ColorsPanel attributes={ attributes } setAttributes={ setAttributes } />
 				<PanelBody className="bPlPanelBody" title={ __( 'Layout', 'b-testimonials-block' ) }>
-					<RangeControl label={ __( 'Columns (Desktop)', 'b-testimonials-block' ) } value={ columns?.desktop } onChange={ ( val ) => setColumn( 'desktop', val ) } min={ 1 } max={ 8 } />
-					<RangeControl label={ __( 'Columns (Tablet)', 'b-testimonials-block' ) } value={ columns?.tablet } onChange={ ( val ) => setColumn( 'tablet', val ) } min={ 1 } max={ 6 } />
-					<RangeControl label={ __( 'Columns (Mobile)', 'b-testimonials-block' ) } value={ columns?.mobile } onChange={ ( val ) => setColumn( 'mobile', val ) } min={ 1 } max={ 4 } />
-					<TextControl label={ __( 'Column gap', 'b-testimonials-block' ) } value={ columnGap } onChange={ ( val ) => setAttributes( { columnGap: val } ) } />
-					<TextControl label={ __( 'Row gap', 'b-testimonials-block' ) } value={ rowGap } onChange={ ( val ) => setAttributes( { rowGap: val } ) } />
+					{/* One responsive control behind the bpl-tools device switch, as the
+					    shared Settings panel does, instead of three stacked ranges. */}
+					<PanelRow>
+						<Label mt="0">{ __( 'Columns:', 'b-testimonials-block' ) }</Label>
+						<BDevice device={ device } onChange={ ( d ) => setDevice( d ) } />
+					</PanelRow>
+					<RangeControl value={ columns?.[ device ] } onChange={ ( val ) => setColumn( device, val ) } min={ 1 } max={ COLUMN_MAX[ device ] } step={ 1 } beforeIcon="grid-view" />
+					<UnitControl className="mt20" label={ __( 'Column Gap:', 'b-testimonials-block' ) } labelPosition="left" value={ columnGap } onChange={ ( val ) => setAttributes( { columnGap: val } ) } units={ [ pxUnit( 30 ), perUnit( 3 ), emUnit( 2 ) ] } isResetValueOnUnitChange={ true } />
+					<UnitControl className="mt20" label={ __( 'Row Gap:', 'b-testimonials-block' ) } labelPosition="left" value={ rowGap } onChange={ ( val ) => setAttributes( { rowGap: val } ) } units={ [ pxUnit( 40 ), perUnit( 3 ), emUnit( 2.5 ) ] } isResetValueOnUnitChange={ true } />
 				</PanelBody>
 
 				<PanelBody className="bPlPanelBody" title={ __( 'Style', 'b-testimonials-block' ) } initialOpen={ false }>
@@ -57,18 +73,13 @@ const Edit = ( { attributes, setAttributes, clientId } ) => {
 				<PanelBody className="bPlPanelBody" title={ __( 'Logos', 'b-testimonials-block' ) } initialOpen={ false }>
 					{ logos.map( ( logo, index ) => (
 						<div key={ index } className="btb-logo-row">
-							<MediaUploadCheck>
-								<MediaUpload
-									allowedTypes={ [ 'image' ] }
-									value={ logo?.img }
-									onSelect={ ( media ) => updateLogo( index, 'img', { id: media.id, url: media.url, alt: media.alt } ) }
-									render={ ( { open } ) => (
-										<Button variant="secondary" onClick={ open } className="btb-logo-pick">
-											{ logo?.img?.url ? <img src={ logo.img.url } alt="" /> : __( 'Select image', 'b-testimonials-block' ) }
-										</Button>
-									) }
-								/>
-							</MediaUploadCheck>
+							{/* bpl-tools picker: same { id, url, alt } shape, and it also
+							    accepts a pasted URL, which the raw button did not. */}
+							<InlineDetailMediaUpload
+								label={ __( 'Logo', 'b-testimonials-block' ) }
+								value={ logo?.img }
+								onChange={ ( val ) => updateLogo( index, 'img', val ) }
+							/>
 
 							<TextControl placeholder={ __( 'Link (optional)', 'b-testimonials-block' ) } value={ logo?.link || '' } onChange={ ( val ) => updateLogo( index, 'link', val ) } />
 
@@ -86,7 +97,7 @@ const Edit = ( { attributes, setAttributes, clientId } ) => {
 
 			<div { ...useBlockProps( { className: 'bClientLogos', id: `btbTestimonialsDir-${ clientId }` } ) }>
 				<Style attributes={ attributes } clientId={ clientId } />
-				<div className={ `logos-grid ${ grayscale ? 'is-grayscale' : '' }` } style={ gridVars( attributes ) }>
+				<div className={ `logos-grid ${ grayscale ? 'is-grayscale' : '' }` } style={ { ...gridVars( attributes ), '--cols-d': colsForDevice( attributes.columns, previewDevice, 4 ) } }>
 					{ logos.map( ( logo, index ) => (
 						<div className="logo-item" key={ index }>
 							{ logo?.img?.url && <img src={ logo.img.url } alt={ logo?.img?.alt || '' } /> }

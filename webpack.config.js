@@ -8,15 +8,51 @@ const plugins = defaultConfig.plugins.filter(p => {
 	return true;
 });
 
+// wp-scripts leaves sass-loader on Dart Sass's legacy JS API, which is
+// deprecated and warns once per stylesheet. Opt the sass rule into the modern
+// API instead.
+const rules = defaultConfig.module.rules.map(rule => {
+	if (!(rule.test instanceof RegExp) || !rule.test.test('style.scss')) {
+		return rule;
+	}
+	return {
+		...rule,
+		use: rule.use.map(loader =>
+			typeof loader === 'object' && loader.loader?.includes('sass-loader')
+				? { ...loader, options: { ...loader.options, api: 'modern' } }
+				: loader
+		),
+	};
+});
+
+// `optimization: {}` left the minimizer unset, so webpack fell back to its own
+// TerserPlugin default with `parallel: true` -- one worker per core, each
+// holding a whole ~6 MB bundle, which is what threw ERR_WORKER_OUT_OF_MEMORY on
+// roughly every other build. Reuse the instance wp-scripts already configured
+// (it preserves `translators:` comments and keeps the i18n function names
+// unmangled, both of which the bare webpack default drops) and cap how many run
+// at once.
+const minimizer = (defaultConfig.optimization?.minimizer || []).map(plugin => {
+	if (plugin?.options && 'parallel' in plugin.options) {
+		plugin.options.parallel = 2;
+	}
+	return plugin;
+});
+
 module.exports = {
 	...defaultConfig,
+	module: { ...defaultConfig.module, rules },
 	entry: {
 		...defaultConfig.entry(),
 		'admin-dashboard': './src/admin/dashboard.js',
 	},
 	plugins: [
 		...plugins,
-		new ESLintPlugin()
+		// threads:false keeps linting in-process; the worker pool blew its heap
+		// on this 40-block build.
+		new ESLintPlugin({ threads: false })
 	],
-	optimization: {}
+	// Only the minimizer is overridden -- webpack fills in the rest of its
+	// defaults, which is what emits index.css / view.css under these names.
+	optimization: { minimizer }
 };

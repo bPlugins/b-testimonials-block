@@ -6,6 +6,8 @@ import { PanelBody, PanelRow, TabPanel, TextControl, SelectControl, RangeControl
 import { produce } from 'immer';
 
 // Settings Components
+import IconSettings from './IconSettings';
+import ColorsPanel from './ColorsPanel';
 import Label from '../../../../../../bpl-tools/Components/Label/Label';
 import { ColorControl } from '../../../../../../bpl-tools/Components/ColorControl/ColorControl';
 import { InlineDetailMediaUpload } from '../../../../../../bpl-tools/Components/MediaControl/MediaControl';
@@ -19,6 +21,7 @@ import { tabController } from '../../../../../../bpl-tools/utils/functions';
 import { emUnit, perUnit, pxUnit } from '../../../../../../bpl-tools/utils/options';
 
 import { checkTheme } from '../../.././utils/functions';
+import { rendersReviewText } from '../../../utils/layoutFeatures';
 import { layoutOpt, generalStyleTabs, themeOpt } from './../../../utils/options';
 import BlockSwitcher from '../../Common/BlockSwitcher';
 
@@ -43,6 +46,9 @@ const Settings = ({ attributes = {}, setAttributes, updateItem, activeIndex, set
         degColor = '#7B7B7B',
         textTypo = {},
         textColor = '#000',
+        expandedTypo = {},
+        expandColor = '',
+        expandHoverColor = '',
         starIconColor = '#FF8C02',
         textLength = 120,
         grid2Bg = '#f9f8f8',
@@ -86,6 +92,10 @@ const Settings = ({ attributes = {}, setAttributes, updateItem, activeIndex, set
     const isSingleTestimonial = layout === 'single' || layout === 'testimonials-single';
     const isSingleItemBlock = singleItemBlocks.includes(layout) || isSingleTestimonial;
     const isCaseStudy = layout === 'case-study-card';
+
+    // The excerpt cut and the Expand/Less toggle belong to the review text, so
+    // they follow whether the layout prints it -- not how many items it shows.
+    const hasExcerpt = rendersReviewText(layout) && elements?.reviewText !== false;
 
     const addItem = () => {
         setAttributes({
@@ -500,7 +510,7 @@ const Settings = ({ attributes = {}, setAttributes, updateItem, activeIndex, set
                                                     labelPosition='left'
                                                     value={rowItem.rating ?? 5}
                                                     onChange={val => {
-                                                        const newItems = produce(items, draft => { draft[rowIdx].rating = parseInt(val, 10) || 5; });
+                                                        const newItems = produce(items, draft => { draft[rowIdx].rating = parseFloat(val) || 5; });
                                                         setAttributes({ items: newItems });
                                                     }}
                                                     min={1}
@@ -897,7 +907,7 @@ const Settings = ({ attributes = {}, setAttributes, updateItem, activeIndex, set
                                     )}
 
                                     {(!isSingleItemBlock || isSingleTestimonial) && !isCaseStudy && (
-                                        <NumberControl className='mt10' label={__('Rating:', 'b-testimonials-block')} labelPosition='left' value={rating} onChange={val => updateItem('rating', val)} min={1} max={5} />
+                                        <NumberControl className='mt10' label={__('Rating:', 'b-testimonials-block')} labelPosition='left' value={rating} onChange={val => updateItem('rating', parseFloat(val))} min={0} max={5} step={0.1} />
                                     )}
 
                                     {!isSingleItemBlock && (
@@ -929,18 +939,30 @@ const Settings = ({ attributes = {}, setAttributes, updateItem, activeIndex, set
                                 <ToggleControl className='mt10' label={__('Review Text', 'b-testimonials-block')} labelPosition='left' checked={elements?.reviewText} onChange={val => updateObject('elements', 'reviewText', val)} />
 
                                 <ToggleControl className='mt10' label={__('Rating', 'b-testimonials-block')} labelPosition='left' checked={elements?.icon} onChange={val => updateObject('elements', 'icon', val)} />
-
-                                <ToggleControl className='mt10' label={__('Expanded Button', 'b-testimonials-block')} labelPosition='left' checked={elements?.expandBtn} onChange={val => updateObject('elements', 'expandBtn', val)} />
                             </PanelBody>
-
-                            {elements?.expandBtn && <PanelBody className='bPlPanelBody' title={__('Button', 'b-testimonials-block')} initialOpen={false}>
-                                <TextControl className='' label={__('Expand Text', 'b-testimonials-block')} value={elements?.expandText} onChange={val => updateObject('elements', 'expandText', val)} />
-
-                                <TextControl className='' label={__('Collapse Text', 'b-testimonials-block')} value={elements?.collapseText} onChange={val => updateObject('elements', 'collapseText', val)} />
-                            </PanelBody>}
                         </>
                     )}
 
+                    {/* One panel for the whole excerpt story. These three used to
+                        sit in three places -- the toggle under Elements, its
+                        button labels in a panel called "Button", and the length
+                        itself over in the Style tab. */}
+                    {hasExcerpt && (
+                        <PanelBody className='bPlPanelBody' title={__('Excerpt & Expand', 'b-testimonials-block')} initialOpen={false}>
+                            <RangeControl label={__('Excerpt length', 'b-testimonials-block')} value={textLength} onChange={val => setAttributes({ textLength: val })} min={10} max={1000} step={1} help={__('Characters shown before the review is cut.', 'b-testimonials-block')} />
+
+                            <ToggleControl className='mt10' label={__('Expand / Less button', 'b-testimonials-block')} labelPosition='left' checked={!!elements?.expandBtn} onChange={val => updateObject('elements', 'expandBtn', val)} help={__('Without it the review is never cut.', 'b-testimonials-block')} />
+
+                            {elements?.expandBtn && <>
+                                <TextControl className='mt10' label={__('Expand Text', 'b-testimonials-block')} value={elements?.expandText ?? 'Expand'} onChange={val => updateObject('elements', 'expandText', val)} />
+
+                                <TextControl className='mt10' label={__('Collapse Text', 'b-testimonials-block')} value={elements?.collapseText ?? 'Less'} onChange={val => updateObject('elements', 'collapseText', val)} />
+                            </>}
+                        </PanelBody>
+                    )}
+
+
+                    <IconSettings attributes={attributes} setAttributes={setAttributes} />
 
                     {(!isSingleItemBlock || isSingleTestimonial) && (
                         <PanelBody className='bPlPanelBody' title={__('Layout', 'b-testimonials-block')} initialOpen={false}>
@@ -986,6 +1008,8 @@ const Settings = ({ attributes = {}, setAttributes, updateItem, activeIndex, set
                 </>}
 
                 {'style' === tab.name && <>
+                    <ColorsPanel attributes={attributes} setAttributes={setAttributes} layout={layout} />
+
                     <PanelBody className='bPlPanelBody' title={__('Card', 'b-testimonials-block')} initialOpen={false} >
 
                         <ColorControl className="mb10" label={__('Background Color', 'b-testimonials-block')} value={background} onChange={val => setAttributes({ background: val })} />
@@ -1033,8 +1057,19 @@ const Settings = ({ attributes = {}, setAttributes, updateItem, activeIndex, set
                             <ColorControl className="mb10" label={__('Color', 'b-testimonials-block')} value={textColor} onChange={val => setAttributes({ textColor: val })} />
 
                             <ColorControl className="mb10" label={__('Rating Icon Color', 'b-testimonials-block')} value={starIconColor} onChange={val => setAttributes({ starIconColor: val })} />
+                        </PanelBody>
+                    )}
 
-                            <RangeControl label={__('Excerpt length', 'b-testimonials-block')} labelPosition='left' value={textLength} onChange={(val) => { setAttributes({ textLength: val }) }} min={10} max={1000} step={1} beforeIcon='grid-view' />
+                    {/* `expandedTypo` was declared here and in Style.js but was
+                        only ever used to emit a Google Font link -- nothing
+                        selected the font, and nothing styled the button. */}
+                    {hasExcerpt && elements?.expandBtn && (
+                        <PanelBody className='bPlPanelBody' title={__('Expand / Less Button', 'b-testimonials-block')} initialOpen={false} >
+                            <Typography className='mt10' label={__('Typography', 'b-testimonials-block')} value={expandedTypo} onChange={val => setAttributes({ expandedTypo: val })} produce={produce} />
+
+                            <ColorControl className="mb10" label={__('Color', 'b-testimonials-block')} value={expandColor} onChange={val => setAttributes({ expandColor: val })} />
+
+                            <ColorControl className="mb10" label={__('Hover Color', 'b-testimonials-block')} value={expandHoverColor} onChange={val => setAttributes({ expandHoverColor: val })} />
                         </PanelBody>
                     )}
 

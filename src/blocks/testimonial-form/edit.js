@@ -1,8 +1,11 @@
 import { useEffect } from 'react';
 import { __ } from '@wordpress/i18n';
-import { useBlockProps, InspectorControls, PanelColorSettings } from '@wordpress/block-editor';
+import { useBlockProps, InspectorControls } from '@wordpress/block-editor';
 import { PanelBody, TextControl, TextareaControl, ToggleControl } from '@wordpress/components';
 import BlockSwitcher from '../../shared/Components/Common/BlockSwitcher';
+import ColorsPanel from '../../shared/Components/Backend/Settings/ColorsPanel';
+import Style from '../../shared/Components/Common/Style';
+import { ColorControl } from '../../../../bpl-tools/Components/ColorControl/ColorControl';
 
 import '../../shared/styles/form.scss';
 
@@ -11,7 +14,7 @@ const Edit = ( { attributes, setAttributes, clientId } ) => {
 
 	useEffect( () => {
 		clientId && setAttributes( { cId: clientId.substring( 0, 10 ) } );
-	}, [ clientId ] );
+	}, [ clientId, setAttributes ] );
 
 	const setField = ( key, val ) => setAttributes( { fields: { ...fields, [ key ]: val } } );
 
@@ -27,13 +30,14 @@ const Edit = ( { attributes, setAttributes, clientId } ) => {
 		<>
 			<InspectorControls>
 				<BlockSwitcher clientId={ clientId } />
-				<PanelBody title={ __( 'Form', 'b-testimonials-block' ) }>
+				<ColorsPanel attributes={ attributes } setAttributes={ setAttributes } />
+				<PanelBody className="bPlPanelBody" title={ __( 'Form', 'b-testimonials-block' ) }>
 					<TextControl label={ __( 'Title', 'b-testimonials-block' ) } value={ formTitle } onChange={ ( val ) => setAttributes( { formTitle: val } ) } />
 					<TextControl label={ __( 'Button text', 'b-testimonials-block' ) } value={ buttonText } onChange={ ( val ) => setAttributes( { buttonText: val } ) } />
 					<TextareaControl label={ __( 'Success message', 'b-testimonials-block' ) } value={ successMessage } onChange={ ( val ) => setAttributes( { successMessage: val } ) } />
 				</PanelBody>
 
-				<PanelBody title={ __( 'Fields', 'b-testimonials-block' ) } initialOpen={ false }>
+				<PanelBody className="bPlPanelBody" title={ __( 'Fields', 'b-testimonials-block' ) } initialOpen={ false }>
 					<p className="description">{ __( 'Name and Review are always shown and required.', 'b-testimonials-block' ) }</p>
 					{ fieldToggles.map( ( [ key, label ] ) => (
 						<ToggleControl key={ key } label={ label } checked={ !! fields?.[ key ] } onChange={ ( val ) => setField( key, val ) } />
@@ -43,20 +47,13 @@ const Edit = ( { attributes, setAttributes, clientId } ) => {
 					) }
 				</PanelBody>
 
-				<PanelColorSettings
-					title={ __( 'Color', 'b-testimonials-block' ) }
-					initialOpen={ false }
-					colorSettings={ [
-						{
-							value: accentColor,
-							onChange: ( val ) => setAttributes( { accentColor: val } ),
-							label: __( 'Accent (button)', 'b-testimonials-block' ),
-						},
-					] }
-				/>
+				<PanelBody className="bPlPanelBody" title={ __( 'Color', 'b-testimonials-block' ) } initialOpen={ false }>
+					<ColorControl label={ __( 'Accent (button)', 'b-testimonials-block' ) } value={ accentColor } onChange={ ( val ) => setAttributes( { accentColor: val } ) } />
+				</PanelBody>
 			</InspectorControls>
 
-			<div { ...useBlockProps( { className: 'bTestimonialForm' } ) }>
+			<div { ...useBlockProps( { className: 'bTestimonialForm', id: `btbTestimonialsDir-${ clientId }` } ) }>
+				<Style attributes={ attributes } clientId={ clientId } />
 				<form className="btb-tform" onSubmit={ ( e ) => e.preventDefault() }>
 					{ formTitle && <h3 className="btb-tform-title">{ formTitle }</h3> }
 

@@ -30,10 +30,10 @@
 		select {
 			width: 100%;
 			padding: 10px 12px;
-			border: 1px solid #d5d8dc;
+			border: var(--btb-border-width, 1px) solid var(--btb-border, #d5d8dc);
 			border-radius: 6px;
 			font: inherit;
-			background: #fff;
+			background: var(--btb-surface, #fff);
 		}
 
 		textarea {
@@ -65,14 +65,14 @@
 
 		&.is-success {
 			display: block;
-			background: #edfaef;
-			color: #1a7f37;
+			background: var(--btb-success-bg, #edfaef);
+			color: var(--btb-success, #1a7f37);
 		}
 
 		&.is-error {
 			display: block;
-			background: #fcebec;
-			color: #b32d2e;
+			background: var(--btb-error-bg, #fcebec);
+			color: var(--btb-error, #b32d2e);
 		}
 	}
 }

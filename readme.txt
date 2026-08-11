@@ -1,5 +1,5 @@
 === B Testimonials Block ===
-Contributors: bplugins, abuhayat, btechnologies
+Contributors: bplugins, abuhayat, btechnologies, himur98
 Donate link: https://www.buymeacoffee.com/abuhayat
 Tags: testimonials, review, rating, block, Gutenberg block
 Requires at least: 6.5
@@ -33,17 +33,6 @@ You can manage your testimonials centrally using the built-in **Testimonials Cus
 - **Image & Avatar Controls**: Adjust photo width, height, circular or rounded border styling, and upload custom avatar thumbnails.
 - **Full Typography & Color Controls**: Comprehensive font family, size, line-height, font-weight, and color settings for reviewer name, designation, review text, and star rating icons.
 - **Excerpt & Read More Control**: Set custom review text excerpt length limiters with expandable Read More / Show Less buttons.
-
-=== bTestimonials Pro – Unlock Premium Features ===
-[bTestimonials Pro](https://bplugins.com/products/b-testimonials-block/pricing/) gives you maximum design power and advanced social proof tools.
-
-== What’s New in the Pro Version? ==
-- **32+ Exclusive Premium Layouts**: Access premium 3D flip carousels, hero spotlight banners, floating avatar bubbles, and modal triggers.
-- **Advanced CPT Query Filtering**: Filter testimonials by category, tag, or rating, with custom order criteria and random sorting.
-- **Video Lightbox Customization**: Play videos in high-resolution modal popups with autoplay and custom accent color play buttons.
-- **Continuous Marquee Direction & Speed**: Fine-tune ticker animation speed, scroll direction, and pause-on-hover behavior.
-- **Custom CSS & Advanced Box Model**: Full control over margin, padding, border-radius, and custom CSS classes per block.
-- **Priority Customer Support**: Fast-track technical support and feature updates.
 
 === How to Use B Testimonials Block – Quick Start Guide ===
 

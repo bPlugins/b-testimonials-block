@@ -35,6 +35,33 @@
     "aggregate"
   ],
   "attributes": {
+    "borderWidth": {
+      "type": "number"
+    },
+    "brandColor": {
+      "type": "string"
+    },
+    "surfaceColor": {
+      "type": "string"
+    },
+    "borderColor": {
+      "type": "string"
+    },
+    "titleColor": {
+      "type": "string"
+    },
+    "bodyColor": {
+      "type": "string"
+    },
+    "mutedColor": {
+      "type": "string"
+    },
+    "ratingColor": {
+      "type": "string"
+    },
+    "trackColor": {
+      "type": "string"
+    },
     "align": {
       "type": "string",
       "default": "wide"
@@ -98,6 +125,21 @@
     "badgeCount": {
       "type": "string",
       "default": ""
+    },
+    "star5Pct": {
+      "type": "number"
+    },
+    "star4Pct": {
+      "type": "number"
+    },
+    "star3Pct": {
+      "type": "number"
+    },
+    "star2Pct": {
+      "type": "number"
+    },
+    "star1Pct": {
+      "type": "number"
     },
     "rating": {
       "type": "number",

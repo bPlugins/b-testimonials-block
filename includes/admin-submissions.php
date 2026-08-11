@@ -199,7 +199,11 @@ function bpbtb_render_admin_submissions_page() {
 	<style>
 		.bpbtb-admin-wrap {
 			max-width: 1280px;
-			margin: 24px 20px 40px 0;
+			/* auto left/right centres the page in the admin content area; the
+			   old `0` left margin pinned it to the edge on wide screens. */
+			margin: 24px auto 40px;
+			padding: 0 20px;
+			box-sizing: border-box;
 			font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
 		}
 
@@ -622,7 +626,7 @@ function bpbtb_render_admin_submissions_page() {
 						<?php if ( $query->have_posts() ) : ?>
 							<?php while ( $query->have_posts() ) : $query->the_post();
 								$pid          = get_the_ID();
-								$rating       = (int) get_post_meta( $pid, 'bpbtb_rating', true ) ?: 5;
+								$rating       = (float) get_post_meta( $pid, 'bpbtb_rating', true ) ?: 5;
 								$designation  = (string) get_post_meta( $pid, 'bpbtb_designation', true );
 								$company      = (string) get_post_meta( $pid, 'bpbtb_company', true );
 								$email        = (string) get_post_meta( $pid, 'bpbtb_email', true );

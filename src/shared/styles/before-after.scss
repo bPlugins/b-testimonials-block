@@ -31,8 +31,8 @@
 	.ba-label {
 		position: absolute;
 		bottom: 12px;
-		background: rgba(0, 0, 0, 0.6);
-		color: #fff;
+		background: var(--btb-ba-label-bg, rgba(0, 0, 0, 0.6));
+		color: var(--btb-ba-label-color, #fff);
 		padding: 4px 10px;
 		border-radius: 4px;
 		font-size: 13px;
@@ -87,7 +87,7 @@
 		display: flex;
 		align-items: center;
 		justify-content: center;
-		color: #333;
+		color: var(--btb-ba-grip, #333);
 		font-size: 18px;
 	}
 

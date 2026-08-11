@@ -1,56 +1,137 @@
-$primaryColor: #4527a4;
+@use "sass:color";
+
+$primaryColor: #382c8d;
+// bPlugins brand colour. Applied to icon wrappers only; the icons themselves
+// stay `currentColor` so the hover/active states can still flip them to white.
+$brandColor: #146ef5;
 
 // Custom
 .btbNowEditing {
-	outline: 2px solid $primaryColor;
+  outline: 2px solid $primaryColor;
 }
 
 .btbCptNotice {
-	padding: 30px 20px;
-	text-align: center;
-	border: 1px dashed #c3c4c7;
-	border-radius: 4px;
-	color: #757575;
+  padding: 30px 20px;
+  text-align: center;
+  border: 1px dashed #c3c4c7;
+  border-radius: 4px;
+  color: #757575;
 }
 
-
 .bTestimonials {
-	.layoutSection {
-		.authorImg {
-			.img {
-				position: relative;
+  .layoutSection {
+    .authorImg {
+      .img {
+        position: relative;
 
-				img {
-					// width: 100%;
-					// height: 100%;
-					// object-fit: cover;
-					// border-radius: 50%;
-				}
-			}
+        img {
+          // width: 100%;
+          // height: 100%;
+          // object-fit: cover;
+          // border-radius: 50%;
+        }
+      }
 
-			.upload {
-				position: absolute;
-				top: 0;
-				left: 0;
-				width: 100%;
-				height: 100%;
-				display: flex;
-				align-items: center;
-				justify-content: center;
-				opacity: 0;
-				transition: 0.3s;
+      .upload {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        opacity: 0;
+        transition: 0.3s;
 
-				button {
-					padding: 0px;
-				}
+        button {
+          padding: 0px;
+        }
 
-				&:hover {
-					opacity: 1;
-					transition: 0.3s;
-				}
-			}
+        &:hover {
+          opacity: 1;
+          transition: 0.3s;
+        }
+      }
+    }
+  }
+}
+
+// Collapsed excerpt for the Expand/Less toggle. The text is already cut to
+// `textLength` in JS, exactly as the front end cuts it, so there is nothing to
+// truncate here -- this only advertises that clicking the excerpt expands it
+// back into an editable field.
+.reviewText.btbTextCollapsed {
+	cursor: text;
+}
+
+// Mirrors the rule in frontend.scss so picked icons look the same in the editor.
+.btb-custom-icon {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	line-height: 1;
+
+	svg {
+		width: 100%;
+		height: 100%;
+		fill: currentColor;
+	}
+}
+
+// Each icon slot groups a picker, a colour and a size control.
+.btb-icon-slot + .btb-icon-slot {
+	margin-top: 20px;
+	padding-top: 20px;
+	border-top: 1px solid #e2e8f0;
+}
+
+/*
+ * Vertical rhythm for inspector controls.
+ *
+ * bpl-tools deliberately zeroes WordPress core's 16px control spacing across
+ * the whole block inspector (Components/style.scss), on the assumption that
+ * every control carries an explicit mt/mb utility. Most of this plugin's
+ * controls don't, so they end up flush against each other. Restore a baseline
+ * gap between the direct children of our panels.
+ *
+ * Using margin-top on subsequent siblings (rather than margin-bottom on all)
+ * means the mt* utilities -- which are !important -- cleanly override this
+ * instead of stacking on top of it.
+ */
+.bPlPanelBody {
+	> * + * {
+		margin-top: 16px;
+	}
+
+	// The panel title already carries its own spacing.
+	> .components-panel__body-title + * {
+		margin-top: 0;
+	}
+
+	// Rows inside a repeater need breathing room from their separator too.
+	.btb-badge-row,
+	.btb-logo-row,
+	.btb-video-row,
+	.btb-stat-row {
+		> * + * {
+			margin-top: 12px;
+		}
+
+		hr {
+			margin: 16px 0 0;
 		}
 	}
+}
+
+/*
+ * Backstop for the inserter's `fill: currentColor` on block icons. The inline
+ * style set in getBlockIcon covers rules that target the <svg>; this covers
+ * rules that reach the child paths directly, which an inline style on the
+ * parent cannot beat.
+ */
+svg.btb-inserter-icon[fill="none"] * {
+	fill: none;
 }
 
 /* ==========================================================================
@@ -59,643 +140,679 @@ $primaryColor: #4527a4;
 
 /* Custom Ultra-Modern React Modal (WP-Free UI) */
 .btb-custom-modal-backdrop {
-	position: fixed;
-	inset: 0;
-	z-index: 999999;
-	background: rgba(15, 23, 42, 0.72);
-	backdrop-filter: blur(8px);
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	padding: 20px;
-	animation: btbFadeIn 0.2s ease-out;
+  position: fixed;
+  inset: 0;
+  z-index: 999999;
+  background: rgba(15, 23, 42, 0.72);
+  backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  animation: btbFadeIn 0.2s ease-out;
 }
 
 @keyframes btbFadeIn {
-	from { opacity: 0; }
-	to { opacity: 1; }
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
 .btb-custom-modal-dialog {
-	background: #ffffff;
-	width: 960px;
-	max-width: 95vw;
-	max-height: 88vh;
-	border-radius: 20px;
-	box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.35);
-	display: flex;
-	flex-direction: column;
-	overflow: hidden;
-	animation: btbScaleUp 0.25s cubic-bezier(0.16, 1, 0.3, 1);
-	border: 1px solid rgba(255, 255, 255, 0.2);
+  background: #ffffff;
+  width: 960px;
+  max-width: 95vw;
+  max-height: 88vh;
+  border-radius: 20px;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.35);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  animation: btbScaleUp 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
 @keyframes btbScaleUp {
-	from { transform: scale(0.95); opacity: 0; }
-	to { transform: scale(1); opacity: 1; }
+  from {
+    transform: scale(0.95);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
 }
 
 .btb-custom-modal-header {
-	padding: 24px 28px 16px 28px;
-	display: flex;
-	align-items: center;
-	justify-content: space-between;
-	background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
-	border-bottom: 1px solid #f1f5f9;
+  padding: 24px 28px 16px 28px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
+  border-bottom: 1px solid #f1f5f9;
 
-	.btb-modal-title-wrap {
-		display: flex;
-		align-items: center;
-		gap: 14px;
-	}
+  .btb-modal-title-wrap {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
 
-	.btb-modal-header-icon {
-		width: 48px;
-		height: 48px;
-		border-radius: 14px;
-		background: linear-gradient(135deg, $primaryColor, #312e81);
-		color: #ffffff;
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		box-shadow: 0 8px 16px rgba(69, 39, 164, 0.25);
-	}
+  .btb-modal-header-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 14px;
+    // Derived from the brand colour so the tile stays on-palette if it changes.
+    background: linear-gradient(
+      135deg,
+      $brandColor,
+      color.adjust($brandColor, $lightness: -18%)
+    );
+    color: #ffffff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 8px 16px rgba(20, 110, 245, 0.25);
+  }
 
-	.btb-modal-title {
-		margin: 0 0 2px 0;
-		font-size: 20px;
-		font-weight: 800;
-		color: #0f172a;
-		letter-spacing: -0.4px;
-	}
+  .btb-modal-title {
+    margin: 0 0 2px 0;
+    font-size: 20px;
+    font-weight: 800;
+    color: #0f172a;
+    letter-spacing: -0.4px;
+  }
 
-	.btb-modal-desc {
-		margin: 0;
-		font-size: 13px;
-		color: #64748b;
-	}
+  .btb-modal-desc {
+    margin: 0;
+    font-size: 13px;
+    color: #64748b;
+  }
 
-	.btb-modal-close-btn {
-		background: #f1f5f9;
-		border: none;
-		width: 36px;
-		height: 36px;
-		border-radius: 50%;
-		font-size: 22px;
-		line-height: 1;
-		color: #64748b;
-		cursor: pointer;
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		transition: all 0.2s ease;
+  .btb-modal-close-btn {
+    background: #f1f5f9;
+    border: none;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    font-size: 22px;
+    line-height: 1;
+    color: #64748b;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
 
-		&:hover {
-			background: #fee2e2;
-			color: #dc2626;
-			transform: rotate(90deg);
-		}
-	}
+    &:hover {
+      background: #fee2e2;
+      color: #dc2626;
+      transform: rotate(90deg);
+    }
+  }
 }
 
 .btb-custom-modal-toolbar {
-	padding: 14px 28px;
-	background: #f8fafc;
-	border-bottom: 1px solid #e2e8f0;
-	display: flex;
-	align-items: center;
-	justify-content: space-between;
-	flex-wrap: wrap;
-	gap: 12px;
+  padding: 14px 28px;
+  background: #f8fafc;
+  border-bottom: 1px solid #e2e8f0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
 }
 
 .btb-modal-cats {
-	display: flex;
-	gap: 6px;
-	flex-wrap: wrap;
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
 }
 
 .btb-cat-chip {
-	background: #ffffff;
-	border: 1px solid #cbd5e1;
-	border-radius: 20px;
-	padding: 6px 16px;
-	font-size: 12px;
-	font-weight: 600;
-	color: #475569;
-	cursor: pointer;
-	transition: all 0.2s ease;
+  background: #ffffff;
+  border: 1px solid #cbd5e1;
+  border-radius: 20px;
+  padding: 6px 16px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #475569;
+  cursor: pointer;
+  transition: all 0.2s ease;
 
-	&:hover {
-		background: #f1f5f9;
-		color: #0f172a;
-		border-color: #94a3b8;
-	}
+  &:hover {
+    background: #f1f5f9;
+    color: #0f172a;
+    border-color: #94a3b8;
+  }
 
-	&.is-active {
-		background: $primaryColor;
-		border-color: $primaryColor;
-		color: #ffffff;
-		box-shadow: 0 4px 12px rgba(69, 39, 164, 0.3);
-	}
+  &.is-active {
+    background: $brandColor;
+    border-color: $brandColor;
+    color: #ffffff;
+    box-shadow: 0 4px 12px rgba(20, 110, 245, 0.3);
+  }
 }
 
 .btb-modal-search-box {
-	position: relative;
-	min-width: 240px;
+  position: relative;
+  min-width: 240px;
 
-	.search-icon {
-		position: absolute;
-		left: 10px;
-		top: 50%;
-		transform: translateY(-50%);
-		color: #94a3b8;
-		font-size: 16px;
-		width: 16px;
-		height: 16px;
-	}
+  .search-icon {
+    position: absolute;
+    left: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #94a3b8;
+    font-size: 16px;
+    width: 16px;
+    height: 16px;
+  }
 
-	input {
-		width: 100%;
-		border-radius: 10px;
-		border: 1px solid #cbd5e1;
-		padding: 7px 32px 7px 32px;
-		font-size: 13px;
-		outline: none;
-		transition: all 0.2s ease;
-		background: #ffffff;
+  input {
+    width: 100%;
+    border-radius: 10px;
+    border: 1px solid #cbd5e1;
+    padding: 7px 32px 7px 32px;
+    font-size: 13px;
+    outline: none;
+    transition: all 0.2s ease;
+    background: #ffffff;
 
-		&:focus {
-			border-color: $primaryColor;
-			box-shadow: 0 0 0 3px rgba(69, 39, 164, 0.15);
-		}
-	}
+    &:focus {
+      border-color: $brandColor;
+      box-shadow: 0 0 0 3px rgba(20, 110, 245, 0.15);
+    }
+  }
 
-	.clear-search-btn {
-		position: absolute;
-		right: 8px;
-		top: 50%;
-		transform: translateY(-50%);
-		background: none;
-		border: none;
-		color: #94a3b8;
-		font-size: 16px;
-		cursor: pointer;
+  .clear-search-btn {
+    position: absolute;
+    right: 8px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    color: #94a3b8;
+    font-size: 16px;
+    cursor: pointer;
 
-		&:hover {
-			color: #0f172a;
-		}
-	}
+    &:hover {
+      color: #0f172a;
+    }
+  }
 }
 
 .btb-custom-modal-grid {
-	display: grid;
-	grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-	gap: 16px;
-	padding: 24px 28px;
-	flex: 1;
-	overflow-y: auto !important;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 16px;
+  padding: 24px 28px;
+  flex: 1;
+  overflow-y: auto !important;
 
-	/* Single Custom Scrollbar */
-	&::-webkit-scrollbar {
-		width: 6px;
-	}
-	&::-webkit-scrollbar-track {
-		background: #f1f5f9;
-	}
-	&::-webkit-scrollbar-thumb {
-		background: #cbd5e1;
-		border-radius: 10px;
+  /* Single Custom Scrollbar */
+  &::-webkit-scrollbar {
+    width: 6px;
+  }
+  &::-webkit-scrollbar-track {
+    background: #f1f5f9;
+  }
+  &::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 10px;
 
-		&:hover {
-			background: #94a3b8;
-		}
-	}
+    &:hover {
+      background: #94a3b8;
+    }
+  }
 }
 
 .btb-modern-card {
-	background: #ffffff;
-	border: 1.5px solid #e2e8f0;
-	border-radius: 14px;
-	padding: 20px;
-	display: flex;
-	flex-direction: column;
-	justify-content: space-between;
-	cursor: pointer;
-	transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
-	position: relative;
+  background: #ffffff;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 14px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  cursor: pointer;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  position: relative;
 
-	&:hover {
-		border-color: $primaryColor;
-		transform: translateY(-4px);
-		box-shadow: 0 16px 32px -8px rgba(69, 39, 164, 0.18);
+  &:hover {
+    border-color: $brandColor;
+    transform: translateY(-4px);
+    box-shadow: 0 16px 32px -8px rgba(20, 110, 245, 0.18);
 
-		.btb-modern-icon {
-			background: $primaryColor;
-			color: #ffffff;
-			transform: scale(1.05);
-		}
-	}
+    .btb-modern-icon {
+      background: $brandColor;
+      color: #ffffff;
+      transform: scale(1.05);
+    }
+  }
 
-	&.is-active {
-		border-color: $primaryColor;
-		background: rgba(69, 39, 164, 0.04);
-		box-shadow: 0 0 0 2px $primaryColor;
+  &.is-active {
+    border-color: $brandColor;
+    background: rgba(20, 110, 245, 0.04);
+    box-shadow: 0 0 0 2px $brandColor;
 
-		.btb-modern-icon {
-			background: $primaryColor;
-			color: #ffffff;
-		}
-	}
+    .btb-modern-icon {
+      background: $brandColor;
+      color: #ffffff;
+    }
+  }
+}
+
+/*
+ * Third-party logos (Facebook, Google, Trustpilot) hardcode their own brand
+ * fill instead of inheriting `currentColor` like the rest of the icon set, so
+ * on an inverted tile they sit blue-on-blue and vanish. Force them to follow
+ * the tile's text colour while inverted; they keep their brand colours at rest.
+ *
+ * The :not([fill='none']) guard matters: the stroke-drawn icons carry
+ * fill="none" and would turn into solid blobs if this caught them.
+ */
+.btb-modern-card:hover,
+.btb-modern-card.is-active,
+.btb-my-testimonials-feeds .items-list .item:hover {
+  .btb-modern-icon,
+  .icon {
+    svg[fill]:not([fill="none"]),
+    svg [fill]:not([fill="none"]) {
+      fill: currentColor;
+    }
+
+    // The rating star hardcodes its stroke as well as its fill, so without
+    // this it keeps an amber outline around an otherwise white glyph.
+    svg[stroke]:not([stroke="none"]),
+    svg [stroke]:not([stroke="none"]) {
+      stroke: currentColor;
+    }
+  }
 }
 
 .btb-modern-card-header {
-	display: flex;
-	align-items: center;
-	justify-content: space-between;
-	margin-bottom: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 14px;
 }
 
 .btb-modern-icon {
-	width: 44px;
-	height: 44px;
-	border-radius: 12px;
-	background: #f1f5f9;
-	color: $primaryColor;
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	transition: all 0.25s ease;
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  background: #f1f5f9;
+  color: $brandColor;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.25s ease;
 
-	svg {
-		display: block;
-		flex-shrink: 0;
-	}
-
-
+  svg {
+    display: block;
+    flex-shrink: 0;
+  }
 }
 
 .btb-modern-badge {
-	background: linear-gradient(135deg, #ff416c, #ff4b2b);
-	color: #ffffff;
-	font-size: 10px;
-	font-weight: 700;
-	padding: 3px 8px;
-	border-radius: 12px;
-	text-transform: uppercase;
-	letter-spacing: 0.4px;
+  background: linear-gradient(135deg, #ff416c, #ff4b2b);
+  color: #ffffff;
+  font-size: 10px;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
 }
 
 .btb-modern-card-body {
-	flex: 1;
-	margin-bottom: 16px;
+  flex: 1;
+  margin-bottom: 16px;
 }
 
 .btb-modern-card-title {
-	margin: 0 0 6px 0;
-	font-size: 16px;
-	font-weight: 700;
-	color: #0f172a;
-	display: flex;
-	align-items: center;
-	justify-content: space-between;
+  margin: 0 0 6px 0;
+  font-size: 16px;
+  font-weight: 700;
+  color: #0f172a;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
 }
 
 .btb-modern-card-desc {
-	margin: 0;
-	font-size: 12px;
-	color: #64748b;
-	line-height: 1.45;
+  margin: 0;
+  font-size: 12px;
+  color: #64748b;
+  line-height: 1.45;
 }
 
 .btb-modern-select-btn {
-	width: 100%;
-	border-radius: 10px;
-	padding: 8px 16px;
-	font-size: 13px;
-	font-weight: 600;
-	cursor: pointer;
-	border: 1px solid #cbd5e1;
-	background: #ffffff;
-	color: #334155;
-	transition: all 0.2s ease;
+  width: 100%;
+  border-radius: 10px;
+  padding: 8px 16px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  border: 1px solid #cbd5e1;
+  background: #ffffff;
+  color: #334155;
+  transition: all 0.2s ease;
 
-	&:hover {
-		background: $primaryColor;
-		color: #ffffff;
-		border-color: $primaryColor;
-	}
+  &:hover {
+    background: $brandColor;
+    color: #ffffff;
+    border-color: $brandColor;
+  }
 
-	&.is-selected {
-		background: rgba(69, 39, 164, 0.12);
-		color: $primaryColor;
-		border-color: rgba(69, 39, 164, 0.3);
+  &.is-selected {
+    background: rgba(20, 110, 245, 0.12);
+    color: $brandColor;
+    border-color: rgba(20, 110, 245, 0.3);
 
-		&:hover {
-			background: $primaryColor;
-			color: #ffffff;
-		}
-	}
+    &:hover {
+      background: $brandColor;
+      color: #ffffff;
+    }
+  }
 }
 
 .btbSmartCard {
-	display: flex;
-	flex-direction: column;
-	justify-content: space-between;
-	background: #ffffff;
-	border: 1.5px solid #e2e8f0;
-	border-radius: 14px;
-	padding: 18px;
-	cursor: pointer;
-	transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-	position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  background: #ffffff;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 14px;
+  padding: 18px;
+  cursor: pointer;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
 
-	&:hover {
-		border-color: $primaryColor;
-		box-shadow: 0 12px 24px -8px rgba(69, 39, 164, 0.18);
-		transform: translateY(-3px);
+  &:hover {
+    border-color: $brandColor;
+    box-shadow: 0 12px 24px -8px rgba(20, 110, 245, 0.18);
+    transform: translateY(-3px);
 
-		.btbIconBox {
-			background: $primaryColor;
-			color: #ffffff;
-		}
-	}
+    .btbIconBox {
+      background: $brandColor;
+      color: #ffffff;
+    }
+  }
 
-	&.is-active {
-		border-color: $primaryColor;
-		background: #f8f6ff;
-		box-shadow: 0 0 0 1px $primaryColor;
+  &.is-active {
+    border-color: $brandColor;
+    background: #f8f6ff;
+    box-shadow: 0 0 0 1px $brandColor;
 
-		.btbIconBox {
-			background: $primaryColor;
-			color: #ffffff;
-		}
-	}
+    .btbIconBox {
+      background: $brandColor;
+      color: #ffffff;
+    }
+  }
 }
 
 .btbSmartCardHeader {
-	display: flex;
-	align-items: center;
-	justify-content: space-between;
-	margin-bottom: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 14px;
 }
 
 .btbIconBox {
-	width: 44px;
-	height: 44px;
-	border-radius: 10px;
-	background: #f1f5f9;
-	color: $primaryColor;
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	transition: all 0.25s ease;
-
-
+  width: 44px;
+  height: 44px;
+  border-radius: 10px;
+  background: #f1f5f9;
+  color: $brandColor;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.25s ease;
 }
 
 .btbSmartBadge {
-	background: linear-gradient(135deg, #ff416c, #ff4b2b);
-	color: #ffffff;
-	font-size: 10px;
-	font-weight: 700;
-	padding: 3px 8px;
-	border-radius: 12px;
-	text-transform: uppercase;
-	letter-spacing: 0.4px;
+  background: linear-gradient(135deg, #ff416c, #ff4b2b);
+  color: #ffffff;
+  font-size: 10px;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
 }
 
 .btbSmartCardBody {
-	flex-grow: 1;
-	margin-bottom: 16px;
+  flex-grow: 1;
+  margin-bottom: 16px;
 }
 
 .btbSmartCardTitle {
-	margin: 0 0 6px 0;
-	font-size: 15px;
-	font-weight: 700;
-	color: #0f172a;
-	display: flex;
-	align-items: center;
-	gap: 8px;
+  margin: 0 0 6px 0;
+  font-size: 15px;
+  font-weight: 700;
+  color: #0f172a;
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
 .btbActivePill {
-	font-size: 10px;
-	font-weight: 600;
-	background: $primaryColor;
-	color: #ffffff;
-	padding: 2px 7px;
-	border-radius: 10px;
+  font-size: 10px;
+  font-weight: 600;
+  background: $brandColor;
+  color: #ffffff;
+  padding: 2px 7px;
+  border-radius: 10px;
 }
 
 .btbSmartCardDesc {
-	margin: 0;
-	font-size: 12px;
-	color: #64748b;
-	line-height: 1.45;
+  margin: 0;
+  font-size: 12px;
+  color: #64748b;
+  line-height: 1.45;
 }
 
 .btbCardSelectBtn {
-	width: 100%;
-	justify-content: center;
-	border-radius: 8px !important;
-	font-weight: 600 !important;
+  width: 100%;
+  justify-content: center;
+  border-radius: 8px !important;
+  font-weight: 600 !important;
 }
 
 /* Canvas Placeholder */
 .btbCanvasPlaceholder {
-	padding: 40px 20px;
-	display: flex;
-	justify-content: center;
-	align-items: center;
+  padding: 40px 20px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 .btbPlaceholderCard {
-	max-width: 580px;
-	width: 100%;
-	background: #ffffff;
-	border: 2px dashed #cbd5e1;
-	border-radius: 20px;
-	padding: 36px 28px;
-	text-align: center;
-	box-shadow: 0 10px 30px rgba(0, 0, 0, 0.04);
-	transition: all 0.25s ease;
+  max-width: 580px;
+  width: 100%;
+  background: #ffffff;
+  border: 2px dashed #cbd5e1;
+  border-radius: 20px;
+  padding: 36px 28px;
+  text-align: center;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.04);
+  transition: all 0.25s ease;
 
-	&:hover {
-		border-color: $primaryColor;
-		border-style: solid;
-		box-shadow: 0 16px 36px rgba(69, 39, 164, 0.1);
-	}
+  &:hover {
+    border-color: $brandColor;
+    border-style: solid;
+    box-shadow: 0 16px 36px rgba(20, 110, 245, 0.1);
+  }
 }
 
 .btbPlaceholderIconWrap {
-	width: 64px;
-	height: 64px;
-	margin: 0 auto 16px auto;
-	border-radius: 16px;
-	background: #f1f5f9;
-	color: $primaryColor;
-	display: flex;
-	align-items: center;
-	justify-content: center;
+  width: 64px;
+  height: 64px;
+  margin: 0 auto 16px auto;
+  border-radius: 16px;
+  background: #f1f5f9;
+  color: $brandColor;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 
-	.btbPlaceholderMainIcon {
-		font-size: 36px;
-		width: 36px;
-		height: 36px;
-	}
+  .btbPlaceholderMainIcon {
+    font-size: 36px;
+    width: 36px;
+    height: 36px;
+  }
 }
 
 .btbPlaceholderTitle {
-	margin: 0 0 10px 0;
-	font-size: 20px;
-	font-weight: 700;
-	color: #0f172a;
+  margin: 0 0 10px 0;
+  font-size: 20px;
+  font-weight: 700;
+  color: #0f172a;
 }
 
 .btbPlaceholderDesc {
-	margin: 0 0 24px 0;
-	font-size: 14px;
-	color: #64748b;
-	line-height: 1.5;
+  margin: 0 0 24px 0;
+  font-size: 14px;
+  color: #64748b;
+  line-height: 1.5;
 }
 
 .btbChooseBlockBtn {
-	border-radius: 10px !important;
-	padding: 10px 24px !important;
-	font-size: 15px !important;
-	font-weight: 600 !important;
-	display: inline-flex;
-	align-items: center;
-	gap: 8px;
-
-
+  border-radius: 10px !important;
+  padding: 10px 24px !important;
+  font-size: 15px !important;
+  font-weight: 600 !important;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
 }
 
 /* Canvas Placeholder Grid matching my-social-feeds */
 .btb-my-testimonials-feeds {
-	background-color: rgba(69, 39, 164, 0.05);
-	padding: 30px 24px;
-	border-radius: 12px;
-	border: 1px dashed rgba(69, 39, 164, 0.25);
-	margin: 20px 0;
+  background-color: rgba(20, 110, 245, 0.05);
+  padding: 30px 24px;
+  border-radius: 12px;
+  border: 1px dashed rgba(20, 110, 245, 0.25);
+  margin: 20px 0;
 
-	h2 {
-		color: #0f172a;
-		text-align: center;
-		padding-top: 10px;
-		padding-bottom: 6px;
-		margin: 0;
-		font-size: 22px;
-		font-weight: 700;
-	}
+  h2 {
+    color: #0f172a;
+    text-align: center;
+    padding-top: 10px;
+    padding-bottom: 6px;
+    margin: 0;
+    font-size: 22px;
+    font-weight: 700;
+  }
 
-	h3 {
-		color: #64748b;
-		text-align: center;
-		margin: 0;
-		font-size: 15px;
-		font-weight: 400;
-	}
+  h3 {
+    color: #64748b;
+    text-align: center;
+    margin: 0;
+    font-size: 15px;
+    font-weight: 400;
+  }
 
-	.items-list {
-		display: grid;
-		grid-template-columns: repeat(3, 1fr);
-		column-gap: 16px;
-		row-gap: 16px;
-		padding-top: 24px;
+  .items-list {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    column-gap: 16px;
+    row-gap: 16px;
+    padding-top: 24px;
 
-		.item {
-			background-color: #ffffff;
-			border: 1.5px solid #e2e8f0;
-			border-radius: 12px;
-			text-align: center;
-			padding: 32px 18px 24px 18px;
-			cursor: pointer;
-			position: relative;
-			transition: all 0.25s ease;
-			transform: translateY(0);
+    .item {
+      background-color: #ffffff;
+      border: 1.5px solid #e2e8f0;
+      border-radius: 12px;
+      text-align: center;
+      padding: 32px 18px 24px 18px;
+      cursor: pointer;
+      position: relative;
+      transition: all 0.25s ease;
+      transform: translateY(0);
 
-			h3 {
-				font-size: 17px;
-				font-weight: 700;
-				margin: 0 0 6px 0;
-				color: #0f172a;
-				transition: color 0.25s ease;
-			}
+      h3 {
+        font-size: 17px;
+        font-weight: 700;
+        margin: 0 0 6px 0;
+        color: #0f172a;
+        transition: color 0.25s ease;
+      }
 
-			p {
-				margin: 0;
-				font-size: 13px;
-				color: #64748b;
-				line-height: 1.4;
-			}
+      p {
+        margin: 0;
+        font-size: 13px;
+        color: #64748b;
+        line-height: 1.4;
+      }
 
-			.icon {
-				margin: 0 auto 12px auto;
-				width: 44px;
-				height: 44px;
-				border-radius: 12px;
-				background: rgba(69, 39, 164, 0.08);
-				display: flex;
-				align-items: center;
-				justify-content: center;
-				transition: transform 0.25s ease;
+      .icon {
+        margin: 0 auto 12px auto;
+        width: 44px;
+        height: 44px;
+        border-radius: 12px;
+        background: rgba(20, 110, 245, 0.08);
+        color: $brandColor;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: transform 0.25s ease;
+      }
 
+      .btbItemBadge {
+        position: absolute;
+        top: 12px;
+        right: 12px;
+        background: linear-gradient(135deg, #ff416c, #ff4b2b);
+        color: #ffffff;
+        font-size: 9px;
+        font-weight: 700;
+        padding: 2px 7px;
+        border-radius: 8px;
+        text-transform: uppercase;
+      }
 
-			}
+      &:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 12px 24px rgba(20, 110, 245, 0.15);
+        border-color: $brandColor;
 
-			.btbItemBadge {
-				position: absolute;
-				top: 12px;
-				right: 12px;
-				background: linear-gradient(135deg, #ff416c, #ff4b2b);
-				color: #ffffff;
-				font-size: 9px;
-				font-weight: 700;
-				padding: 2px 7px;
-				border-radius: 8px;
-				text-transform: uppercase;
-			}
+        h3 {
+          color: $brandColor;
+        }
 
-			&:hover {
-				transform: translateY(-5px);
-				box-shadow: 0 12px 24px rgba(69, 39, 164, 0.15);
-				border-color: $primaryColor;
+        .icon {
+          background: $brandColor;
+          color: #ffffff;
+        }
+      }
+    }
+  }
 
-				h3 {
-					color: $primaryColor;
-				}
+  .btbPlaceholderModalBtnWrap {
+    text-align: center;
+    margin-top: 24px;
+  }
 
-				.icon {
-					background: $primaryColor;
-					color: #ffffff;
-				}
-			}
-		}
-	}
-
-	.btbPlaceholderModalBtnWrap {
-		text-align: center;
-		margin-top: 24px;
-	}
-
-	.btbOpenModalBtn {
-		border-radius: 10px !important;
-		padding: 8px 20px !important;
-		font-weight: 600 !important;
-	}
+  .btbOpenModalBtn {
+    border-radius: 10px !important;
+    padding: 8px 20px !important;
+    font-weight: 600 !important;
+  }
 }
 
 @media (max-width: 960px) {
-	.btb-my-testimonials-feeds .items-list {
-		grid-template-columns: repeat(2, 1fr);
-	}
+  .btb-my-testimonials-feeds .items-list {
+    grid-template-columns: repeat(2, 1fr);
+  }
 }
 
 @media (max-width: 600px) {
-	.btb-my-testimonials-feeds .items-list {
-		grid-template-columns: 1fr;
-	}
+  .btb-my-testimonials-feeds .items-list {
+    grid-template-columns: 1fr;
+  }
 }

@@ -1,4 +1,3 @@
-import { useState, useEffect } from 'react';
 import { Navigation, A11y, Autoplay, Mousewheel, Pagination, EffectCoverflow } from 'swiper/modules';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import 'swiper/css';

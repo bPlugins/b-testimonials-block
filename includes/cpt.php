@@ -133,14 +133,14 @@ if ( ! function_exists( 'bpbtb_testimonial_meta_box_cb' ) ) {
 function bpbtb_testimonial_meta_box_cb( $post ) {
 	wp_nonce_field( 'bpbtb_save_testimonial', 'bpbtb_testimonial_nonce' );
 
-	$rating      = (int) get_post_meta( $post->ID, 'bpbtb_rating', true );
+	$rating      = (float) get_post_meta( $post->ID, 'bpbtb_rating', true );
 	$designation = (string) get_post_meta( $post->ID, 'bpbtb_designation', true );
 	$company     = (string) get_post_meta( $post->ID, 'bpbtb_company', true );
 	$rating      = $rating ? $rating : 5;
 	?>
 	<p>
-		<label for="bpbtb_rating"><strong><?php esc_html_e( 'Rating (1–5)', 'b-testimonials-block' ); ?></strong></label>
-		<input type="number" min="1" max="5" step="1" id="bpbtb_rating" name="bpbtb_rating" value="<?php echo esc_attr( $rating ); ?>" style="width:100%;" />
+		<label for="bpbtb_rating"><strong><?php esc_html_e( 'Rating (0–5)', 'b-testimonials-block' ); ?></strong></label>
+		<input type="number" min="0" max="5" step="0.1" id="bpbtb_rating" name="bpbtb_rating" value="<?php echo esc_attr( $rating ); ?>" style="width:100%;" />
 	</p>
 	<p>
 		<label for="bpbtb_designation"><strong><?php esc_html_e( 'Designation', 'b-testimonials-block' ); ?></strong></label>
@@ -175,7 +175,9 @@ function bpbtb_save_testimonial_meta( $post_id ) {
 	}
 
 	if ( isset( $_POST['bpbtb_rating'] ) ) {
-		$rating = min( 5, max( 1, absint( wp_unslash( $_POST['bpbtb_rating'] ) ) ) );
+		// Float, not absint() -- absint() truncated 4.5 to 4 and made fractional
+		// ratings impossible to save. Casting still sanitises the input.
+		$rating = round( min( 5, max( 0, (float) wp_unslash( $_POST['bpbtb_rating'] ) ) ), 1 );
 		update_post_meta( $post_id, 'bpbtb_rating', $rating );
 	}
 
@@ -220,7 +222,7 @@ add_filter( 'manage_testimonial_posts_columns', 'bpbtb_testimonial_columns' );
 if ( ! function_exists( 'bpbtb_testimonial_column_content' ) ) {
 function bpbtb_testimonial_column_content( $col, $post_id ) {
 	if ( 'bpbtb_rating' === $col ) {
-		$rating = (int) get_post_meta( $post_id, 'bpbtb_rating', true );
+		$rating = (float) get_post_meta( $post_id, 'bpbtb_rating', true );
 		echo esc_html( str_repeat( '★', max( 0, min( 5, $rating ) ) ) );
 	} elseif ( 'bpbtb_designation' === $col ) {
 		echo esc_html( (string) get_post_meta( $post_id, 'bpbtb_designation', true ) );
@@ -264,7 +266,7 @@ function bpbtb_get_testimonial_items( $q = [] ) {
 			'name'       => get_the_title( $post ),
 			'deg'        => (string) get_post_meta( $post->ID, 'bpbtb_designation', true ),
 			'reviewText' => wp_kses_post( $post->post_content ),
-			'rating'     => (int) get_post_meta( $post->ID, 'bpbtb_rating', true ) ?: 5,
+			'rating'     => (float) get_post_meta( $post->ID, 'bpbtb_rating', true ) ?: 5,
 		];
 	}
 

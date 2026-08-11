@@ -1,9 +1,15 @@
 import { useEffect } from 'react';
 import { __ } from '@wordpress/i18n';
-import { useBlockProps, InspectorControls, MediaUpload, MediaUploadCheck, PanelColorSettings } from '@wordpress/block-editor';
+import { useBlockProps, InspectorControls, MediaUpload, MediaUploadCheck } from '@wordpress/block-editor';
 import { PanelBody, RangeControl, TextControl, Button, Dashicon } from '@wordpress/components';
 import { produce } from 'immer';
 import BlockSwitcher from '../../shared/Components/Common/BlockSwitcher';
+import ColorsPanel from '../../shared/Components/Backend/Settings/ColorsPanel';
+import Style from '../../shared/Components/Common/Style';
+import { ColorControl } from '../../../../bpl-tools/Components/ColorControl/ColorControl';
+import IconSettings from '../../shared/Components/Backend/Settings/IconSettings';
+import BlockIcon from '../../shared/Components/Common/BlockIcon';
+import { getIcon } from '../../shared/utils/blockIcons';
 
 import './edit.scss';
 import '../../shared/styles/video.scss';
@@ -17,8 +23,15 @@ const gridVars = ( { columns, columnGap, rowGap, accentColor } ) => ( {
 	'--accent': accentColor,
 } );
 
-const PlayIcon = () => (
-	<svg viewBox="0 0 24 24" width="26" height="26" fill="currentColor"><path d="M8 5v14l11-7z" /></svg>
+const PlayIcon = ( { icon } ) => (
+	<BlockIcon
+		icon={ icon }
+		size={ 26 }
+		defaultColor="currentColor"
+		renderFallback={ ( color ) => (
+			<svg viewBox="0 0 24 24" width="26" height="26" fill={ color }><path d="M8 5v14l11-7z" /></svg>
+		) }
+	/>
 );
 
 const Edit = ( { attributes, setAttributes, clientId } ) => {
@@ -26,7 +39,7 @@ const Edit = ( { attributes, setAttributes, clientId } ) => {
 
 	useEffect( () => {
 		clientId && setAttributes( { cId: clientId.substring( 0, 10 ) } );
-	}, [ clientId ] );
+	}, [ clientId, setAttributes ] );
 
 	const setColumn = ( device, val ) => setAttributes( { columns: { ...columns, [ device ]: val } } );
 
@@ -42,7 +55,9 @@ const Edit = ( { attributes, setAttributes, clientId } ) => {
 		<>
 			<InspectorControls>
 				<BlockSwitcher clientId={ clientId } />
-				<PanelBody title={ __( 'Layout', 'b-testimonials-block' ) }>
+				<ColorsPanel attributes={ attributes } setAttributes={ setAttributes } />
+				<IconSettings attributes={ attributes } setAttributes={ setAttributes } />
+				<PanelBody className="bPlPanelBody" title={ __( 'Layout', 'b-testimonials-block' ) }>
 					<RangeControl label={ __( 'Columns (Desktop)', 'b-testimonials-block' ) } value={ columns?.desktop } onChange={ ( val ) => setColumn( 'desktop', val ) } min={ 1 } max={ 5 } />
 					<RangeControl label={ __( 'Columns (Tablet)', 'b-testimonials-block' ) } value={ columns?.tablet } onChange={ ( val ) => setColumn( 'tablet', val ) } min={ 1 } max={ 4 } />
 					<RangeControl label={ __( 'Columns (Mobile)', 'b-testimonials-block' ) } value={ columns?.mobile } onChange={ ( val ) => setColumn( 'mobile', val ) } min={ 1 } max={ 2 } />
@@ -50,13 +65,11 @@ const Edit = ( { attributes, setAttributes, clientId } ) => {
 					<TextControl label={ __( 'Row gap', 'b-testimonials-block' ) } value={ rowGap } onChange={ ( val ) => setAttributes( { rowGap: val } ) } />
 				</PanelBody>
 
-				<PanelColorSettings
-					title={ __( 'Color', 'b-testimonials-block' ) }
-					initialOpen={ false }
-					colorSettings={ [ { value: accentColor, onChange: ( val ) => setAttributes( { accentColor: val } ), label: __( 'Play button', 'b-testimonials-block' ) } ] }
-				/>
+				<PanelBody className="bPlPanelBody" title={ __( 'Color', 'b-testimonials-block' ) } initialOpen={ false }>
+					<ColorControl label={ __( 'Play button', 'b-testimonials-block' ) } value={ accentColor } onChange={ ( val ) => setAttributes( { accentColor: val } ) } />
+				</PanelBody>
 
-				<PanelBody title={ __( 'Videos', 'b-testimonials-block' ) } initialOpen={ false }>
+				<PanelBody className="bPlPanelBody" title={ __( 'Videos', 'b-testimonials-block' ) } initialOpen={ false }>
 					{ items.map( ( item, index ) => (
 						<div key={ index } className="btb-video-row">
 							<strong>{ __( 'Video', 'b-testimonials-block' ) } { index + 1 }</strong>
@@ -82,12 +95,13 @@ const Edit = ( { attributes, setAttributes, clientId } ) => {
 				</PanelBody>
 			</InspectorControls>
 
-			<div { ...useBlockProps( { className: 'bVideoTestimonials' } ) }>
+			<div { ...useBlockProps( { className: 'bVideoTestimonials', id: `btbTestimonialsDir-${ clientId }` } ) }>
+				<Style attributes={ attributes } clientId={ clientId } />
 				<div className="videos-grid" style={ gridVars( attributes ) }>
 					{ items.map( ( item, index ) => (
 						<div className="video-item" key={ index }>
 							<div className="video-frame" style={ item?.poster?.url ? { backgroundImage: `url(${ item.poster.url })` } : undefined }>
-								<span className="video-play" style={ { color: accentColor } }><PlayIcon /></span>
+								<span className="video-play" style={ { color: accentColor } }><PlayIcon icon={ getIcon( attributes, 'play' ) } /></span>
 							</div>
 							<div className="video-meta">
 								{ item?.name && <h3 className="name">{ item.name }</h3> }

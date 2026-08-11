@@ -1,5 +1,6 @@
 
 import { getStar } from '../../../utils/functions';
+import { editorClickable } from '../../../utils/a11y';
 import Image from '../Image';
 import ReviewText from '../ReviewText';
 import RatingIcon from '../RatingIcon';
@@ -9,7 +10,7 @@ const Default = ({ item = {}, index, itemEls = {}, attributes = {}, activeIndex,
     const { starIconColor } = attributes || {};
     const { img = {}, reviewText = '', rating = 5 } = item || {};
 
-    return <div className={`single ${isBackend && index === activeIndex ? "btbNowEditing" : ""}`} onClick={() => isBackend && setActiveIndex(index)}>
+    return <div className={`single ${isBackend && index === activeIndex ? "btbNowEditing" : ""}`} {...editorClickable(isBackend, () => setActiveIndex(index))}>
 
         <div className="top">
             <Image attributes={attributes} img={img}>{itemEls?.img}</Image>

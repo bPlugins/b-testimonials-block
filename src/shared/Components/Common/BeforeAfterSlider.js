@@ -89,6 +89,7 @@ const BeforeAfterSlider = ({ attributes = {} }) => {
 			<div
 				ref={containerRef}
 				className="ba-wrap"
+				role="presentation"
 				style={{ '--pos': `${pos}%` }}
 				onMouseDown={onMouseDown}
 				onTouchStart={onTouchStart}

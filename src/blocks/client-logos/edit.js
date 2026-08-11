@@ -4,6 +4,8 @@ import { useBlockProps, InspectorControls, MediaUpload, MediaUploadCheck } from 
 import { PanelBody, RangeControl, ToggleControl, TextControl, Button, Dashicon } from '@wordpress/components';
 import { produce } from 'immer';
 import BlockSwitcher from '../../shared/Components/Common/BlockSwitcher';
+import ColorsPanel from '../../shared/Components/Backend/Settings/ColorsPanel';
+import Style from '../../shared/Components/Common/Style';
 
 import './edit.scss';
 import '../../shared/styles/logos.scss';
@@ -22,7 +24,7 @@ const Edit = ( { attributes, setAttributes, clientId } ) => {
 
 	useEffect( () => {
 		clientId && setAttributes( { cId: clientId.substring( 0, 10 ) } );
-	}, [ clientId ] );
+	}, [ clientId, setAttributes ] );
 
 	const setColumn = ( device, val ) => setAttributes( { columns: { ...columns, [ device ]: val } } );
 
@@ -38,7 +40,8 @@ const Edit = ( { attributes, setAttributes, clientId } ) => {
 		<>
 			<InspectorControls>
 				<BlockSwitcher clientId={ clientId } />
-				<PanelBody title={ __( 'Layout', 'b-testimonials-block' ) }>
+				<ColorsPanel attributes={ attributes } setAttributes={ setAttributes } />
+				<PanelBody className="bPlPanelBody" title={ __( 'Layout', 'b-testimonials-block' ) }>
 					<RangeControl label={ __( 'Columns (Desktop)', 'b-testimonials-block' ) } value={ columns?.desktop } onChange={ ( val ) => setColumn( 'desktop', val ) } min={ 1 } max={ 8 } />
 					<RangeControl label={ __( 'Columns (Tablet)', 'b-testimonials-block' ) } value={ columns?.tablet } onChange={ ( val ) => setColumn( 'tablet', val ) } min={ 1 } max={ 6 } />
 					<RangeControl label={ __( 'Columns (Mobile)', 'b-testimonials-block' ) } value={ columns?.mobile } onChange={ ( val ) => setColumn( 'mobile', val ) } min={ 1 } max={ 4 } />
@@ -46,12 +49,12 @@ const Edit = ( { attributes, setAttributes, clientId } ) => {
 					<TextControl label={ __( 'Row gap', 'b-testimonials-block' ) } value={ rowGap } onChange={ ( val ) => setAttributes( { rowGap: val } ) } />
 				</PanelBody>
 
-				<PanelBody title={ __( 'Style', 'b-testimonials-block' ) } initialOpen={ false }>
+				<PanelBody className="bPlPanelBody" title={ __( 'Style', 'b-testimonials-block' ) } initialOpen={ false }>
 					<RangeControl label={ __( 'Logo height (px)', 'b-testimonials-block' ) } value={ logoHeight } onChange={ ( val ) => setAttributes( { logoHeight: val } ) } min={ 20 } max={ 200 } />
 					<ToggleControl label={ __( 'Grayscale (color on hover)', 'b-testimonials-block' ) } checked={ grayscale } onChange={ ( val ) => setAttributes( { grayscale: val } ) } />
 				</PanelBody>
 
-				<PanelBody title={ __( 'Logos', 'b-testimonials-block' ) } initialOpen={ false }>
+				<PanelBody className="bPlPanelBody" title={ __( 'Logos', 'b-testimonials-block' ) } initialOpen={ false }>
 					{ logos.map( ( logo, index ) => (
 						<div key={ index } className="btb-logo-row">
 							<MediaUploadCheck>
@@ -81,7 +84,8 @@ const Edit = ( { attributes, setAttributes, clientId } ) => {
 				</PanelBody>
 			</InspectorControls>
 
-			<div { ...useBlockProps( { className: 'bClientLogos' } ) }>
+			<div { ...useBlockProps( { className: 'bClientLogos', id: `btbTestimonialsDir-${ clientId }` } ) }>
+				<Style attributes={ attributes } clientId={ clientId } />
 				<div className={ `logos-grid ${ grayscale ? 'is-grayscale' : '' }` } style={ gridVars( attributes ) }>
 					{ logos.map( ( logo, index ) => (
 						<div className="logo-item" key={ index }>

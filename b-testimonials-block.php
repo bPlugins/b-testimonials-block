@@ -1,7 +1,7 @@
 <?php
 /**
  * Plugin Name: B Testimonials Block
- * Description: Boost your website's credibility with b testimonials block, effortlessly showcasing customer ratings and reviews..
+ * Description: Boost your website's credibility with b testimonials block, effortlessly showcasing customer ratings and reviews.
  * Version: 1.0.3
  * Author: bPlugins
  * Author URI: http://bplugins.com
@@ -28,6 +28,7 @@ class BPBTB_Testimonials_Block{
 
         add_action('init', [$this, 'onInit']);
         add_filter('block_categories_all', [$this, 'register_block_category']);
+        add_filter('block_type_metadata', [$this, 'set_block_asset_version']);
 
         // Redirect to Demo & Help page on first activation.
         register_activation_hook( __FILE__, [ $this, 'on_activation' ] );
@@ -74,9 +75,16 @@ class BPBTB_Testimonials_Block{
 
     private function define_constants() {
         $http_host = isset( $_SERVER['HTTP_HOST'] ) ? sanitize_text_field( wp_unslash( $_SERVER['HTTP_HOST'] ) ) : '';
+        // Local dev is usually served on a port (Studio uses localhost:PORT), so
+        // match the host prefix rather than the bare string -- otherwise assets
+        // are cached under a fixed version and rebuilds never reach the browser.
+        $host_only = strtok( $http_host, ':' );
+        $is_local  = in_array( $host_only, array( 'localhost', '127.0.0.1', '::1' ), true )
+            || ( '' !== $host_only && str_ends_with( $host_only, '.local' ) );
+
         // Constant
         if ( ! defined( 'BPBTB_PLUGIN_VERSION' ) ) {
-            define( 'BPBTB_PLUGIN_VERSION', 'localhost' === $http_host ? time() : '1.0.3' );
+            define( 'BPBTB_PLUGIN_VERSION', $is_local ? time() : '1.0.3' );
         }
         if ( ! defined( 'BTB_PLUGIN_VERSION' ) ) {
             define( 'BTB_PLUGIN_VERSION', BPBTB_PLUGIN_VERSION );
@@ -118,6 +126,26 @@ class BPBTB_Testimonials_Block{
 			// Fallback for the legacy single-block build layout.
 			register_block_type( __DIR__ . '/build' );
 		}
+	}
+
+	/**
+	 * Give our blocks' scripts and styles a real ?ver= stamp.
+	 *
+	 * Without a `version` in block.json, WordPress registers block assets with
+	 * $version = false and falls back to the WordPress core version, so the
+	 * asset URL never changes between plugin builds and browsers serve stale
+	 * CSS/JS. Tying it to BPBTB_PLUGIN_VERSION busts the cache on every local
+	 * rebuild and on every released version.
+	 *
+	 * @param array $metadata Parsed block.json metadata.
+	 * @return array
+	 */
+	public function set_block_asset_version( $metadata ) {
+		if ( isset( $metadata['name'] ) && str_starts_with( $metadata['name'], 'bptmb/' ) && empty( $metadata['version'] ) ) {
+			$metadata['version'] = (string) BPBTB_PLUGIN_VERSION;
+		}
+
+		return $metadata;
 	}
 
 	// Group all bPlugins testimonial blocks under one category in the inserter.

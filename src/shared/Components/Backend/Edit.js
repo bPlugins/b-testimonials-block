@@ -19,7 +19,7 @@ import Style from '../Common/Style';
 import Layout from '../Common/Layout/Layout';
 import TestimonialsView from '../Common/TestimonialsView';
 import { upload } from '../../utils/icons';
-import { htmlTagsStrip } from '../../utils/functions';
+import { clickable } from '../../utils/a11y';
 
 const mapCptPost = (post) => ({
 	img: { url: post?._embedded?.['wp:featuredmedia']?.[0]?.source_url || '' },
@@ -69,7 +69,7 @@ const Edit = props => {
 		[clientId]
 	);
 
-	useEffect(() => { clientId && setAttributes({ cId: clientId.substring(0, 10) }); }, [clientId]); // Set & Update clientId to cId
+	useEffect(() => { clientId && setAttributes({ cId: clientId.substring(0, 10) }); }, [clientId, setAttributes]); // Set & Update clientId to cId
 
 	useEffect(() => tabController(), [isSelected]);
 	const [activeIndex, setActiveIndex] = useState(0);
@@ -167,7 +167,6 @@ const Edit = props => {
 	const itemsEls = items.map((item) => {
 		if (!item) return { img: null, name: null, deg: null, reviewText: null };
 		const { name = '', deg = '', img = {}, reviewText = '' } = item;
-		const contentLength = htmlTagsStrip(reviewText || '').length;
 
 		return {
 			img: <div className="upload">
@@ -180,7 +179,7 @@ const Edit = props => {
 
 			deg: elements?.deg && <RichText tagName="h5" className='deg' value={deg || ''} onChange={(val) => updateItem("deg", val)} placeholder={__('Enter your designation', 'b-testimonials-block')} inlineToolbar />,
 
-			reviewText: <ReviewText attributes={attributes} elements={elements} contentLength={contentLength} textLength={textLength} reviewText={reviewText || ''} updateItem={updateItem} />
+			reviewText: <ReviewText attributes={attributes} elements={elements} textLength={textLength} reviewText={reviewText || ''} updateItem={updateItem} />
 		};
 	});
 
@@ -207,12 +206,33 @@ const Edit = props => {
 export default Edit;
 
 
-const ReviewText = ({ attributes, elements, contentLength, textLength, reviewText, updateItem }) => {
+const ReviewText = ({ attributes, elements, textLength, reviewText, updateItem }) => {
 	const [expanded, setExpanded] = useState(false);
 
-	return <>
-		{elements?.reviewText && <RichText tagName="p" className='reviewText' value={reviewText} onChange={(val) => updateItem("reviewText", val)} placeholder={__('Enter your review', 'b-testimonials-block')} inlineToolbar />}
+	// These three lines must stay identical to ViewReviewText in
+	// Common/TestimonialsView.js -- that is what the front end renders, and any
+	// difference here shows up as an editor preview that does not match the
+	// published post. Measure the raw string, exactly as the front end does.
+	const text = reviewText || '';
+	const isCollapsible = !!elements?.expandBtn && text.length > textLength;
+	const collapsed = isCollapsible && !expanded;
 
-		{contentLength > textLength && <ExpandButton attributes={attributes} reviewText={reviewText} expanded={expanded} onChange={() => setExpanded(!expanded)} />}
+	// While collapsed the excerpt is a plain paragraph rather than a RichText:
+	// this RichText *is* the editable source, so slicing its value would save the
+	// shortened text back over the author's content. Swapping the element keeps
+	// the stored text intact while showing the real front end cut. Clicking the
+	// excerpt expands it, so editing is one click away.
+	if (!elements?.reviewText) { return null; }
+
+	return <>
+		{collapsed
+			? <p
+				className="reviewText btbTextCollapsed"
+				{...clickable(() => setExpanded(true), __('Expand the review text to edit it', 'b-testimonials-block'))}
+				dangerouslySetInnerHTML={{ __html: text.slice(0, textLength) }}
+			/>
+			: <RichText tagName="p" className="reviewText" value={reviewText} onChange={(val) => updateItem("reviewText", val)} placeholder={__('Enter your review', 'b-testimonials-block')} inlineToolbar />}
+
+		{isCollapsible && <ExpandButton attributes={attributes} expanded={expanded} onChange={() => setExpanded(!expanded)} />}
 	</>
 }

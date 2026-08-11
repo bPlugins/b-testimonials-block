@@ -1,9 +1,12 @@
 import { useEffect } from 'react';
 import { __ } from '@wordpress/i18n';
-import { useBlockProps, InspectorControls, PanelColorSettings } from '@wordpress/block-editor';
+import { useBlockProps, InspectorControls } from '@wordpress/block-editor';
 import { PanelBody, RangeControl, TextControl, ToggleControl, Button, Dashicon } from '@wordpress/components';
 import { produce } from 'immer';
 import BlockSwitcher from '../../shared/Components/Common/BlockSwitcher';
+import ColorsPanel from '../../shared/Components/Backend/Settings/ColorsPanel';
+import Style from '../../shared/Components/Common/Style';
+import { ColorControl } from '../../../../bpl-tools/Components/ColorControl/ColorControl';
 
 import './edit.scss';
 import '../../shared/styles/stats.scss';
@@ -22,7 +25,7 @@ const Edit = ( { attributes, setAttributes, clientId } ) => {
 
 	useEffect( () => {
 		clientId && setAttributes( { cId: clientId.substring( 0, 10 ) } );
-	}, [ clientId ] );
+	}, [ clientId, setAttributes ] );
 
 	const setColumn = ( device, val ) => setAttributes( { columns: { ...columns, [ device ]: val } } );
 	const updateItem = ( i, key, val ) => setAttributes( { items: produce( items, ( d ) => { d[ i ][ key ] = val; } ) } );
@@ -33,7 +36,8 @@ const Edit = ( { attributes, setAttributes, clientId } ) => {
 		<>
 			<InspectorControls>
 				<BlockSwitcher clientId={ clientId } />
-				<PanelBody title={ __( 'Layout', 'b-testimonials-block' ) }>
+				<ColorsPanel attributes={ attributes } setAttributes={ setAttributes } />
+				<PanelBody className="bPlPanelBody" title={ __( 'Layout', 'b-testimonials-block' ) }>
 					<RangeControl label={ __( 'Columns (Desktop)', 'b-testimonials-block' ) } value={ columns?.desktop } onChange={ ( v ) => setColumn( 'desktop', v ) } min={ 1 } max={ 6 } />
 					<RangeControl label={ __( 'Columns (Tablet)', 'b-testimonials-block' ) } value={ columns?.tablet } onChange={ ( v ) => setColumn( 'tablet', v ) } min={ 1 } max={ 4 } />
 					<RangeControl label={ __( 'Columns (Mobile)', 'b-testimonials-block' ) } value={ columns?.mobile } onChange={ ( v ) => setColumn( 'mobile', v ) } min={ 1 } max={ 2 } />
@@ -42,9 +46,11 @@ const Edit = ( { attributes, setAttributes, clientId } ) => {
 					<ToggleControl label={ __( 'Animate count', 'b-testimonials-block' ) } checked={ animate } onChange={ ( v ) => setAttributes( { animate: v } ) } />
 				</PanelBody>
 
-				<PanelColorSettings title={ __( 'Color', 'b-testimonials-block' ) } initialOpen={ false } colorSettings={ [ { value: accentColor, onChange: ( v ) => setAttributes( { accentColor: v } ), label: __( 'Number color', 'b-testimonials-block' ) } ] } />
+				<PanelBody className="bPlPanelBody" title={ __( 'Color', 'b-testimonials-block' ) } initialOpen={ false }>
+					<ColorControl label={ __( 'Number color', 'b-testimonials-block' ) } value={ accentColor } onChange={ ( v ) => setAttributes( { accentColor: v } ) } />
+				</PanelBody>
 
-				<PanelBody title={ __( 'Stats', 'b-testimonials-block' ) } initialOpen={ false }>
+				<PanelBody className="bPlPanelBody" title={ __( 'Stats', 'b-testimonials-block' ) } initialOpen={ false }>
 					{ items.map( ( item, i ) => (
 						<div key={ i } className="btb-stat-row">
 							<TextControl label={ __( 'Number', 'b-testimonials-block' ) } type="number" value={ item?.number } onChange={ ( v ) => updateItem( i, 'number', Number( v ) ) } />
@@ -61,7 +67,8 @@ const Edit = ( { attributes, setAttributes, clientId } ) => {
 				</PanelBody>
 			</InspectorControls>
 
-			<div { ...useBlockProps( { className: 'bTestimonialStats' } ) }>
+			<div { ...useBlockProps( { className: 'bTestimonialStats', id: `btbTestimonialsDir-${ clientId }` } ) }>
+				<Style attributes={ attributes } clientId={ clientId } />
 				<div className="stats-grid" style={ gridVars( attributes ) }>
 					{ items.map( ( item, i ) => (
 						<div className="stat-item" key={ i }>

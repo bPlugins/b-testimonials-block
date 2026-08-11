@@ -1,19 +1,39 @@
 
 import { star } from './icons';
 
+/**
+ * Render a 0-5 star rating, supporting fractions.
+ *
+ * Each star is a grey base with the coloured star layered on top and clipped to
+ * the portion that should be filled, so any fraction works -- 4.5, 4.3, 3.75 --
+ * not just halves. Previously this compared `i <= value`, which snapped every
+ * rating down to a whole star and made fractional values invisible.
+ *
+ * @param {number} value Rating from 0 to 5.
+ * @param {string} color Fill colour for the earned portion.
+ * @return {Array} Star elements.
+ */
 export const getStar = (value, color) => {
-    let rating = [];
+    const score = Math.max(0, Math.min(5, parseFloat(value) || 0));
+    const rating = [];
+
     for (let i = 1; i <= 5; i++) {
-        if (i <= value) {
-            rating.push(
-                star(color)
-            );
-        } else {
-            rating.push(
-                star('#ccc')
-            );
-        }
+        // How much of this particular star is earned, as a percentage.
+        const filled = Math.max(0, Math.min(1, score - (i - 1))) * 100;
+
+        rating.push(
+            <span key={i} className="btbStar">
+                {star('#ccc')}
+
+                {filled > 0 && (
+                    <span className="btbStarFill" style={{ width: `${filled}%` }}>
+                        {star(color)}
+                    </span>
+                )}
+            </span>
+        );
     }
+
     return rating;
 }
 

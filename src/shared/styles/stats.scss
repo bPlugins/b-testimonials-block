@@ -19,7 +19,7 @@
 	.stat-label {
 		margin-top: 6px;
 		font-size: 16px;
-		color: #7b7b7b;
+		color: var(--btb-muted, #7b7b7b);
 	}
 
 	@media ( max-width: 768px ) {

@@ -36,6 +36,39 @@
 		"image"
 	],
 	"attributes": {
+		"brandColor": {
+			"type": "string"
+		},
+		"surfaceColor": {
+			"type": "string"
+		},
+		"borderColor": {
+			"type": "string"
+		},
+		"titleColor": {
+			"type": "string"
+		},
+		"bodyColor": {
+			"type": "string"
+		},
+		"mutedColor": {
+			"type": "string"
+		},
+		"ratingColor": {
+			"type": "string"
+		},
+		"trackColor": {
+			"type": "string"
+		},
+		"labelBgColor": {
+			"type": "string"
+		},
+		"labelTextColor": {
+			"type": "string"
+		},
+		"gripIconColor": {
+			"type": "string"
+		},
 		"align": {
 			"type": "string",
 			"default": "wide"

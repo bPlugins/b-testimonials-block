@@ -240,7 +240,11 @@ function bpbtb_render_nps_poll_admin_page() {
 	<style>
 		.bpbtb-nps-wrap {
 			max-width: 1280px;
-			margin: 24px 20px 40px 0;
+			/* auto left/right centres the page in the admin content area; the
+			   old `0` left margin pinned it to the edge on wide screens. */
+			margin: 24px auto 40px;
+			padding: 0 20px;
+			box-sizing: border-box;
 			font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
 		}
 

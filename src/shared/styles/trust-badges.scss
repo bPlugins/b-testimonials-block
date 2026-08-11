@@ -10,9 +10,9 @@
 		align-items: center;
 		gap: 14px;
 		padding: 18px 20px;
-		border: 1px solid #ececec;
+		border: var(--btb-border-width, 1px) solid var(--btb-border, #ececec);
 		border-radius: 10px;
-		background: #fff;
+		background: var(--btb-surface, #fff);
 	}
 
 	.badge-icon {
@@ -31,7 +31,7 @@
 	.badge-subtitle {
 		margin: 2px 0 0;
 		font-size: 14px;
-		color: #7b7b7b;
+		color: var(--btb-muted, #7b7b7b);
 	}
 
 	@media ( max-width: 768px ) {

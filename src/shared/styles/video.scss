@@ -57,7 +57,7 @@
 		width: 62px;
 		height: 62px;
 		border-radius: 50%;
-		background: #fff;
+		background: var(--btb-surface, #fff);
 		display: flex;
 		align-items: center;
 		justify-content: center;
@@ -81,7 +81,7 @@
 		.deg {
 			margin: 2px 0 0;
 			font-size: 14px;
-			color: #7b7b7b;
+			color: var(--btb-muted, #7b7b7b);
 		}
 	}
 

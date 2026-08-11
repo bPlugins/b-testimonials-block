@@ -16,6 +16,33 @@
   ],
   "textdomain": "b-testimonials-block",
   "attributes": {
+    "borderWidth": {
+      "type": "number"
+    },
+    "brandColor": {
+      "type": "string"
+    },
+    "surfaceColor": {
+      "type": "string"
+    },
+    "borderColor": {
+      "type": "string"
+    },
+    "titleColor": {
+      "type": "string"
+    },
+    "bodyColor": {
+      "type": "string"
+    },
+    "mutedColor": {
+      "type": "string"
+    },
+    "ratingColor": {
+      "type": "string"
+    },
+    "trackColor": {
+      "type": "string"
+    },
     "align": {
       "type": "string",
       "default": "wide"

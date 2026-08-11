@@ -2,9 +2,9 @@ import { registerBlockType } from '@wordpress/blocks';
 
 import metadata from './block.json';
 import Edit from './edit';
-import { blockIcon } from '../../shared/utils/icons';
+import { getBlockIcon } from '../../shared/utils/getBlockIcon';
 
 registerBlockType( metadata, {
-	icon: blockIcon,
+	icon: getBlockIcon( metadata.name ),
 	edit: Edit,
 } );

@@ -4,6 +4,7 @@ import { Button } from '@wordpress/components';
 import { dispatch } from '@wordpress/data';
 import { createBlock } from '@wordpress/blocks';
 import { getLayoutSvgIcon } from '../../utils/icons';
+import { clickable } from '../../utils/a11y';
 import BlockSwitcherModal, { CHILD_BLOCKS_LIST } from './BlockSwitcherModal';
 
 const BlockPlaceholder = ({ clientId, currentBlockName, setAttributes }) => {
@@ -32,7 +33,7 @@ const BlockPlaceholder = ({ clientId, currentBlockName, setAttributes }) => {
 					<div
 						key={item.name}
 						className={`item ${item.category}-item`}
-						onClick={() => handleInsertBlock(item.name)}
+						{...clickable(() => handleInsertBlock(item.name), item.title)}
 					>
 						<div className="icon">
 							{getLayoutSvgIcon(item.icon, 24)}

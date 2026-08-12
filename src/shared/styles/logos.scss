@@ -7,10 +7,16 @@
 		align-items: center;
 	}
 
+	// Border Color, Border Width and Bars & Tracks are offered for this layout,
+	// and until now they painted the old front-end markup only -- this grid had
+	// no declaration to read them. Transparent and zero defaults keep an
+	// untouched strip looking exactly as it did.
 	.logo-item {
 		display: flex;
 		align-items: center;
 		justify-content: center;
+		background: var(--btb-track, transparent);
+		border: var(--btb-border-width, 0px) solid var(--btb-border, transparent);
 
 		img {
 			height: var(--logo-h, 60px);
@@ -18,6 +24,13 @@
 			max-width: 100%;
 			object-fit: contain;
 		}
+	}
+
+	// A background or an outline needs room to read as one; added only once the
+	// author sets one, so the default strip keeps its bare logos.
+	.logos-grid.has-surface .logo-item {
+		padding: 20px;
+		border-radius: 10px;
 	}
 
 	.is-grayscale .logo-item img {

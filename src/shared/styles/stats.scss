@@ -6,8 +6,18 @@
 		grid-template-columns: repeat(var(--cols-d, 3), 1fr);
 	}
 
+	// Card Surface, Border Color and Border Width are offered for this layout but
+	// had nothing to paint here -- they only ever reached the old front-end
+	// markup. Transparent and zero defaults leave a plain grid plain.
 	.stat-item {
 		text-align: center;
+		background: var(--btb-surface, transparent);
+		border: var(--btb-border-width, 0px) solid var(--btb-border, transparent);
+	}
+
+	.stats-grid.has-surface .stat-item {
+		padding: 20px 12px;
+		border-radius: 12px;
 	}
 
 	.stat-value {

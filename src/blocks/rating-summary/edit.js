@@ -4,10 +4,12 @@ import { useBlockProps, InspectorControls } from '@wordpress/block-editor';
 import { PanelBody, RangeControl, TextControl, ToggleControl } from '@wordpress/components';
 import BlockSwitcher from '../../shared/Components/Common/BlockSwitcher';
 import ColorsPanel from '../../shared/Components/Backend/Settings/ColorsPanel';
+import SizeSpacingPanel from '../../shared/Components/Backend/Settings/SizeSpacingPanel';
 import Style from '../../shared/Components/Common/Style';
+import Layout from '../../shared/Components/Common/Layout/Layout';
 import { ColorControl } from '../../../../bpl-tools/Components/ColorControl/ColorControl';
 
-import '../../shared/styles/rating-summary.scss';
+import '../../shared/styles/frontend.scss';
 
 const Edit = ( { attributes, setAttributes, clientId } ) => {
 	const { rating, outOf, count, showCount, countText, starColor, stacked, badgeTitle, badgeScore, badgeCount } = attributes;
@@ -16,14 +18,12 @@ const Edit = ( { attributes, setAttributes, clientId } ) => {
 		clientId && setAttributes( { cId: clientId.substring( 0, 10 ) } );
 	}, [ clientId, setAttributes ] );
 
-	const pct = outOf > 0 ? Math.min( 100, ( rating / outOf ) * 100 ) : 0;
-	const countLabel = ( countText || '' ).replace( '{count}', Number( count ).toLocaleString() );
-
 	return (
 		<>
 			<InspectorControls>
 				<BlockSwitcher clientId={ clientId } />
 				<ColorsPanel attributes={ attributes } setAttributes={ setAttributes } />
+				<SizeSpacingPanel attributes={ attributes } setAttributes={ setAttributes } />
 				<PanelBody className="bPlPanelBody" title={ __( 'Rating', 'b-testimonials-block' ) }>
 					<RangeControl label={ __( 'Rating', 'b-testimonials-block' ) } value={ rating } onChange={ ( val ) => setAttributes( { rating: val } ) } min={ 0 } max={ outOf } step={ 0.1 } />
 					<RangeControl label={ __( 'Out of', 'b-testimonials-block' ) } value={ outOf } onChange={ ( val ) => setAttributes( { outOf: val } ) } min={ 1 } max={ 10 } />
@@ -36,15 +36,15 @@ const Edit = ( { attributes, setAttributes, clientId } ) => {
 				</PanelBody>
 
 				{ /*
-				  * The front end renders this block through Layout.js, which reads
-				  * badgeScore/badgeCount and the per-star percentages -- not the
-				  * rating/count fields above. Without these controls those values
-				  * were unreachable, so the published block ignored the editor.
+				  * Overrides, and the per-star bar percentages the compact fields
+				  * above have no equivalent for. Each one wins over the Rating panel
+				  * when filled, and over the figures calculated from the site's own
+				  * testimonials when those exist.
 				  */ }
 				<PanelBody className="bPlPanelBody" title={ __( 'Published Summary', 'b-testimonials-block' ) } initialOpen={ false }>
 					<TextControl label={ __( 'Heading', 'b-testimonials-block' ) } value={ badgeTitle || '' } onChange={ ( val ) => setAttributes( { badgeTitle: val } ) } />
-					<TextControl label={ __( 'Score', 'b-testimonials-block' ) } help={ __( 'Leave empty to calculate from your testimonials.', 'b-testimonials-block' ) } value={ badgeScore || '' } onChange={ ( val ) => setAttributes( { badgeScore: val } ) } />
-					<TextControl label={ __( 'Count text', 'b-testimonials-block' ) } help={ __( 'Leave empty to calculate from your testimonials.', 'b-testimonials-block' ) } value={ badgeCount || '' } onChange={ ( val ) => setAttributes( { badgeCount: val } ) } />
+					<TextControl label={ __( 'Score', 'b-testimonials-block' ) } help={ __( 'Leave empty to use the Rating settings above.', 'b-testimonials-block' ) } value={ badgeScore || '' } onChange={ ( val ) => setAttributes( { badgeScore: val } ) } />
+					<TextControl label={ __( 'Count text', 'b-testimonials-block' ) } help={ __( 'Leave empty to use the Rating settings above.', 'b-testimonials-block' ) } value={ badgeCount || '' } onChange={ ( val ) => setAttributes( { badgeCount: val } ) } />
 
 					{ [ 5, 4, 3, 2, 1 ].map( ( star ) => (
 						<RangeControl
@@ -64,14 +64,13 @@ const Edit = ( { attributes, setAttributes, clientId } ) => {
 				</PanelBody>
 			</InspectorControls>
 
-			<div { ...useBlockProps( { className: `bRatingSummary ${ stacked ? 'is-stacked' : '' }`, id: `btbTestimonialsDir-${ clientId }` } ) }>
+			{/* The preview is the published markup, via the shared Layout.
+			    It used to be a compact score-and-stars of its own, which is why
+			    the two drifted: the Rating panel styled this preview while the page
+			    rendered a different summary that ignored it. */}
+			<div { ...useBlockProps() } id={ `btbTestimonialsDir-${ clientId }` }>
 				<Style attributes={ attributes } clientId={ clientId } />
-				<div className="rs-score">{ rating }</div>
-				<div className="rs-stars">
-					<div className="rs-stars-base">★★★★★</div>
-					<div className="rs-stars-fill" style={ { width: `${ pct }%`, color: starColor } }>★★★★★</div>
-				</div>
-				{ showCount && <div className="rs-count">{ countLabel }</div> }
+				<Layout attributes={ attributes } isBackend={ true } __={ __ } />
 			</div>
 		</>
 	);

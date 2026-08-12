@@ -125,9 +125,53 @@
       "type": "string",
       "default": "before-after"
     },
+    "blockMargin": {
+      "type": "object",
+      "default": {}
+    },
     "cardMargin": {
       "type": "object",
       "default": {}
+    },
+    "degDivider": {
+      "type": "object",
+      "default": {}
+    },
+    "orientation": {
+      "type": "string",
+      "default": "horizontal"
+    },
+    "interaction": {
+      "type": "string",
+      "default": "drag"
+    },
+    "aspectRatio": {
+      "type": "string",
+      "default": "auto"
+    },
+    "mediaRadius": {
+      "type": "string",
+      "default": "8px"
+    },
+    "dividerWidth": {
+      "type": "number",
+      "default": 3
+    },
+    "gripSize": {
+      "type": "number",
+      "default": 38
+    },
+    "showLabels": {
+      "type": "boolean",
+      "default": true
+    },
+    "labelPosition": {
+      "type": "string",
+      "default": "bottom"
+    },
+    "labelFontSize": {
+      "type": "number",
+      "default": 13
     }
   }
 }

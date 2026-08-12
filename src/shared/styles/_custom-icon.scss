@@ -1,0 +1,45 @@
+// Styling for a user-picked icon, shared by every stylesheet that can end up
+// rendering one.
+//
+// It used to be copied into frontend.scss and editor.scss, which between them
+// only covered the blocks going through the shared Edit. The two blocks with a
+// bespoke editor -- trust-badges and video-testimonials -- pulled in neither, so
+// a picked icon had no sizing or fill in their editor preview at all while
+// looking correct on the published page. Kept here so a block cannot pick up
+// half of it.
+
+.btb-custom-icon {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	line-height: 1;
+
+	svg {
+		width: 100%;
+		height: 100%;
+		fill: currentColor;
+	}
+}
+
+// Icon Stroke Color, added only once the author sets one -- see BlockIcon.js for
+// why this is not simply defaulted to the fill colour.
+//
+// `svg *` as well as `svg` because Lucid puts `stroke="currentColor"` on the
+// root while other sets leave it off entirely, and a presentation attribute
+// loses to any CSS rule -- so this reaches both without caring which set the
+// glyph came from.
+.btb-icon-stroke {
+
+	svg,
+	svg * {
+		stroke: var(--btb-icon-stroke);
+	}
+}
+
+// The bare wrapper around a block's built-in artwork, which exists only to carry
+// the custom property. `:not()` matters: this rule sits after `.btb-custom-icon`,
+// so without it an unqualified `display: contents` would win on order and drop
+// the picked icon's inline-flex box -- taking the width and height with it.
+.btb-icon-stroke:not(.btb-custom-icon) {
+	display: contents;
+}

@@ -1,4 +1,8 @@
 @use './devices' as *;
+// This block registers its own editor, so it does not get frontend.scss the way
+// the shared Edit does -- without this a picked icon has no sizing, fill or
+// stroke in the editor preview while looking right on the published page.
+@use './custom-icon' as *;
 .bTrustBadges {
 	.badges-grid {
 		display: grid;
@@ -14,6 +18,10 @@
 		border: var(--btb-border-width, 1px) solid var(--btb-border, #ececec);
 		border-radius: 10px;
 		background: var(--btb-surface, #fff);
+
+		// Body Text is offered for this layout: the old front-end item read it,
+		// this one did not, so the control painted nothing.
+		color: var(--btb-body, inherit);
 	}
 
 	.badge-icon {

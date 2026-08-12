@@ -26,6 +26,13 @@ export const resolveIconColor = (icon = {}, fallback = BRAND_COLOR) => {
  * handed the resolved colour, so the colour control still works on the built-in
  * artwork without the user having to choose an icon first.
  *
+ * Stroke colour is deliberately opt-in rather than defaulted to the fill.
+ * Font Awesome and Bootstrap glyphs are solid shapes carrying no stroke at all,
+ * and SVG's initial `stroke-width` is 1 -- so painting a stroke unconditionally
+ * would thicken every one of those icons the moment the control existed. The
+ * class only goes on once the author picks a colour, which keeps an untouched
+ * block rendering exactly as before.
+ *
  * @param {Object}   props
  * @param {Object}   props.icon           Icon slot value.
  * @param {number}   props.size           Default size in px.
@@ -41,22 +48,41 @@ const BlockIcon = ({
   renderFallback,
 }) => {
   const svg = icon?.svg;
+  const strokeColor = icon?.strokeColor;
+  const strokeClass = strokeColor ? " btb-icon-stroke" : "";
+  const strokeVar = strokeColor ? { "--btb-icon-stroke": strokeColor } : {};
 
   if (!svg) {
-    return renderFallback
+    const fallback = renderFallback
       ? renderFallback(resolveIconColor(icon, defaultColor))
       : null;
+
+    if (!fallback || !strokeColor) {
+      return fallback;
+    }
+
+    // The built-in artwork is rendered by the caller, so the stroke reaches it
+    // through a wrapper instead of a prop -- otherwise the control would look
+    // dead until the author had picked an icon, and every call site would need
+    // the same two lines. `display: contents` keeps the wrapper out of the
+    // layout while custom properties and descendant selectors pass through it.
+    return (
+      <span className="btb-icon-stroke" style={strokeVar}>
+        {fallback}
+      </span>
+    );
   }
 
   const box = `${icon.size || size}px`;
 
   return (
     <span
-      className={`btb-custom-icon ${className}`.trim()}
+      className={`btb-custom-icon${strokeClass} ${className}`.trim()}
       style={{
         color: resolveIconColor(icon, defaultColor),
         width: box,
         height: box,
+        ...strokeVar,
       }}
       aria-hidden="true"
       dangerouslySetInnerHTML={{ __html: svg }}

@@ -176,7 +176,15 @@
 				"left": "15px"
 			}
 		},
+		"blockMargin": {
+			"type": "object",
+			"default": {}
+		},
 		"cardMargin": {
+			"type": "object",
+			"default": {}
+		},
+		"degDivider": {
 			"type": "object",
 			"default": {}
 		},
@@ -306,6 +314,18 @@
 				"mouseWheel": true,
 				"navigation": true
 			}
+		},
+		"marquee": {
+			"type": "object",
+			"default": {
+				"speed": 30,
+				"direction": "left",
+				"pauseOnHover": true
+			}
+		},
+		"pauseInEditor": {
+			"type": "boolean",
+			"default": false
 		},
 		"dataSource": {
 			"type": "string",

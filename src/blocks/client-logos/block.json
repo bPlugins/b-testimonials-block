@@ -124,6 +124,14 @@
 			"type": "string",
 			"default": "client-logos"
 		},
+		"degDivider": {
+			"type": "object",
+			"default": {}
+		},
+		"blockMargin": {
+			"type": "object",
+			"default": {}
+		},
 		"cardMargin": {
 			"type": "object",
 			"default": {}

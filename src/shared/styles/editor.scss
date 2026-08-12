@@ -1,4 +1,5 @@
 @use "sass:color";
+@use './custom-icon' as *;
 
 $primaryColor: #382c8d;
 // bPlugins brand colour. Applied to icon wrappers only; the icons themselves
@@ -63,20 +64,6 @@ $brandColor: #146ef5;
 // back into an editable field.
 .reviewText.btbTextCollapsed {
 	cursor: text;
-}
-
-// Mirrors the rule in frontend.scss so picked icons look the same in the editor.
-.btb-custom-icon {
-	display: inline-flex;
-	align-items: center;
-	justify-content: center;
-	line-height: 1;
-
-	svg {
-		width: 100%;
-		height: 100%;
-		fill: currentColor;
-	}
 }
 
 // Each icon slot groups a picker, a colour and a size control.

@@ -4,7 +4,9 @@ import { useBlockProps, InspectorControls } from '@wordpress/block-editor';
 import { PanelBody, TextControl, TextareaControl, ToggleControl } from '@wordpress/components';
 import BlockSwitcher from '../../shared/Components/Common/BlockSwitcher';
 import ColorsPanel from '../../shared/Components/Backend/Settings/ColorsPanel';
+import SizeSpacingPanel from '../../shared/Components/Backend/Settings/SizeSpacingPanel';
 import Style from '../../shared/Components/Common/Style';
+import TestimonialForm from '../../shared/Components/Common/TestimonialForm';
 import { ColorControl } from '../../../../bpl-tools/Components/ColorControl/ColorControl';
 
 import '../../shared/styles/form.scss';
@@ -31,6 +33,7 @@ const Edit = ( { attributes, setAttributes, clientId } ) => {
 			<InspectorControls>
 				<BlockSwitcher clientId={ clientId } />
 				<ColorsPanel attributes={ attributes } setAttributes={ setAttributes } />
+				<SizeSpacingPanel attributes={ attributes } setAttributes={ setAttributes } />
 				<PanelBody className="bPlPanelBody" title={ __( 'Form', 'b-testimonials-block' ) }>
 					<TextControl label={ __( 'Title', 'b-testimonials-block' ) } value={ formTitle } onChange={ ( val ) => setAttributes( { formTitle: val } ) } />
 					<TextControl label={ __( 'Button text', 'b-testimonials-block' ) } value={ buttonText } onChange={ ( val ) => setAttributes( { buttonText: val } ) } />
@@ -52,62 +55,11 @@ const Edit = ( { attributes, setAttributes, clientId } ) => {
 				</PanelBody>
 			</InspectorControls>
 
-			<div { ...useBlockProps( { className: 'bTestimonialForm', id: `btbTestimonialsDir-${ clientId }` } ) }>
+			<div { ...useBlockProps() } id={ `btbTestimonialsDir-${ clientId }` }>
 				<Style attributes={ attributes } clientId={ clientId } />
-				<form className="btb-tform" onSubmit={ ( e ) => e.preventDefault() }>
-					{ formTitle && <h3 className="btb-tform-title">{ formTitle }</h3> }
-
-					<div className="btb-tform-field">
-						<label>{ __( 'Name', 'b-testimonials-block' ) } *</label>
-						<input type="text" disabled />
-					</div>
-
-					{ fields?.email && (
-						<div className="btb-tform-field">
-							<label>{ __( 'Email', 'b-testimonials-block' ) }</label>
-							<input type="email" disabled />
-						</div>
-					) }
-
-					{ fields?.designation && (
-						<div className="btb-tform-field">
-							<label>{ __( 'Designation', 'b-testimonials-block' ) }</label>
-							<input type="text" disabled />
-						</div>
-					) }
-
-					{ fields?.company && (
-						<div className="btb-tform-field">
-							<label>{ __( 'Company', 'b-testimonials-block' ) }</label>
-							<input type="text" disabled />
-						</div>
-					) }
-
-					{ fields?.rating && (
-						<div className="btb-tform-field">
-							<label>{ __( 'Rating', 'b-testimonials-block' ) }</label>
-							<select disabled>
-								{ [ 5, 4, 3, 2, 1 ].map( ( n ) => <option key={ n }>{ n }</option> ) }
-							</select>
-						</div>
-					) }
-
-					{ fields?.image && (
-						<div className="btb-tform-field">
-							<label>{ __( 'Photo', 'b-testimonials-block' ) }</label>
-							<input type="file" accept="image/*" disabled />
-						</div>
-					) }
-
-					<div className="btb-tform-field">
-						<label>{ __( 'Review', 'b-testimonials-block' ) } *</label>
-						<textarea disabled />
-					</div>
-
-					<button type="submit" className="btb-tform-submit" style={ { backgroundColor: accentColor } } disabled>
-						{ buttonText }
-					</button>
-				</form>
+				{/* Same component the front end renders, so the preview cannot drift
+				    away from the published form again. */}
+				<TestimonialForm attributes={ attributes } isBackend={ true } />
 			</div>
 		</>
 	);

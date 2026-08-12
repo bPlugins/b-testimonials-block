@@ -39,6 +39,14 @@ export const ROLES = {
 
 	successColor: { cssVar: '--btb-success', label: __( 'Thank-you Message', 'b-testimonials-block' ) },
 
+	// The testimonial form's own result banners. form.scss has always read these
+	// four custom properties, and the block has always declared the attributes,
+	// but no layout claimed the roles -- so the banners were stuck on their
+	// literals and three of the attributes were unreachable dead weight.
+	successBg: { cssVar: '--btb-success-bg', label: __( 'Thank-you Background', 'b-testimonials-block' ) },
+	errorColor: { cssVar: '--btb-error', label: __( 'Error Message', 'b-testimonials-block' ) },
+	errorBg: { cssVar: '--btb-error-bg', label: __( 'Error Background', 'b-testimonials-block' ) },
+
 	// The before/after slider's drag handle already follows `accentColor`; only
 	// its two corner labels were stuck on a fixed translucent black.
 	labelBgColor: { cssVar: '--btb-ba-label-bg', label: __( 'Label Background', 'b-testimonials-block' ) },
@@ -66,7 +74,8 @@ export const LAYOUT_ROLES = {
 	'verified-buyer-badge': [ 'brandColor', 'surfaceColor', 'borderColor', 'borderWidth', 'titleColor', 'mutedColor', 'ratingColor' ],
 	'review-badge-widget': [ 'brandColor', 'surfaceColor', 'borderColor', 'borderWidth', 'titleColor', 'mutedColor', 'ratingColor' ],
 	'trust-badges': [ 'surfaceColor', 'borderColor', 'borderWidth', 'bodyColor' ],
-	'testimonial-form': [ 'brandColor', 'surfaceColor', 'borderColor', 'borderWidth', 'titleColor', 'ratingColor' ],
+	// No stars here -- the rating is a select -- so Rating Stars is not offered.
+	'testimonial-form': [ 'brandColor', 'surfaceColor', 'borderColor', 'borderWidth', 'titleColor', 'successColor', 'successBg', 'errorColor', 'errorBg' ],
 	'user-feedback-poll': [ 'brandColor', 'surfaceColor', 'borderColor', 'borderWidth', 'titleColor', 'mutedColor', 'trackColor', 'successColor' ],
 	'rating-summary': [ 'surfaceColor', 'borderColor', 'borderWidth', 'titleColor', 'bodyColor', 'mutedColor', 'ratingColor', 'trackColor' ],
 	'star-rating-bars': [ 'surfaceColor', 'borderColor', 'borderWidth', 'titleColor', 'bodyColor', 'mutedColor', 'ratingColor', 'trackColor' ],

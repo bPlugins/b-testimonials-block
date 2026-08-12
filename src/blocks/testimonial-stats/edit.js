@@ -9,6 +9,7 @@ import Label from '../../../../bpl-tools/Components/Label/Label';
 import BDevice from '../../../../bpl-tools/Components/Deprecated/BDevice/BDevice';
 import { emUnit, perUnit, pxUnit } from '../../../../bpl-tools/utils/options';
 import ColorsPanel from '../../shared/Components/Backend/Settings/ColorsPanel';
+import SizeSpacingPanel from '../../shared/Components/Backend/Settings/SizeSpacingPanel';
 import Style from '../../shared/Components/Common/Style';
 import { ColorControl } from '../../../../bpl-tools/Components/ColorControl/ColorControl';
 
@@ -48,6 +49,7 @@ const Edit = ( { attributes, setAttributes, clientId } ) => {
 			<InspectorControls>
 				<BlockSwitcher clientId={ clientId } />
 				<ColorsPanel attributes={ attributes } setAttributes={ setAttributes } />
+				<SizeSpacingPanel attributes={ attributes } setAttributes={ setAttributes } />
 				<PanelBody className="bPlPanelBody" title={ __( 'Layout', 'b-testimonials-block' ) }>
 					{/* One responsive control behind the bpl-tools device switch, as the
 					    shared Settings panel does, instead of three stacked ranges. */}
@@ -82,9 +84,9 @@ const Edit = ( { attributes, setAttributes, clientId } ) => {
 				</PanelBody>
 			</InspectorControls>
 
-			<div { ...useBlockProps( { className: 'bTestimonialStats', id: `btbTestimonialsDir-${ clientId }` } ) }>
+			<div { ...useBlockProps( { className: 'bTestimonialStats' } ) } id={ `btbTestimonialsDir-${ clientId }` }>
 				<Style attributes={ attributes } clientId={ clientId } />
-				<div className="stats-grid" style={ { ...gridVars( attributes ), '--cols-d': colsForDevice( attributes.columns, previewDevice, 3 ) } }>
+				<div className={ `stats-grid ${ attributes.surfaceColor || attributes.borderColor ? 'has-surface' : '' }` } style={ { ...gridVars( attributes ), '--cols-d': colsForDevice( attributes.columns, previewDevice, 3 ) } }>
 					{ items.map( ( item, i ) => (
 						<div className="stat-item" key={ i }>
 							<div className="stat-value" style={ { color: accentColor } }>

@@ -1,11 +1,16 @@
 .bBeforeAfter {
+	.btb-ba-title {
+		text-align: center;
+		margin-bottom: 16px;
+	}
+
 	.ba-wrap {
 		position: relative;
 		overflow: hidden;
 		line-height: 0;
 		user-select: none;
 		--pos: 50%;
-		border-radius: 8px;
+		border-radius: var(--ba-radius, 8px);
 	}
 
 	.ba-before,
@@ -28,6 +33,58 @@
 		clip-path: inset(0 0 0 var(--pos));
 	}
 
+	// A fixed ratio makes both halves fill the same box, which is the only way
+	// two images of different proportions line up along the divider. Left on
+	// `auto` the wrapper still follows the before image's own height.
+	.ba-wrap.has-ratio {
+		.ba-before,
+		.ba-after {
+			height: 100%;
+		}
+
+		.ba-before img,
+		.ba-after img {
+			height: 100%;
+			object-fit: cover;
+		}
+	}
+
+	// Vertical: the divider runs across and After is revealed below it.
+	.ba-wrap.is-vertical {
+		.ba-after {
+			clip-path: inset(var(--pos) 0 0 0);
+		}
+
+		.ba-handle {
+			top: var(--pos);
+			bottom: auto;
+			left: 0;
+			right: 0;
+			width: auto;
+			height: 0;
+			transform: translateY(-50%);
+			cursor: ns-resize;
+		}
+
+		.ba-handle-line {
+			top: 50%;
+			bottom: auto;
+			left: 0;
+			right: 0;
+			width: auto;
+			height: var(--ba-divider-w, 3px);
+			transform: translateY(-50%);
+		}
+	}
+
+	.ba-wrap.is-hover {
+		cursor: crosshair;
+
+		.ba-handle {
+			cursor: inherit;
+		}
+	}
+
 	.ba-label {
 		position: absolute;
 		bottom: 12px;
@@ -35,8 +92,13 @@
 		color: var(--btb-ba-label-color, #fff);
 		padding: 4px 10px;
 		border-radius: 4px;
-		font-size: 13px;
+		font-size: var(--ba-label-size, 13px);
 		line-height: 1.3;
+	}
+
+	.ba-wrap.labels-top .ba-label {
+		bottom: auto;
+		top: 12px;
 	}
 
 	.ba-label-before {
@@ -63,7 +125,7 @@
 		top: 0;
 		bottom: 0;
 		left: 50%;
-		width: 3px;
+		width: var(--ba-divider-w, 3px);
 		transform: translateX(-50%);
 		background: #fff;
 	}
@@ -73,8 +135,8 @@
 		top: 50%;
 		left: 50%;
 		transform: translate(-50%, -50%);
-		width: 38px;
-		height: 38px;
+		width: var(--ba-grip, 38px);
+		height: var(--ba-grip, 38px);
 		border-radius: 50%;
 		background: #fff;
 		box-shadow: 0 2px 10px rgba(0, 0, 0, 0.35);
@@ -88,7 +150,11 @@
 		align-items: center;
 		justify-content: center;
 		color: var(--btb-ba-grip, #333);
-		font-size: 18px;
+		font-size: calc(var(--ba-grip, 38px) * 0.47);
+	}
+
+	.ba-wrap.is-vertical .ba-handle-grip::before {
+		content: "\2195";
 	}
 
 	.ba-empty {

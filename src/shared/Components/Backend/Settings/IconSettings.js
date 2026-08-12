@@ -67,6 +67,16 @@ const IconSettings = ({
               defaultColor={BRAND_COLOR}
             />
 
+            {/* Left unset rather than seeded with the fill colour: an icon
+                with no stroke of its own would gain one at SVG's initial
+                1px width the moment this panel opened. Clearing it back to
+                empty removes the stroke again. */}
+            <ColorControl
+              label={__("Icon Stroke Color", "b-testimonials-block")}
+              value={icon.strokeColor || ""}
+              onChange={(strokeColor) => setIcon(slot.key, { strokeColor })}
+            />
+
             <RangeControl
               label={__("Icon Size", "b-testimonials-block")}
               value={icon.size ?? config.size}

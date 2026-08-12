@@ -10,8 +10,11 @@ import Label from '../../../../bpl-tools/Components/Label/Label';
 import BDevice from '../../../../bpl-tools/Components/Deprecated/BDevice/BDevice';
 import { emUnit, perUnit, pxUnit } from '../../../../bpl-tools/utils/options';
 import ColorsPanel from '../../shared/Components/Backend/Settings/ColorsPanel';
+import SizeSpacingPanel from '../../shared/Components/Backend/Settings/SizeSpacingPanel';
 import Style from '../../shared/Components/Common/Style';
 import IconSettings from '../../shared/Components/Backend/Settings/IconSettings';
+import BlockIcon from '../../shared/Components/Common/BlockIcon';
+import { getIcon } from '../../shared/utils/blockIcons';
 
 import './edit.scss';
 import '../../shared/styles/trust-badges.scss';
@@ -48,6 +51,7 @@ const Edit = ( { attributes, setAttributes, clientId } ) => {
 			<InspectorControls>
 				<BlockSwitcher clientId={ clientId } />
 				<ColorsPanel attributes={ attributes } setAttributes={ setAttributes } />
+				<SizeSpacingPanel attributes={ attributes } setAttributes={ setAttributes } />
 				<IconSettings attributes={ attributes } setAttributes={ setAttributes } />
 				<PanelBody className="bPlPanelBody" title={ __( 'Layout', 'b-testimonials-block' ) }>
 					{/* One responsive control behind the bpl-tools device switch, as the
@@ -79,12 +83,26 @@ const Edit = ( { attributes, setAttributes, clientId } ) => {
 				</PanelBody>
 			</InspectorControls>
 
-			<div { ...useBlockProps( { className: 'bTrustBadges', id: `btbTestimonialsDir-${ clientId }` } ) }>
+			<div { ...useBlockProps( { className: 'bTrustBadges' } ) } id={ `btbTestimonialsDir-${ clientId }` }>
 				<Style attributes={ attributes } clientId={ clientId } />
 				<div className="badges-grid" style={ { ...gridVars( attributes ), '--cols-d': colsForDevice( attributes.columns, previewDevice, 3 ) } }>
 					{ items.map( ( item, i ) => (
 						<div className="badge-item" key={ i }>
-							{ item?.img?.url && <img className="badge-icon" src={ item.img.url } alt={ item?.img?.alt || '' } /> }
+							{/* Falls back to the Icons panel, as the front end does, so a
+							    badge with no image of its own still shows its icon here. */}
+							{ item?.img?.url ? (
+								<img className="badge-icon" src={ item.img.url } alt={ item?.img?.alt || '' } />
+							) : (
+								<BlockIcon
+									icon={ getIcon( attributes, `trust${ i }` ) }
+									size={ 32 }
+									renderFallback={ ( color ) => (
+										<svg viewBox="0 0 24 24" width="32" height="32">
+											<path fill={ color } d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4z" />
+										</svg>
+									) }
+								/>
+							) }
 							<div className="badge-text">
 								{ item?.title && <h4 className="badge-title">{ item.title }</h4> }
 								{ item?.subtitle && <p className="badge-subtitle">{ item.subtitle }</p> }

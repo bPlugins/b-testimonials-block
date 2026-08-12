@@ -13,6 +13,9 @@
 	.btb-tform-title {
 		margin: 0;
 		padding: 0;
+
+		// Headings is offered for this layout and had nothing to paint.
+		color: var(--btb-title, inherit);
 	}
 
 	.btb-tform-field {

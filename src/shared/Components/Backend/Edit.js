@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { __ } from '@wordpress/i18n';
-import { RichText, MediaUpload, MediaUploadCheck, useBlockProps, InnerBlocks } from '@wordpress/block-editor';
+import { RichText, MediaUpload, MediaUploadCheck, useBlockProps, InnerBlocks, InspectorControls } from '@wordpress/block-editor';
 import { ToolbarButton } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
 import apiFetch from '@wordpress/api-fetch';
@@ -11,6 +11,7 @@ import { produce } from 'immer';
 import { tabController } from '../../../../../bpl-tools/utils/functions';
 import ExpandButton from '../Common/ExpandButton';
 import BlockPlaceholder from '../Common/BlockPlaceholder';
+import BlockSwitcher from '../Common/BlockSwitcher';
 import { ALLOWED_CHILD_BLOCKS } from '../Common/BlockSwitcherModal';
 
 // The layout stylesheet was previously imported only from each block's view.js,
@@ -131,10 +132,24 @@ const Edit = props => {
 		if (!isClassicExplicit) {
 			// 1. If child blocks are present, render child blocks container
 			if (innerBlocks && innerBlocks.length > 0) {
+				// Once a child block is chosen this block is a pass-through: render.php
+				// echoes `$content` and returns, so nothing of the parent reaches the
+				// page. Its full Settings used to be shown here anyway, and the whole
+				// Style tab -- Margin, Width, Card, colours, typography -- could not
+				// take effect in either place: `<Style>` scopes every rule to
+				// `#btbTestimonialsDir-<clientId>`, an id this wrapper never carried,
+				// and the front end has no parent wrapper at all. The child block owns
+				// all of it, so only the switcher, which retargets the child, is shown.
 				return (
 					<div {...blockProps}>
-						<Settings attributes={attributes} setAttributes={setAttributes} updateItem={() => { }} activeIndex={activeIndex} setActiveIndex={setActiveIndex} clientId={clientId} currentBlockName={name} />
-						<Style attributes={attributes} clientId={clientId} />
+						<InspectorControls>
+							<BlockSwitcher
+								clientId={clientId}
+								currentBlockName={name}
+								attributes={attributes}
+								setAttributes={setAttributes}
+							/>
+						</InspectorControls>
 						<InnerBlocks
 							templateLock={false}
 							allowedBlocks={ALLOWED_CHILD_BLOCKS}

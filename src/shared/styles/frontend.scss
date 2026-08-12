@@ -1,5 +1,6 @@
 @use './devices' as *;
 @use './before-after.scss' as *;
+@use './custom-icon' as *;
 
 $primaryColor: #382C8D;
 
@@ -43,19 +44,6 @@ $primaryColor: #382C8D;
 	display: inline-block;
 	margin-left: 5px;
 	cursor: pointer;
-}
-
-.btb-custom-icon {
-	display: inline-flex;
-	align-items: center;
-	justify-content: center;
-	line-height: 1;
-
-	svg {
-		width: 100%;
-		height: 100%;
-		fill: currentColor;
-	}
 }
 
 // Block Directory
@@ -433,7 +421,13 @@ $primaryColor: #382C8D;
 			}
 
 			&.masonry-layout {
-				display: initial;
+				// `block`, not `initial`. The initial value of `display` is
+				// `inline`, so this was making the masonry section an inline box:
+				// vertical padding on one of those paints but creates no space,
+				// which is why the headroom for Theme-1's overhanging avatar had
+				// no effect here while working everywhere else. The intent was
+				// only ever to undo the grid from .layoutSection.
+				display: block;
 			}
 
 			// List: one testimonial per full-width row.
@@ -450,7 +444,21 @@ $primaryColor: #382C8D;
 				.marquee-track {
 					display: flex;
 					width: max-content;
-					animation: btbMarquee 30s linear infinite;
+					// Duration and direction come from the Marquee panel via inline
+					// custom properties; the fallback is the value this was fixed at.
+					animation: btbMarquee var(--btb-marquee-duration, 30s) linear infinite;
+
+					// Opt-in now. It used to apply to every marquee with no way to
+					// turn it off, which is awkward on a wide wall of testimonials
+					// where the pointer rests over the track most of the time.
+					&.pause-on-hover:hover {
+						animation-play-state: paused;
+					}
+
+					// Set by the editor-only "Pause while editing" toggle.
+					&.is-paused {
+						animation-play-state: paused;
+					}
 				}
 
 				.marquee-group {
@@ -460,10 +468,6 @@ $primaryColor: #382C8D;
 				.marquee-item {
 					flex: 0 0 auto;
 					width: 320px;
-				}
-
-				&:hover .marquee-track {
-					animation-play-state: paused;
 				}
 
 				// The editor runs the same animation as the frontend. Hovering
@@ -501,6 +505,12 @@ $primaryColor: #382C8D;
 				// nested one outranks `.swiper-3d`, so coverflow was projected
 				// through two stacked viewing frustums and came out looking flat.
 				.swiper {
+					// Top padding is the headroom for themes that lift the avatar
+					// above the card. .swiper clips its overflow -- it has to, that
+					// is what hides the off-screen slides -- so an avatar sitting
+					// higher than this is cut in half. Theme-1 pulls it up 33px and
+					// Theme-4 19px, hence the override below rather than a blanket
+					// increase that would pad every other theme for nothing.
 					padding: 20px 28px 45px 28px;
 					overflow: hidden;
 
@@ -549,6 +559,96 @@ $primaryColor: #382C8D;
 					}
 				}
 
+			}
+
+			// Headroom for the overhanging avatar, matched to how far each theme
+			// lifts it: Theme-1 by 33px, Theme-4 by 19px.
+			//
+			// Two separate places need it, for two different reasons:
+			//
+			// 1. The slider clips its own overflow, so the avatar was cut in half
+			//    at the .swiper edge. The padding goes on .swiper itself.
+			// 2. The flat arrangements do not clip, but the avatar still hangs
+			//    above the block and collides with whatever sits over it -- and
+			//    marquee DOES clip (overflow: hidden is what makes the scroll
+			//    work), so there it was cut off outright. The padding goes on the
+			//    section, and only for these arrangements: adding it for the
+			//    slider too would push the whole carousel down twice over.
+			&.theme_1 .swiper {
+				padding-top: 45px;
+			}
+
+			&.theme_4 .swiper {
+				padding-top: 32px;
+			}
+
+			&.default-layout,
+			&.list-layout,
+			&.masonry-layout,
+			&.marquee-layout,
+			&.btb-default-layout,
+			&.btb-list-layout,
+			&.btb-masonry-layout,
+			&.btb-marquee-layout {
+				&.theme_1 {
+					padding-top: 33px;
+				}
+
+				&.theme_4 {
+					padding-top: 19px;
+				}
+			}
+
+			// Coverflow rotates each card by tilt x its distance from the centre,
+			// so at a 50 degree tilt a card two places out lands at 100 degrees --
+			// past side-on, showing its back with the text mirrored. Hiding the
+			// back face makes those cards drop away at the edge instead, which
+			// reads as depth rather than as a rendering fault. Lowering 3D Tilt in
+			// the Slider panel keeps them visible for longer.
+			&.coverflow-layout,
+			&.slider-3d-layout,
+			&.btb-coverflow-layout,
+			&.btb-slider-3d-layout {
+				.swiper-slide {
+					backface-visibility: hidden;
+				}
+
+				// Every further slide is pushed back and scaled down again, so the
+				// distant ones end up tiny and stacked on top of each other in a
+				// cluster at the edges -- and the loop padding, which repeats the
+				// list so the carousel never hits an end, adds more of them to
+				// pile up.
+				//
+				// How many stay visible is the "Visible Side Cards" control, which
+				// puts a btb-sides-* class on the .swiper element. Hiding is gated
+				// on that class being present, so if it is ever absent the slides
+				// stay visible rather than the whole slider going blank.
+				// Keyed on .swiper-slide-visible, which Swiper sets on the slides
+				// that are actually within the viewport and re-applies on every
+				// update. Slider.js sizes slides-per-view to 2n+1 from the Visible
+				// Side Cards control, so "within the viewport" is exactly the set
+				// the user asked for, at any count.
+				//
+				// Two earlier attempts failed here and are worth not repeating.
+				// Sibling selectors (.swiper-slide-next + .swiper-slide) picked the
+				// wrong element, because looping reorders the slides in the DOM, so
+				// one side showed a clipped fragment. Adding a class from JS was
+				// worse: React resets each slide's className on re-render, the mark
+				// was wiped, and every card disappeared. Both tried to work out the
+				// visible set independently; this one asks Swiper for it.
+				.swiper.btb-cull .swiper-slide:not(.swiper-slide-visible) {
+					opacity: 0;
+					pointer-events: none;
+				}
+
+				// Set when Card Width is given. Swiper measures the slides under
+				// slidesPerView 'auto', so the width has to be on the slide itself;
+				// max-width keeps it from overflowing a container narrower than the
+				// value, which is what a fixed width would do on a phone.
+				.swiper.btb-fixed-w .swiper-slide {
+					width: var(--btb-slide-w, auto);
+					max-width: 100%;
+				}
 			}
 
 			// Dimming the neighbours suits the flat slider, but on coverflow it
@@ -767,9 +867,23 @@ $primaryColor: #382C8D;
 	.btb-rs-left {
 		text-align: center; min-width: 120px;
 		.btb-rs-big-number { font-size: 48px; font-weight: 800; color: var(--btb-title, #0f172a); display: block; }
-		.btb-rs-stars { color: var(--btb-star, #f59e0b); font-size: 20px; letter-spacing: 2px; margin: 4px 0; }
+
+		/* Two stacked rows, so a score of 4.3 out of 5 -- or anything out of 10 --
+		   fills a partial star instead of rounding to a whole glyph. */
+		.btb-rs-stars {
+			position: relative; display: inline-block; font-size: 20px;
+			letter-spacing: 2px; margin: 4px 0; line-height: 1; white-space: nowrap;
+		}
+		.btb-rs-stars-base { color: var(--btb-track, #dcdcdc); }
+		.btb-rs-stars-fill {
+			position: absolute; top: 0; left: 0; overflow: hidden; white-space: nowrap;
+			color: var(--btb-star, #f59e0b);
+		}
 		.btb-rs-count { font-size: 13px; color: var(--btb-muted, #64748b); }
 	}
+
+	/* Stacked layout puts the score above the bars rather than beside them. */
+	&.is-stacked { flex-direction: column; gap: 20px; .btb-rs-bars { width: 100%; } }
 	.btb-rs-bars { flex: 1; display: flex; flex-direction: column; gap: 8px; }
 	.btb-rs-bar-row {
 		display: flex; align-items: center; gap: 10px;

@@ -11,6 +11,7 @@ import ThemeSix from "../Themes/ThemeSix";
 import Slider from "./Slider";
 import Marquee from "./Marquee";
 import BeforeAfterSlider from "../BeforeAfterSlider";
+import TestimonialForm from "../TestimonialForm";
 
 import { getVideoEmbed } from "../../../utils/functions";
 import { clickable, editorClickable } from "../../../utils/a11y";
@@ -547,16 +548,68 @@ const Layout = ({
     // The Columns and Gap controls only reached this block's editor preview --
     // the front end grid was a fixed repeat(4, 1fr). Same custom properties the
     // video layout uses, so both honour the inspector.
+    const gridVars = {
+      "--cols-d": previewCols || 3,
+      "--cols-t": tablet || 3,
+      "--cols-m": mobile || 1,
+      "--col-gap": columnGap || "16px",
+      "--row-gap": rowGap || "16px",
+    };
+
+    // The block's editor is a repeater of badges -- icon image, title, subtitle
+    // -- and none of it reached the page: this branch rendered four fixed
+    // badges built out of the generic badge fields, so adding or editing a badge
+    // moved the editor preview only. Where the repeater has content it now
+    // drives the page, with the Icons panel supplying the artwork for any badge
+    // whose image is empty.
+    const badgeItems = Array.isArray(attributes.items) ? attributes.items : [];
+    const hasRepeater = badgeItems.some(
+      (it) => it && (it.img?.url || it.title || it.subtitle),
+    );
+
+    if (hasRepeater) {
+      return (
+        <div className="bTrustBadges">
+          <div className="badges-grid" style={gridVars}>
+            {badgeItems.map((item, index) => {
+              const slot = trustItems[index];
+
+              return (
+                <div className="badge-item" key={index}>
+                  {item?.img?.url ? (
+                    <img
+                      className="badge-icon"
+                      src={item.img.url}
+                      alt={item.img.alt || ""}
+                    />
+                  ) : (
+                    <BlockIcon
+                      icon={getIcon(attributes, slot?.slot || `trust${index}`)}
+                      size={32}
+                      defaultColor={slot?.color || BRAND_COLOR}
+                      renderFallback={(color) => (
+                        <svg viewBox="0 0 24 24" width="32" height="32">
+                          <path fill={color} d={slot?.d || trustItems[0].d} />
+                        </svg>
+                      )}
+                    />
+                  )}
+                  <div className="badge-text">
+                    {item?.title && <h4 className="badge-title">{item.title}</h4>}
+                    {item?.subtitle && (
+                      <p className="badge-subtitle">{item.subtitle}</p>
+                    )}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      );
+    }
+
     return (
-      <div
-        className="btb-trust-badges-grid"
-        style={{
-          "--cols-d": previewCols || 3,
-          "--cols-t": tablet || 3,
-          "--cols-m": mobile || 1,
-          "--col-gap": columnGap || "16px",
-          "--row-gap": rowGap || "16px",
-        }}>
+      <div className="btb-trust-badges-grid" style={gridVars}>
         {trustItems.map((it) => (
           <div className="btb-trust-item" key={it.slot}>
             <BlockIcon
@@ -581,36 +634,7 @@ const Layout = ({
   // ================================================================
 
   if (layout === "testimonial-form") {
-    return (
-      <div className="btb-form-wrapper">
-        <h3 className="btb-form-title">{bt || "Leave a Customer Review"}</h3>
-        <div className="btb-form-grid">
-          <input
-            type="text"
-            className="btb-input"
-            placeholder="Your Name"
-            readOnly
-          />
-          <input
-            type="text"
-            className="btb-input"
-            placeholder="Your Company / Designation"
-            readOnly
-          />
-          <div className="btb-form-rating-selector">
-            <span>Rating: </span>
-            <span className="stars">★★★★★</span>
-          </div>
-          <textarea
-            className="btb-textarea"
-            placeholder="Write your testimonial review here..."
-            readOnly></textarea>
-          <button type="button" className="btb-submit-btn">
-            {bc || "Submit Testimonial"}
-          </button>
-        </div>
-      </div>
-    );
+    return <TestimonialForm attributes={attributes} isBackend={isBackend} />;
   }
 
   if (layout === "user-feedback-poll") {
@@ -657,31 +681,81 @@ const Layout = ({
   }
 
   if (layout === "rating-summary") {
+    // The Rating panel's own fields -- Rating, Out of, Show review count and
+    // Count text -- reached the editor preview only: the score fell back to a
+    // hard-coded 4.8 and the count line to "Based on 256 reviews", and there was
+    // no way at all to turn the count off. Only Star color made it through,
+    // through its palette alias.
+    const {
+      rating,
+      outOf = 5,
+      count,
+      countText = "",
+      showCount = true,
+      stacked = false,
+    } = attributes;
+
+    // Which of the two wins is decided by the data source, not by whether any
+    // testimonials happen to exist. `items` ships with three demo reviews, so
+    // "calculate when there are items" meant the Rating panel could never win --
+    // the block would have kept ignoring it. Choosing the testimonials source is
+    // the request to be calculated; anything else means the panel's own figures.
+    const useComputed = "cpt" === attributes.dataSource && computedStats.total > 0;
+
+    const manualScore =
+      undefined === rating || null === rating || "" === rating
+        ? ""
+        : `${rating}`;
+
     const displayScore =
-      bs || (computedStats.total > 0 ? computedStats.avg : "4.8");
+      bs || (useComputed ? computedStats.avg : manualScore || "4.8");
+
+    const manualCountText = countText
+      ? countText.replace("{count}", Number(count || 0).toLocaleString())
+      : "";
+
     const displayCountText =
       bc ||
-      (computedStats.total > 0
+      (useComputed
         ? `Based on ${computedStats.total} reviews`
-        : "Based on 256 reviews");
+        : manualCountText || "Based on 256 reviews");
+
+    // Out of is not always 5, so the star row is drawn rather than a literal
+    // run of five glyphs, with the filled overlay clipped to the score.
+    const starCount = Math.max(1, Math.min(10, Number(outOf) || 5));
+    const scoreNum = parseFloat(displayScore) || 0;
+    const fillPct = Math.max(
+      0,
+      Math.min(100, (scoreNum / starCount) * 100),
+    );
+    const starRow = "★".repeat(starCount);
 
     const defaultPcts = { 5: 78, 4: 15, 3: 4, 2: 2, 1: 1 };
 
+    // Same precedence as the score above, so the bars cannot disagree with it.
     const rows = [5, 4, 3, 2, 1].map((s) => {
-      const count = computedStats.counts[s];
-      const pct =
-        computedStats.total > 0
-          ? Math.round((count / computedStats.total) * 100)
-          : attributes[`star${s}Pct`] ?? defaultPcts[s];
-      return { star: s, pct, count };
+      const starTotal = computedStats.counts[s];
+      const pct = useComputed
+        ? Math.round((starTotal / computedStats.total) * 100)
+        : attributes[`star${s}Pct`] ?? defaultPcts[s];
+      return { star: s, pct, count: starTotal };
     });
 
     return (
-      <div className="btb-rating-summary">
+      <div className={`btb-rating-summary ${stacked ? "is-stacked" : ""}`}>
         <div className="btb-rs-left">
           <span className="btb-rs-big-number">{displayScore}</span>
-          <div className="btb-rs-stars">★★★★★</div>
-          <span className="btb-rs-count">{displayCountText}</span>
+          <div className="btb-rs-stars">
+            <span className="btb-rs-stars-base">{starRow}</span>
+            <span
+              className="btb-rs-stars-fill"
+              style={{ width: `${fillPct}%` }}>
+              {starRow}
+            </span>
+          </div>
+          {showCount && (
+            <span className="btb-rs-count">{displayCountText}</span>
+          )}
         </div>
         <div className="btb-rs-bars">
           {rows.map((r) => (
@@ -751,46 +825,99 @@ const Layout = ({
   }
 
   if (layout === "testimonial-stats") {
+    const gridVars = {
+      "--cols-d": previewCols || 3,
+      "--cols-t": tablet || 3,
+      "--cols-m": mobile || 1,
+      "--col-gap": columnGap || "16px",
+      "--row-gap": rowGap || "16px",
+      "--accent": attributes.accentColor,
+    };
+
+    // The block's editor is a repeater -- number, prefix, suffix, label per
+    // stat -- and its view script animates `.stat-number[data-number]` inside
+    // `.bTestimonialStats[data-animate="1"]`. Neither reached the page: this
+    // branch used to render four fixed cards out of the generic badge fields,
+    // so adding, removing or editing a stat changed only the editor, and Animate
+    // count never ran. Rendering the repeater fixes all of it at once.
+    const statItems = Array.isArray(attributes.items) ? attributes.items : [];
+    const hasRepeater = statItems.some(
+      (it) =>
+        it &&
+        (it.number !== undefined || it.label !== undefined || it.suffix || it.prefix),
+    );
+
+    if (hasRepeater) {
+      return (
+        <div
+          className="bTestimonialStats"
+          data-animate={attributes.animate ? "1" : "0"}>
+          <div
+            className={`stats-grid ${
+              attributes.surfaceColor || attributes.borderColor
+                ? "has-surface"
+                : ""
+            }`}
+            style={gridVars}>
+            {statItems.map((item, index) => {
+              const raw = String(item?.number ?? "");
+              const decimals = raw.includes(".")
+                ? raw.split(".")[1].length
+                : 0;
+
+              return (
+                <div className="stat-item" key={index}>
+                  <div
+                    className="stat-value"
+                    style={{ color: attributes.accentColor }}>
+                    <span className="stat-prefix">{item?.prefix}</span>
+                    {/* The literal stays in the markup so the number is still
+                        right with JavaScript off; the view script only takes
+                        over to count up to it. */}
+                    <span
+                      className="stat-number"
+                      data-number={item?.number}
+                      data-decimals={decimals}>
+                      {Number(item?.number || 0).toLocaleString()}
+                    </span>
+                    <span className="stat-suffix">{item?.suffix}</span>
+                  </div>
+                  <div className="stat-label">{item?.label}</div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      );
+    }
+
+    // Fallback for blocks saved before the repeater existed, which described
+    // their stats through the generic badge fields.
     const fiveStarCount = computedStats.counts[5];
     const calcAvg = computedStats.total > 0 ? computedStats.avg : "4.9";
     const calc5Star = computedStats.total > 0 ? `${fiveStarCount}` : "500+";
 
-    const stat1Num =
-      bs || (computedStats.total > 0 ? `${computedStats.total}+` : "10K+");
-    const stat1Label = bt || "Happy Customers";
-    const stat2Num = bc || "98%";
-    const stat2Label = bd || "Satisfaction Rate";
-    const stat3Num = attributes.stat3Number || calcAvg;
-    const stat3Label = attributes.stat3Label || "Average Rating";
-    const stat4Num = attributes.stat4Number || calc5Star;
-    const stat4Label = attributes.stat4Label || "5-Star Reviews";
+    const legacyStats = [
+      [
+        bs || (computedStats.total > 0 ? `${computedStats.total}+` : "10K+"),
+        bt || "Happy Customers",
+      ],
+      [bc || "98%", bd || "Satisfaction Rate"],
+      [attributes.stat3Number || calcAvg, attributes.stat3Label || "Average Rating"],
+      [
+        attributes.stat4Number || calc5Star,
+        attributes.stat4Label || "5-Star Reviews",
+      ],
+    ];
 
     return (
-      <div
-        className="btb-stats-grid"
-        style={{
-          "--cols-d": previewCols || 3,
-          "--cols-t": tablet || 3,
-          "--cols-m": mobile || 1,
-          "--col-gap": columnGap || "16px",
-          "--row-gap": rowGap || "16px",
-        }}>
-        <div className="btb-stat-card">
-          <span className="btb-stat-number">{stat1Num}</span>
-          <span className="btb-stat-label">{stat1Label}</span>
-        </div>
-        <div className="btb-stat-card">
-          <span className="btb-stat-number">{stat2Num}</span>
-          <span className="btb-stat-label">{stat2Label}</span>
-        </div>
-        <div className="btb-stat-card">
-          <span className="btb-stat-number">{stat3Num}</span>
-          <span className="btb-stat-label">{stat3Label}</span>
-        </div>
-        <div className="btb-stat-card">
-          <span className="btb-stat-number">{stat4Num}</span>
-          <span className="btb-stat-label">{stat4Label}</span>
-        </div>
+      <div className="btb-stats-grid" style={gridVars}>
+        {legacyStats.map(([num, label], index) => (
+          <div className="btb-stat-card" key={index}>
+            <span className="btb-stat-number">{num}</span>
+            <span className="btb-stat-label">{label}</span>
+          </div>
+        ))}
       </div>
     );
   }
@@ -1084,31 +1211,51 @@ const Layout = ({
 
   if (layout === "client-logos") {
     const logoItems = items.length > 0 ? items : attributes.logos || [];
+
+    // Same markup and custom properties as the block's own editor.
+    //
+    // This used to render a `.btb-client-logos` grid of its own with the gap
+    // and the logo height written into the stylesheet as literals, so four of
+    // the block's controls -- Column Gap, Row Gap, Logo height and Grayscale --
+    // moved the editor preview and nothing else. Matching the editor markup is
+    // what makes them reach the page, and it is the markup logos.scss styles.
     return (
-      <div
-        className={`btb-client-logos columns-${previewCols} columns-tablet-${tablet} columns-mobile-${mobile}`}>
-        {logoItems.map((item, index) => {
-          const imgEl = (
-            <img
-              src={
-                item.img?.url ||
-                "https://templates.bplugins.com/wp-content/uploads/2025/02/p-29.png"
-              }
-              alt={item.name || item.img?.alt || ""}
-            />
-          );
-          return (
-            <div key={index} className="btb-logo-item">
-              {item.link ? (
-                <a href={item.link} target="_blank" rel="noopener noreferrer">
-                  {imgEl}
-                </a>
-              ) : (
-                imgEl
-              )}
-            </div>
-          );
-        })}
+      <div className="bClientLogos">
+        <div
+          className={`logos-grid ${attributes.grayscale ? "is-grayscale" : ""} ${
+            attributes.trackColor || attributes.borderColor ? "has-surface" : ""
+          }`}
+          style={{
+            "--cols-d": previewCols || 4,
+            "--cols-t": tablet || 3,
+            "--cols-m": mobile || 2,
+            "--col-gap": columnGap || "30px",
+            "--row-gap": rowGap || "30px",
+            "--logo-h": `${attributes.logoHeight || 60}px`,
+          }}>
+          {logoItems.map((item, index) => {
+            const imgEl = (
+              <img
+                src={
+                  item.img?.url ||
+                  "https://templates.bplugins.com/wp-content/uploads/2025/02/p-29.png"
+                }
+                alt={item.name || item.img?.alt || ""}
+              />
+            );
+            return (
+              <div key={index} className="logo-item">
+                {item.link ? (
+                  <a href={item.link} target="_blank" rel="noopener noreferrer">
+                    {imgEl}
+                  </a>
+                ) : (
+                  imgEl
+                )}
+              </div>
+            );
+          })}
+        </div>
       </div>
     );
   }
@@ -1475,6 +1622,9 @@ const Layout = ({
                 items={items}
                 themeSelect={themeSelect}
                 columnGap={columnGap}
+                marquee={attributes?.marquee}
+                isBackend={isBackend}
+                pauseInEditor={attributes?.pauseInEditor}
               />
             );
           // All other testimonial-items layouts: quote-box, speech-bubble, compact, list, etc.

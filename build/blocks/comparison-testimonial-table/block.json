@@ -112,6 +112,16 @@
       "type": "string",
       "default": "30px"
     },
+    "grid2Border": {
+      "type": "object",
+      "default": {
+        "width": "0px",
+        "style": "solid",
+        "color": "#0575e6",
+        "side": "all",
+        "radius": "3px"
+      }
+    },
     "grid2Bg": {
       "type": "string",
       "default": "#f9f8f8"
@@ -150,7 +160,15 @@
         "left": "15px"
       }
     },
+    "blockMargin": {
+      "type": "object",
+      "default": {}
+    },
     "cardMargin": {
+      "type": "object",
+      "default": {}
+    },
+    "degDivider": {
       "type": "object",
       "default": {}
     },

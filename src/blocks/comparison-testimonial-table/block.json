@@ -149,15 +149,15 @@
 		},
 		"background": {
 			"type": "string",
-			"default": "#0000"
+			"default": "#fff"
 		},
 		"padding": {
 			"type": "object",
 			"default": {
-				"top": "10px",
-				"right": "15px",
-				"bottom": "10px",
-				"left": "15px"
+				"top": "24px",
+				"right": "24px",
+				"bottom": "24px",
+				"left": "24px"
 			}
 		},
 		"blockMargin": {
@@ -177,9 +177,9 @@
 			"default": {
 				"width": "1px",
 				"style": "solid",
-				"color": "#0575e6",
+				"color": "#e2e8f0",
 				"side": "all",
-				"radius": "3px"
+				"radius": "14px"
 			}
 		},
 		"shadow": {
@@ -207,13 +207,11 @@
 			"type": "object",
 			"default": {
 				"fontSize": {
-					"desktop": 16,
-					"tablet": 16,
-					"mobile": 14
+					"desktop": 18,
+					"tablet": 18,
+					"mobile": 18
 				},
-				"fontFamily": "Open Sans",
-				"fontWeight": 700,
-				"lineHeight": "135%"
+				"fontWeight": 700
 			}
 		},
 		"nameColor": {
@@ -241,12 +239,11 @@
 			"type": "object",
 			"default": {
 				"fontSize": {
-					"desktop": 16,
-					"tablet": 16,
-					"mobile": 14
+					"desktop": 13,
+					"tablet": 13,
+					"mobile": 13
 				},
-				"fontWeight": 400,
-				"lineHeight": "135%"
+				"fontWeight": 400
 			}
 		},
 		"textColor": {

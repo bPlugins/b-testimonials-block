@@ -23,6 +23,7 @@ import { produce } from "immer";
 // Settings Components
 import IconSettings from "./IconSettings";
 import ColorsPanel from "./ColorsPanel";
+import SizeSpacingPanel from "./SizeSpacingPanel";
 import Label from "../../../../../../bpl-tools/Components/Label/Label";
 import { ColorControl } from "../../../../../../bpl-tools/Components/ColorControl/ColorControl";
 import { InlineDetailMediaUpload } from "../../../../../../bpl-tools/Components/MediaControl/MediaControl";
@@ -37,8 +38,6 @@ import {
   emUnit,
   perUnit,
   pxUnit,
-  vhUnit,
-  vwUnit,
 } from "../../../../../../bpl-tools/utils/options";
 
 import { checkTheme } from "../../.././utils/functions";
@@ -68,11 +67,8 @@ const Settings = ({
     columns = { desktop: 3, tablet: 2, mobile: 1 },
     columnGap = "30px",
     rowGap = "40px",
-    // Both empty per device by default, so an untouched block keeps taking
-    // its width from the theme's layout and its height from its content.
-    blockWidth = {},
-    cardHeight = {},
-    cardMargin = {},
+    // Block Width, Card Height, Block Margin and Card Margin are read by
+    // SizeSpacingPanel rather than here -- see the panel it renders below.
     degDivider = {},
     marquee = {},
     pauseInEditor = false,
@@ -112,7 +108,6 @@ const Settings = ({
     grid2Bg = "#f9f8f8",
     grid2Padding = {},
     grid2Border = {},
-    blockMargin = {},
     slider = {
       height: 500,
       autoPlay: true,
@@ -206,7 +201,10 @@ const Settings = ({
   // below reads this instead of asking `isSingleItemBlock` how many
   // testimonials the layout shows, which was never the same question -- see
   // utils/layoutControls.js for what each flag is derived from.
-  const controls = getLayoutControls(layout);
+  // Attributes are passed so a control whose target depends on the item count
+  // can be hidden while there is nothing for it to act on -- the hero's Columns
+  // before a third testimonial exists. See utils/layoutControls.js.
+  const controls = getLayoutControls(layout, attributes);
 
   // Whether a card part is rendered, for the style panel that goes with it.
   // A part switched off in the Elements panel needs no typography -- but only
@@ -219,11 +217,58 @@ const Settings = ({
   // inline (so the colour applies) while their review text is styled by the
   // stylesheet (so the typography does not reach it).
   const hasTextStyle = controls.textStyle && rendersPart("reviewText");
-  const hasRatingColor = controls.ratingIcon && rendersPart("icon");
+  // Of the seven card themes only Theme 4 renders no rating icon, so on that one
+  // both the Elements toggle and the star colour have nothing to act on. Checked
+  // across all seven components rather than assumed.
+  const themeHasRating = "theme_4" !== theme;
+
+  const hasRatingColor =
+    controls.ratingIcon && rendersPart("icon") && themeHasRating;
+
+  // Which of the Layout panel's three grid controls the current arrangement can
+  // actually act on. The arrangement decides this, not the block: the same card
+  // list becomes a grid, a single column, a scrolling row or a Swiper track, and
+  // each of those reads a different thing.
+  //
+  // Every entry below was measured on the block at two column counts and two gap
+  // values, not read off the source:
+  //
+  //   Columns    grid 595px -> 220px, masonry 2 tracks -> 5. Both keep it.
+  //              list stayed 1220px (one flex column), marquee stayed 320px
+  //              (`display: block`, so the `columns-N` class computes a
+  //              `grid-template-columns` nothing reads), and 3D and coverflow
+  //              take their slide count from Visible Side Cards / Card Width --
+  //              Slider.js sets `isCoverflow` for both, which routes around
+  //              `columns` entirely.
+  //
+  //   Column Gap marquee works through the inline `margin-right` Marquee.js puts
+  //              on each item: item pitch 350px -> 440px at 120px. The plain
+  //              slider passes it to Swiper's `spaceBetween`. list cannot use it
+  //              -- `column-gap` on a single-column flex has no second column to
+  //              separate, measured unchanged at 250px -- and Slider.js forces
+  //              `spaceBetween: 0` for 3D and coverflow, so the rotation has no
+  //              gap to work around.
+  //
+  //   Row Gap    list works (card pitch 178px -> 338px at 200px). The marquee has
+  //              exactly one row, and a Swiper track one line of slides.
+  const COLUMNS_INERT = ["list", "marquee", "slider-3d", "coverflow"];
+  const COLUMN_GAP_INERT = ["list", "slider-3d", "coverflow"];
+  const ROW_GAP_INERT = ["marquee", "slider", "slider-3d", "coverflow"];
+
+  const showColumns = controls.columns && !COLUMNS_INERT.includes(arrangement);
+  const showColumnGap = controls.gaps && !COLUMN_GAP_INERT.includes(arrangement);
+  const showRowGap = controls.gaps && !ROW_GAP_INERT.includes(arrangement);
 
   // The Layout panel is empty unless at least one of its four controls applies.
+  // The three grid controls are counted as what the arrangement can actually
+  // use, so a layout left with none of them and no Arrangement or Theme select
+  // gets no empty panel.
   const hasLayoutPanel =
-    canArrange || controls.theme || controls.columns || controls.gaps;
+    canArrange ||
+    controls.theme ||
+    showColumns ||
+    showColumnGap ||
+    showRowGap;
 
   const addItem = () => {
     setAttributes({
@@ -269,6 +314,39 @@ const Settings = ({
     const newAttr = { ...attributes[attr] };
     newAttr[key] = val;
     setAttributes({ [attr]: newAttr });
+  };
+
+  // Avatar size, per device.
+  //
+  // `image.width` / `image.height` used to be single numbers, and every block
+  // saved so far still holds them that way. Reading accepts either shape and
+  // writing upgrades to `{ desktop, tablet, mobile }`, carrying the old number
+  // over as the desktop value so nothing shifts on an existing block.
+  //
+  // Tablet and mobile show the size they inherit when empty, so the field is
+  // never blank while the avatar plainly has a size on screen -- but the
+  // inherited value is only shown, not stored, and editing tablet leaves mobile
+  // following it.
+  const imageSize = (key, forDevice) => {
+    const value = image?.[key];
+    const perDevice = value && "object" === typeof value ? value : { desktop: value };
+
+    if ("mobile" === forDevice) {
+      return perDevice.mobile ?? perDevice.tablet ?? perDevice.desktop;
+    }
+    if ("tablet" === forDevice) {
+      return perDevice.tablet ?? perDevice.desktop;
+    }
+    return perDevice.desktop;
+  };
+
+  const setImageSize = (key, val) => {
+    const value = image?.[key];
+    const perDevice =
+      value && "object" === typeof value ? { ...value } : { desktop: value };
+
+    perDevice[device] = val;
+    updateObject("image", key, perDevice);
   };
   const currentItem = items[activeIndex] || items[0] || {};
   const {
@@ -1805,7 +1883,11 @@ const Settings = ({
                         />
                       )}
 
-                      {controls.elements.includes("icon") && (
+                      {/* Theme 4 is the one card that draws no stars at all, so
+                          the toggle has nothing to switch there -- measured on
+                          the masonry block, which ships with that theme: turning
+                          Rating off changed nothing in the rendered card. */}
+                      {controls.elements.includes("icon") && themeHasRating && (
                         <ToggleControl
                           className="mt10"
                           label={__("Rating", "b-testimonials-block")}
@@ -1828,21 +1910,15 @@ const Settings = ({
                       className="bPlPanelBody"
                       title={__("Excerpt & Expand", "b-testimonials-block")}
                       initialOpen={false}>
-                      <RangeControl
-                        label={__("Excerpt length", "b-testimonials-block")}
-                        value={textLength}
-                        onChange={(val) => setAttributes({ textLength: val })}
-                        min={10}
-                        max={1000}
-                        step={1}
-                        help={__(
-                          "Characters shown before the review is cut.",
-                          "b-testimonials-block",
-                        )}
-                      />
-
+                      {/* The toggle comes first because the length depends on it.
+                          Both the editor preview and the front end cut the review
+                          only when the Expand button is on -- `isCollapsible` in
+                          Backend/Edit.js and ViewReviewText require it -- so on
+                          the 25 blocks that ship with the button off, Excerpt
+                          length moved nothing at all. Measured, not inferred:
+                          setting it to 12 characters left every one of them
+                          rendering the full review. */}
                       <ToggleControl
-                        className="mt10"
                         label={__(
                           "Expand / Less button",
                           "b-testimonials-block",
@@ -1853,13 +1929,32 @@ const Settings = ({
                           updateObject("elements", "expandBtn", val)
                         }
                         help={__(
-                          "Without it the review is never cut.",
+                          "Cuts the review to the length below and adds a button to reveal the rest.",
                           "b-testimonials-block",
                         )}
                       />
 
                       {elements?.expandBtn && (
                         <>
+                          <RangeControl
+                            className="mt10"
+                            label={__(
+                              "Excerpt length",
+                              "b-testimonials-block",
+                            )}
+                            value={textLength}
+                            onChange={(val) =>
+                              setAttributes({ textLength: val })
+                            }
+                            min={10}
+                            max={1000}
+                            step={1}
+                            help={__(
+                              "Characters shown before the review is cut.",
+                              "b-testimonials-block",
+                            )}
+                          />
+
                           <TextControl
                             className="mt10"
                             label={__("Expand Text", "b-testimonials-block")}
@@ -1938,7 +2033,7 @@ const Settings = ({
                         </PanelRow>
                       )}
 
-                      {controls.columns && (
+                      {showColumns && (
                         <>
                           <PanelRow>
                             <Label mt="0">
@@ -1950,6 +2045,16 @@ const Settings = ({
                             />
                           </PanelRow>
 
+                          {/* The hero layout spends its first testimonial on
+                              the spotlight card, so Columns only reaches the
+                              row beneath it. Layout.js clamps that row to the
+                              number of cards in it rather than leaving empty
+                              tracks, so asking for more columns than there are
+                              follower cards changed nothing and read as a dead
+                              control. The range stops at the last column that
+                              can actually be filled, and the panel hides the
+                              control entirely below three testimonials -- see
+                              CONTROL_CONDITIONS in utils/layoutControls.js. */}
                           <RangeControl
                             value={columns[device]}
                             onChange={(val) => {
@@ -1958,9 +2063,21 @@ const Settings = ({
                               });
                             }}
                             min={1}
-                            max={6}
+                            max={
+                              "testimonials-hero" === layout
+                                ? Math.max(1, Math.min(6, items.length - 1))
+                                : 6
+                            }
                             step={1}
                             beforeIcon="grid-view"
+                            help={
+                              "testimonials-hero" === layout
+                                ? __(
+                                    "Lays out the cards below the spotlight, so it stops at one column per follower card.",
+                                    "b-testimonials-block",
+                                  )
+                                : undefined
+                            }
                           />
                         </>
                       )}
@@ -1969,8 +2086,9 @@ const Settings = ({
                             two reach only the layouts that wrap their cards in
                             it. A timeline stacks its cards with a fixed margin
                             and a case study grid with a fixed gap; neither ever
-                            moved. */}
-                      {controls.gaps && (
+                            moved. Which of the two the current arrangement can
+                            use is worked out above. */}
+                      {showColumnGap && (
                         <UnitControl
                           className="mt20"
                           label={__("Column Gap:", "b-testimonials-block")}
@@ -1982,7 +2100,7 @@ const Settings = ({
                         />
                       )}
 
-                      {controls.gaps && !isSliderArrangement && (
+                      {showRowGap && (
                         <UnitControl
                           className="mt20"
                           label={__("Row Gap:", "b-testimonials-block")}
@@ -2382,76 +2500,20 @@ const Settings = ({
                     layout={layout}
                   />
 
-                  <PanelBody
-                    className="bPlPanelBody"
-                    title={__("Width & Height", "b-testimonials-block")}
-                    initialOpen={false}>
-                    {/* Shares the device switch with the Layout panel, so the
-                            device you are editing does not silently differ between
-                            the two tabs. */}
-                    <PanelRow>
-                      <Label mt="0">
-                        {__("Device:", "b-testimonials-block")}
-                      </Label>
-                      <BDevice
-                        device={device}
-                        onChange={(val) => setDevice(val)}
-                      />
-                    </PanelRow>
-
-                    {/* max-width, not width: a hard width would overflow a
-                            container narrower than the value on small screens. */}
-                    <UnitControl
-                      className="mt20"
-                      label={__("Block Width:", "b-testimonials-block")}
-                      labelPosition="left"
-                      value={blockWidth?.[device] || ""}
-                      onChange={(val) =>
-                        updateObject("blockWidth", device, val)
-                      }
-                      units={[
-                        pxUnit(1200),
-                        perUnit(100),
-                        emUnit(60),
-                        vwUnit(100),
-                      ]}
-                      isResetValueOnUnitChange={true}
-                      help={__(
-                        "Maximum width. Leave empty to follow the theme.",
-                        "b-testimonials-block",
-                      )}
-                    />
-
-                    {/* min-height, so a card that needs more room still grows
-                            rather than clipping its review text. */}
-                    <UnitControl
-                      className="mt20"
-                      label={__("Card Height:", "b-testimonials-block")}
-                      labelPosition="left"
-                      value={cardHeight?.[device] || ""}
-                      onChange={(val) =>
-                        updateObject("cardHeight", device, val)
-                      }
-                      units={[pxUnit(320), emUnit(20), vhUnit(50)]}
-                      isResetValueOnUnitChange={true}
-                      help={__(
-                        "Minimum height, for evening up ragged cards.",
-                        "b-testimonials-block",
-                      )}
-                    />
-
-                    {/* Space around the whole block, which is what separates this
-                        block from its neighbours. The Card panel's Margin moves
-                        the card inside the block instead, so it never could. */}
-                    <BoxControl
-                      className="mt20"
-                      label={__("Block Margin", "b-testimonials-block")}
-                      values={blockMargin}
-                      onChange={(val) => setAttributes({ blockMargin: val })}
-                      resetValues={{ top: "", right: "", bottom: "", left: "" }}
-                      units={[pxUnit(3), emUnit(2), perUnit(2)]}
-                    />
-                  </PanelBody>
+                  {/* Block Width, Card Height, Block Margin and Card Margin, in
+                      the same component the seven bespoke editors render, so the
+                      two cannot drift apart. Card Margin used to sit in the Card
+                      panel below, which meant gating that panel took it away
+                      from the eight layouts whose card it does reach -- it
+                      shares Card Height's selector list, not the Card panel's.
+                      The device switch is passed in so it stays the same one the
+                      Layout panel uses on the General tab. */}
+                  <SizeSpacingPanel
+                    attributes={attributes}
+                    setAttributes={setAttributes}
+                    device={device}
+                    setDevice={setDevice}
+                  />
 
                   {/* The four rules behind this panel name seven selectors:
                       `.layoutSection .single` and six widgets. On the layouts
@@ -2471,7 +2533,7 @@ const Settings = ({
                         value={background}
                         onChange={(val) => setAttributes({ background: val })}
                       />
-  
+
                       <BoxControl
                         label={__("Padding", "b-testimonials-block")}
                         values={padding}
@@ -2484,26 +2546,14 @@ const Settings = ({
                         }}
                         units={[pxUnit(3), emUnit(2)]}
                       />
-  
-                      {/* Resets to nothing rather than to a value of ours: the
-                              gap between cards is already set by Column/Row Gap in
-                              the Layout panel, so a default margin here would fight
-                              it. This is for nudging cards, not spacing them. */}
-                      <BoxControl
-                        label={__("Margin", "b-testimonials-block")}
-                        values={cardMargin}
-                        onChange={(val) => setAttributes({ cardMargin: val })}
-                        resetValues={{ top: "", right: "", bottom: "", left: "" }}
-                        units={[pxUnit(3), emUnit(2), perUnit(2)]}
-                      />
-  
+
                       <BorderControl
                         className=""
                         label={__("Border", "b-testimonials-block")}
                         value={border}
                         onChange={(val) => setAttributes({ border: val })}
                       />
-  
+
                       <ShadowControl
                         label={__("Shadow:", "sound-cloud")}
                         value={shadow}
@@ -2513,139 +2563,161 @@ const Settings = ({
                     </PanelBody>
                   )}
 
-                  {controls.image &&
-                    rendersPart("img") && (
-                      <PanelBody
-                        className="bPlPanelBody"
-                        title={__("Image", "b-testimonials-block")}
-                        initialOpen={false}>
-                        <PanelRow>
-                          <NumberControl
-                            className="mt10"
-                            label={__("Width:", "b-testimonials-block")}
-                            labelPosition="left"
-                            value={image?.width}
-                            onChange={(val) =>
-                              updateObject("image", "width", val)
-                            }
-                          />
+                  {controls.image && rendersPart("img") && (
+                    <PanelBody
+                      className="bPlPanelBody"
+                      title={__("Image", "b-testimonials-block")}
+                      initialOpen={false}>
+                      {/* Shares the device switch with the Layout and Width &
+                          Height panels, so the device being edited does not
+                          differ between them. */}
+                      <PanelRow>
+                        <Label mt="0">
+                          {__("Device:", "b-testimonials-block")}
+                        </Label>
+                        <BDevice
+                          device={device}
+                          onChange={(val) => setDevice(val)}
+                        />
+                      </PanelRow>
 
-                          <NumberControl
-                            className="mt10"
-                            label={__("Height:", "b-testimonials-block")}
-                            labelPosition="left"
-                            value={image?.height}
-                            onChange={(val) =>
-                              updateObject("image", "height", val)
-                            }
-                          />
-                        </PanelRow>
+                      <PanelRow>
+                        <NumberControl
+                          className="mt10"
+                          label={__("Width:", "b-testimonials-block")}
+                          labelPosition="left"
+                          value={imageSize("width", device)}
+                          onChange={(val) => setImageSize("width", val)}
+                        />
+
+                        <NumberControl
+                          className="mt10"
+                          label={__("Height:", "b-testimonials-block")}
+                          labelPosition="left"
+                          value={imageSize("height", device)}
+                          onChange={(val) => setImageSize("height", val)}
+                        />
+                      </PanelRow>
+
+                      <p className="components-base-control__help">
+                        {__(
+                          "Leave tablet and mobile empty to follow the desktop size.",
+                          "b-testimonials-block",
+                        )}
+                      </p>
+                      {/* Size reaches every layout's avatar; the border rule is
+                          still scoped to `.single .img`. On the three layouts
+                          that draw their own avatar -- case study, toast, avatar
+                          list -- it therefore moved nothing, and widening it
+                          would repaint rings those layouts define themselves
+                          (the avatar list's `--btb-border` ring, the toast's
+                          circle). Hidden there rather than half-working. */}
+                      {controls.imageBorder && (
                         <BorderControl
                           className=""
                           label={__("Border", "b-testimonials-block")}
                           value={imgBorder}
                           onChange={(val) => setAttributes({ imgBorder: val })}
                         />
-                      </PanelBody>
-                    )}
+                      )}
+                    </PanelBody>
+                  )}
 
-                  {controls.nameStyle &&
-                    rendersPart("name") && (
-                      <PanelBody
-                        className="bPlPanelBody"
-                        title={__("Name", "b-testimonials-block")}
-                        initialOpen={false}>
-                        <Typography
-                          className="mt10"
-                          label={__("Typography", "b-testimonials-block")}
-                          value={nameTypo}
-                          onChange={(val) => setAttributes({ nameTypo: val })}
-                          produce={produce}
-                        />
+                  {controls.nameStyle && rendersPart("name") && (
+                    <PanelBody
+                      className="bPlPanelBody"
+                      title={__("Name", "b-testimonials-block")}
+                      initialOpen={false}>
+                      <Typography
+                        className="mt10"
+                        label={__("Typography", "b-testimonials-block")}
+                        value={nameTypo}
+                        onChange={(val) => setAttributes({ nameTypo: val })}
+                        produce={produce}
+                      />
 
-                        <ColorControl
-                          className="mb10"
-                          label={__("Color", "b-testimonials-block")}
-                          value={nameColor}
-                          onChange={(val) => setAttributes({ nameColor: val })}
-                        />
-                      </PanelBody>
-                    )}
+                      <ColorControl
+                        className="mb10"
+                        label={__("Color", "b-testimonials-block")}
+                        value={nameColor}
+                        onChange={(val) => setAttributes({ nameColor: val })}
+                      />
+                    </PanelBody>
+                  )}
 
-                  {controls.degStyle &&
-                    rendersPart("deg") && (
-                      <PanelBody
-                        className="bPlPanelBody"
-                        title={__("Designation", "b-testimonials-block")}
-                        initialOpen={false}>
-                        <Typography
-                          className="mt10"
-                          label={__("Typography", "b-testimonials-block")}
-                          value={degTypo}
-                          onChange={(val) => setAttributes({ degTypo: val })}
-                          produce={produce}
-                        />
+                  {controls.degStyle && rendersPart("deg") && (
+                    <PanelBody
+                      className="bPlPanelBody"
+                      title={__("Designation", "b-testimonials-block")}
+                      initialOpen={false}>
+                      <Typography
+                        className="mt10"
+                        label={__("Typography", "b-testimonials-block")}
+                        value={degTypo}
+                        onChange={(val) => setAttributes({ degTypo: val })}
+                        produce={produce}
+                      />
 
-                        <ColorControl
-                          className="mb10"
-                          label={__("Color", "b-testimonials-block")}
-                          value={degColor}
-                          onChange={(val) => setAttributes({ degColor: val })}
-                        />
+                      <ColorControl
+                        className="mb10"
+                        label={__("Color", "b-testimonials-block")}
+                        value={degColor}
+                        onChange={(val) => setAttributes({ degColor: val })}
+                      />
 
-                        {/* The short rule under the designation. Only Theme 1
+                      {/* The short rule under the designation. Only Theme 1
                             draws one, so showing these anywhere else would be
                             three more controls that move nothing. */}
-                        {"theme_1" === theme && (
-                          <>
-                            <Label className="mt20">
-                              {__("Divider", "b-testimonials-block")}
-                            </Label>
+                      {"theme_1" === theme && (
+                        <>
+                          <Label className="mt20">
+                            {__("Divider", "b-testimonials-block")}
+                          </Label>
 
-                            <ColorControl
-                              className="mb10"
-                              label={__("Color", "b-testimonials-block")}
-                              value={degDivider?.color || ""}
-                              onChange={(val) =>
-                                setAttributes({
-                                  degDivider: { ...degDivider, color: val },
-                                })
-                              }
-                            />
+                          <ColorControl
+                            className="mb10"
+                            label={__("Color", "b-testimonials-block")}
+                            value={degDivider?.color || ""}
+                            onChange={(val) =>
+                              setAttributes({
+                                degDivider: { ...degDivider, color: val },
+                              })
+                            }
+                          />
 
-                            <RangeControl
-                              label={__("Thickness", "b-testimonials-block")}
-                              value={degDivider?.width}
-                              onChange={(val) =>
-                                setAttributes({
-                                  degDivider: { ...degDivider, width: val },
-                                })
-                              }
-                              min={0}
-                              max={10}
-                              allowReset
-                              help={__(
-                                "0 removes the divider.",
-                                "b-testimonials-block",
-                              )}
-                            />
+                          <RangeControl
+                            label={__("Thickness", "b-testimonials-block")}
+                            value={degDivider?.width}
+                            onChange={(val) =>
+                              setAttributes({
+                                degDivider: { ...degDivider, width: val },
+                              })
+                            }
+                            min={0}
+                            max={10}
+                            allowReset
+                            help={__(
+                              "0 removes the divider.",
+                              "b-testimonials-block",
+                            )}
+                          />
 
-                            <RangeControl
-                              label={__("Length", "b-testimonials-block")}
-                              value={degDivider?.length}
-                              onChange={(val) =>
-                                setAttributes({
-                                  degDivider: { ...degDivider, length: val },
-                                })
-                              }
-                              min={0}
-                              max={200}
-                              allowReset
-                            />
-                          </>
-                        )}
-                      </PanelBody>
-                    )}
+                          <RangeControl
+                            label={__("Length", "b-testimonials-block")}
+                            value={degDivider?.length}
+                            onChange={(val) =>
+                              setAttributes({
+                                degDivider: { ...degDivider, length: val },
+                              })
+                            }
+                            min={0}
+                            max={200}
+                            allowReset
+                          />
+                        </>
+                      )}
+                    </PanelBody>
+                  )}
 
                   {/* The rating colour is written inline by getStar rather than
                       through a selector, so it applies wherever a Themes/* card
@@ -2653,52 +2725,50 @@ const Settings = ({
                       text this panel cannot reach. The panel is named for
                       whichever half is left. */}
                   {(hasTextStyle || hasRatingColor) && (
-                      <PanelBody
-                        className="bPlPanelBody"
-                        title={
-                          hasTextStyle
-                            ? __("Review Text", "b-testimonials-block")
-                            : __("Rating", "b-testimonials-block")
-                        }
-                        initialOpen={false}>
-                        {hasTextStyle && (
-                          <>
-                            <Typography
-                              className="mt10"
-                              label={__("Typography", "b-testimonials-block")}
-                              value={textTypo}
-                              onChange={(val) =>
-                                setAttributes({ textTypo: val })
-                              }
-                              produce={produce}
-                            />
+                    <PanelBody
+                      className="bPlPanelBody"
+                      title={
+                        hasTextStyle
+                          ? __("Review Text", "b-testimonials-block")
+                          : __("Rating", "b-testimonials-block")
+                      }
+                      initialOpen={false}>
+                      {hasTextStyle && (
+                        <>
+                          <Typography
+                            className="mt10"
+                            label={__("Typography", "b-testimonials-block")}
+                            value={textTypo}
+                            onChange={(val) => setAttributes({ textTypo: val })}
+                            produce={produce}
+                          />
 
-                            <ColorControl
-                              className="mb10"
-                              label={__("Color", "b-testimonials-block")}
-                              value={textColor}
-                              onChange={(val) =>
-                                setAttributes({ textColor: val })
-                              }
-                            />
-                          </>
-                        )}
-
-                        {hasRatingColor && (
                           <ColorControl
                             className="mb10"
-                            label={__(
-                              "Rating Icon Color",
-                              "b-testimonials-block",
-                            )}
-                            value={starIconColor}
+                            label={__("Color", "b-testimonials-block")}
+                            value={textColor}
                             onChange={(val) =>
-                              setAttributes({ starIconColor: val })
+                              setAttributes({ textColor: val })
                             }
                           />
-                        )}
-                      </PanelBody>
-                    )}
+                        </>
+                      )}
+
+                      {hasRatingColor && (
+                        <ColorControl
+                          className="mb10"
+                          label={__(
+                            "Rating Icon Color",
+                            "b-testimonials-block",
+                          )}
+                          value={starIconColor}
+                          onChange={(val) =>
+                            setAttributes({ starIconColor: val })
+                          }
+                        />
+                      )}
+                    </PanelBody>
+                  )}
 
                   {/* `expandedTypo` was declared here and in Style.js but was
                         only ever used to emit a Google Font link -- nothing
@@ -2750,11 +2820,13 @@ const Settings = ({
                           value={grid2Bg}
                           onChange={(val) => setAttributes({ grid2Bg: val })}
                         />
-  
+
                         <BoxControl
                           label={__("Padding", "b-testimonials-block")}
                           values={grid2Padding}
-                          onChange={(val) => setAttributes({ grid2Padding: val })}
+                          onChange={(val) =>
+                            setAttributes({ grid2Padding: val })
+                          }
                           resetValues={{
                             top: "10px",
                             right: "10px",
@@ -2763,7 +2835,7 @@ const Settings = ({
                           }}
                           units={[pxUnit(3), emUnit(2)]}
                         />
-  
+
                         {/* `grid2Border` was declared by the parent block and read
                             by nothing: no control set it and no rule used it, so the
                             header strip could be tinted and padded but never
@@ -2771,12 +2843,14 @@ const Settings = ({
                         <BorderControl
                           label={__("Border", "b-testimonials-block")}
                           value={grid2Border}
-                          onChange={(val) => setAttributes({ grid2Border: val })}
+                          onChange={(val) =>
+                            setAttributes({ grid2Border: val })
+                          }
                         />
                       </PanelBody>
                     )}
-                  </>
-                )}
+                </>
+              )}
             </>
           )}
         </TabPanel>

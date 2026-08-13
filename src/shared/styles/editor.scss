@@ -19,41 +19,46 @@ $brandColor: #146ef5;
   color: #757575;
 }
 
+// Hover-to-upload overlay: a plus button that fades in over an avatar and
+// opens the media library for that card.
+//
+// This used to be scoped to `.layoutSection .authorImg`, so it only reached the
+// layouts that wrap their cards in that element. Hero, timeline and card-stack
+// build their own wrapper, which left their overlay unpositioned -- and once
+// `.img` started clipping its overflow, invisible. Anchoring is per-avatar
+// below; the overlay rule itself is layout-agnostic.
 .bTestimonials {
-  .layoutSection {
-    .authorImg {
-      .img {
-        position: relative;
+  .authorImg .img,
+  .btb-avatar-thumb,
+  .btb-bubble-avatar,
+  .btb-cs-avatar-wrap {
+    position: relative;
+  }
 
-        img {
-          // width: 100%;
-          // height: 100%;
-          // object-fit: cover;
-          // border-radius: 50%;
-        }
-      }
+  .upload {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: 0.3s;
+    // The plus icon is drawn in black, so it needs a light scrim to stay
+    // legible over a dark photo. `inherit` keeps it inside a circular avatar.
+    background: rgba(255, 255, 255, 0.68);
+    border-radius: inherit;
+    cursor: pointer;
 
-      .upload {
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        opacity: 0;
-        transition: 0.3s;
+    button {
+      padding: 0px;
+    }
 
-        button {
-          padding: 0px;
-        }
-
-        &:hover {
-          opacity: 1;
-          transition: 0.3s;
-        }
-      }
+    &:hover {
+      opacity: 1;
+      transition: 0.3s;
     }
   }
 }

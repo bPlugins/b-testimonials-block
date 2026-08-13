@@ -16,7 +16,10 @@ import { getVisualControls } from "../../../utils/visualControls";
  *                                       not keep it in `attributes.layout`.
  */
 const ColorsPanel = ({ attributes = {}, setAttributes, layout }) => {
-  const controls = getVisualControls(layout ?? attributes.layout);
+  // Attributes are passed so the state-dependent roles can be hidden while the
+  // element they paint is not on the page -- the card stack's nav buttons before
+  // a second review is added, the before/after labels before an image is picked.
+  const controls = getVisualControls(layout ?? attributes.layout, attributes);
 
   if (!controls.length) {
     return null;

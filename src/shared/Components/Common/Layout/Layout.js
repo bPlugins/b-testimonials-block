@@ -13,79 +13,12 @@ import Marquee from "./Marquee";
 import BeforeAfterSlider from "../BeforeAfterSlider";
 import TestimonialForm from "../TestimonialForm";
 
-import { getVideoEmbed } from "../../../utils/functions";
 import { clickable, editorClickable } from "../../../utils/a11y";
 import { BRAND_COLOR } from "../../../utils/icons";
 import BlockIcon from "../BlockIcon";
+import VideoCard from "../VideoCard";
 import { getIcon } from "../../../utils/blockIcons";
 import { ARRANGEMENTS, resolveArrangement } from "../../../utils/layoutFeatures";
-
-const VideoCard = ({ item, accentColor, playIcon = {} }) => {
-  const [isPlaying, setIsPlaying] = useState(false);
-  const embedHtml = item?.videoUrl ? getVideoEmbed(item.videoUrl) : "";
-
-  return (
-    <div className="video-item">
-      <div
-        className={`video-frame ${isPlaying ? "is-playing" : ""}`}
-        style={
-          !isPlaying && item?.poster?.url
-            ? { backgroundImage: `url(${item.poster.url})` }
-            : undefined
-        }
-        data-embed={embedHtml}
-        onClick={() => {
-          if (embedHtml) {
-            setIsPlaying(true);
-          }
-        }}
-        tabIndex={0}
-        role="button"
-        onKeyDown={(e) => {
-          if ((e.key === "Enter" || e.key === " ") && embedHtml) {
-            e.preventDefault();
-            setIsPlaying(true);
-          }
-        }}>
-        {isPlaying ? (
-          <div
-            className="video-embed-container"
-            style={{
-              width: "100%",
-              height: "100%",
-              position: "absolute",
-              inset: 0,
-            }}
-            dangerouslySetInnerHTML={{ __html: embedHtml }}
-          />
-        ) : (
-          <span
-            className="video-play"
-            style={accentColor ? { color: accentColor } : undefined}>
-            <BlockIcon
-              icon={playIcon}
-              size={26}
-              defaultColor="currentColor"
-              renderFallback={(color) => (
-                <svg viewBox="0 0 24 24" width="26" height="26" fill={color}>
-                  <path d="M8 5v14l11-7z" />
-                </svg>
-              )}
-            />
-          </span>
-        )}
-      </div>
-      <div className="video-meta">
-        {item?.name && <h3 className="name">{item.name}</h3>}
-        {(item?.deg || item?.company) && (
-          <p className="deg">
-            {[item?.deg, item?.company].filter(Boolean).join(", ")}
-          </p>
-        )}
-      </div>
-    </div>
-  );
-};
 
 const SocialProofToast = ({ items = [], bt, bd, isBackend, activeIndex }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -1025,6 +958,9 @@ const Layout = ({
                 }
                 alt={it.name || ""}
               />
+              {/* Same hover-to-upload overlay the themed cards get. This
+                  layout draws its own avatar markup, so it has to opt in. */}
+              {itemsEls?.[idx]?.img}
             </div>
           ))}
         </div>
@@ -1179,14 +1115,20 @@ const Layout = ({
           return (
             <div key={index} className="btb-case-study">
               <div className="btb-cs-header">
-                <img
-                  src={
-                    item.img?.url ||
-                    "https://templates.bplugins.com/wp-content/uploads/2025/02/p-29.png"
-                  }
-                  alt={item.name}
-                  className="btb-cs-avatar"
-                />
+                {/* Wrapper is rendered on both sides so the editor and the
+                    front end keep identical markup; it only carries the
+                    positioning the upload overlay needs. */}
+                <div className="btb-cs-avatar-wrap">
+                  <img
+                    src={
+                      item.img?.url ||
+                      "https://templates.bplugins.com/wp-content/uploads/2025/02/p-29.png"
+                    }
+                    alt={item.name}
+                    className="btb-cs-avatar"
+                  />
+                  {itemsEls?.[index]?.img}
+                </div>
                 <div>
                   <h4 className="btb-cs-name">{item.name || "John Doe"}</h4>
                   <span className="btb-cs-deg">{item.deg || "Developer"}</span>
@@ -1267,13 +1209,28 @@ const Layout = ({
 
   if (layout === "testimonials-hero") {
     const heroItem = items[0] || {};
+
+    // The spotlight takes the first testimonial, so the grid only ever holds
+    // the ones after it -- which is why Columns looks broken here. A hero block
+    // ships with a single testimonial and renders no grid at all, so the control
+    // has nothing to act on until a second card is added; and with more columns
+    // than follower cards the few that exist were squeezed into a fraction of
+    // the row with the remaining tracks left empty. Measured at 4 columns and
+    // one follower: a 310px card in a 1280px row.
+    //
+    // Clamping to the number of cards actually in the grid keeps the control
+    // honest at every count -- it can still reduce the columns, it just cannot
+    // ask for more tracks than there are cards to fill them.
+    const followers = items.slice(1);
+    const gridCols = (value) => Math.max(1, Math.min(Number(value) || 1, followers.length));
+
     return (
       <div className="btb-hero-layout">
         <div className="btb-hero-card">{themeSelect(heroItem, 0)}</div>
-        {items.length > 1 && (
+        {followers.length > 0 && (
           <div
-            className={`btb-hero-grid columns-${previewCols} columns-tablet-${tablet} columns-mobile-${mobile}`}>
-            {items.slice(1).map((item, index) => themeSelect(item, index + 1))}
+            className={`btb-hero-grid columns-${gridCols(previewCols)} columns-tablet-${gridCols(tablet)} columns-mobile-${gridCols(mobile)}`}>
+            {followers.map((item, index) => themeSelect(item, index + 1))}
           </div>
         )}
       </div>
@@ -1423,6 +1380,7 @@ const Layout = ({
                 }
                 alt={item.name}
               />
+              {itemsEls?.[index]?.img}
             </div>
             <div className="btb-bubble-content">
               {itemsEls?.[index]?.reviewText}
@@ -1477,14 +1435,25 @@ const Layout = ({
                 ? (index - activeIdx + totalItems) % totalItems
                 : 0;
             const isTop = pos === 0;
-            const isVisibleBehind = pos > 0 && pos <= 2;
+
+            // One state class, not two. This was `${isTop ? 'is-top' : ''}`
+            // followed by a separate `is-behind-N` / `is-hidden` ternary, so the
+            // top card came out as `is-top is-hidden`: both classes carry the
+            // same specificity and `.is-hidden` is declared last, so it won with
+            // `opacity: 0`. Every stack rendered its front card invisible, and a
+            // stack of one -- which is the default -- showed nothing at all. The
+            // front-end view script assigns these exclusively already, but it
+            // returns early on a single card, so it never repaired that case.
+            const stateClass = isTop
+              ? "is-top"
+              : pos <= 2
+                ? `is-behind-${pos}`
+                : "is-hidden";
 
             return (
               <div
                 key={index}
-                className={`btb-stacked-card ${isTop ? "is-top" : ""} ${
-                  isVisibleBehind ? `is-behind-${pos}` : "is-hidden"
-                }`}
+                className={`btb-stacked-card ${stateClass}`}
                 data-index={index}
                 data-stack-pos={pos}
                 style={{
@@ -1613,6 +1582,7 @@ const Layout = ({
                 itemProps={itemProps}
                 isBackend={isBackend}
                 previewCols={previewCols}
+                previewDevice={previewDevice}
                 arrangement={arrangement}
               />
             );

@@ -13,7 +13,7 @@ import ThemeFour from '../Themes/ThemeFour';
 import ThemeFive from '../Themes/ThemeFive';
 import ThemeSix from '../Themes/ThemeSix';
 
-const Slider = ({ attributes = {}, itemsEls = [], itemProps = {}, isBackend = false, previewCols = 0, arrangement = '' }) => {
+const Slider = ({ attributes = {}, itemsEls = [], itemProps = {}, isBackend = false, previewCols = 0, previewDevice = 'Desktop', arrangement = '' }) => {
 	const { items = [], slider = {}, columnGap = '30px', theme = 'default', columns = {}, layout, pauseInEditor = false } = attributes || {};
 	const { desktop = 3, tablet = 2, mobile = 1 } = (columns && typeof columns === 'object') ? columns : { desktop: 3, tablet: 2, mobile: 1 };
 	const { autoPlay = true, autoPlayDelay = 3, mouseWheel = true, navigation = true, coverRotate, coverDepth, coverScale, visibleSides = 1, cardWidth = '' } = (slider && typeof slider === 'object') ? slider : { autoPlay: true, mouseWheel: true, navigation: true };
@@ -71,6 +71,33 @@ const Slider = ({ attributes = {}, itemsEls = [], itemProps = {}, isBackend = fa
 	// was asked for, and how many fit follows from it.
 	const hasCardWidth = !! cardWidth && '0' !== String( parseInt( cardWidth, 10 ) );
 
+	// Coverflow has to come down on a narrow screen.
+	//
+	// Visible Side Cards is deliberately not a per-device setting -- "how many
+	// cards flank the active one" is the shape of the effect, not a column count.
+	// But the count alone decides the slide width, so 1 card a side stayed three
+	// slides wide at every size: measured on a 420px phone that is a 101px slide
+	// holding 147px of content, spilling out of the card and unreadable.
+	//
+	// Fractional caps rather than a whole number, so the neighbours still peek in
+	// from the edges and the effect survives at the smaller sizes instead of
+	// collapsing to a plain one-up slider.
+	const perViewCap = ( device ) => {
+		if ( 'Mobile' === device ) {
+			return 1.4;
+		}
+		if ( 'Tablet' === device ) {
+			return 2.4;
+		}
+		return coverPerView;
+	};
+
+	// The editor follows the device buttons; the front end uses breakpoints
+	// below, so it starts from the desktop count.
+	const coverPerViewNow = isBackend
+		? Math.min( coverPerView, perViewCap( previewDevice ) )
+		: coverPerView;
+
 	const maxPerView = isCoverflow
 		? coverPerView
 		: Math.max( Number( previewCols ) || 0, desktop, 1 );
@@ -113,7 +140,11 @@ const Slider = ({ attributes = {}, itemsEls = [], itemProps = {}, isBackend = fa
 			// - the coverflow numbers, which are read once when the effect
 			//   initialises, so dragging a slider would otherwise change nothing
 			//   until the block remounted for some other reason.
-			key={ `${ effective }-${ theme }-${ items.length }-${ spaceBetweenVal }-${ previewCols }-${ isPaused }-${ autoPlayDelay }-${ effectRotate }-${ effectDepth }-${ effectScale }-${ repeats }-${ sideCards }-${ cardWidth }` }
+			// - coverPerViewNow, so the editor's device buttons re-initialise the
+			//   coverflow count. previewCols alone does not cover it: coverflow
+			//   takes its count from Visible Side Cards, so switching to Mobile
+			//   with the same column settings would not change the key at all.
+			key={ `${ effective }-${ theme }-${ items.length }-${ spaceBetweenVal }-${ previewCols }-${ isPaused }-${ autoPlayDelay }-${ effectRotate }-${ effectDepth }-${ effectScale }-${ repeats }-${ sideCards }-${ cardWidth }-${ coverPerViewNow }` }
 			modules={ [ Navigation, A11y, Autoplay, Mousewheel, Pagination, EffectCoverflow ] }
 			effect={ isCoverflow ? 'coverflow' : undefined }
 			// slideShadows stays off. Swiper paints them as an absolutely
@@ -156,10 +187,25 @@ const Slider = ({ attributes = {}, itemsEls = [], itemProps = {}, isBackend = fa
 			// on a 3D carousel "how many cards flank the active one" is the real
 			// question, and it should not change with the device the way a grid's
 			// column count does.
-			slidesPerView={ isCoverflow ? ( hasCardWidth ? 'auto' : coverPerView ) : ( isBackend ? ( previewCols || desktop ) : mobile ) }
+			slidesPerView={ isCoverflow ? ( hasCardWidth ? 'auto' : coverPerViewNow ) : ( isBackend ? ( previewCols || desktop ) : mobile ) }
 			// min-width breakpoints, so these are the CSS max-widths in
 			// _devices.scss plus one -- keeps the slider in step with the grids.
-			breakpoints={ isCoverflow || isBackend ? undefined : { 641: { slidesPerView: tablet }, 1025: { slidesPerView: desktop } } }
+			//
+			// Coverflow gets them too now. It used to opt out entirely, which is
+			// what left its slides at the desktop count on a phone; the caps below
+			// only ever lower that count, so a block asking for fewer side cards
+			// than the cap keeps exactly what it asked for.
+			breakpoints={ isBackend
+				? undefined
+				: isCoverflow
+					? ( hasCardWidth
+						? undefined
+						: {
+							0: { slidesPerView: Math.min( coverPerView, perViewCap( 'Mobile' ) ) },
+							641: { slidesPerView: Math.min( coverPerView, perViewCap( 'Tablet' ) ) },
+							1025: { slidesPerView: coverPerView },
+						} )
+					: { 641: { slidesPerView: tablet }, 1025: { slidesPerView: desktop } } }
 			autoplay={ autoPlay && ! isPaused ? { delay: ( Number( autoPlayDelay ) || 3 ) * 1000, disableOnInteraction: false } : false }
 			mousewheel={ mouseWheel }
 			navigation={ navigation }

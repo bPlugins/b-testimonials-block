@@ -18,7 +18,7 @@ import {
 } from "../../../../../../bpl-tools/utils/options";
 
 /**
- * Block Width, Card Height and Card Margin.
+ * Block Width, Card Height, Block Margin and Card Margin.
  *
  * The seven blocks that ship their own editor -- before/after, client logos,
  * rating summary, testimonial form, stats, trust badges and video testimonials
@@ -28,10 +28,27 @@ import {
  * missing half, kept in one place so the bespoke editors and the shared
  * Settings tab cannot drift apart again.
  *
+ * All four reach every layout. Block Width and Block Margin are written on the
+ * block's own box, and Card Height and Card Margin share the long selector list
+ * in Style.js that names each layout's card whatever it is built from -- which
+ * is why this panel is never gated by utils/layoutControls.js the way the Card,
+ * Image and typography panels are.
+ *
  * @param {Object}   props.attributes    Block attributes.
  * @param {Function} props.setAttributes Attribute setter.
+ * @param {string}   props.device        Device to edit. Pass this with
+ *                                       `setDevice` to share the switch with
+ *                                       another panel, so the device being
+ *                                       edited cannot silently differ between
+ *                                       the two; omit both for a local one.
+ * @param {Function} props.setDevice     Setter for the shared device.
  */
-const SizeSpacingPanel = ({ attributes = {}, setAttributes }) => {
+const SizeSpacingPanel = ({
+  attributes = {},
+  setAttributes,
+  device: sharedDevice,
+  setDevice: setSharedDevice,
+}) => {
   const {
     blockWidth = {},
     cardHeight = {},
@@ -39,7 +56,9 @@ const SizeSpacingPanel = ({ attributes = {}, setAttributes }) => {
     blockMargin = {},
   } = attributes;
 
-  const [device, setDevice] = useState("desktop");
+  const [localDevice, setLocalDevice] = useState("desktop");
+  const device = sharedDevice ?? localDevice;
+  const setDevice = setSharedDevice ?? setLocalDevice;
 
   const updateObject = (key, prop, val) =>
     setAttributes({ [key]: { ...(attributes[key] || {}), [prop]: val } });

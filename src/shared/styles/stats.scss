@@ -1,9 +1,16 @@
 @use './devices' as *;
 .bTestimonialStats {
+	// minmax(0, 1fr) rather than a bare 1fr.
+	//
+	// A `1fr` track is really `minmax(auto, 1fr)`, so it refuses to shrink below
+	// its content's min-content width -- and a 44px stat number with a label
+	// under it is wider than a third of a phone. Asking for 3 columns on mobile
+	// pushed this block 130px past a 420px viewport and gave the whole page a
+	// horizontal scrollbar. Measured, and measured again at 0 after the change.
 	.stats-grid {
 		display: grid;
 		gap: var(--row-gap, 30px) var(--col-gap, 30px);
-		grid-template-columns: repeat(var(--cols-d, 3), 1fr);
+		grid-template-columns: repeat(var(--cols-d, 3), minmax(0, 1fr));
 	}
 
 	// Card Surface, Border Color and Border Width are offered for this layout but
@@ -35,13 +42,13 @@
 
 	@media ( max-width: $tablet-max ) {
 		.stats-grid {
-			grid-template-columns: repeat(var(--cols-t, 3), 1fr);
+			grid-template-columns: repeat(var(--cols-t, 3), minmax(0, 1fr));
 		}
 	}
 
 	@media ( max-width: $mobile-max ) {
 		.stats-grid {
-			grid-template-columns: repeat(var(--cols-m, 1), 1fr);
+			grid-template-columns: repeat(var(--cols-m, 1), minmax(0, 1fr));
 		}
 	}
 }

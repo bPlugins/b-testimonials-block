@@ -200,21 +200,19 @@
 		"image": {
 			"type": "object",
 			"default": {
-				"width": 50,
-				"height": 50
+				"width": 44,
+				"height": 44
 			}
 		},
 		"nameTypo": {
 			"type": "object",
 			"default": {
 				"fontSize": {
-					"desktop": 16,
-					"tablet": 16,
+					"desktop": 14,
+					"tablet": 14,
 					"mobile": 14
 				},
-				"fontFamily": "Open Sans",
-				"fontWeight": 700,
-				"lineHeight": "135%"
+				"fontWeight": 600
 			}
 		},
 		"nameColor": {
@@ -225,13 +223,11 @@
 			"type": "object",
 			"default": {
 				"fontSize": {
-					"desktop": 14,
-					"tablet": 14,
-					"mobile": 14
+					"desktop": 12,
+					"tablet": 12,
+					"mobile": 12
 				},
-				"fontFamily": "Open Sans",
-				"fontWeight": 400,
-				"lineHeight": "135%"
+				"fontWeight": 400
 			}
 		},
 		"degColor": {

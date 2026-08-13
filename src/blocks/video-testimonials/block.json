@@ -61,6 +61,40 @@
 				"mobile": ""
 			}
 		},
+		"nameTypo": {
+			"type": "object",
+			"default": {
+				"fontSize": {
+					"desktop": 17,
+					"tablet": 17,
+					"mobile": 16
+				},
+				"fontFamily": "Open Sans",
+				"fontWeight": 700,
+				"lineHeight": "135%"
+			}
+		},
+		"nameColor": {
+			"type": "string",
+			"default": "#000"
+		},
+		"degTypo": {
+			"type": "object",
+			"default": {
+				"fontSize": {
+					"desktop": 14,
+					"tablet": 14,
+					"mobile": 13
+				},
+				"fontFamily": "Open Sans",
+				"fontWeight": 400,
+				"lineHeight": "135%"
+			}
+		},
+		"degColor": {
+			"type": "string",
+			"default": "#7B7B7B"
+		},
 		"cId": {
 			"type": "string",
 			"default": ""

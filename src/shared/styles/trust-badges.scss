@@ -4,10 +4,13 @@
 // stroke in the editor preview while looking right on the published page.
 @use './custom-icon' as *;
 .bTrustBadges {
+	// minmax(0, 1fr): a bare `1fr` will not shrink past its content's min-content
+	// width, and a 44px icon beside its text is wider than a third of a phone.
+	// At 3 columns on mobile this ran 116px past a 420px viewport.
 	.badges-grid {
 		display: grid;
 		gap: var(--row-gap, 30px) var(--col-gap, 30px);
-		grid-template-columns: repeat(var(--cols-d, 3), 1fr);
+		grid-template-columns: repeat(var(--cols-d, 3), minmax(0, 1fr));
 	}
 
 	.badge-item {
@@ -45,13 +48,13 @@
 
 	@media ( max-width: $tablet-max ) {
 		.badges-grid {
-			grid-template-columns: repeat(var(--cols-t, 3), 1fr);
+			grid-template-columns: repeat(var(--cols-t, 3), minmax(0, 1fr));
 		}
 	}
 
 	@media ( max-width: $mobile-max ) {
 		.badges-grid {
-			grid-template-columns: repeat(var(--cols-m, 1), 1fr);
+			grid-template-columns: repeat(var(--cols-m, 1), minmax(0, 1fr));
 		}
 	}
 }

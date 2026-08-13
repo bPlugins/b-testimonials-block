@@ -55,6 +55,7 @@ const SECTIONED = {
   gaps: true,
   cardBox: true,
   image: true,
+  imageBorder: true,
   nameStyle: true,
   degStyle: true,
   textStyle: true,
@@ -62,6 +63,20 @@ const SECTIONED = {
 };
 
 const FULL = { ...THEMED, ...SECTIONED };
+
+/**
+ * The card-level half of SECTIONED: everything Style.js writes against `.single`
+ * itself, with none of the rules that need the `.layoutSection` wrapper (the
+ * column tracks and the grid gap).
+ */
+const CARD_STYLE = {
+  cardBox: true,
+  image: true,
+  imageBorder: true,
+  nameStyle: true,
+  degStyle: true,
+  textStyle: true,
+};
 
 /**
  * The single-widget blocks whose whole widget is `.btb-badge-card`, which is one
@@ -91,41 +106,112 @@ export const LAYOUT_CONTROLS = {
 
   // -- Themed cards in a bespoke wrapper ------------------------------------
   // `.btb-timeline-card`, `.btb-hero-card` and `.btb-stacked-card` hold a real
-  // `.single`, so the Elements toggles, the Theme select and the rating colour
-  // all apply -- but no `.layoutSection` sits above them, so the Card, Image,
-  // Name, Designation, Review Text and Top panels reach nothing, and neither
-  // does the grid-gap rule.
-  "testimonials-timeline": { ...THEMED },
-  // The one exception: the secondary grid below the hero card carries the
-  // `columns-*` classes, which are global rather than scoped.
-  "testimonials-hero": { ...THEMED, columns: true },
-  "testimonials-card-stack": { ...THEMED },
+  // `.single` with no `.layoutSection` above it. That used to cost them the
+  // Card, Image, Name, Designation and Review Text panels, because every rule
+  // behind those panels was scoped to `.layoutSection .single` and so reached
+  // nothing here -- the hero card's avatar in particular ignored the Image
+  // width and height entirely and rendered at its natural size.
+  //
+  // Style.js names `.single` on its own now, so all five reach these three. The
+  // grid-gap rule is still scoped to `.layoutSection`, which is why `gaps` stays
+  // off.
+  "testimonials-timeline": { ...THEMED, ...CARD_STYLE },
+  // The secondary grid below the hero card carries the `columns-*` classes,
+  // which are global rather than scoped.
+  "testimonials-hero": { ...THEMED, ...CARD_STYLE, columns: true },
+  "testimonials-card-stack": { ...THEMED, ...CARD_STYLE },
 
   // -- Bespoke markup ------------------------------------------------------
   // Renders its own `.btb-avatar-*` parts, which Style.js names alongside the
   // `.single` ones for exactly this reason, and `.btb-avatar-list-wrapper` is
   // in the Card rule. Its three parts are always rendered, so no toggle for
   // them would do anything.
+  // Every entry below gained controls when Style.js stopped naming only
+  // `.single .name` and friends and started naming each layout's own classes as
+  // well. Before that the stylesheet's hardcoded font sizes and avatar sizes
+  // were the only values in play, which is what made the panels look dead; those
+  // values now live in each block's attribute defaults, so an untouched block
+  // renders as it always did and the control owns the property from there.
+  //
+  // None of the four below sets `imageBorder`. Avatar *size* reaches their own
+  // classes, but the border rule is still scoped to `.single .img`, so the Image
+  // panel's Border control moved nothing on them -- measured on each. Widening
+  // that rule would repaint rings these layouts define themselves (the avatar
+  // list's `--btb-border` ring, the bubble's accent ring), so the control is
+  // hidden rather than left half-working.
   "testimonials-avatar-list": {
+    cardBox: true,
+    image: true,
+    nameStyle: true,
+    degStyle: true,
+    textStyle: true,
+  },
+  // `.btb-toast-text` and `.btb-toast-meta` are the message and its byline, and
+  // `.btb-toast-avatar` the photo beside them.
+  "social-proof-toast": {
+    cardBox: true,
+    image: true,
+    nameStyle: true,
+    degStyle: true,
+  },
+  // Title, per-star label and count map onto Name, Review Text and Designation
+  // -- the same three roles the Colors panel already paints them with.
+  "star-rating-bars": {
     cardBox: true,
     nameStyle: true,
     degStyle: true,
     textStyle: true,
   },
-  // `.btb-toast-card` and `.btb-star-rating-bars` are in the Card rule; the
-  // text inside both is styled by the stylesheet through the palette
-  // variables, which the Colors panel already exposes.
-  "social-proof-toast": { cardBox: true },
-  "star-rating-bars": { cardBox: true },
   // `.btb-case-study-grid` takes its track count from the global `columns-*`
   // classes, but its gap is the stylesheet's own.
-  "case-study-card": { columns: true },
+  "case-study-card": {
+    columns: true,
+    cardBox: true,
+    image: true,
+    nameStyle: true,
+    degStyle: true,
+    textStyle: true,
+  },
   // These three print the review text through `itemsEls`, so that one toggle
   // -- and the excerpt controls with it -- is honoured. Everything else in
   // their markup is unconditional.
-  "testimonials-floating-bubble": { elements: ["reviewText"] },
-  "comparison-testimonial-table": { elements: ["reviewText"] },
-  "faq-testimonial-accordion": { elements: ["reviewText"] },
+  //
+  // The bubble's name is accent-coloured by design, so it takes the Name
+  // typography without the Name colour; no Designation part is rendered.
+  //
+  // `gaps` is on despite the missing `.layoutSection`: the bubbles sit in a
+  // wrapping flex row spaced by a gap, so both controls have something real to
+  // move, and Style.js names that wrapper directly. The block's own gap
+  // defaults were lowered to the 20px the stylesheet had been using, so an
+  // untouched block renders exactly as it did before the control existed.
+  "testimonials-floating-bubble": {
+    elements: ["reviewText"],
+    gaps: true,
+    image: true,
+    nameStyle: true,
+    textStyle: true,
+  },
+  // Table title is the Name role, the review cells the Review Text role. The
+  // column headers keep the stylesheet's own styling -- they are chrome rather
+  // than a card part.
+  "comparison-testimonial-table": {
+    elements: ["reviewText"],
+    cardBox: true,
+    nameStyle: true,
+    textStyle: true,
+  },
+  // Question / answer / author map onto Name, Review Text and Designation.
+  //
+  // No Card panel: `.btb-faq-item` is where it would land, and the stylesheet
+  // recolours that border on `[open]` to mark the expanded row. An ID-scoped
+  // border from the Card panel outranks the `[open]` rule, so offering it would
+  // trade the open-state indicator for a box control.
+  "faq-testimonial-accordion": {
+    elements: ["reviewText"],
+    nameStyle: true,
+    degStyle: true,
+    textStyle: true,
+  },
   // Nothing in the sidebar's shared panels reaches the poll.
   "user-feedback-poll": {},
 
@@ -152,6 +238,32 @@ export const LAYOUT_CONTROLS = {
   "trust-badges": { columns: true, gaps: true, cardBox: true },
 };
 
+/**
+ * Controls whose target only exists at certain item counts.
+ *
+ * now. The hero spotlight is the case: it spends the first testimonial on the
+ * A layout can support a control and still have nothing for it to act on right
+ * big card, so Columns only lays out the row beneath, and that row is clamped to
+ * the number of cards in it so a four-column setting cannot leave three tracks
+ * empty. Measured across item counts:
+ *
+ *   1 testimonial  -> no follower row is rendered at all; Columns is inert
+ *   2              -> one follower, clamped to one track; Columns is inert
+ *   3              -> two followers; Columns moves between 1 and 2
+ *   5              -> four followers; Columns moves between 1 and 4
+ *
+ * So the control is offered from three testimonials up, which is the first count
+ * at which changing it changes the page.
+ *
+ * Each predicate takes the block's attributes and returns whether the control
+ * has something to act on.
+ */
+export const CONTROL_CONDITIONS = {
+  "testimonials-hero": {
+    columns: (attributes) => (attributes?.items?.length || 0) > 2,
+  },
+};
+
 const NONE = {
   elements: [],
   theme: false,
@@ -160,6 +272,7 @@ const NONE = {
   gaps: false,
   cardBox: false,
   image: false,
+  imageBorder: false,
   nameStyle: false,
   degStyle: false,
   textStyle: false,
@@ -173,11 +286,26 @@ const NONE = {
  * block and the `single` / `testimonials-single` layouts are, and it keeps a
  * newly added layout visible rather than silently stripped.
  *
- * @param {string} layout Current layout name.
+ * @param {string} layout     Current layout name.
+ * @param {Object} attributes Block attributes, for the item-count conditions in
+ *                            CONTROL_CONDITIONS. Omit to skip those checks.
  * @return {Object} One flag per control group, plus `elements` as the list of
  *                  card parts whose toggle is honoured.
  */
-export const getLayoutControls = (layout) => ({
-  ...NONE,
-  ...(LAYOUT_CONTROLS[layout] || FULL),
-});
+export const getLayoutControls = (layout, attributes) => {
+  const controls = { ...NONE, ...(LAYOUT_CONTROLS[layout] || FULL) };
+
+  if (!attributes) {
+    return controls;
+  }
+
+  for (const [name, condition] of Object.entries(
+    CONTROL_CONDITIONS[layout] || {},
+  )) {
+    if (controls[name] && !condition(attributes)) {
+      controls[name] = false;
+    }
+  }
+
+  return controls;
+};

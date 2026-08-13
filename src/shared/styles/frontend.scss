@@ -84,24 +84,33 @@ $primaryColor: #382C8D;
 
 	.btbTestimonialsDir {
 
+		// The avatar box. Style.js gives it its width and height; these keep the
+		// photo inside that box.
+		//
+		// They used to be nested under `.layoutSection .single`, which the hero
+		// spotlight never enters -- so its avatar had neither the clip nor the
+		// image sizing, and a portrait photo rendered at its own full height and
+		// ran straight across the name, stars and review text under it. Measured
+		// on a 375px box: the image came out 373x1119 and hung 745px below.
+		//
+		// `cover` rather than the `fill` this rule used to carry: a photo whose
+		// proportions differ from the box was being stretched to fit, and a
+		// square box is exactly the case where that shows. It crops now instead.
+		.single .authorImg .img {
+			border-radius: 50%;
+			overflow: hidden;
+
+			img {
+				width: 100%;
+				height: 100%;
+				object-fit: cover;
+			}
+		}
+
 		.layoutSection {
 			display: grid;
 
 			.single {
-
-				.authorImg {
-
-					.img {
-						border-radius: 50%;
-						overflow: hidden;
-
-						img {
-							width: 100%;
-							height: 100%;
-							object-fit: fill;
-						}
-					}
-				}
 
 				.top {
 					display: flex;
@@ -837,12 +846,18 @@ $primaryColor: #382C8D;
 
 	.btb-poll-title { font-size: 18px; font-weight: 700; margin: 0 0 8px; color: var(--btb-title, #1e293b); }
 	.btb-poll-desc { font-size: 13px; color: var(--btb-muted, #64748b); margin: 0 0 20px; }
+	// The scale is the one row here that cannot fit a phone: eleven 38px buttons
+	// plus their gaps and the two end labels come to roughly 480px, and none of
+	// it was allowed to wrap. Measured at a 420px viewport it pushed 67px past
+	// the edge and took the whole page's horizontal scrollbar with it -- the only
+	// block on the page that did. Wrapping costs nothing at wider widths, where
+	// the row still fits on one line.
 	.btb-poll-scale {
-		display: flex; align-items: center; gap: 10px; justify-content: center;
+		display: flex; align-items: center; gap: 10px; justify-content: center; flex-wrap: wrap;
 		.btb-poll-label-low, .btb-poll-label-high { font-size: 12px; color: var(--btb-muted, #94a3b8); font-weight: 500; }
 	}
 	.btb-poll-buttons {
-		display: flex; gap: 6px;
+		display: flex; gap: 6px; flex-wrap: wrap; justify-content: center;
 		.btb-poll-num-btn {
 			width: 38px; height: 38px; border-radius: 8px; border: var(--btb-border-width, 1px) solid var(--btb-border, #cbd5e1);
 			background: var(--btb-surface, #fff); font-weight: 700; cursor: pointer; transition: all 0.15s;
@@ -900,13 +915,15 @@ $primaryColor: #382C8D;
 	background: var(--btb-surface, #fff); border: var(--btb-border-width, 1px) solid var(--btb-border, #e2e8f0); border-radius: 14px;
 	padding: 24px; max-width: 500px; margin: 0 auto;
 
-	.btb-srb-title { font-size: 17px; font-weight: 700; margin: 0 0 16px; color: var(--btb-title, #1e293b); }
+	// Font size and weight moved into the block's nameTypo / textTypo / degTypo
+	// defaults -- the Name, Review Text and Designation panels own them now.
+	.btb-srb-title { margin: 0 0 16px; color: var(--btb-title, #1e293b); }
 	.btb-srb-row {
 		display: flex; align-items: center; gap: 10px; margin-bottom: 8px;
-		.btb-srb-label { font-size: 13px; font-weight: 600; width: 60px; flex-shrink: 0; color: var(--btb-body, #334155); }
+		.btb-srb-label { width: 60px; flex-shrink: 0; color: var(--btb-body, #334155); }
 		.btb-srb-track { flex: 1; height: 10px; background: var(--btb-track, #f1f5f9); border-radius: 5px; overflow: hidden; }
 		.btb-srb-fill { height: 100%; background: linear-gradient(90deg, var(--btb-star, #f59e0b), var(--btb-star, #fbbf24)); border-radius: 5px; transition: width 0.4s ease; }
-		.btb-srb-count { font-size: 12px; color: var(--btb-muted, #64748b); min-width: 75px; text-align: right; white-space: nowrap; flex-shrink: 0; }
+		.btb-srb-count { color: var(--btb-muted, #64748b); min-width: 75px; text-align: right; white-space: nowrap; flex-shrink: 0; }
 	}
 }
 
@@ -932,28 +949,35 @@ $primaryColor: #382C8D;
 		padding: 14px 20px; box-shadow: 0 8px 30px rgba(0,0,0,0.1);
 		max-width: 380px; animation: btbToastSlide 0.4s ease;
 
+		// Size comes from the Image panel, font size and weight from Name and
+		// Designation. What stays is containment: the circle, the clip, and the
+		// photo filling whatever box the control asks for.
 		.btb-toast-avatar {
-			width: 44px; height: 44px; border-radius: 50%; overflow: hidden; flex-shrink: 0;
+			border-radius: 50%; overflow: hidden; flex-shrink: 0;
 			img { width: 100%; height: 100%; object-fit: cover; }
 		}
 		.btb-toast-body {
-			.btb-toast-text { font-size: 14px; font-weight: 600; color: var(--btb-title, #1e293b); margin: 0 0 2px; }
-			.btb-toast-meta { font-size: 12px; color: var(--btb-muted, #94a3b8); }
+			.btb-toast-text { color: var(--btb-title, #1e293b); margin: 0 0 2px; }
+			.btb-toast-meta { color: var(--btb-muted, #94a3b8); }
 		}
 	}
 }
 @keyframes btbToastSlide { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
 
 /* --- Comparison Table (Category E) --- */
+// Background, padding, border and shadow are the Card panel's now, and the
+// title's and cells' font sizes the Name and Review Text panels'. All of it
+// lives in this block's attribute defaults, so the table looks unchanged until
+// one of those controls is touched. The column headers keep their own styling --
+// they are table chrome rather than a card part, so no panel claims them.
 .btb-comparison-table {
-	background: var(--btb-surface, #fff); border: var(--btb-border-width, 1px) solid var(--btb-border, #e2e8f0); border-radius: 14px;
-	padding: 24px; overflow: hidden;
+	overflow: hidden;
 
-	.btb-ct-title { font-size: 18px; font-weight: 700; margin: 0 0 16px; color: var(--btb-title, #1e293b); }
+	.btb-ct-title { margin: 0 0 16px; color: var(--btb-title, #1e293b); }
 	.btb-ct-table {
 		width: 100%; border-collapse: collapse;
 		th { background: var(--btb-track, #f8fafc); padding: 10px 14px; font-size: 13px; font-weight: 600; color: var(--btb-body, #475569); text-align: left; border-bottom: var(--btb-divider-width, 2px) solid var(--btb-divider, #e2e8f0); }
-		td { padding: 10px 14px; font-size: 13px; color: var(--btb-body, #334155); border-bottom: var(--btb-divider-width, 1px) solid var(--btb-divider, #f1f5f9); }
+		td { padding: 10px 14px; color: var(--btb-body, #334155); border-bottom: var(--btb-divider-width, 1px) solid var(--btb-divider, #f1f5f9); }
 		.btb-ct-rating { color: var(--btb-star, #f59e0b); }
 		// The cell now holds the shared review paragraph so the excerpt applies;
 		// drop the paragraph's default margin so the row keeps its height.
@@ -968,17 +992,20 @@ $primaryColor: #382C8D;
 	.btb-faq-item {
 		border: var(--btb-border-width, 1px) solid var(--btb-border, #e2e8f0); border-radius: 10px; margin-bottom: 8px; overflow: hidden;
 		&[open] { border-color: var(--btb-accent, #382C8D); }
+		// Font size and weight are the Name / Review Text / Designation panels'
+		// (question, answer, author); the box itself keeps the stylesheet's
+		// border so the `[open]` accent below still marks the expanded row.
 		.btb-faq-question {
-			padding: 14px 18px; font-weight: 600; font-size: 15px; color: var(--btb-title, #1e293b);
+			padding: 14px 18px; color: var(--btb-title, #1e293b);
 			cursor: pointer; list-style: none;
 			&::-webkit-details-marker { display: none; }
 			&::before { content: '+'; margin-right: 10px; font-size: 18px; color: var(--btb-accent, #382C8D); }
 		}
 		&[open] .btb-faq-question::before { content: '−'; }
 		.btb-faq-answer {
-			padding: 0 18px 14px; font-size: 14px; color: var(--btb-body, #475569);
+			padding: 0 18px 14px; color: var(--btb-body, #475569);
 			p { margin: 0 0 6px; }
-			.btb-faq-author { font-size: 12px; color: var(--btb-muted, #94a3b8); font-style: italic; }
+			.btb-faq-author { color: var(--btb-muted, #94a3b8); font-style: italic; }
 		}
 	}
 }
@@ -989,19 +1016,24 @@ $primaryColor: #382C8D;
 
 	.btb-avatar-row {
 		display: flex; justify-content: center; gap: 16px; margin-bottom: 24px; flex-wrap: wrap;
+		// Thumbnail size is the Image panel's; the ring, the clip and the active
+		// state stay here.
 		.btb-avatar-thumb {
-			width: 60px; height: 60px; border-radius: 50%; overflow: hidden; cursor: pointer;
+			border-radius: 50%; overflow: hidden; cursor: pointer;
 			border: var(--btb-border-width, 2px) solid var(--btb-border, #e2e8f0); transition: all 0.25s;
 			img { width: 100%; height: 100%; object-fit: cover; }
 			&.active { border: 3px solid var(--btb-accent, #382C8D); transform: scale(1.15); box-shadow: 0 4px 16px rgba(56,44,141,0.2); }
 		}
 	}
+	// The Card panel paints this panel rather than the transparent wrapper around
+	// it, so its background, padding, border and shadow moved into the block's
+	// defaults. Font sizes were already the typography panels' -- those rules
+	// reached `.btb-avatar-*` before this change and simply repeated themselves
+	// here at a lower specificity.
 	.btb-avatar-detail {
-		background: var(--btb-surface, #fff); border-radius: 16px; padding: 28px; border: var(--btb-border-width, 1px) solid var(--btb-border, #e2e8f0);
-		box-shadow: 0 8px 24px rgba(0,0,0,0.04);
-		.btb-avatar-review { font-style: italic; font-size: 16px; color: var(--btb-body, #334155); margin: 0 0 16px; }
-		.btb-avatar-name { margin: 0; font-weight: 700; color: var(--btb-title, #0f172a); font-size: 16px; }
-		.btb-avatar-deg { font-size: 13px; color: var(--btb-muted, #64748b); }
+		.btb-avatar-review { font-style: italic; color: var(--btb-body, #334155); margin: 0 0 16px; }
+		.btb-avatar-name { margin: 0; color: var(--btb-title, #0f172a); }
+		.btb-avatar-deg { color: var(--btb-muted, #64748b); }
 	}
 }
 
@@ -1097,15 +1129,19 @@ $primaryColor: #382C8D;
 	gap: 20px;
 }
 
+// Card box, avatar size and the three text sizes all live in this block's
+// attribute defaults now, so the Card, Image, Name, Designation and Review Text
+// panels each own their property. The section labels keep their own styling --
+// they are the block's own structure, not a card part any panel names.
 .btb-case-study {
-	background: var(--btb-surface, #fff); border: var(--btb-border-width, 1px) solid var(--btb-border, #e2e8f0); border-radius: 16px;
-	padding: 28px; box-shadow: 0 4px 16px rgba(0,0,0,0.04);
-
 	.btb-cs-header {
 		display: flex; align-items: center; gap: 14px; margin-bottom: 20px; padding-bottom: 16px; border-bottom: var(--btb-divider-width, 1px) solid var(--btb-divider, #f1f5f9);
-		.btb-cs-avatar { width: 56px; height: 56px; border-radius: 50%; object-fit: cover; }
-		.btb-cs-name { font-size: 17px; font-weight: 700; color: var(--btb-title, #1e293b); margin: 0; }
-		.btb-cs-deg { font-size: 13px; color: var(--btb-muted, #64748b); }
+		// The wrapper anchors the editor's upload overlay; the Image panel sizes
+		// both it and the photo inside it.
+		.btb-cs-avatar-wrap { flex-shrink: 0; border-radius: 50%; }
+		.btb-cs-avatar { border-radius: 50%; object-fit: cover; display: block; }
+		.btb-cs-name { color: var(--btb-title, #1e293b); margin: 0; }
+		.btb-cs-deg { color: var(--btb-muted, #64748b); }
 	}
 	.btb-cs-body {
 		.btb-cs-section {
@@ -1114,7 +1150,7 @@ $primaryColor: #382C8D;
 				font-size: 11px; font-weight: 700; text-transform: uppercase;
 				letter-spacing: 1px; color: var(--btb-accent, #382C8D); margin-bottom: 6px; display: block;
 			}
-			p { font-size: 14px; color: var(--btb-body, #475569); margin: 0; line-height: 1.6; }
+			p { color: var(--btb-body, #475569); margin: 0; }
 		}
 	}
 }
@@ -1147,16 +1183,22 @@ $primaryColor: #382C8D;
 	.btb-bubble-item {
 		display: flex; gap: 12px; max-width: 340px;
 		animation: btbBubbleFloat 3s ease-in-out infinite alternate;
+		// Avatar size is the Image panel's, the two text sizes the Review Text and
+		// Name panels'. The bubble itself keeps its background and shape: it is
+		// painted with the track colour rather than the surface colour, so folding
+		// it into the Card panel would move it to a different palette role.
 		.btb-bubble-avatar {
-			width: 48px; height: 48px; border-radius: 50%; overflow: hidden; flex-shrink: 0;
+			border-radius: 50%; overflow: hidden; flex-shrink: 0;
 			border: 2px solid var(--btb-accent, #382C8D);
 			img { width: 100%; height: 100%; object-fit: cover; }
 		}
 		.btb-bubble-content {
 			background: var(--btb-track, #f1f5f9); padding: 12px 16px; border-radius: 14px 14px 14px 4px;
 			position: relative;
-			p { font-size: 13px; color: var(--btb-body, #334155); margin: 0 0 4px; }
-			.btb-bubble-name { font-size: 12px; font-weight: 600; color: var(--btb-accent, #382C8D); }
+			p { color: var(--btb-body, #334155); margin: 0 0 4px; }
+			// Accent-coloured by design, so it takes the Name typography without
+			// joining the Name colour rule.
+			.btb-bubble-name { color: var(--btb-accent, #382C8D); }
 		}
 	}
 }

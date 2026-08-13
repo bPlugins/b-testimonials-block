@@ -217,13 +217,11 @@
 			"type": "object",
 			"default": {
 				"fontSize": {
-					"desktop": 16,
-					"tablet": 16,
-					"mobile": 14
+					"desktop": 15,
+					"tablet": 15,
+					"mobile": 15
 				},
-				"fontFamily": "Open Sans",
-				"fontWeight": 700,
-				"lineHeight": "135%"
+				"fontWeight": 600
 			}
 		},
 		"nameColor": {
@@ -234,13 +232,11 @@
 			"type": "object",
 			"default": {
 				"fontSize": {
-					"desktop": 14,
-					"tablet": 14,
-					"mobile": 14
+					"desktop": 12,
+					"tablet": 12,
+					"mobile": 12
 				},
-				"fontFamily": "Open Sans",
-				"fontWeight": 400,
-				"lineHeight": "135%"
+				"fontWeight": 400
 			}
 		},
 		"degColor": {
@@ -251,12 +247,11 @@
 			"type": "object",
 			"default": {
 				"fontSize": {
-					"desktop": 16,
-					"tablet": 16,
+					"desktop": 14,
+					"tablet": 14,
 					"mobile": 14
 				},
-				"fontWeight": 400,
-				"lineHeight": "135%"
+				"fontWeight": 400
 			}
 		},
 		"textColor": {

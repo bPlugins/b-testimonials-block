@@ -193,6 +193,26 @@ const Style = ({ attributes = {}, clientId }) => {
     .map((selector) => `${mainEl} ${selector}`)
     .join(",\n\t\t");
 
+  // Card Height needs the card itself, which is not always what Margin wants.
+  //
+  // Several layouts wrap their card in a positioning div and put the visible
+  // card inside it -- the hero spotlight is the clearest: `.btb-hero-card` only
+  // carries a bottom margin, and the box a reader sees is the `.single` within
+  // it. A margin on the wrapper still moves the card, so the list above is right
+  // for margin; a min-height on the wrapper just grows an invisible box while
+  // the card keeps its own height, which is why Card Height appeared to do
+  // nothing there. Hero's secondary cards sit in `.btb-hero-grid`, which is not
+  // a `.layoutSection` either, so they matched no height selector at all.
+  //
+  // Naming `.single` on its own reaches the card in every one of those layouts;
+  // the widget classes stay because those blocks have no `.single`.
+  const cardHeightEl = cardSelectors
+    .map((selector) =>
+      ".layoutSection .single" === selector ? ".single" : selector,
+    )
+    .map((selector) => `${mainEl} ${selector}`)
+    .join(",\n\t\t");
+
   // The Top panel (Style tab) paints the card's header strip -- avatar, name and
   // designation -- and is shown for Theme 2 or the masonry arrangement.
   //
@@ -238,10 +258,26 @@ const Style = ({ attributes = {}, clientId }) => {
   // the block with `margin-left/right: auto`, and writing a blanket `margin`
   // here -- 0 on the sides left empty, as getBoxCSS would -- would silently undo
   // that centring for anyone who only wanted room above and below.
+  // The side margins need `!important`, which nothing else here does.
+  //
+  // A block theme's constrained layout emits
+  // `margin-left: auto !important; margin-right: auto !important` for its
+  // children, and no selector -- ID or otherwise -- outranks an `!important`
+  // declaration. Measured on this site: a block asking for 43px on all four
+  // sides rendered 43px top and bottom and 281.5px either side, which is the
+  // theme's auto centring, not the value asked for.
+  //
+  // Top and bottom face no such rule, so they stay plain. Only a side the author
+  // actually filled in is emitted, so the centring survives untouched for
+  // everyone who only wanted room above and below.
   const blockMarginCSS = ["top", "right", "bottom", "left"]
-    .map((side) =>
-      isSet(blockMargin?.[side]) ? `margin-${side}: ${blockMargin[side]};` : "",
-    )
+    .map((side) => {
+      if (!isSet(blockMargin?.[side])) {
+        return "";
+      }
+      const beatsTheme = "left" === side || "right" === side;
+      return `margin-${side}: ${blockMargin[side]}${beatsTheme ? " !important" : ""};`;
+    })
     .filter(Boolean)
     .join("\n\t\t\t");
 
@@ -299,20 +335,133 @@ const Style = ({ attributes = {}, clientId }) => {
       .join("\n\t\t\t");
   };
 
+  // Every class each card part is rendered with, across all the layouts.
+  //
+  // The bespoke layouts name their parts themselves -- `.btb-cs-name` for a case
+  // study's customer, `.btb-faq-question` for an accordion's headline -- so a
+  // rule that only knew `.single .name` never reached them and the stylesheet's
+  // own font size was the only value that ever applied. That is why those
+  // controls read as dead: not specificity (these rules are ID-scoped and win
+  // every time) but a selector that names nothing on the page.
+  //
+  // Grouped by role rather than by block, since the roles line up with what the
+  // Colors panel already paints: name/title, designation/muted, review/body.
+  const NAME_PARTS = [
+    ".single .name",
+    ".btb-avatar-name",
+    ".btb-cs-name",
+    ".btb-toast-text",
+    ".btb-faq-question",
+    ".btb-ct-title",
+    ".btb-srb-title",
+    // The video card's caption. Its editor is bespoke, so nothing ever named
+    // these two and the stylesheet's 17px/14px were the only values in play.
+    ".video-item .name",
+  ];
+
+  const DEG_PARTS = [
+    ".single .deg",
+    ".btb-avatar-deg",
+    ".btb-cs-deg",
+    ".btb-toast-meta",
+    ".btb-faq-author",
+    ".btb-srb-count",
+    ".video-item .deg",
+  ];
+
+  const TEXT_PARTS = [
+    ".single .reviewText",
+    ".btb-avatar-review",
+    ".btb-cs-body p",
+    ".btb-bubble-content p",
+    ".btb-faq-answer",
+    ".btb-ct-table td",
+    ".btb-srb-label",
+  ];
+
+  // A floating bubble's name is painted with the accent colour rather than the
+  // title colour, so it takes the Name typography without joining the Name
+  // colour rule -- adding it there would repaint it and change how the layout
+  // looks for anyone who has never opened the panel.
+  const NAME_TYPO_ONLY = [".btb-bubble-name"];
+
+  // The avatar box. Same story: four layouts draw their own and pinned the size
+  // in the stylesheet, so the Image width and height moved nothing. Both the
+  // case-study wrapper and the image inside it are named -- the wrapper anchors
+  // the editor's upload overlay, the image is what a reader sees.
+  const IMAGE_PARTS = [
+    ".single .img",
+    ".btb-avatar-thumb",
+    ".btb-cs-avatar-wrap",
+    ".btb-cs-avatar",
+    ".btb-bubble-avatar",
+    ".btb-toast-avatar",
+  ];
+
+  const selectorList = (parts) =>
+    parts.map((part) => `${mainEl} ${part}`).join(",\n\t\t");
+
+  // The star-rating-bars parts keep their own colour rules further down: each
+  // carries a different fallback from the shared one, and folding them in would
+  // repaint the widget for anyone who has not set a colour. Typography they do
+  // take from the shared groups.
+  const COLOR_EXCLUDE = [".btb-srb-title", ".btb-srb-label", ".btb-srb-count"];
+  const colorParts = (parts) =>
+    parts.filter((part) => !COLOR_EXCLUDE.includes(part));
+
+  // Avatar size, per device.
+  //
+  // `image.width` and `image.height` were single numbers, so one avatar size had
+  // to serve every screen -- a 300px portrait that suits a desktop hero card
+  // fills a phone. Each is now either a plain number, as every block saved so
+  // far holds it, or a `{ desktop, tablet, mobile }` object.
+  //
+  // A device left empty emits nothing and simply inherits the wider one, which
+  // is what keeps the tablet and mobile fields optional rather than something
+  // that must be filled in before the block looks right.
+  const imageFor = (value, device) => {
+    if (value && "object" === typeof value) {
+      return value[device];
+    }
+
+    return "desktop" === device ? value : undefined;
+  };
+
+  const imageCSS = (device) => {
+    const width = imageFor(image?.width, device);
+    const height = imageFor(image?.height, device);
+    const fallback = "desktop" === device ? 50 : undefined;
+
+    const declarations = [
+      isSet(width) ? `width: ${width}px;` : isSet(fallback) ? `width: ${fallback}px;` : "",
+      isSet(height)
+        ? `height: ${height}px;`
+        : isSet(fallback)
+          ? `height: ${fallback}px;`
+          : "",
+    ]
+      .filter(Boolean)
+      .join("\n\t\t\t");
+
+    return declarations
+      ? `${selectorList(IMAGE_PARTS)} {\n\t\t\t${declarations}\n\t\t}`
+      : "";
+  };
+
   const sizeCSS = (device) => {
     const width = blockWidth?.[device];
     const height = cardHeight?.[device];
 
     return [
+      imageCSS(device),
       // Centred once narrowed, otherwise it would sit against the left edge.
       width
         ? `${widthEl} {\n\t\t\tmax-width: ${width};\n\t\t\tmargin-left: auto;\n\t\t\tmargin-right: auto;\n\t\t}`
         : "",
-      // Same selector list as Margin, for the same reason: `.layoutSection
-      // .single` alone reached none of the layouts that build their card out of
-      // something else, so Card Height silently did nothing on timeline, hero,
-      // audio, logos, badges, stats and the rest.
-      height ? `${cardMarginEl} {\n\t\t\tmin-height: ${height};\n\t\t}` : "",
+      // `.layoutSection .single` alone reached none of the layouts that build
+      // their card out of something else, so Card Height silently did nothing on
+      // timeline, hero, audio, logos, badges, stats and the rest.
+      height ? `${cardHeightEl} {\n\t\t\tmin-height: ${height};\n\t\t}` : "",
     ]
       .filter(Boolean)
       .join("\n\t\t");
@@ -330,6 +479,19 @@ const Style = ({ attributes = {}, clientId }) => {
     .map((typo) => getTypoCSS("", typo)?.googleFontLink || "")
     .filter(Boolean)
     .join("\n");
+  // Every rule below names `.single` on its own rather than
+  // `.layoutSection .single`.
+  //
+  // The hero spotlight renders its card straight inside `.btb-hero-card`, with
+  // no `.layoutSection` anywhere, so the narrower selector missed it and the
+  // whole Style tab slid off that block: the avatar ignored the Image width and
+  // height and rendered at its natural 589px -- inflating the card to 860px, at
+  // which point Card Height had nothing left to do -- and the card took none of
+  // the background, padding, border, shadow, colours or typography set for it.
+  // Measured against a grid block on the same page, not inferred.
+  //
+  // The hero card therefore now carries the same Card defaults as every other
+  // layout, in place of the flat 28px padding its stylesheet used to give it.
   return (
     <style
       dangerouslySetInnerHTML={{
@@ -340,22 +502,12 @@ const Style = ({ attributes = {}, clientId }) => {
 		
 		${
       getTypoCSS(
-        `${mainEl} .layoutSection .single .name, ${mainEl} .btb-avatar-name`,
+        selectorList([...NAME_PARTS, ...NAME_TYPO_ONLY]),
         nameTypo,
       )?.styles || ""
     }
-		${
-      getTypoCSS(
-        `${mainEl} .layoutSection .single .deg, ${mainEl} .btb-avatar-deg`,
-        degTypo,
-      )?.styles || ""
-    }
-		${
-      getTypoCSS(
-        `${mainEl} .layoutSection .single .reviewText, ${mainEl} .btb-avatar-review`,
-        textTypo,
-      )?.styles || ""
-    }
+		${getTypoCSS(selectorList(DEG_PARTS), degTypo)?.styles || ""}
+		${getTypoCSS(selectorList(TEXT_PARTS), textTypo)?.styles || ""}
 		${getTypoCSS(`${mainEl} .expandBtn`, expandedTypo)?.styles || ""}
  
 		
@@ -369,6 +521,17 @@ const Style = ({ attributes = {}, clientId }) => {
 
 		${mainEl} .layoutSection {
 			grid-gap: ${rowGap} ${columnGap};
+		}
+
+		${/* The bubble layout is the one bespoke wrapper where a gap is a real
+		     question: it is a wrapping flex row of several bubbles, spaced by a
+		     `gap` of its own. Every other layout without `.layoutSection` either
+		     holds a single widget -- where there is nothing to space it from --
+		     or stacks its items with a margin. Its own rule rather than joining
+		     the selector above, because `grid-gap` is the legacy grid alias and
+		     this one is flex. */ ""}
+		${mainEl} .btb-floating-bubble-layout {
+			gap: ${rowGap} ${columnGap};
 		}
 
 		${mainEl} .theme_2 .single .top,
@@ -391,13 +554,30 @@ const Style = ({ attributes = {}, clientId }) => {
       };
 		}
 
-		${mainEl} .layoutSection .single,
+		${/* The card box. `.btb-avatar-detail` in place of
+		     `.btb-avatar-list-wrapper`: the wrapper is a transparent container
+		     and the box a reader sees is the panel inside it, which carried its
+		     own background, padding, border and shadow in the stylesheet -- so
+		     the Card panel painted something invisible while the visible box
+		     ignored it. The wrapper stays in the margin list, which is the one
+		     thing it is the right element for.
+
+		     The last two build their card out of neither `.single` nor any of
+		     the widget classes, so the Card panel reached nothing on them at
+		     all. Their stylesheet values now live in each block's defaults.
+
+		     `.btb-faq-item` is deliberately absent: the stylesheet recolours its
+		     border on `[open]` to mark the expanded row, and an ID-scoped border
+		     from here would outrank that. */ ""}
+		${mainEl} .single,
 		${mainEl} .btb-star-rating-bars,
 		${mainEl} .btb-badge-card,
 		${mainEl} .btb-stat-card,
 		${mainEl} .btb-toast-card,
-		${mainEl} .btb-avatar-list-wrapper,
-		${mainEl} .btb-trust-badges-grid {
+		${mainEl} .btb-avatar-detail,
+		${mainEl} .btb-trust-badges-grid,
+		${mainEl} .btb-case-study,
+		${mainEl} .btb-comparison-table {
 			background:${withRole("--btb-surface", background)};
 			padding:${getBoxValue(padding)};
 			${paletteBorderCSS(border)};
@@ -406,19 +586,19 @@ const Style = ({ attributes = {}, clientId }) => {
 
 		${cardMarginCSS ? `${cardMarginEl} {\n\t\t\tmargin: ${cardMarginCSS};\n\t\t}` : ""}
  
-		${mainEl} .layoutSection .single .img{
-			width:${image?.width || 50}px;
-			height:${image?.height || 50}px;
+		${mainEl} .single .img{
+			${/* Width and height are emitted per device by sizeCSS below. A fixed
+			     px avatar is wider than the card on a narrow screen, so it is
+			     capped here rather than allowed to push out of the card. */ ""}
+			max-width: 100%;
 			${getBorderCSS(imgBorder)};
 		}
 
-		${mainEl} .layoutSection .single .name,
-		${mainEl} .btb-avatar-name {
+		${selectorList(colorParts(NAME_PARTS))} {
 			color:${withRole("--btb-title", nameColor)};
 		}
 
-		${mainEl} .layoutSection .single .deg,
-		${mainEl} .btb-avatar-deg {
+		${selectorList(colorParts(DEG_PARTS))} {
 			color:${withRole("--btb-muted", degColor)};
 		}
 
@@ -428,8 +608,7 @@ const Style = ({ attributes = {}, clientId }) => {
         : ""
     }
 
-		${mainEl} .layoutSection .single .reviewText,
-		${mainEl} .btb-avatar-review {
+		${selectorList(colorParts(TEXT_PARTS))} {
 			color:${withRole("--btb-body", textColor)};
 		}
 
@@ -444,8 +623,12 @@ const Style = ({ attributes = {}, clientId }) => {
 			color: ${withRole("--btb-body", textColor || "#334155")};
 		}
 
+		${/* The per-star count is the Designation role -- that is where its
+		     typography comes from, and `--btb-muted` is the palette role beside
+		     it. It read `textColor` here, so the Designation panel's colour
+		     control had no target on this layout while its typography worked. */ ""}
 		${mainEl} .btb-srb-count {
-			color: ${withRole("--btb-muted", textColor || "#334155")};
+			color: ${withRole("--btb-muted", degColor || "#334155")};
 		}
 
 		${expandColor ? `${mainEl} .expandBtn { color: ${expandColor}; }` : ""}

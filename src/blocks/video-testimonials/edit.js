@@ -12,9 +12,10 @@ import { emUnit, perUnit, pxUnit } from '../../../../bpl-tools/utils/options';
 import ColorsPanel from '../../shared/Components/Backend/Settings/ColorsPanel';
 import SizeSpacingPanel from '../../shared/Components/Backend/Settings/SizeSpacingPanel';
 import Style from '../../shared/Components/Common/Style';
+import Typography from '../../../../bpl-tools/Components/Typography/Typography';
+import VideoCard from '../../shared/Components/Common/VideoCard';
 import { ColorControl } from '../../../../bpl-tools/Components/ColorControl/ColorControl';
 import IconSettings from '../../shared/Components/Backend/Settings/IconSettings';
-import BlockIcon from '../../shared/Components/Common/BlockIcon';
 import { getIcon } from '../../shared/utils/blockIcons';
 
 import './edit.scss';
@@ -31,19 +32,8 @@ const gridVars = ( { columns, columnGap, rowGap, accentColor } ) => ( {
 	'--accent': accentColor,
 } );
 
-const PlayIcon = ( { icon } ) => (
-	<BlockIcon
-		icon={ icon }
-		size={ 26 }
-		defaultColor="currentColor"
-		renderFallback={ ( color ) => (
-			<svg viewBox="0 0 24 24" width="26" height="26" fill={ color }><path d="M8 5v14l11-7z" /></svg>
-		) }
-	/>
-);
-
 const Edit = ( { attributes, setAttributes, clientId } ) => {
-	const { items = [], columns, columnGap, rowGap, accentColor } = attributes;
+	const { items = [], columns, columnGap, rowGap, accentColor, nameTypo, nameColor, degTypo, degColor } = attributes;
 
 	// The device buttons only produce a real viewport when the editor canvas
 	// is iframed, which one apiVersion 2 block anywhere on the site disables.
@@ -87,6 +77,44 @@ const Edit = ( { attributes, setAttributes, clientId } ) => {
 					<ColorControl label={ __( 'Play button', 'b-testimonials-block' ) } value={ accentColor } onChange={ ( val ) => setAttributes( { accentColor: val } ) } />
 				</PanelBody>
 
+				{ /* The caption under each video. Style.js now names
+				     `.video-item .name` and `.video-item .deg`, but this block
+				     renders its own editor, so nothing offered the controls --
+				     the stylesheet's 17px and 14px were the only values a user
+				     could ever get. Defaults match those, so an untouched block
+				     is unchanged. */ }
+				<PanelBody className="bPlPanelBody" title={ __( 'Name', 'b-testimonials-block' ) } initialOpen={ false }>
+					<Typography
+						className="mt10"
+						label={ __( 'Typography', 'b-testimonials-block' ) }
+						value={ nameTypo }
+						onChange={ ( val ) => setAttributes( { nameTypo: val } ) }
+						produce={ produce }
+					/>
+					<ColorControl
+						className="mb10"
+						label={ __( 'Color', 'b-testimonials-block' ) }
+						value={ nameColor }
+						onChange={ ( val ) => setAttributes( { nameColor: val } ) }
+					/>
+				</PanelBody>
+
+				<PanelBody className="bPlPanelBody" title={ __( 'Designation', 'b-testimonials-block' ) } initialOpen={ false }>
+					<Typography
+						className="mt10"
+						label={ __( 'Typography', 'b-testimonials-block' ) }
+						value={ degTypo }
+						onChange={ ( val ) => setAttributes( { degTypo: val } ) }
+						produce={ produce }
+					/>
+					<ColorControl
+						className="mb10"
+						label={ __( 'Color', 'b-testimonials-block' ) }
+						value={ degColor }
+						onChange={ ( val ) => setAttributes( { degColor: val } ) }
+					/>
+				</PanelBody>
+
 				<PanelBody className="bPlPanelBody" title={ __( 'Videos', 'b-testimonials-block' ) } initialOpen={ false }>
 					{ items.map( ( item, index ) => (
 						<div key={ index } className="btb-video-row">
@@ -111,16 +139,18 @@ const Edit = ( { attributes, setAttributes, clientId } ) => {
 			<div { ...useBlockProps( { className: 'bVideoTestimonials' } ) } id={ `btbTestimonialsDir-${ clientId }` }>
 				<Style attributes={ attributes } clientId={ clientId } />
 				<div className="videos-grid" style={ { ...gridVars( attributes ), '--cols-d': colsForDevice( attributes.columns, previewDevice, 3 ) } }>
+					{ /* The same component the front end renders. This was a
+					     hand-written copy of the markup with no state and no click
+					     handler, so the play button did nothing while editing --
+					     there was no way to check a video URL without previewing
+					     the page. */ }
 					{ items.map( ( item, index ) => (
-						<div className="video-item" key={ index }>
-							<div className="video-frame" style={ item?.poster?.url ? { backgroundImage: `url(${ item.poster.url })` } : undefined }>
-								<span className="video-play" style={ { color: accentColor } }><PlayIcon icon={ getIcon( attributes, 'play' ) } /></span>
-							</div>
-							<div className="video-meta">
-								{ item?.name && <h3 className="name">{ item.name }</h3> }
-								{ ( item?.deg || item?.company ) && <p className="deg">{ [ item?.deg, item?.company ].filter( Boolean ).join( ', ' ) }</p> }
-							</div>
-						</div>
+						<VideoCard
+							key={ index }
+							item={ item }
+							accentColor={ accentColor }
+							playIcon={ getIcon( attributes, 'play' ) }
+						/>
 					) ) }
 				</div>
 			</div>

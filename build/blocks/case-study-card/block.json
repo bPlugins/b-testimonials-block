@@ -156,15 +156,15 @@
     },
     "background": {
       "type": "string",
-      "default": "#0000"
+      "default": "#fff"
     },
     "padding": {
       "type": "object",
       "default": {
-        "top": "10px",
-        "right": "15px",
-        "bottom": "10px",
-        "left": "15px"
+        "top": "28px",
+        "right": "28px",
+        "bottom": "28px",
+        "left": "28px"
       }
     },
     "blockMargin": {
@@ -184,14 +184,20 @@
       "default": {
         "width": "1px",
         "style": "solid",
-        "color": "#0575e6",
+        "color": "#e2e8f0",
         "side": "all",
-        "radius": "3px"
+        "radius": "16px"
       }
     },
     "shadow": {
       "type": "object",
-      "default": {}
+      "default": {
+        "hOffset": "0px",
+        "vOffset": "4px",
+        "blur": "16px",
+        "spreed": "0px",
+        "color": "rgba(0,0,0,0.04)"
+      }
     },
     "imgBorder": {
       "type": "object",
@@ -206,21 +212,19 @@
     "image": {
       "type": "object",
       "default": {
-        "width": 50,
-        "height": 50
+        "width": 56,
+        "height": 56
       }
     },
     "nameTypo": {
       "type": "object",
       "default": {
         "fontSize": {
-          "desktop": 16,
-          "tablet": 16,
-          "mobile": 14
+          "desktop": 17,
+          "tablet": 17,
+          "mobile": 17
         },
-        "fontFamily": "Open Sans",
-        "fontWeight": 700,
-        "lineHeight": "135%"
+        "fontWeight": 700
       }
     },
     "nameColor": {
@@ -231,13 +235,11 @@
       "type": "object",
       "default": {
         "fontSize": {
-          "desktop": 14,
-          "tablet": 14,
-          "mobile": 14
+          "desktop": 13,
+          "tablet": 13,
+          "mobile": 13
         },
-        "fontFamily": "Open Sans",
-        "fontWeight": 400,
-        "lineHeight": "135%"
+        "fontWeight": 400
       }
     },
     "degColor": {
@@ -248,12 +250,12 @@
       "type": "object",
       "default": {
         "fontSize": {
-          "desktop": 16,
-          "tablet": 16,
+          "desktop": 14,
+          "tablet": 14,
           "mobile": 14
         },
         "fontWeight": 400,
-        "lineHeight": "135%"
+        "lineHeight": "1.6"
       }
     },
     "textColor": {

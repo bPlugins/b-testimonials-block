@@ -3,6 +3,7 @@ import { __ } from '@wordpress/i18n';
 import { useBlockProps, InspectorControls } from '@wordpress/block-editor';
 import { PanelBody, TextControl, TextareaControl, ToggleControl } from '@wordpress/components';
 import BlockSwitcher from '../../shared/Components/Common/BlockSwitcher';
+import SettingsTabs from '../../shared/Components/Backend/Settings/SettingsTabs';
 import ColorsPanel from '../../shared/Components/Backend/Settings/ColorsPanel';
 import SizeSpacingPanel from '../../shared/Components/Backend/Settings/SizeSpacingPanel';
 import Style from '../../shared/Components/Common/Style';
@@ -31,28 +32,38 @@ const Edit = ( { attributes, setAttributes, clientId } ) => {
 	return (
 		<>
 			<InspectorControls>
-				<BlockSwitcher clientId={ clientId } />
-				<ColorsPanel attributes={ attributes } setAttributes={ setAttributes } />
-				<SizeSpacingPanel attributes={ attributes } setAttributes={ setAttributes } />
-				<PanelBody className="bPlPanelBody" title={ __( 'Form', 'b-testimonials-block' ) }>
-					<TextControl label={ __( 'Title', 'b-testimonials-block' ) } value={ formTitle } onChange={ ( val ) => setAttributes( { formTitle: val } ) } />
-					<TextControl label={ __( 'Button text', 'b-testimonials-block' ) } value={ buttonText } onChange={ ( val ) => setAttributes( { buttonText: val } ) } />
-					<TextareaControl label={ __( 'Success message', 'b-testimonials-block' ) } value={ successMessage } onChange={ ( val ) => setAttributes( { successMessage: val } ) } />
-				</PanelBody>
+				<SettingsTabs
+					general={
+						<>
+						<BlockSwitcher clientId={ clientId } />
+						<PanelBody className="bPlPanelBody" title={ __( 'Form', 'b-testimonials-block' ) }>
+							<TextControl label={ __( 'Title', 'b-testimonials-block' ) } value={ formTitle } onChange={ ( val ) => setAttributes( { formTitle: val } ) } />
+							<TextControl label={ __( 'Button text', 'b-testimonials-block' ) } value={ buttonText } onChange={ ( val ) => setAttributes( { buttonText: val } ) } />
+							<TextareaControl label={ __( 'Success message', 'b-testimonials-block' ) } value={ successMessage } onChange={ ( val ) => setAttributes( { successMessage: val } ) } />
+						</PanelBody>
 
-				<PanelBody className="bPlPanelBody" title={ __( 'Fields', 'b-testimonials-block' ) } initialOpen={ false }>
-					<p className="description">{ __( 'Name and Review are always shown and required.', 'b-testimonials-block' ) }</p>
-					{ fieldToggles.map( ( [ key, label ] ) => (
-						<ToggleControl key={ key } label={ label } checked={ !! fields?.[ key ] } onChange={ ( val ) => setField( key, val ) } />
-					) ) }
-					{ fields?.image && (
-						<p className="description">{ __( 'Note: photo upload allows anonymous image uploads. Submissions stay pending until you approve them.', 'b-testimonials-block' ) }</p>
-					) }
-				</PanelBody>
+						<PanelBody className="bPlPanelBody" title={ __( 'Fields', 'b-testimonials-block' ) } initialOpen={ false }>
+							<p className="description">{ __( 'Name and Review are always shown and required.', 'b-testimonials-block' ) }</p>
+							{ fieldToggles.map( ( [ key, label ] ) => (
+								<ToggleControl key={ key } label={ label } checked={ !! fields?.[ key ] } onChange={ ( val ) => setField( key, val ) } />
+							) ) }
+							{ fields?.image && (
+								<p className="description">{ __( 'Note: photo upload allows anonymous image uploads. Submissions stay pending until you approve them.', 'b-testimonials-block' ) }</p>
+							) }
+						</PanelBody>
 
-				<PanelBody className="bPlPanelBody" title={ __( 'Color', 'b-testimonials-block' ) } initialOpen={ false }>
-					<ColorControl label={ __( 'Accent (button)', 'b-testimonials-block' ) } value={ accentColor } onChange={ ( val ) => setAttributes( { accentColor: val } ) } />
-				</PanelBody>
+						</>
+					}
+					style={
+						<>
+						<ColorsPanel attributes={ attributes } setAttributes={ setAttributes } />
+						<SizeSpacingPanel attributes={ attributes } setAttributes={ setAttributes } />
+						<PanelBody className="bPlPanelBody" title={ __( 'Color', 'b-testimonials-block' ) } initialOpen={ false }>
+							<ColorControl label={ __( 'Accent (button)', 'b-testimonials-block' ) } value={ accentColor } onChange={ ( val ) => setAttributes( { accentColor: val } ) } />
+						</PanelBody>
+						</>
+					}
+				/>
 			</InspectorControls>
 
 			<div { ...useBlockProps() } id={ `btbTestimonialsDir-${ clientId }` }>

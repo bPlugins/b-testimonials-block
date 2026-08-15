@@ -17,6 +17,7 @@ import { clickable, editorClickable } from "../../../utils/a11y";
 import { BRAND_COLOR } from "../../../utils/icons";
 import BlockIcon from "../BlockIcon";
 import VideoCard from "../VideoCard";
+import AudioPlayer from "../AudioPlayer";
 import { getIcon } from "../../../utils/blockIcons";
 import { ARRANGEMENTS, resolveArrangement } from "../../../utils/layoutFeatures";
 
@@ -78,6 +79,7 @@ const Layout = ({
   previewDevice = "Desktop",
   __,
   RichText,
+  SandBox,
 }) => {
   const {
     items = [],
@@ -1025,29 +1027,13 @@ const Layout = ({
         className={`layoutSection btb-audio-layout ${theme} columns-${previewCols} columns-tablet-${tablet} columns-mobile-${mobile}`}>
         {items.map((item, index) => (
           <div key={index} className="btb-audio-card">
-            <div className="btb-audio-player">
-              <BlockIcon
-                icon={getIcon(attributes, "play")}
-                size={40}
-                renderFallback={(color) => (
-                  <svg viewBox="0 0 24 24" width="40" height="40">
-                    <circle cx="12" cy="12" r="11" fill={color} opacity="0.1" />
-                    <path
-                      fill={color}
-                      d="M10 8.64L15.27 12 10 15.36V8.64M8 5v14l11-7L8 5z"
-                    />
-                  </svg>
-                )}
-              />
-              <div className="btb-audio-wave">
-                {[35, 55, 25, 65, 45, 70, 30, 60, 40, 50].map((h, i) => (
-                  <div
-                    key={i}
-                    className="btb-wave-bar"
-                    style={{ height: `${h}%` }}></div>
-                ))}
-              </div>
-            </div>
+            {/* Was a static play glyph beside ten fixed bars -- no <audio>
+                element existed, so the card only looked like a player. */}
+            <AudioPlayer
+              src={item?.audio?.url || ""}
+              playIcon={getIcon(attributes, "play")}
+              isBackend={isBackend}
+            />
             {themeSelect(item, index)}
           </div>
         ))}
@@ -1074,6 +1060,7 @@ const Layout = ({
               item={item}
               playIcon={getIcon(attributes, "play")}
               accentColor={attributes.accentColor}
+              SandBox={SandBox}
             />
           ))}
         </div>

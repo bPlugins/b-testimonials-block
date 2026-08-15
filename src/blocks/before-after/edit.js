@@ -10,6 +10,7 @@ import {
   __experimentalUnitControl as UnitControl,
 } from "@wordpress/components";
 import BlockSwitcher from "../../shared/Components/Common/BlockSwitcher";
+import SettingsTabs from "../../shared/Components/Backend/Settings/SettingsTabs";
 import { InlineDetailMediaUpload } from '../../../../bpl-tools/Components/MediaControl/MediaControl';
 import ColorsPanel from "../../shared/Components/Backend/Settings/ColorsPanel";
 import SizeSpacingPanel from "../../shared/Components/Backend/Settings/SizeSpacingPanel";
@@ -66,152 +67,179 @@ const Edit = ({ attributes, setAttributes, clientId }) => {
   return (
     <>
       <InspectorControls>
-        <BlockSwitcher clientId={clientId} />
-        <ColorsPanel attributes={attributes} setAttributes={setAttributes} />
-        <SizeSpacingPanel attributes={attributes} setAttributes={setAttributes} />
-        <PanelBody className="bPlPanelBody" title={__("Images", "b-testimonials-block")}>
-          {pickButton(
-            __("before image", "b-testimonials-block"),
-            beforeImg,
-            "beforeImg",
-          )}
-          {pickButton(
-            __("after image", "b-testimonials-block"),
-            afterImg,
-            "afterImg",
-          )}
-
-          {/* Two images of different proportions cannot line up along the
-              divider while each keeps its own height, so a fixed ratio is the
-              fix for the most common complaint here. */}
-          <SelectControl
-            label={__("Aspect ratio", "b-testimonials-block")}
-            value={aspectRatio}
-            options={RATIO_OPTIONS}
-            onChange={(v) => setAttributes({ aspectRatio: v })}
-            help={__(
-              "A fixed ratio crops both images to the same box.",
-              "b-testimonials-block",
-            )}
-          />
-
-          <UnitControl
-            className="mt20"
-            label={__("Corner radius:", "b-testimonials-block")}
-            labelPosition="left"
-            value={mediaRadius}
-            onChange={(v) => setAttributes({ mediaRadius: v })}
-            units={[pxUnit(8), perUnit(2), emUnit(1)]}
-            isResetValueOnUnitChange={true}
-          />
-        </PanelBody>
-
-        <PanelBody
-          className="bPlPanelBody"
-          title={__("Slider", "b-testimonials-block")}
-          initialOpen={false}>
-          <SelectControl
-            label={__("Orientation", "b-testimonials-block")}
-            value={orientation}
-            options={[
-              {
-                label: __("Horizontal", "b-testimonials-block"),
-                value: "horizontal",
-              },
-              {
-                label: __("Vertical", "b-testimonials-block"),
-                value: "vertical",
-              },
-            ]}
-            onChange={(v) => setAttributes({ orientation: v })}
-          />
-
-          <SelectControl
-            label={__("Reveal on", "b-testimonials-block")}
-            value={interaction}
-            options={[
-              { label: __("Drag", "b-testimonials-block"), value: "drag" },
-              { label: __("Hover", "b-testimonials-block"), value: "hover" },
-            ]}
-            onChange={(v) => setAttributes({ interaction: v })}
-            help={__(
-              "Hover still drags on touch devices, which have no hover.",
-              "b-testimonials-block",
-            )}
-          />
-
-          <RangeControl
-            label={__("Start position (%)", "b-testimonials-block")}
-            value={startPosition}
-            onChange={(v) => setAttributes({ startPosition: v })}
-            min={0}
-            max={100}
-          />
-
-          <RangeControl
-            label={__("Divider width (px)", "b-testimonials-block")}
-            value={dividerWidth}
-            onChange={(v) => setAttributes({ dividerWidth: v })}
-            min={0}
-            max={20}
-          />
-
-          <RangeControl
-            label={__("Handle size (px)", "b-testimonials-block")}
-            value={gripSize}
-            onChange={(v) => setAttributes({ gripSize: v })}
-            min={0}
-            max={90}
-          />
-
-          <ColorControl
-            label={__("Handle color", "b-testimonials-block")}
-            value={accentColor}
-            onChange={(v) => setAttributes({ accentColor: v })}
-          />
-        </PanelBody>
-
-        <PanelBody
-          className="bPlPanelBody"
-          title={__("Labels", "b-testimonials-block")}
-          initialOpen={false}>
-          <ToggleControl
-            label={__("Show labels", "b-testimonials-block")}
-            checked={showLabels}
-            onChange={(v) => setAttributes({ showLabels: v })}
-          />
-
-          {showLabels && (
+        <SettingsTabs
+          general={
             <>
-              <TextControl
-                label={__("Before label", "b-testimonials-block")}
-                value={beforeLabel}
-                onChange={(v) => setAttributes({ beforeLabel: v })}
-              />
-              <TextControl
-                label={__("After label", "b-testimonials-block")}
-                value={afterLabel}
-                onChange={(v) => setAttributes({ afterLabel: v })}
-              />
-              <SelectControl
-                label={__("Position", "b-testimonials-block")}
-                value={labelPosition}
-                options={[
-                  { label: __("Bottom", "b-testimonials-block"), value: "bottom" },
-                  { label: __("Top", "b-testimonials-block"), value: "top" },
-                ]}
-                onChange={(v) => setAttributes({ labelPosition: v })}
-              />
-              <RangeControl
-                label={__("Font size (px)", "b-testimonials-block")}
-                value={labelFontSize}
-                onChange={(v) => setAttributes({ labelFontSize: v })}
-                min={8}
-                max={40}
-              />
+              <BlockSwitcher clientId={clientId} />
+
+              <PanelBody
+                className="bPlPanelBody"
+                title={__("Images", "b-testimonials-block")}>
+                {pickButton(
+                  __("before image", "b-testimonials-block"),
+                  beforeImg,
+                  "beforeImg",
+                )}
+                {pickButton(
+                  __("after image", "b-testimonials-block"),
+                  afterImg,
+                  "afterImg",
+                )}
+              </PanelBody>
+
+              {/* Behaviour only. How the slider *looks* -- the divider, the
+                  handle, the crop and the label size -- moved to the Style tab
+                  with the rest of the styling, which is what every other block
+                  in this plugin does. */}
+              <PanelBody
+                className="bPlPanelBody"
+                title={__("Slider", "b-testimonials-block")}
+                initialOpen={false}>
+                <SelectControl
+                  label={__("Orientation", "b-testimonials-block")}
+                  value={orientation}
+                  options={[
+                    {
+                      label: __("Horizontal", "b-testimonials-block"),
+                      value: "horizontal",
+                    },
+                    {
+                      label: __("Vertical", "b-testimonials-block"),
+                      value: "vertical",
+                    },
+                  ]}
+                  onChange={(v) => setAttributes({ orientation: v })}
+                />
+
+                <SelectControl
+                  label={__("Reveal on", "b-testimonials-block")}
+                  value={interaction}
+                  options={[
+                    { label: __("Drag", "b-testimonials-block"), value: "drag" },
+                    { label: __("Hover", "b-testimonials-block"), value: "hover" },
+                  ]}
+                  onChange={(v) => setAttributes({ interaction: v })}
+                  help={__(
+                    "Hover still drags on touch devices, which have no hover.",
+                    "b-testimonials-block",
+                  )}
+                />
+
+                <RangeControl
+                  label={__("Start position (%)", "b-testimonials-block")}
+                  value={startPosition}
+                  onChange={(v) => setAttributes({ startPosition: v })}
+                  min={0}
+                  max={100}
+                />
+              </PanelBody>
+
+              <PanelBody
+                className="bPlPanelBody"
+                title={__("Labels", "b-testimonials-block")}
+                initialOpen={false}>
+                <ToggleControl
+                  label={__("Show labels", "b-testimonials-block")}
+                  checked={showLabels}
+                  onChange={(v) => setAttributes({ showLabels: v })}
+                />
+
+                {showLabels && (
+                  <>
+                    <TextControl
+                      label={__("Before label", "b-testimonials-block")}
+                      value={beforeLabel}
+                      onChange={(v) => setAttributes({ beforeLabel: v })}
+                    />
+                    <TextControl
+                      label={__("After label", "b-testimonials-block")}
+                      value={afterLabel}
+                      onChange={(v) => setAttributes({ afterLabel: v })}
+                    />
+                    <SelectControl
+                      label={__("Position", "b-testimonials-block")}
+                      value={labelPosition}
+                      options={[
+                        { label: __("Bottom", "b-testimonials-block"), value: "bottom" },
+                        { label: __("Top", "b-testimonials-block"), value: "top" },
+                      ]}
+                      onChange={(v) => setAttributes({ labelPosition: v })}
+                    />
+                  </>
+                )}
+              </PanelBody>
             </>
-          )}
-        </PanelBody>
+          }
+          style={
+            <>
+              <ColorsPanel attributes={attributes} setAttributes={setAttributes} />
+              <SizeSpacingPanel
+                attributes={attributes}
+                setAttributes={setAttributes}
+              />
+
+              <PanelBody
+                className="bPlPanelBody"
+                title={__("Appearance", "b-testimonials-block")}>
+                {/* Two images of different proportions cannot line up along the
+                    divider while each keeps its own height, so a fixed ratio is the
+                    fix for the most common complaint here. */}
+                <SelectControl
+                  label={__("Aspect ratio", "b-testimonials-block")}
+                  value={aspectRatio}
+                  options={RATIO_OPTIONS}
+                  onChange={(v) => setAttributes({ aspectRatio: v })}
+                  help={__(
+                    "A fixed ratio crops both images to the same box.",
+                    "b-testimonials-block",
+                  )}
+                />
+
+                <UnitControl
+                  className="mt20"
+                  label={__("Corner radius:", "b-testimonials-block")}
+                  labelPosition="left"
+                  value={mediaRadius}
+                  onChange={(v) => setAttributes({ mediaRadius: v })}
+                  units={[pxUnit(8), perUnit(2), emUnit(1)]}
+                  isResetValueOnUnitChange={true}
+                />
+
+                <RangeControl
+                  label={__("Divider width (px)", "b-testimonials-block")}
+                  value={dividerWidth}
+                  onChange={(v) => setAttributes({ dividerWidth: v })}
+                  min={0}
+                  max={20}
+                />
+
+                <RangeControl
+                  label={__("Handle size (px)", "b-testimonials-block")}
+                  value={gripSize}
+                  onChange={(v) => setAttributes({ gripSize: v })}
+                  min={0}
+                  max={90}
+                />
+
+                <ColorControl
+                  label={__("Handle color", "b-testimonials-block")}
+                  value={accentColor}
+                  onChange={(v) => setAttributes({ accentColor: v })}
+                />
+
+                {showLabels && (
+                  <RangeControl
+                    label={__("Font size (px)", "b-testimonials-block")}
+                    value={labelFontSize}
+                    onChange={(v) => setAttributes({ labelFontSize: v })}
+                    min={8}
+                    max={40}
+                  />
+                )}
+              </PanelBody>
+            </>
+          }
+        />
       </InspectorControls>
 
       <div { ...useBlockProps() } id={ `btbTestimonialsDir-${ clientId }` }>

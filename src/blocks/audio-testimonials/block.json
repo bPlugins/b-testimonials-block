@@ -165,15 +165,15 @@
 		},
 		"background": {
 			"type": "string",
-			"default": "#0000"
+			"default": "#fff"
 		},
 		"padding": {
 			"type": "object",
 			"default": {
-				"top": "10px",
-				"right": "15px",
-				"bottom": "10px",
-				"left": "15px"
+				"top": "20px",
+				"right": "20px",
+				"bottom": "20px",
+				"left": "20px"
 			}
 		},
 		"blockMargin": {
@@ -193,14 +193,20 @@
 			"default": {
 				"width": "1px",
 				"style": "solid",
-				"color": "#0575e6",
+				"color": "#e2e8f0",
 				"side": "all",
-				"radius": "3px"
+				"radius": "14px"
 			}
 		},
 		"shadow": {
 			"type": "object",
-			"default": {}
+			"default": {
+				"hOffset": "0px",
+				"vOffset": "2px",
+				"blur": "12px",
+				"spreed": "0px",
+				"color": "rgba(0,0,0,0.03)"
+			}
 		},
 		"imgBorder": {
 			"type": "object",

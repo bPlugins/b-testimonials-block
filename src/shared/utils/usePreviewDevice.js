@@ -25,6 +25,25 @@ const usePreviewDevice = () =>
 	);
 
 /**
+ * The same device, as the key the responsive attributes are stored under.
+ *
+ * Every responsive attribute in this plugin is shaped `{ desktop, tablet,
+ * mobile }`, so a panel editing one needs the lowercase key rather than the
+ * store's capitalised label.
+ *
+ * This is what the device switches in the sidebar read. They used to carry a
+ * `useState` each, which is a second source of truth: the switch said Tablet
+ * while the canvas stayed at Desktop, so the panel edited a value the preview
+ * was not showing, and two panels could sit on different devices at once.
+ * Reading the editor's own device instead means picking a device in any panel
+ * resizes the canvas, every panel agrees, and the top toolbar's buttons move
+ * them all.
+ *
+ * @return {string} 'desktop', 'tablet' or 'mobile'.
+ */
+export const useDeviceKey = () => usePreviewDevice().toLowerCase();
+
+/**
  * Resolve a responsive value for the device currently previewed.
  *
  * @param {Object} columns Shape { desktop, tablet, mobile }.

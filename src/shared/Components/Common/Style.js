@@ -10,6 +10,7 @@ import {
   tabBreakpoint,
 } from "../../../../../bpl-tools/utils/data";
 import { getPaletteCSS } from "../../utils/visualControls";
+import { ownBoxForDevice } from "../../utils/responsiveBox";
 
 const Style = ({ attributes = {}, clientId }) => {
   const {
@@ -136,7 +137,12 @@ const Style = ({ attributes = {}, clientId }) => {
   // blank with 0, and returns nothing at all when every side is empty. Passing
   // an untouched `{ top: '', right: '', ... }` through getBoxValue would emit a
   // bare `margin: ;` instead.
-  const cardMarginCSS = getBoxCSS(cardMargin);
+  //
+  // `ownBoxForDevice` rather than the value itself: Padding, Card Margin and
+  // Block Margin are per device now, and the desktop entry is what the base rule
+  // wants. A block saved before that shape existed reads as desktop-only, so it
+  // renders unchanged. See utils/responsiveBox.js.
+  const cardMarginCSS = getBoxCSS(ownBoxForDevice(cardMargin, "desktop"));
 
   // Every per-card element across the layouts.
   //
@@ -213,6 +219,36 @@ const Style = ({ attributes = {}, clientId }) => {
     .map((selector) => `${mainEl} ${selector}`)
     .join(",\n\t\t");
 
+  // Which element the Card panel's background, padding, border and shadow land
+  // on.
+  //
+  // For nearly every layout that is `.single`, the themed card itself. Two build
+  // a painted box *around* the themed card and put the card inside it -- the
+  // audio player's `.btb-audio-card` and the swipeable `.btb-stacked-card`, both
+  // of which carry their own surface, border, radius, padding and shadow in the
+  // stylesheet. On those two the panel was painting the inner box while the card
+  // a reader sees ignored every control: measured on the front end, setting the
+  // Card background to red left `.btb-audio-card` computing `rgb(255,255,255)`
+  // and reddened only the quote inside it.
+  //
+  // So on those two the outer box is the target, and their block.json defaults
+  // now carry the values the stylesheet used to hardcode, which is what keeps an
+  // untouched block rendering as it always did. Every other layout is unchanged.
+  // `shadow: false` on the stack is deliberate. Its depth is the layered
+  // shadows -- `.is-top` carries a stronger one than the cards behind it, which
+  // is what makes it read as a stack rather than a stack of flat rectangles --
+  // and an ID-scoped `box-shadow` here outranks the `.is-top` rule and flattens
+  // all of them to one value. The audio card's shadow is a plain drop shadow
+  // with no such state, so it comes across as a default instead.
+  const CARD_BOX_OVERRIDE = {
+    "audio-testimonials": { selector: ".btb-audio-card", shadow: true },
+    "testimonials-card-stack": { selector: ".btb-stacked-card", shadow: false },
+  };
+  const cardBox = CARD_BOX_OVERRIDE[layout];
+  const cardBoxEl = `${mainEl} ${cardBox?.selector || ".single"}`;
+  const cardBoxShadowCSS =
+    cardBox && !cardBox.shadow ? "" : `box-shadow: ${getShadowCSS(shadow)};`;
+
   // The Top panel (Style tab) paints the card's header strip -- avatar, name and
   // designation -- and is shown for Theme 2 or the masonry arrangement.
   //
@@ -270,16 +306,41 @@ const Style = ({ attributes = {}, clientId }) => {
   // Top and bottom face no such rule, so they stay plain. Only a side the author
   // actually filled in is emitted, so the centring survives untouched for
   // everyone who only wanted room above and below.
-  const blockMarginCSS = ["top", "right", "bottom", "left"]
-    .map((side) => {
-      if (!isSet(blockMargin?.[side])) {
-        return "";
-      }
-      const beatsTheme = "left" === side || "right" === side;
-      return `margin-${side}: ${blockMargin[side]}${beatsTheme ? " !important" : ""};`;
+  const blockMarginSides = (box) =>
+    ["top", "right", "bottom", "left"]
+      .map((side) => {
+        if (!isSet(box?.[side])) {
+          return "";
+        }
+        const beatsTheme = "left" === side || "right" === side;
+        return `margin-${side}: ${box[side]}${beatsTheme ? " !important" : ""};`;
+      })
+      .filter(Boolean)
+      .join("\n\t\t\t");
+
+  const blockMarginCSS = blockMarginSides(ownBoxForDevice(blockMargin, "desktop"));
+
+  // Block Margin's per-device rules cannot ride along in sizeCSS the way Padding
+  // and Card Margin do.
+  //
+  // The base Block Margin rule is emitted last on purpose, so an explicit side
+  // beats the auto-centring the Block Width rules apply -- including the ones
+  // inside the media queries. That also puts it after anything sizeCSS writes,
+  // at equal specificity, so a tablet margin written there simply lost: measured
+  // at 900px with tablet set to 25px, the block still rendered the desktop 50px.
+  // Emitting these after the base rule instead is what makes the override stick.
+  const blockMarginBreakpoints = [
+    [tabBreakpoint, "tablet"],
+    [mobileBreakpoint, "mobile"],
+  ]
+    .map(([query, device]) => {
+      const sides = blockMarginSides(ownBoxForDevice(blockMargin, device));
+      return sides
+        ? `${query} {\n\t\t\t${widthEl} {\n\t\t\t\t${sides}\n\t\t\t}\n\t\t}`
+        : "";
     })
     .filter(Boolean)
-    .join("\n\t\t\t");
+    .join("\n\t\t");
 
   // Let the Colors panel outrank the classic Style panels.
   //
@@ -297,6 +358,33 @@ const Style = ({ attributes = {}, clientId }) => {
   // and it renders exactly as it did before; once a role is set, it wins.
   const withRole = (cssVar, value) => `var(${cssVar}, ${value})`;
 
+  // The layouts whose stylesheet spends one border side on a brand stripe.
+  //
+  // The badges draw `border-left: 4px solid var(--btb-accent)` and the quote box
+  // `border-left: 5px solid var(--btb-accent)`, on the same element the Card
+  // panel's border lands on. The Card border is emitted per side at ID
+  // specificity from a block.json default that is never empty, so it claimed the
+  // left side on every one of them and the Accent control painted nothing --
+  // measured on the front end, a Capterra badge with Accent set computed
+  // `border-left: 9px solid rgb(7, 8, 9)`, the Border Color, while `--btb-accent`
+  // sat declared and unused.
+  //
+  // Leaving that side to the stylesheet gives both controls something to do: the
+  // Card border still draws the other three sides, and the stripe follows
+  // Accent. It also matches what the side is for -- the brand bar is what makes
+  // a Google badge look like a Google badge, so the Card panel taking it over
+  // was never the intent.
+  const ACCENT_STRIPE_SIDE = {
+    "google-review-badge": "left",
+    "capterra-review-badge": "left",
+    "facebook-review-badge": "left",
+    "trustpilot-review-badge": "left",
+    "g2-review-badge": "left",
+    "verified-buyer-badge": "left",
+    "review-badge-widget": "left",
+    "testimonials-quote-box": "left",
+  };
+
   // getBorderCSS builds the shorthand from a plain width and colour, so the
   // palette has to be woven in rather than wrapped around the result. Emitting
   // nothing when the width is absent is deliberate and matches getBorderCSS:
@@ -313,6 +401,9 @@ const Style = ({ attributes = {}, clientId }) => {
 
     const wanted = (s) => {
       const bSide = side?.toLowerCase();
+      if (ACCENT_STRIPE_SIDE[layout] === s) {
+        return false;
+      }
       return bSide?.includes("all") || bSide?.includes(s);
     };
 
@@ -451,6 +542,15 @@ const Style = ({ attributes = {}, clientId }) => {
   const sizeCSS = (device) => {
     const width = blockWidth?.[device];
     const height = cardHeight?.[device];
+    // The desktop boxes are already written by the base rules further down, so
+    // only the two breakpoints add anything here.
+    const isBase = "desktop" === device;
+    const devicePadding = isBase
+      ? ""
+      : getBoxValue(ownBoxForDevice(padding, device) || {});
+    const deviceCardMargin = isBase
+      ? ""
+      : getBoxCSS(ownBoxForDevice(cardMargin, device));
 
     return [
       imageCSS(device),
@@ -462,6 +562,18 @@ const Style = ({ attributes = {}, clientId }) => {
       // their card out of something else, so Card Height silently did nothing on
       // timeline, hero, audio, logos, badges, stats and the rest.
       height ? `${cardHeightEl} {\n\t\t\tmin-height: ${height};\n\t\t}` : "",
+      // Padding, Card Margin and Block Margin, for the devices that set one of
+      // their own. `ownBoxForDevice` returns nothing when a device inherits, so
+      // a media query is only written where there is something to override --
+      // repeating the desktop value here would freeze it in place instead.
+      //
+      // Each targets the same element its desktop rule does, so a value set for
+      // one device behaves exactly like the value set for another.
+      devicePadding ? `${cardBoxEl} {\n\t\t\tpadding: ${devicePadding};\n\t\t}` : "",
+      deviceCardMargin
+        ? `${cardMarginEl} {\n\t\t\tmargin: ${deviceCardMargin};\n\t\t}`
+        : "",
+      // Block Margin is deliberately not here -- see blockMarginBreakpoints.
     ]
       .filter(Boolean)
       .join("\n\t\t");
@@ -569,7 +681,7 @@ const Style = ({ attributes = {}, clientId }) => {
 		     `.btb-faq-item` is deliberately absent: the stylesheet recolours its
 		     border on `[open]` to mark the expanded row, and an ID-scoped border
 		     from here would outrank that. */ ""}
-		${mainEl} .single,
+		${cardBoxEl},
 		${mainEl} .btb-star-rating-bars,
 		${mainEl} .btb-badge-card,
 		${mainEl} .btb-stat-card,
@@ -578,10 +690,18 @@ const Style = ({ attributes = {}, clientId }) => {
 		${mainEl} .btb-trust-badges-grid,
 		${mainEl} .btb-case-study,
 		${mainEl} .btb-comparison-table {
-			background:${withRole("--btb-surface", background)};
-			padding:${getBoxValue(padding)};
+			${/* `background-color`, not the `background` shorthand. The shorthand
+			     also resets `background-image`, which erased the quote box's
+			     `linear-gradient(135deg, var(--btb-surface), var(--btb-track))`
+			     -- so its Card Gradient End control painted nothing and the card
+			     rendered flat. Measured: `background-image` computed `none` with
+			     the gradient's own rule matching. Every other layout paints its
+			     card with a plain colour, so dropping the shorthand changes
+			     nothing for them. */ ""}
+			background-color:${withRole("--btb-surface", background)};
+			padding:${getBoxValue(ownBoxForDevice(padding, "desktop"))};
 			${paletteBorderCSS(border)};
-			box-shadow: ${getShadowCSS(shadow)};
+			${cardBoxShadowCSS}
 		}
 
 		${cardMarginCSS ? `${cardMarginEl} {\n\t\t\tmargin: ${cardMarginCSS};\n\t\t}` : ""}
@@ -610,6 +730,17 @@ const Style = ({ attributes = {}, clientId }) => {
 
 		${selectorList(colorParts(TEXT_PARTS))} {
 			color:${withRole("--btb-body", textColor)};
+		}
+
+		${/* The rating cell is inside `.btb-ct-table td`, so the Body Text rule
+		     above -- ID-scoped, and therefore stronger than the stylesheet's
+		     `.btb-ct-rating { color: var(--btb-star) }` -- was repainting the
+		     stars with the body colour and leaving Rating Stars dead. Restating
+		     it here at the same specificity, after that rule, hands the cell
+		     back. Measured: the stars computed the body colour while
+		     `--btb-star` sat declared and unused. */ ""}
+		${mainEl} .btb-ct-table .btb-ct-rating {
+			color:${withRole("--btb-star", starIconColor)};
 		}
 
 		${mainEl} .btb-srb-title {
@@ -664,6 +795,8 @@ const Style = ({ attributes = {}, clientId }) => {
 		${/* Last, so an explicit side beats the auto centring the per-device Block
 		     Width rules above apply -- including the ones inside the media queries. */ ""}
 		${blockMarginCSS ? `${widthEl} {\n\t\t\t${blockMarginCSS}\n\t\t}` : ""}
+
+		${blockMarginBreakpoints}
 	`,
       }}
     />

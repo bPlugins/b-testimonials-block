@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 
 const DEFAULT_IMG =
   "https://templates.bplugins.com/wp-content/uploads/2025/02/p-29.png";
@@ -41,18 +41,21 @@ const BeforeAfterSlider = ({ attributes = {} }) => {
     setPos(startPosition);
   }, [startPosition]);
 
-  const updatePos = (clientX, clientY) => {
-    if (!containerRef.current) {
-      return;
-    }
-    const rect = containerRef.current.getBoundingClientRect();
-    const span = isVertical ? rect.height : rect.width;
-    if (!span) {
-      return;
-    }
-    const offset = isVertical ? clientY - rect.top : clientX - rect.left;
-    setPos(Math.max(0, Math.min(100, (offset / span) * 100)));
-  };
+  const updatePos = useCallback(
+    (clientX, clientY) => {
+      if (!containerRef.current) {
+        return;
+      }
+      const rect = containerRef.current.getBoundingClientRect();
+      const span = isVertical ? rect.height : rect.width;
+      if (!span) {
+        return;
+      }
+      const offset = isVertical ? clientY - rect.top : clientX - rect.left;
+      setPos(Math.max(0, Math.min(100, (offset / span) * 100)));
+    },
+    [isVertical]
+  );
 
   const pointFrom = (e) => {
     const touch = e.touches && e.touches[0];
@@ -100,8 +103,7 @@ const BeforeAfterSlider = ({ attributes = {} }) => {
       window.removeEventListener("mouseup", onEnd);
       window.removeEventListener("touchend", onEnd);
     };
-     
-  }, [isDragging, isVertical]);
+  }, [isDragging, updatePos]);
 
   const handleKeyDown = (e) => {
     const back = isVertical ? "ArrowUp" : "ArrowLeft";

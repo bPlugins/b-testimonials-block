@@ -8,7 +8,7 @@ import {
   InnerBlocks,
   InspectorControls,
 } from "@wordpress/block-editor";
-import { ToolbarButton } from "@wordpress/components";
+import { ToolbarButton, SandBox } from "@wordpress/components";
 import { useSelect } from "@wordpress/data";
 import apiFetch from "@wordpress/api-fetch";
 import { addQueryArgs } from "@wordpress/url";
@@ -363,6 +363,7 @@ const Edit = (props) => {
                 updateItem={updateItem}
                 __={__}
                 RichText={RichText}
+                SandBox={SandBox}
               />
             </div>
           </>

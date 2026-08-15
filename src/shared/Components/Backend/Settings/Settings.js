@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { __ } from "@wordpress/i18n";
 import { InspectorControls, BlockControls } from "@wordpress/block-editor";
 import {
@@ -28,7 +27,7 @@ import Label from "../../../../../../bpl-tools/Components/Label/Label";
 import { ColorControl } from "../../../../../../bpl-tools/Components/ColorControl/ColorControl";
 import { InlineDetailMediaUpload } from "../../../../../../bpl-tools/Components/MediaControl/MediaControl";
 import Typography from "../../../../../../bpl-tools/Components/Typography/Typography";
-import BDevice from "../../../../../../bpl-tools/Components/Deprecated/BDevice/BDevice";
+import Device from "../../../../../../bpl-tools/Components/Device/Device";
 import BorderControl from "../../../../../../bpl-tools/Components/Deprecated/BorderControl/BorderControl";
 import ShadowControl from "../../../../../../bpl-tools/Components/Deprecated/ShadowControl/ShadowControl";
 
@@ -41,12 +40,15 @@ import {
 } from "../../../../../../bpl-tools/utils/options";
 
 import { checkTheme } from "../../.././utils/functions";
+import { useDeviceKey } from "../../../utils/usePreviewDevice";
 import {
   rendersReviewText,
   resolveArrangement,
   supportsArrangement,
 } from "../../../utils/layoutFeatures";
 import { getLayoutControls } from "../../../utils/layoutControls";
+import { getVisualControls } from "../../../utils/visualControls";
+import { boxForDevice, setBoxForDevice } from "../../../utils/responsiveBox";
 import {
   arrangementOpt,
   generalStyleTabs,
@@ -127,7 +129,12 @@ const Settings = ({
     ...(rawElements || {}),
   };
 
-  const [device, setDevice] = useState("desktop");
+  // The editor's own preview device, not a switch of our own. Every device
+  // switch in the sidebar reads it, so they all agree with each other and with
+  // the canvas -- the local `useState` this replaces let a panel say Tablet
+  // while the preview stayed on Desktop, which meant the control was editing a
+  // value the canvas was not showing.
+  const device = useDeviceKey();
   const {
     speed: marqueeSpeed = 30,
     direction: marqueeDirection = "left",
@@ -180,6 +187,9 @@ const Settings = ({
   const isSingleItemBlock =
     singleItemBlocks.includes(layout) || isSingleTestimonial;
   const isCaseStudy = layout === "case-study-card";
+  // The only layout that plays a per-card media file, so the upload below is
+  // scoped to it rather than added to every testimonial card.
+  const isAudio = layout === "audio-testimonials";
 
   // Whether this block's card list can be rearranged, and which arrangement is
   // currently in effect (falling back to `layout` for posts saved before the
@@ -205,6 +215,76 @@ const Settings = ({
   // can be hidden while there is nothing for it to act on -- the hero's Columns
   // before a third testimonial exists. See utils/layoutControls.js.
   const controls = getLayoutControls(layout, attributes);
+
+  // The Card panel's Background and Border, and the Colors panel's Card Surface
+  // and Border Color, were two controls over one pixel.
+  //
+  // Style.js emits the Card values as the fallback inside `var(--btb-surface,
+  // ...)` and `var(--btb-border, ...)`, so whenever the palette role was set the
+  // Card control silently stopped doing anything. Measured across the 22 blocks
+  // that offer both: on 14 the two land on the exact same element, and on the
+  // rest the palette reaches that element and more (the avatar list's thumb
+  // ring, the card stack's nav buttons, the poll's number buttons). So there was
+  // never a pixel only the Card control could reach -- just a second control
+  // that lost.
+  //
+  // Rather than hide one, they write the same value. The Card control reads the
+  // palette role where the layout has one, so it always shows what is on screen,
+  // and writes both, so editing from either panel moves the same pixel and the
+  // two can never disagree. Where a layout offers no palette role for a
+  // property -- the hero, popup modal and timeline have no Card Surface, the
+  // quote box no Border Color -- the Card control keeps it to itself as before.
+  //
+  // Border style, side and radius have no palette role at all and stay purely
+  // the Card panel's.
+  const paletteRoles = getVisualControls(layout, attributes).map((c) => c.attr);
+  const ownsSurface = paletteRoles.includes("surfaceColor");
+  const ownsBorderColor = paletteRoles.includes("borderColor");
+  const ownsBorderWidth = paletteRoles.includes("borderWidth");
+
+  // Cleared from the Colors panel means unset, not "transparent": getPaletteCSS
+  // skips an empty value, so the Card value is what paints again and is what
+  // this control has to show.
+  const isSet = (v) => undefined !== v && null !== v && "" !== v;
+
+  const cardBackgroundValue =
+    ownsSurface && isSet(attributes.surfaceColor)
+      ? attributes.surfaceColor
+      : background;
+
+  const setCardBackground = (val) =>
+    setAttributes(
+      ownsSurface ? { background: val, surfaceColor: val } : { background: val },
+    );
+
+  const cardBorderValue = {
+    ...border,
+    ...(ownsBorderColor && isSet(attributes.borderColor)
+      ? { color: attributes.borderColor }
+      : {}),
+    ...(ownsBorderWidth && isSet(attributes.borderWidth)
+      ? { width: `${attributes.borderWidth}px` }
+      : {}),
+  };
+
+  const setCardBorder = (val) => {
+    const next = { border: val };
+
+    if (ownsBorderColor) {
+      next.borderColor = val?.color;
+    }
+    if (ownsBorderWidth) {
+      // The palette stores a bare number of pixels; the Border control a CSS
+      // length. An unparseable unit (em, %) leaves the palette alone rather than
+      // writing NaN, and the Card value still applies through the var fallback.
+      const px = parseInt(val?.width, 10);
+      if (Number.isFinite(px)) {
+        next.borderWidth = px;
+      }
+    }
+
+    setAttributes(next);
+  };
 
   // Whether a card part is rendered, for the style panel that goes with it.
   // A part switched off in the Elements panel needs no typography -- but only
@@ -1567,6 +1647,33 @@ const Settings = ({
                               )}
                             />
 
+                            {/* The Audio Testimonials card drew a play button
+                                and a waveform with no audio behind either: no
+                                field here, and no <audio> element in the
+                                layout. `types` (not `type`) is the prop
+                                InlineDetailMediaUpload reads -- the avatar
+                                upload above only gets images because that is
+                                also the default. */}
+                            {isAudio && (
+                              <>
+                                <Label className="mt10">
+                                  {__(
+                                    "Audio File:",
+                                    "b-testimonials-block",
+                                  )}
+                                </Label>
+                                <InlineDetailMediaUpload
+                                  value={currentItem?.audio || {}}
+                                  types={["audio"]}
+                                  onChange={(val) => updateItem("audio", val)}
+                                  placeholder={__(
+                                    "Enter Audio URL (mp3, m4a, ogg, wav)",
+                                    "b-testimonials-block",
+                                  )}
+                                />
+                              </>
+                            )}
+
                             <TextControl
                               className="mt10"
                               label={__("Name", "b-testimonials-block")}
@@ -2039,10 +2146,7 @@ const Settings = ({
                             <Label mt="0">
                               {__("Columns:", "b-testimonials-block")}
                             </Label>
-                            <BDevice
-                              device={device}
-                              onChange={(val) => setDevice(val)}
-                            />
+                            <Device className="" />
                           </PanelRow>
 
                           {/* The hero layout spends its first testimonial on
@@ -2506,13 +2610,13 @@ const Settings = ({
                       panel below, which meant gating that panel took it away
                       from the eight layouts whose card it does reach -- it
                       shares Card Height's selector list, not the Card panel's.
-                      The device switch is passed in so it stays the same one the
-                      Layout panel uses on the General tab. */}
+                      Its device switch needs nothing passed to it: every switch
+                      now reads the editor's preview device, so this panel and
+                      the Layout panel on the General tab are on the same one by
+                      construction rather than by wiring. */}
                   <SizeSpacingPanel
                     attributes={attributes}
                     setAttributes={setAttributes}
-                    device={device}
-                    setDevice={setDevice}
                   />
 
                   {/* The four rules behind this panel name seven selectors:
@@ -2530,14 +2634,31 @@ const Settings = ({
                       <ColorControl
                         className="mb10"
                         label={__("Background Color", "b-testimonials-block")}
-                        value={background}
-                        onChange={(val) => setAttributes({ background: val })}
+                        value={cardBackgroundValue}
+                        onChange={setCardBackground}
                       />
+
+                      {/* Per device, like Block Width and Card Height. The
+                          padding that suits a three-column desktop grid is a lot
+                          of room to give up on a phone, and this was one flat
+                          value for every screen. The switch is the editor's own
+                          preview device, so it is the same one the other panels
+                          use. */}
+                      <PanelRow>
+                        <Label mt="0">
+                          {__("Device:", "b-testimonials-block")}
+                        </Label>
+                        <Device className="" />
+                      </PanelRow>
 
                       <BoxControl
                         label={__("Padding", "b-testimonials-block")}
-                        values={padding}
-                        onChange={(val) => setAttributes({ padding: val })}
+                        values={boxForDevice(padding, device)}
+                        onChange={(val) =>
+                          setAttributes({
+                            padding: setBoxForDevice(padding, device, val),
+                          })
+                        }
                         resetValues={{
                           top: "5px",
                           right: "10px",
@@ -2550,8 +2671,8 @@ const Settings = ({
                       <BorderControl
                         className=""
                         label={__("Border", "b-testimonials-block")}
-                        value={border}
-                        onChange={(val) => setAttributes({ border: val })}
+                        value={cardBorderValue}
+                        onChange={setCardBorder}
                       />
 
                       <ShadowControl
@@ -2575,10 +2696,7 @@ const Settings = ({
                         <Label mt="0">
                           {__("Device:", "b-testimonials-block")}
                         </Label>
-                        <BDevice
-                          device={device}
-                          onChange={(val) => setDevice(val)}
-                        />
+                        <Device className="" />
                       </PanelRow>
 
                       <PanelRow>

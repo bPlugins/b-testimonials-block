@@ -740,6 +740,15 @@ $primaryColor: #382C8D;
 	margin: 10px 0;
 	transition: box-shadow 0.2s, transform 0.2s;
 
+	/* The badge was only "responsive" in that the theme's content width squeezed
+	   it -- nothing inside reflowed, so the card kept its desktop row and crushed
+	   its own contents. Measured at 360px: the Facebook badge's count wrapped
+	   into a two-line column jammed against the stars, and Trustpilot and G2
+	   broke "5.0 / 5" across lines. Facebook shows it worst only because its
+	   count string is the longest. */
+	max-width: 100%;
+	box-sizing: border-box;
+
 	&:hover {
 		box-shadow: 0 8px 30px rgba(0,0,0,0.1);
 		transform: translateY(-2px);
@@ -749,11 +758,16 @@ $primaryColor: #382C8D;
 		display: flex;
 		align-items: center;
 		gap: 16px;
+		/* Without this the header refuses to shrink below its content and the
+		   text is what gives, rather than the row rearranging. */
+		min-width: 0;
 	}
 
 	.btb-badge-brand-logo { flex-shrink: 0; }
 
 	.btb-badge-info {
+		min-width: 0;
+
 		.btb-badge-title {
 			font-size: 17px;
 			font-weight: 700;
@@ -769,10 +783,31 @@ $primaryColor: #382C8D;
 			display: flex;
 			align-items: center;
 			gap: 8px;
-			.score { font-weight: 800; color: var(--btb-title, #0f172a); font-size: 18px; }
-			.stars { color: var(--btb-star, #f59e0b); letter-spacing: 2px; font-size: 16px; }
+			/* Score, stars and count drop to a second line instead of each being
+			   squeezed. The count is the piece that wraps first, which is what
+			   was breaking "Recommended by 250+ Customers" mid-phrase. */
+			flex-wrap: wrap;
+			.score { font-weight: 800; color: var(--btb-title, #0f172a); font-size: 18px; white-space: nowrap; }
+			.stars { color: var(--btb-star, #f59e0b); letter-spacing: 2px; font-size: 16px; white-space: nowrap; }
 			.count { font-size: 13px; color: var(--btb-muted, #64748b); }
 		}
+	}
+}
+
+/* Below the phone breakpoint the logo sits above the text rather than beside
+   it: at 360px the row leaves the title barely 200px, which is where the
+   wrapping starts to look broken however the rating row behaves. */
+@media only screen and (max-width: 480px) {
+	.btb-badge-card {
+		display: flex;
+		padding: 16px 18px;
+
+		.btb-badge-header {
+			flex-wrap: wrap;
+			gap: 10px;
+		}
+
+		.btb-badge-info .btb-badge-title { font-size: 16px; }
 	}
 }
 .btb-google-badge { border-left: 4px solid var(--btb-accent, #4285F4); }
@@ -1067,18 +1102,54 @@ $primaryColor: #382C8D;
 		.btb-audio-player {
 			display: flex; align-items: center; gap: 12px; margin-bottom: 14px;
 			padding-bottom: 14px; border-bottom: var(--btb-divider-width, 1px) solid var(--btb-divider, #f1f5f9);
+
+			/* The play/pause control. It was a bare glyph before there was
+			   anything to play, so it needs the button reset here rather than
+			   inheriting the theme's button styling. */
+			.btb-audio-toggle {
+				display: inline-flex; align-items: center; justify-content: center;
+				padding: 0; border: 0; background: none; cursor: pointer; line-height: 0;
+				color: var(--btb-accent, #382C8D);
+				transition: transform 0.15s ease;
+				&:hover:not(:disabled) { transform: scale(1.08); }
+				&:disabled { cursor: default; opacity: 0.45; }
+			}
+
 			.btb-audio-wave {
 				display: flex; align-items: flex-end; gap: 3px; height: 36px;
+				flex: 1; min-width: 0; cursor: pointer;
 				.btb-wave-bar {
-					width: 4px; background: var(--btb-accent, #382C8D); border-radius: 2px; opacity: 0.5;
-					animation: btbWave 1.2s ease-in-out infinite alternate;
-					&:nth-child(odd) { animation-delay: 0.2s; }
+					flex: 1; min-width: 3px; max-width: 6px;
+					background: var(--btb-accent, #382C8D); border-radius: 2px; opacity: 0.35;
+					transform-origin: bottom; transition: opacity 0.2s ease;
+					/* Fills left to right as the clip plays -- the waveform is
+					   the scrub track, so it has to show position. */
+					&.is-played { opacity: 1; }
 				}
 			}
+
+			/* Idle players stay still. The bars used to pulse forever whether or
+			   not anything was playing, which read as "playing" on a card that
+			   had no audio at all. */
+			&.is-playing .btb-wave-bar {
+				animation: btbWave 1.2s ease-in-out infinite alternate;
+				&:nth-child(odd) { animation-delay: 0.2s; }
+			}
+
+			&.is-empty .btb-audio-wave { cursor: default; }
+
+			.btb-audio-time {
+				font-size: 12px; color: var(--btb-muted, #64748b);
+				font-variant-numeric: tabular-nums; white-space: nowrap;
+			}
+
+			.btb-audio-hint { font-size: 12px; color: var(--btb-muted, #94a3b8); white-space: nowrap; }
 		}
 	}
 }
-@keyframes btbWave { 0% { opacity: 0.3; } 100% { opacity: 1; } }
+/* Height, not opacity: opacity is what marks the played part of the track, and
+   an opacity animation would override it for the whole waveform while playing. */
+@keyframes btbWave { 0% { transform: scaleY(0.55); } 100% { transform: scaleY(1); } }
 
 /* --- Video Testimonials (Category C) --- */
 .btb-video-layout {

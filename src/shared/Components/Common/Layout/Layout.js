@@ -21,6 +21,83 @@ import AudioPlayer from "../AudioPlayer";
 import { getIcon } from "../../../utils/blockIcons";
 import { ARRANGEMENTS, resolveArrangement } from "../../../utils/layoutFeatures";
 
+/**
+ * The Feedback & NPS Poll scale, shared by the editor and the front end.
+ *
+ * On a published page the block's view script owns this interaction: it binds a
+ * delegated click, writes `.is-selected` onto the button it was given and posts
+ * the vote to the REST route. That script is registered as `viewScript`, so it
+ * never loads in the editor -- which left every number completely dead there.
+ * Clicking one did nothing, and the selected state could not be seen at all
+ * while styling it.
+ *
+ * So the editor gets local state and the front end deliberately gets none. If
+ * React owned `.is-selected` on the page, its next render would wipe whatever
+ * the view script had just written; and nothing in the editor may post a real
+ * vote, which is why the click here only ever sets state.
+ *
+ * It lives in its own component because Layout returns early for each layout,
+ * and a hook cannot be called inside one of those branches.
+ */
+const FeedbackPoll = ({ attributes = {}, isBackend, bt, bd }) => {
+  const [picked, setPicked] = useState(null);
+
+  const minVal =
+    attributes.minScore !== undefined ? Number(attributes.minScore) : 0;
+  const maxVal =
+    attributes.maxScore !== undefined ? Number(attributes.maxScore) : 10;
+  const lowLbl =
+    attributes.lowLabel !== undefined ? attributes.lowLabel : "Not likely";
+  const highLbl =
+    attributes.highLabel !== undefined ? attributes.highLabel : "Very likely";
+
+  const pollNumbers = [];
+  for (let i = minVal; i <= maxVal; i++) {
+    pollNumbers.push(i);
+  }
+
+  const previewing = isBackend && picked !== null;
+
+  return (
+    // Endpoint and REST nonce come from render.php; the view script reads them
+    // off this element rather than guessing the REST root.
+    <div
+      className="btb-poll-wrapper"
+      data-endpoint={attributes.pollEndpoint || ""}
+      data-rest-nonce={attributes.pollRestNonce || ""}>
+      <h4 className="btb-poll-title">
+        {bt || "How likely are you to recommend us?"}
+      </h4>
+      <p className="btb-poll-desc">{bd || "Net Promoter Score Survey"}</p>
+      <div className="btb-poll-scale">
+        {lowLbl && <span className="btb-poll-label-low">{lowLbl}</span>}
+        <div className="btb-poll-buttons">
+          {pollNumbers.map((n) => (
+            <button
+              key={n}
+              type="button"
+              className={
+                previewing && picked === n
+                  ? "btb-poll-num-btn is-selected"
+                  : "btb-poll-num-btn"
+              }
+              data-mark={n}
+              onClick={isBackend ? () => setPicked(n) : undefined}>
+              {n}
+            </button>
+          ))}
+        </div>
+        {highLbl && <span className="btb-poll-label-high">{highLbl}</span>}
+      </div>
+      <div
+        className="btb-poll-response-msg"
+        style={{ display: previewing ? "block" : "none" }}>
+        {previewing ? "Preview only — votes are recorded on the published page." : ""}
+      </div>
+    </div>
+  );
+};
+
 const SocialProofToast = ({ items = [], bt, bd, isBackend, activeIndex }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
 
@@ -573,45 +650,13 @@ const Layout = ({
   }
 
   if (layout === "user-feedback-poll") {
-    const minVal =
-      attributes.minScore !== undefined ? Number(attributes.minScore) : 0;
-    const maxVal =
-      attributes.maxScore !== undefined ? Number(attributes.maxScore) : 10;
-    const lowLbl =
-      attributes.lowLabel !== undefined ? attributes.lowLabel : "Not likely";
-    const highLbl =
-      attributes.highLabel !== undefined ? attributes.highLabel : "Very likely";
-
-    const pollNumbers = [];
-    for (let i = minVal; i <= maxVal; i++) {
-      pollNumbers.push(i);
-    }
-
     return (
-      <div className="btb-poll-wrapper">
-        <h4 className="btb-poll-title">
-          {bt || "How likely are you to recommend us?"}
-        </h4>
-        <p className="btb-poll-desc">{bd || "Net Promoter Score Survey"}</p>
-        <div className="btb-poll-scale">
-          {lowLbl && <span className="btb-poll-label-low">{lowLbl}</span>}
-          <div className="btb-poll-buttons">
-            {pollNumbers.map((n) => (
-              <button
-                key={n}
-                type="button"
-                className="btb-poll-num-btn"
-                data-mark={n}>
-                {n}
-              </button>
-            ))}
-          </div>
-          {highLbl && <span className="btb-poll-label-high">{highLbl}</span>}
-        </div>
-        <div
-          className="btb-poll-response-msg"
-          style={{ display: "none" }}></div>
-      </div>
+      <FeedbackPoll
+        attributes={attributes}
+        isBackend={isBackend}
+        bt={bt}
+        bd={bd}
+      />
     );
   }
 

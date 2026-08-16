@@ -5,6 +5,7 @@ import { PanelBody, TextControl, TextareaControl, ToggleControl } from '@wordpre
 import BlockSwitcher from '../../shared/Components/Common/BlockSwitcher';
 import SettingsTabs from '../../shared/Components/Backend/Settings/SettingsTabs';
 import ColorsPanel from '../../shared/Components/Backend/Settings/ColorsPanel';
+import FormFieldsPanel from '../../shared/Components/Backend/Settings/FormFieldsPanel';
 import SizeSpacingPanel from '../../shared/Components/Backend/Settings/SizeSpacingPanel';
 import Style from '../../shared/Components/Common/Style';
 import TestimonialForm from '../../shared/Components/Common/TestimonialForm';
@@ -56,8 +57,14 @@ const Edit = ( { attributes, setAttributes, clientId } ) => {
 					}
 					style={
 						<>
-						<ColorsPanel attributes={ attributes } setAttributes={ setAttributes } />
+						{/* Surface and Border are the input background and input border on
+						    this layout -- nothing else in form.scss reads either role -- so
+						    they are excluded here and offered in the Input Fields panel under
+						    names that say what they paint. Same attributes either way, so a
+						    form saved before this keeps the colours it has. */}
+						<ColorsPanel attributes={ attributes } setAttributes={ setAttributes } exclude={ [ 'surfaceColor', 'borderColor', 'borderWidth' ] } />
 						<SizeSpacingPanel attributes={ attributes } setAttributes={ setAttributes } />
+						<FormFieldsPanel attributes={ attributes } setAttributes={ setAttributes } />
 						<PanelBody className="bPlPanelBody" title={ __( 'Color', 'b-testimonials-block' ) } initialOpen={ false }>
 							<ColorControl label={ __( 'Accent (button)', 'b-testimonials-block' ) } value={ accentColor } onChange={ ( val ) => setAttributes( { accentColor: val } ) } />
 						</PanelBody>

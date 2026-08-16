@@ -2,6 +2,11 @@ const gridIcon = <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" 
 const sliderIcon = <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="2" y="6" width="20" height="12" rx="2" /><polyline points="15 12 19 12" /><polyline points="5 12 9 12" /></svg>;
 const masonryIcon = <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="3" width="7" height="9" /><rect x="14" y="3" width="7" height="5" /><rect x="14" y="12" width="7" height="9" /><rect x="3" y="16" width="7" height="5" /></svg>;
 const tickerIcon = <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="3" y1="12" x2="21" y2="12" /><polyline points="16 7 21 12 16 17" /></svg>;
+const quoteIcon = <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M9 7H5a2 2 0 0 0-2 2v3a2 2 0 0 0 2 2h2v3H4" /><path d="M19 7h-4a2 2 0 0 0-2 2v3a2 2 0 0 0 2 2h2v3h-3" /></svg>;
+const mediaIcon = <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="9" /><polygon points="10 8 16 12 10 16" /></svg>;
+const chartIcon = <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="4" y1="20" x2="4" y2="12" /><line x1="10" y1="20" x2="10" y2="4" /><line x1="16" y1="20" x2="16" y2="9" /><line x1="22" y1="20" x2="22" y2="15" /></svg>;
+const shieldIcon = <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M12 3l7 3v5c0 4.4-3 8.4-7 10-4-1.6-7-5.6-7-10V6z" /><polyline points="9 12 11 14 15 10" /></svg>;
+const feedbackIcon = <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 15a2 2 0 0 1-2 2H8l-5 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" /><line x1="8" y1="9" x2="16" y2="9" /><line x1="8" y1="13" x2="13" y2="13" /></svg>;
 
 // Getting Started Tab Icons (same as b-slider)
 const gutenbergTabIcon = <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' strokeWidth={2} strokeLinecap='round' strokeLinejoin='round'><rect x='3' y='3' width='7' height='7' rx='1' /><rect x='14' y='3' width='7' height='7' rx='1' /><rect x='3' y='14' width='7' height='7' rx='1' /><rect x='14' y='14' width='7' height='7' rx='1' /></svg>;
@@ -10,10 +15,12 @@ const elementorTabIcon = <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24
 const phpTabIcon = <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' width={16} height={16} fill='none' stroke='currentColor' strokeWidth={2} strokeLinecap='round' strokeLinejoin='round'><path d='M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z' /><polyline points='14 2 14 8 20 8' /><line x1='9' y1='15' x2='15' y2='15' /></svg>;
 
 
+import welcomeBanner from '../assets/welcomeBanner';
+
 const slug = 'b-testimonial';
 
 export const dashboardInfo = (info) => {
-	const { version, isPremium, hasPro, adminUrl, licenseActiveNonce, deleteDataOnUninstall = false, uninstallNonce = '' } = info;
+	const { version, isPremium, hasPro, adminUrl, demoBase = '/', licenseActiveNonce, deleteDataOnUninstall = false, uninstallNonce = '' } = info;
 	const proSuffix = isPremium ? ' Pro' : '';
 
 	return {
@@ -24,11 +31,16 @@ export const dashboardInfo = (info) => {
 		version,
 		isPremium,
 		hasPro,
+		// Drives the Header's own "Our Plugins" button in the top-right corner.
+		// It links to `#our-plugins`, so the matching route in App.js has to stay
+		// even though the page is deliberately absent from the nav.
 		displayOurPlugins: true,
 		media: {
 			logo: `https://ps.w.org/b-testimonial/assets/icon-128x128.png`,
 			banner: `https://ps.w.org/b-testimonial/assets/banner-772x250.png`,
-			thumbnail: `https://bplugins.com/wp-content/themes/b-technologies/assets/images/products/${slug}.png`,
+			// The Welcome hero's artwork. Vector and bundled -- see the module
+			// for why it is a string rather than an imported .svg.
+			thumbnail: welcomeBanner,
 			// video: 'https://www.youtube.com/watch?v=DOvUG5ArWHE&t=3s',
 			isYoutube: true,
 		},
@@ -38,6 +50,8 @@ export const dashboardInfo = (info) => {
 			pricing: `https://bplugins.com/products/${slug}/pricing`,
 		},
 		adminUrl,
+		// Reaches App, which hands it to demoInfo() for the preview URLs.
+		demoBase,
 		licenseActiveNonce,
 		deleteDataOnUninstall,
 		uninstallNonce,
@@ -48,81 +62,140 @@ export const dashboardInfo = (info) => {
 	};
 };
 
-export const demoInfo = {
-	allInOneLabel: 'See All Demos',
-	allInOneLink: 'https://bplugins.com/products/b-testimonials-block/#demos',
-	demos: [
-		{
-			icon: gridIcon,
-			title: 'Grid Layouts',
-			children: [
-				{
-					title: 'Default Grid',
-					type: 'iframe',
-					url: 'https://b-testimonials.bplugins.com/demo/grid-default/',
-				},
-				{
-					title: 'Centered Grid',
-					type: 'iframe',
-					url: 'https://b-testimonials.bplugins.com/demo/grid-centered/',
-				},
-				{
-					title: 'Gradient Border Grid',
-					type: 'iframe',
-					url: 'https://b-testimonials.bplugins.com/demo/grid-gradient/',
-				},
-			],
-		},
-		{
-			icon: sliderIcon,
-			title: 'Sliders & Carousels',
-			children: [
-				{
-					title: 'Default Slider',
-					type: 'iframe',
-					url: 'https://b-testimonials.bplugins.com/demo/slider-default/',
-				},
-				{
-					title: '3D Coverflow',
-					type: 'iframe',
-					url: 'https://b-testimonials.bplugins.com/demo/slider-coverflow/',
-				},
-			],
-		},
-		{
-			icon: masonryIcon,
-			title: 'Masonry & Lists',
-			children: [
-				{
-					title: 'Masonry Grid',
-					type: 'iframe',
-					url: 'https://b-testimonials.bplugins.com/demo/masonry/',
-				},
-				{
-					title: 'Avatar List',
-					type: 'iframe',
-					url: 'https://b-testimonials.bplugins.com/demo/avatar-list/',
-				},
-			],
-		},
-		{
-			icon: tickerIcon,
-			title: 'Marquee & Widgets',
-			children: [
-				{
-					title: 'Marquee Ticker',
-					type: 'iframe',
-					url: 'https://b-testimonials.bplugins.com/demo/marquee/',
-				},
-				{
-					title: 'Rating Summary',
-					type: 'iframe',
-					url: 'https://b-testimonials.bplugins.com/demo/rating-summary/',
-				},
-			],
-		},
-	],
-};
+/**
+ * Live demos, one per block.
+ *
+ * Every block the plugin registers is listed here -- the page previously showed
+ * 9 hand-picked demos out of 40, so most blocks had no entry at all.
+ *
+ * The previews are rendered by this install, not fetched from a demo site:
+ * `includes/demo-preview.php` answers `?bpbtb_demo=<slug>` with the real block.
+ * The external host these used to point at (b-testimonials.bplugins.com) has no
+ * DNS record, so every one of them opened an unreachable page -- and a working
+ * external site would still drift out of step with the blocks over time. Local
+ * previews are live, interactive, and cannot go stale.
+ *
+ * Each slug is the block name after the `bptmb/` prefix, which is what
+ * demo-preview.php looks up in the block registry. That is usually the
+ * directory name under src/blocks/, but not always: `src/blocks/testimonials`
+ * registers `bptmb/b-testimonials`.
+ */
+const demoGroups = [
+	{
+		icon: gridIcon,
+		title: 'Grids & Lists',
+		blocks: [
+			// `bptmb/b-testimonials`, not `bptmb/testimonials` -- the one block
+			// whose registered name differs from its directory.
+			[ 'b-testimonials', 'B Testimonials Block' ],
+			[ 'testimonials-grid-2', 'Centered Cards Grid' ],
+			[ 'testimonials-grid-3', 'Gradient Border Grid' ],
+			[ 'testimonials-grid-minimal', 'Minimalist Reviews Grid' ],
+			[ 'testimonials-list', 'Testimonials List' ],
+			[ 'testimonials-compact', 'Compact Reviews List' ],
+			[ 'testimonials-avatar-list', 'Avatar Reviews List' ],
+		],
+	},
+	{
+		icon: masonryIcon,
+		title: 'Masonry & Stacks',
+		blocks: [
+			[ 'testimonials-masonry', 'Testimonials Masonry' ],
+			[ 'testimonials-card-stack', 'Stacked Review Cards' ],
+			[ 'testimonials-floating-bubble', 'Floating Avatar Bubbles' ],
+		],
+	},
+	{
+		icon: sliderIcon,
+		title: 'Sliders & Carousels',
+		blocks: [
+			[ 'testimonials-slider', 'Testimonials Slider' ],
+			[ 'testimonials-carousel-2', 'Coverflow Carousel' ],
+			[ 'testimonials-slider-3d', '3D Flip Perspective Carousel' ],
+		],
+	},
+	{
+		icon: tickerIcon,
+		title: 'Marquee & Toasts',
+		blocks: [
+			[ 'testimonials-marquee', 'Testimonials Marquee' ],
+			[ 'social-proof-toast', 'Social Proof Toast' ],
+		],
+	},
+	{
+		icon: quoteIcon,
+		title: 'Spotlight & Story',
+		blocks: [
+			[ 'testimonials-hero', 'Hero Testimonial Spotlight' ],
+			[ 'testimonials-quote-box', 'Quote Box Showcase' ],
+			[ 'testimonials-speech-bubble', 'Speech Bubble Cards' ],
+			[ 'testimonials-timeline', 'Customer Journey Timeline' ],
+			[ 'case-study-card', 'Customer Case Study' ],
+		],
+	},
+	{
+		icon: mediaIcon,
+		title: 'Video & Audio',
+		blocks: [
+			[ 'video-testimonials', 'Video Testimonials' ],
+			[ 'audio-testimonials', 'Audio Testimonials' ],
+			[ 'before-after', 'Before / After' ],
+		],
+	},
+	{
+		icon: chartIcon,
+		title: 'Ratings & Stats',
+		blocks: [
+			[ 'rating-summary', 'Rating Summary' ],
+			[ 'star-rating-bars', 'Star Rating Progress Bars' ],
+			[ 'testimonial-stats', 'Testimonial Stats' ],
+			[ 'comparison-testimonial-table', 'Comparison Review Table' ],
+		],
+	},
+	{
+		icon: shieldIcon,
+		title: 'Badges & Trust',
+		blocks: [
+			[ 'google-review-badge', 'Google Reviews Badge' ],
+			[ 'facebook-review-badge', 'Facebook Recommendation Badge' ],
+			[ 'g2-review-badge', 'G2 Review Badge' ],
+			[ 'capterra-review-badge', 'Capterra Score Badge' ],
+			[ 'trustpilot-review-badge', 'Trustpilot Score Badge' ],
+			[ 'review-badge-widget', 'Floating Review Badge' ],
+			[ 'verified-buyer-badge', 'Verified Buyer Trust Seal' ],
+			[ 'trust-badges', 'Trust Badges' ],
+			[ 'client-logos', 'Client Logos' ],
+		],
+	},
+	{
+		icon: feedbackIcon,
+		title: 'Feedback & Forms',
+		blocks: [
+			[ 'testimonial-form', 'Testimonial Form' ],
+			[ 'user-feedback-poll', 'Feedback & NPS Poll' ],
+			[ 'faq-testimonial-accordion', 'FAQ Review Accordion' ],
+			[ 'testimonials-popup-modal', 'Popup Modal Review Trigger' ],
+		],
+	},
+];
+
+/**
+ * @param {string} demoBase Site home URL, passed through from home_url( '/' ).
+ */
+export const demoInfo = ( demoBase = '/' ) => ( {
+	allInOneLabel: 'Browse All Blocks',
+	// The plugin's own block list, rather than an off-site demo index.
+	allInOneLink: `${ demoBase }wp-admin/edit.php?post_type=testimonial&page=bpbtb-dashboard#/welcome`,
+	demos: demoGroups.map( ( { icon, title, blocks } ) => ( {
+		icon,
+		title,
+		children: blocks.map( ( [ slug, label ] ) => ( {
+			title: label,
+			type: 'iframe',
+			url: `${ demoBase }?bpbtb_demo=${ slug }`,
+		} ) ),
+	} ) ),
+} );
 
 
 export const welcomeInfo = (adminUrl) => ({

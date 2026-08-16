@@ -109,10 +109,11 @@ const Edit = ({ attributes, setAttributes, clientId }) => {
                 {/* One responsive control behind the bpl-tools device switch, as the
       					    shared Settings panel does, instead of three stacked ranges. */}
                 <PanelRow>
-                  <Label mt="0">{__("Columns:", "b-testimonials-block")}</Label>
+                  <Label mt="0">{__("Device:", "b-testimonials-block")}</Label>
                   <Device className="" />
                 </PanelRow>
                 <RangeControl
+                  label={__("Columns:", "b-testimonials-block")}
                   value={columns?.[device]}
                   onChange={(val) => setColumn(device, val)}
                   min={1}

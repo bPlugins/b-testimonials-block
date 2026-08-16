@@ -178,6 +178,19 @@ export const ROLE_LABELS = {
 		trackColor: __( 'Timeline Rail End', 'b-testimonials-block' ),
 		brandColor: __( 'Timeline Rail Start & Dots', 'b-testimonials-block' ),
 	},
+	// frontend.scss:
+	// `.btb-poll-wrapper { background: var(--btb-track, #f8fafc) }` and
+	// `.btb-poll-num-btn { background: var(--btb-surface, #fff) }`.
+	//
+	// The poll draws no bar, no track and no card, so both generic names
+	// described something that is not on the page -- "Bars & Tracks" is the box
+	// a reader sees behind the whole poll, and "Card Surface" is the scale
+	// buttons. Neither variable is read anywhere else in this layout, so each
+	// override names the one element it paints.
+	'user-feedback-poll': {
+		trackColor: __( 'Poll Box Background', 'b-testimonials-block' ),
+		surfaceColor: __( 'Number Button Background', 'b-testimonials-block' ),
+	},
 };
 
 /**

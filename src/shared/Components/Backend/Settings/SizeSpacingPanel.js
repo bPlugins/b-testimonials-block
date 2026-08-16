@@ -68,7 +68,7 @@ const SizeSpacingPanel = ({ attributes = {}, setAttributes }) => {
 
         <p className="description">
           {__(
-            "Both values below are saved per device, and switching device here also switches the editor preview. Desktop is the base: tablet and mobile inherit it until you give them a value of their own, and clearing a value hands that screen back to the one above it.",
+            "Saved per device. Tablet and mobile inherit desktop until set.",
             "b-testimonials-block",
           )}
         </p>
@@ -84,7 +84,7 @@ const SizeSpacingPanel = ({ attributes = {}, setAttributes }) => {
           units={[pxUnit(1200), perUnit(100), emUnit(60), vwUnit(100)]}
           isResetValueOnUnitChange={true}
           help={__(
-            "How wide the whole block may get. It is a maximum, so a narrower screen still wins and the block shrinks to fit. Empty means the theme decides.",
+            "Maximum width of the block. Empty uses the theme width.",
             "b-testimonials-block",
           )}
         />
@@ -100,7 +100,7 @@ const SizeSpacingPanel = ({ attributes = {}, setAttributes }) => {
           units={[pxUnit(320), emUnit(20), vhUnit(50)]}
           isResetValueOnUnitChange={true}
           help={__(
-            "A floor for every card, to even up a ragged row. Cards never get cut off: one with more text than the rest grows past this instead.",
+            "Minimum height for each card. Longer content still expands.",
             "b-testimonials-block",
           )}
         />
@@ -117,14 +117,7 @@ const SizeSpacingPanel = ({ attributes = {}, setAttributes }) => {
 
         <p className="description">
           {__(
-            "Two different boxes: Block Margin is the space outside the whole block, Card Margin the space around each card inside it. Neither is the gap between cards — that is Column Gap and Row Gap in the Layout panel. Both are margins, so they push from the outside; for space inside a card use Padding in the Card panel.",
-            "b-testimonials-block",
-          )}
-        </p>
-
-        <p className="description">
-          {__(
-            "Both are saved per device. Desktop is the base; tablet and mobile show what they inherit until you change them.",
+            "Saved per device. For space inside a card use Card → Padding, and for the gap between cards use Layout → Column and Row Gap.",
             "b-testimonials-block",
           )}
         </p>
@@ -148,7 +141,7 @@ const SizeSpacingPanel = ({ attributes = {}, setAttributes }) => {
         />
         <p className="description">
           {__(
-            "Separates this block from whatever sits above or below it on the page.",
+            "Space outside the whole block.",
             "b-testimonials-block",
           )}
         </p>
@@ -170,7 +163,7 @@ const SizeSpacingPanel = ({ attributes = {}, setAttributes }) => {
         />
         <p className="description">
           {__(
-            "Nudges every card by the same amount. It adds to the grid gap rather than replacing it, so leave it empty unless a card needs shifting.",
+            "Space around each card, added to the gap.",
             "b-testimonials-block",
           )}
         </p>

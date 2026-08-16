@@ -69,10 +69,10 @@ function bpbtb_pending_submissions_notice() {
 	if ( $pending_count > 0 ) {
 		$url = admin_url( 'edit.php?post_type=testimonial&page=bpbtb-submissions' );
 		?>
-		<div class="notice notice-warning is-dismissible" style="border-left-color: #5b34c9; padding: 12px 16px; border-radius: 8px;">
+		<div class="notice notice-warning is-dismissible" style="border-left-color: #146ef5; padding: 12px 16px; border-radius: 8px;">
 			<p style="margin: 0; font-size: 14px; display: flex; align-items: center; justify-content: space-between;">
 				<span>
-					<strong style="color: #4527a4;"><?php esc_html_e( 'B Testimonials Block:', 'b-testimonials-block' ); ?></strong>
+					<strong style="color: #0f57c4;"><?php esc_html_e( 'B Testimonials Block:', 'b-testimonials-block' ); ?></strong>
 					<?php
 					printf(
 						/* translators: %d: number of pending submissions */
@@ -81,7 +81,7 @@ function bpbtb_pending_submissions_notice() {
 					);
 					?>
 				</span>
-				<a href="<?php echo esc_url( $url ); ?>" class="button button-primary" style="background: linear-gradient(135deg, #5b34c9, #4527a4); border: none; border-radius: 6px; font-weight: 600;">
+				<a href="<?php echo esc_url( $url ); ?>" class="button button-primary" style="background: linear-gradient(135deg, #146ef5, #0f57c4); border: none; border-radius: 6px; font-weight: 600;">
 					<?php esc_html_e( 'View Submissions', 'b-testimonials-block' ); ?> &rarr;
 				</a>
 			</p>
@@ -209,14 +209,14 @@ function bpbtb_render_admin_submissions_page() {
 
 		/* Modern Hero Header Banner */
 		.bpbtb-hero-banner {
-			background: linear-gradient(135deg, #1e1b4b 0%, #312e81 40%, #4338ca 100%);
+			background: linear-gradient(135deg, #1b2d4b 0%, #2e4d7f 40%, #146ef5 100%);
 			border-radius: 16px;
 			padding: 28px 32px;
 			color: #ffffff;
 			display: flex;
 			align-items: center;
 			justify-content: space-between;
-			box-shadow: 0 10px 25px -5px rgba(49, 46, 129, 0.25);
+			box-shadow: 0 10px 25px -5px rgba(20, 110, 245, 0.25);
 			margin-bottom: 24px;
 			position: relative;
 			overflow: hidden;
@@ -315,12 +315,12 @@ function bpbtb_render_admin_submissions_page() {
 		}
 
 		.bpbtb-tab-link:hover {
-			color: #1e1b4b;
+			color: #1b2d4b;
 			background: #f1f5f9;
 		}
 
 		.bpbtb-tab-link.is-active {
-			background: #4338ca;
+			background: #146ef5;
 			color: #ffffff;
 		}
 
@@ -420,14 +420,14 @@ function bpbtb_render_admin_submissions_page() {
 			width: 46px;
 			height: 46px;
 			border-radius: 50%;
-			background: linear-gradient(135deg, #6366f1, #4f46e5);
+			background: linear-gradient(135deg, #4d90f8, #146ef5);
 			color: #ffffff;
 			display: flex;
 			align-items: center;
 			justify-content: center;
 			font-weight: 800;
 			font-size: 17px;
-			box-shadow: 0 2px 4px rgba(99, 102, 241, 0.25);
+			box-shadow: 0 2px 4px rgba(20, 110, 245, 0.25);
 		}
 
 		/* Status Badges */
@@ -514,6 +514,208 @@ function bpbtb_render_admin_submissions_page() {
 
 		.bpbtb-action-delete:hover {
 			text-decoration: underline;
+		}
+		/* ---------------------------------------------------------------
+		   Responsive.
+
+		   This page had no media queries at all, so nothing here ever gave
+		   way: the hero kept its stat pills beside the title, the toolbar
+		   kept four tabs and the bulk controls on one line, and the table
+		   kept all eight columns. Measured at 380px the page was 498px
+		   wide -- the stats alone hung 279px past the edge, and the last
+		   four table columns were simply unreachable.
+
+		   WordPress collapses its own admin menu at 960px and switches to
+		   touch sizing at 782px, so those are the two points used below
+		   rather than inventing new ones.
+		   --------------------------------------------------------------- */
+
+		@media screen and (max-width: 960px) {
+			.bpbtb-hero-banner {
+				flex-direction: column;
+				align-items: flex-start;
+				gap: 20px;
+				padding: 24px;
+			}
+
+			/* The pills share the full width once they are on their own row
+			   instead of keeping their 90px minimum and overflowing. */
+			.bpbtb-hero-stats {
+				width: 100%;
+			}
+
+			.bpbtb-stat-box {
+				flex: 1;
+				min-width: 0;
+			}
+
+			/* Full column set kept here -- the card scrolls sideways on its
+			   own so the page itself never does. */
+			.bpbtb-modern-table-card {
+				overflow-x: auto;
+			}
+
+			.bpbtb-modern-table {
+				min-width: 860px;
+			}
+		}
+
+		@media screen and (max-width: 782px) {
+			.bpbtb-admin-wrap {
+				margin-top: 12px;
+				padding: 0 12px;
+			}
+
+			.bpbtb-hero-title {
+				font-size: 19px;
+			}
+
+			.bpbtb-nav-toolbar {
+				align-items: stretch;
+			}
+
+			.bpbtb-tabs {
+				flex-wrap: wrap;
+			}
+
+			.bpbtb-tab-link {
+				flex: 1 0 auto;
+				justify-content: center;
+			}
+
+			.bpbtb-bulk-wrap {
+				width: 100%;
+			}
+
+			.bpbtb-bulk-select {
+				flex: 1;
+				min-width: 0;
+			}
+
+			/* Eight columns cannot be read side by side on a phone, so each
+			   row becomes a card and every cell names itself from its
+			   `data-label`. This is what core does for `.wp-list-table`,
+			   which this table is not, so it is spelled out here. */
+			.bpbtb-modern-table,
+			.bpbtb-modern-table tbody,
+			.bpbtb-modern-table tr,
+			.bpbtb-modern-table td {
+				display: block;
+				width: auto;
+				box-sizing: border-box;
+			}
+
+			.bpbtb-modern-table {
+				min-width: 0;
+			}
+
+			.bpbtb-modern-table thead {
+				display: none;
+			}
+
+			/* `overflow` contains the floated checkbox and avatar below. */
+			.bpbtb-modern-table tr {
+				overflow: hidden;
+				border-bottom: 1px solid #e2e8f0;
+				padding: 10px 4px 16px;
+			}
+
+			.bpbtb-modern-table tr:last-child {
+				border-bottom: none;
+			}
+
+			.bpbtb-modern-table td {
+				border-bottom: none;
+				padding: 6px 16px;
+				text-align: left !important;
+			}
+
+			/* Everything with a heading starts a fresh line under the
+			   floated checkbox and avatar rather than wrapping around them. */
+			.bpbtb-modern-table td[data-label] {
+				clear: both;
+			}
+
+			.bpbtb-modern-table td[data-label]::before {
+				content: attr(data-label);
+				display: block;
+				margin-bottom: 3px;
+				font-size: 11px;
+				font-weight: 700;
+				text-transform: uppercase;
+				letter-spacing: 0.5px;
+				color: #94a3b8;
+			}
+
+			/* Cells the row has no data for carry no label, so they are not
+			   worth a blank line of their own. */
+			.bpbtb-modern-table td:not([data-label]):not([colspan]):not(.bpbtb-cell-check):not(.bpbtb-cell-photo):not(.bpbtb-cell-name) {
+				display: none;
+			}
+
+			/* Checkbox and avatar read as part of the name, not as two more
+			   labelled rows above it. */
+			.bpbtb-modern-table td.bpbtb-cell-check,
+			.bpbtb-modern-table td.bpbtb-cell-photo {
+				float: left;
+				width: auto;
+				padding: 6px 10px 6px 16px;
+			}
+
+			.bpbtb-modern-table td.bpbtb-cell-check {
+				padding-top: 22px;
+			}
+
+			.bpbtb-modern-table td.bpbtb-cell-name {
+				overflow: hidden;
+				padding-top: 14px;
+			}
+
+			.bpbtb-action-approve,
+			.bpbtb-action-reject {
+				margin: 2px 4px 2px 0;
+			}
+		}
+
+		/* The 960px rule gives the three pills `flex: 1; min-width: 0`, which
+		   lets them shrink below their own contents -- and a one-word label
+		   cannot wrap, so it spills out of the pill instead. At 360px the row
+		   offers each box about 80px while "APPROVED" needs ~58px of text
+		   inside 40px of padding. Trim the box before it gets that far. */
+		@media screen and (max-width: 600px) {
+			.bpbtb-hero-stats {
+				gap: 8px;
+			}
+
+			.bpbtb-stat-box {
+				padding: 10px 6px;
+			}
+
+			.bpbtb-stat-num {
+				font-size: 19px;
+			}
+
+			.bpbtb-stat-label {
+				font-size: 10px;
+				letter-spacing: 0.2px;
+			}
+		}
+
+		/* Narrower than this even the compact label runs out of room three
+		   across, so the pills take a row each rather than clipping. */
+		@media screen and (max-width: 360px) {
+			.bpbtb-hero-banner {
+				padding: 20px 16px;
+			}
+
+			.bpbtb-hero-title {
+				font-size: 17px;
+			}
+
+			.bpbtb-hero-stats {
+				display: grid;
+				grid-template-columns: 1fr;
+			}
 		}
 	</style>
 
@@ -635,10 +837,10 @@ function bpbtb_render_admin_submissions_page() {
 								$action_nonce = wp_create_nonce( 'bpbtb_submission_action_' . $pid );
 								?>
 								<tr>
-									<td>
+									<td class="bpbtb-cell-check">
 										<input type="checkbox" name="post_ids[]" value="<?php echo esc_attr( $pid ); ?>">
 									</td>
-									<td>
+									<td class="bpbtb-cell-photo">
 										<?php if ( $thumb_url ) : ?>
 											<img src="<?php echo esc_url( $thumb_url ); ?>" class="bpbtb-avatar-box" alt="">
 										<?php else : ?>
@@ -647,7 +849,7 @@ function bpbtb_render_admin_submissions_page() {
 											</div>
 										<?php endif; ?>
 									</td>
-									<td>
+									<td class="bpbtb-cell-name">
 										<div style="font-weight: 700; color: #0f172a; font-size: 14px;">
 											<a href="<?php echo esc_url( get_edit_post_link( $pid ) ); ?>" style="text-decoration: none; color: #0f172a;"><?php the_title(); ?></a>
 										</div>
@@ -657,12 +859,13 @@ function bpbtb_render_admin_submissions_page() {
 											<span class="bpbtb-badge-approved"><?php esc_html_e( 'Approved', 'b-testimonials-block' ); ?></span>
 										<?php endif; ?>
 									</td>
-									<td>
+									<td data-label="<?php esc_attr_e( 'Rating', 'b-testimonials-block' ); ?>">
 										<div class="bpbtb-stars-wrap">
 											<?php echo esc_html( str_repeat( '★', max( 1, min( 5, $rating ) ) ) ); ?>
 										</div>
 									</td>
-									<td>
+									<?php // No label when the row has neither, so the stacked card skips the cell entirely. ?>
+									<td <?php echo ( $designation || $company || $email ) ? 'data-label="' . esc_attr__( 'Designation / Email', 'b-testimonials-block' ) . '"' : ''; ?>>
 										<?php if ( $designation || $company ) : ?>
 											<div style="font-weight: 600; color: #334155;"><?php echo esc_html( trim( $designation . ( $company ? ' (' . $company . ')' : '' ) ) ); ?></div>
 										<?php endif; ?>
@@ -670,16 +873,16 @@ function bpbtb_render_admin_submissions_page() {
 											<div style="font-size: 12px; color: #64748b; margin-top: 2px;"><?php echo esc_html( $email ); ?></div>
 										<?php endif; ?>
 									</td>
-									<td>
+									<td data-label="<?php esc_attr_e( 'Feedback Content', 'b-testimonials-block' ); ?>">
 										<div style="max-height: 75px; overflow: hidden; color: #475569; line-height: 1.45;">
 											<?php the_content(); ?>
 										</div>
 									</td>
-									<td style="color: #64748b; font-size: 12px;">
+									<td data-label="<?php esc_attr_e( 'Date', 'b-testimonials-block' ); ?>" style="color: #64748b; font-size: 12px;">
 										<?php echo esc_html( get_the_date( 'M j, Y' ) ); ?>
 										<div style="font-size: 11px; color: #94a3b8;"><?php echo esc_html( get_the_date( 'g:i a' ) ); ?></div>
 									</td>
-									<td style="text-align: right;">
+									<td data-label="<?php esc_attr_e( 'Actions', 'b-testimonials-block' ); ?>" style="text-align: right;">
 										<?php if ( 'publish' !== $p_status && 'trash' !== $p_status ) : ?>
 											<a href="<?php echo esc_url( admin_url( 'edit.php?post_type=testimonial&page=bpbtb-submissions&action=approve&post_id=' . $pid . '&_wpnonce=' . $action_nonce ) ); ?>" class="bpbtb-action-approve">
 												✓ <?php esc_html_e( 'Approve', 'b-testimonials-block' ); ?>

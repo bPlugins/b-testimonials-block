@@ -43,6 +43,26 @@ const Style = ({ attributes = {}, clientId }) => {
     cardMargin = {},
     blockMargin = {},
     degDivider = {},
+    labelTypo = {},
+    labelColor = "",
+    inputTypo = {},
+    inputColor = "",
+    placeholderColor = "",
+    inputFocusColor = "",
+    inputRadius = "",
+    inputPadding = {},
+    textareaHeight = "",
+    pollTitleTypo = {},
+    pollDescTypo = {},
+    pollLabelTypo = {},
+    pollBtnTypo = {},
+    pollBtnColor = "",
+    pollBtnActiveColor = "",
+    pollBtnSize = "",
+    pollBtnRadius = "",
+    pollBtnGap = "",
+    pollPadding = {},
+    pollRadius = "",
   } = attributes || {};
 
   const cId = clientId || attributes?.cId || "";
@@ -122,6 +142,13 @@ const Style = ({ attributes = {}, clientId }) => {
   const arrowHover = [
     navHoverColor ? `color: ${navHoverColor};` : "",
     navHoverBg ? `background: ${navHoverBg};` : "",
+    // The default arrow darkens on hover with an inset wash, so that it works
+    // over the accent, a theme's own accent, or an Arrow Background, none of
+    // which CSS can darken through a custom property. An explicit Arrow Hover
+    // Background is a chosen colour rather than a starting point, so the wash is
+    // dropped here and only the lift shadow is kept -- otherwise the colour
+    // picked in the sidebar would render 14% darker than it was picked.
+    navHoverBg ? "box-shadow: 0 8px 18px rgba(15, 23, 42, 0.26);" : "",
   ]
     .filter(Boolean)
     .join("\n\t\t\t");
@@ -582,12 +609,153 @@ const Style = ({ attributes = {}, clientId }) => {
   const tabletSize = sizeCSS("tablet");
   const mobileSize = sizeCSS("mobile");
 
+  // The Testimonial Form's labels and inputs.
+  //
+  // Neither had a control of any kind. form.scss pinned a label at
+  // `font-weight: 600; font-size: 14px` with an inherited colour, and gave the
+  // inputs a background and a border read from the palette and nothing else --
+  // no text colour, no typography, no placeholder, no radius, no padding, no
+  // focus state. So the one layout built almost entirely out of form fields had
+  // the least say over how those fields look.
+  //
+  // Scoped to `.bTestimonialForm` rather than hung off `mainEl` alone: that is
+  // what the form component wraps itself in, and naming it keeps these rules
+  // ahead of form.scss even on a block saved without a `cId`, where `mainEl`
+  // falls back to a single class and would otherwise lose to the stylesheet's
+  // own two-class selectors.
+  //
+  // Every declaration below is conditional, so a form nobody has styled emits an
+  // empty string here and renders exactly as it always has.
+  const formEl = `${mainEl} .bTestimonialForm`;
+  const labelEl = `${formEl} .btb-tform-field label`;
+  const inputParts = ["input", "textarea", "select"];
+  const inputEl = inputParts
+    .map((part) => `${formEl} .btb-tform-field ${part}`)
+    .join(",\n\t\t");
+  // A rule of its own rather than joining the one above: a pseudo-element in a
+  // selector list would drop the whole list on a browser that cannot parse it.
+  const placeholderEl = inputParts
+    .map((part) => `${formEl} .btb-tform-field ${part}::placeholder`)
+    .join(",\n\t\t");
+  const focusEl = inputParts
+    .map((part) => `${formEl} .btb-tform-field ${part}:focus`)
+    .join(",\n\t\t");
+
+  const inputPaddingCSS = getBoxCSS(inputPadding);
+
+  const inputBoxCSS = [
+    inputColor ? `color: ${inputColor};` : "",
+    inputRadius ? `border-radius: ${inputRadius};` : "",
+    inputPaddingCSS ? `padding: ${inputPaddingCSS};` : "",
+  ]
+    .filter(Boolean)
+    .join("\n\t\t\t");
+
+  // getTypoCSS always returns a ruleset, empty braces and two empty media
+  // queries included, so an untouched typography object would add dead rules to
+  // all 35 blocks rather than only to a form somebody has styled.
+  const typoCSS = (selector, typo) =>
+    Object.keys(typo || {}).length ? getTypoCSS(selector, typo)?.styles || "" : "";
+
+  const formCSS = [
+    labelColor ? `${labelEl} {\n\t\t\tcolor: ${labelColor};\n\t\t}` : "",
+    typoCSS(labelEl, labelTypo),
+    inputBoxCSS ? `${inputEl} {\n\t\t\t${inputBoxCSS}\n\t\t}` : "",
+    typoCSS(inputEl, inputTypo),
+    placeholderColor
+      ? `${placeholderEl} {\n\t\t\tcolor: ${placeholderColor};\n\t\t}`
+      : "",
+    // `outline-color` alongside the border, so the browser's own focus ring
+    // follows the chosen colour instead of contradicting it.
+    inputFocusColor
+      ? `${focusEl} {\n\t\t\tborder-color: ${inputFocusColor};\n\t\t\toutline-color: ${inputFocusColor};\n\t\t}`
+      : "",
+    // min-height, so a longer review grows the box rather than scrolling inside
+    // a fixed one.
+    textareaHeight
+      ? `${formEl} .btb-tform-field textarea {\n\t\t\tmin-height: ${textareaHeight};\n\t\t}`
+      : "",
+  ]
+    .filter(Boolean)
+    .join("\n\t\t");
+
+  // The Feedback & NPS Poll's text, scale buttons and box.
+  //
+  // This is the layout layoutControls.js gives an empty entry -- no shared panel
+  // reaches it -- so every size it renders was pinned in frontend.scss: an
+  // 18px/700 question, a 13px description, 12px scale labels, a 38x38 button at
+  // radius 8, a 32px box at radius 16. The button's two text colours were worse
+  // than fixed sizes: idle it inherited, and once picked it was a literal `#fff`
+  // over the accent, so an author who set a pale accent got white on near-white
+  // with nothing to fix it.
+  //
+  // The colours a `--btb-*` role already paints stay with the Colors panel, so
+  // only what no role covers is emitted here.
+  const pollEl = `${mainEl} .btb-poll-wrapper`;
+  const pollBtnEl = `${pollEl} .btb-poll-num-btn`;
+  // Hover and selected are one state as far as the stylesheet is concerned --
+  // both paint the accent behind a white number -- so they take one control.
+  const pollBtnActiveEl = `${pollBtnEl}:hover,\n\t\t${pollBtnEl}.is-selected`;
+
+  const pollPaddingCSS = getBoxCSS(pollPadding);
+
+  const pollBoxCSS = [
+    pollPaddingCSS ? `padding: ${pollPaddingCSS};` : "",
+    pollRadius ? `border-radius: ${pollRadius};` : "",
+  ]
+    .filter(Boolean)
+    .join("\n\t\t\t");
+
+  // Square: `width` and `height` from one value, so the button cannot end up a
+  // rectangle with a radius meant for a square.
+  const pollBtnBoxCSS = [
+    isSet(pollBtnSize) ? `width: ${pollBtnSize}px;` : "",
+    isSet(pollBtnSize) ? `height: ${pollBtnSize}px;` : "",
+    pollBtnRadius ? `border-radius: ${pollBtnRadius};` : "",
+    pollBtnColor ? `color: ${pollBtnColor};` : "",
+  ]
+    .filter(Boolean)
+    .join("\n\t\t\t");
+
+  const pollCSS = [
+    pollBoxCSS ? `${pollEl} {\n\t\t\t${pollBoxCSS}\n\t\t}` : "",
+    typoCSS(`${pollEl} .btb-poll-title`, pollTitleTypo),
+    typoCSS(`${pollEl} .btb-poll-desc`, pollDescTypo),
+    typoCSS(
+      `${pollEl} .btb-poll-label-low,\n\t\t${pollEl} .btb-poll-label-high`,
+      pollLabelTypo,
+    ),
+    // 0 is a real gap -- it butts the buttons together into one strip.
+    isSet(pollBtnGap)
+      ? `${pollEl} .btb-poll-buttons {\n\t\t\tgap: ${pollBtnGap}px;\n\t\t}`
+      : "",
+    pollBtnBoxCSS ? `${pollBtnEl} {\n\t\t\t${pollBtnBoxCSS}\n\t\t}` : "",
+    typoCSS(pollBtnEl, pollBtnTypo),
+    // After the idle rule above, so the picked state wins the colour.
+    pollBtnActiveColor
+      ? `${pollBtnActiveEl} {\n\t\t\tcolor: ${pollBtnActiveColor};\n\t\t}`
+      : "",
+  ]
+    .filter(Boolean)
+    .join("\n\t\t");
+
   // These are `@import url(...)` statements, and CSS drops any @import that
   // follows a style rule -- an empty ruleset counts as a rule. So they have to
   // be emitted before everything else below, or every block silently loses its
   // font family and falls back to the generic category. Collected here so the
   // constraint survives reformatting instead of depending on line order.
-  const fontImports = [nameTypo, degTypo, textTypo, expandedTypo]
+  const fontImports = [
+    nameTypo,
+    degTypo,
+    textTypo,
+    expandedTypo,
+    labelTypo,
+    inputTypo,
+    pollTitleTypo,
+    pollDescTypo,
+    pollLabelTypo,
+    pollBtnTypo,
+  ]
     .map((typo) => getTypoCSS("", typo)?.googleFontLink || "")
     .filter(Boolean)
     .join("\n");
@@ -649,7 +817,7 @@ const Style = ({ attributes = {}, clientId }) => {
 		${mainEl} .theme_2 .single .top,
 		${mainEl} .masonry-layout .single .top,
 		${mainEl} .btb-masonry-layout .single .top {
-			background:${grid2Bg};
+			background-color:${grid2Bg};
 			padding:${getBoxValue(grid2Padding)};
 			${getBorderCSS(grid2Border)};
 		}
@@ -785,6 +953,14 @@ const Style = ({ attributes = {}, clientId }) => {
         ? `${mainEl} .swiper-button-prev:hover, ${mainEl} .swiper-button-next:hover {\n\t\t\t${arrowHover}\n\t\t}`
         : ""
     }
+
+		${/* The Testimonial Form's labels and inputs. After the shared colour and
+		     typography rules above, which name none of these elements, and before
+		     the size rules, which carry their own media queries. */ ""}
+		${formCSS}
+
+		${/* The poll's text, scale buttons and box, on the same terms. */ ""}
+		${pollCSS}
 
 		${sizeCSS("desktop")}
 

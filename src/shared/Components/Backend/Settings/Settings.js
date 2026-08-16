@@ -22,6 +22,7 @@ import { produce } from "immer";
 // Settings Components
 import IconSettings from "./IconSettings";
 import ColorsPanel from "./ColorsPanel";
+import PollStylePanel from "./PollStylePanel";
 import SizeSpacingPanel from "./SizeSpacingPanel";
 import Label from "../../../../../../bpl-tools/Components/Label/Label";
 import { ColorControl } from "../../../../../../bpl-tools/Components/ColorControl/ColorControl";
@@ -47,7 +48,7 @@ import {
   supportsArrangement,
 } from "../../../utils/layoutFeatures";
 import { getLayoutControls } from "../../../utils/layoutControls";
-import { getVisualControls } from "../../../utils/visualControls";
+import { getVisualControls, ROLE_LABELS } from "../../../utils/visualControls";
 import { boxForDevice, setBoxForDevice } from "../../../utils/responsiveBox";
 import {
   arrangementOpt,
@@ -228,19 +229,38 @@ const Settings = ({
   // never a pixel only the Card control could reach -- just a second control
   // that lost.
   //
-  // Rather than hide one, they write the same value. The Card control reads the
-  // palette role where the layout has one, so it always shows what is on screen,
-  // and writes both, so editing from either panel moves the same pixel and the
-  // two can never disagree. Where a layout offers no palette role for a
-  // property -- the hero, popup modal and timeline have no Card Surface, the
-  // quote box no Border Color -- the Card control keeps it to itself as before.
+  // Mirroring the two came first and fixed the losing, but two dials over one
+  // value is its own problem: clearing from the Colors panel read as a broken
+  // reset, and every doc page had to explain both names for one colour. So where
+  // this panel renders a Card box the Card control is now the only control --
+  // `cardRoles` below is handed to the Colors panel to drop. It still reads the
+  // palette role, so it shows what is on screen, and still writes both, so old
+  // posts that only carry `background` keep painting and the palette keeps
+  // reaching the extra elements the Card rule alone cannot (that thumb ring,
+  // those nav buttons).
+  //
+  // Blocks with their own editor render the Colors panel without a Card panel --
+  // the play button on the video block, the before/after labels -- so nothing is
+  // excluded there and the palette stays the only home.
   //
   // Border style, side and radius have no palette role at all and stay purely
   // the Card panel's.
-  const paletteRoles = getVisualControls(layout, attributes).map((c) => c.attr);
+  const paletteControls = getVisualControls(layout, attributes);
+  const paletteRoles = paletteControls.map((c) => c.attr);
   const ownsSurface = paletteRoles.includes("surfaceColor");
   const ownsBorderColor = paletteRoles.includes("borderColor");
   const ownsBorderWidth = paletteRoles.includes("borderWidth");
+
+  const cardRoles = controls.cardBox
+    ? ["surfaceColor", "borderColor", "borderWidth"]
+    : [];
+
+  // A role can be named for what it paints on this layout -- the quote box's
+  // surface is the start of a gradient, not a flat card back. Taking over the
+  // control means taking over that name too, or consolidating would cost the
+  // accuracy the palette labels were written for.
+  const cardBackgroundLabel =
+    ROLE_LABELS[layout]?.surfaceColor || __("Background Color", "b-testimonials-block");
 
   // Cleared from the Colors panel means unset, not "transparent": getPaletteCSS
   // skips an empty value, so the Card value is what paints again and is what
@@ -267,6 +287,15 @@ const Settings = ({
       : {}),
   };
 
+  // The palette stores a bare number of pixels; the Border control a CSS length.
+  // `parseInt` was reading "2em" as 2 -- and now that this is the only control,
+  // a value it mis-parses has nothing left to correct it -- so only a genuine
+  // px (or unitless) length syncs.
+  const pxLengthOf = (length) => {
+    const match = /^\s*(-?[\d.]+)\s*(?:px)?\s*$/.exec(String(length ?? ""));
+    return match ? Math.round(parseFloat(match[1])) : null;
+  };
+
   const setCardBorder = (val) => {
     const next = { border: val };
 
@@ -274,13 +303,11 @@ const Settings = ({
       next.borderColor = val?.color;
     }
     if (ownsBorderWidth) {
-      // The palette stores a bare number of pixels; the Border control a CSS
-      // length. An unparseable unit (em, %) leaves the palette alone rather than
-      // writing NaN, and the Card value still applies through the var fallback.
-      const px = parseInt(val?.width, 10);
-      if (Number.isFinite(px)) {
-        next.borderWidth = px;
-      }
+      // Switching to em clears the palette width rather than leaving the last px
+      // figure behind it: a stale `--btb-border-width` would paint the elements
+      // only the palette reaches at a width the author has moved off.
+      const px = pxLengthOf(val?.width);
+      next.borderWidth = null === px ? undefined : px;
     }
 
     setAttributes(next);
@@ -2602,6 +2629,7 @@ const Settings = ({
                     attributes={attributes}
                     setAttributes={setAttributes}
                     layout={layout}
+                    exclude={cardRoles}
                   />
 
                   {/* Block Width, Card Height, Block Margin and Card Margin, in
@@ -2619,6 +2647,17 @@ const Settings = ({
                     setAttributes={setAttributes}
                   />
 
+                  {/* The poll is the layout `layoutControls.js` gives an empty
+                      entry -- no shared panel below reaches it -- so every size
+                      it renders was fixed in the stylesheet with nothing in the
+                      sidebar to change it. */}
+                  {"user-feedback-poll" === layout && (
+                    <PollStylePanel
+                      attributes={attributes}
+                      setAttributes={setAttributes}
+                    />
+                  )}
+
                   {/* The four rules behind this panel name seven selectors:
                       `.layoutSection .single` and six widgets. On the layouts
                       that build their card out of anything else -- timeline,
@@ -2633,7 +2672,7 @@ const Settings = ({
                       initialOpen={false}>
                       <ColorControl
                         className="mb10"
-                        label={__("Background Color", "b-testimonials-block")}
+                        label={cardBackgroundLabel}
                         value={cardBackgroundValue}
                         onChange={setCardBackground}
                       />

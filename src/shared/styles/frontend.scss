@@ -1,8 +1,77 @@
+@use "sass:color";
 @use './devices' as *;
 @use './before-after.scss' as *;
 @use './custom-icon' as *;
 
-$primaryColor: #382C8D;
+// bPlugins brand colour, matching `$brandColor` in editor.scss.
+//
+// No block sets a `brandColor` default, so `--btb-accent` is unset until
+// someone picks an Accent -- which makes the fallback beside every
+// `var(--btb-accent, ...)` below the colour these blocks actually ship with.
+// It used to be #382C8D, so the old purple was still the out-of-the-box accent
+// on the slider dots, the badge stripes, the timeline and the rest.
+$brandColor: #146ef5;
+
+// No focus ring on a mouse click.
+//
+// WordPress's global styles paint one with `:where(.wp-site-blocks :focus)`,
+// which matches plain `:focus` -- so every click target in these blocks kept a
+// 2px outline after being clicked: the audio play button and its waveform, the
+// video card, the before/after handle, every Expand toggle, the Swiper arrows
+// and bullets, the card-stack nav, the poll buttons, the FAQ summary, the popup
+// trigger and the avatar thumbs. Measured across all 40 blocks: 19 of them
+// painted a ring on click, on 30 different elements.
+//
+// `:focus-visible` is the distinction that rule is missing. Chrome already
+// works out that a mouse click on these needs no ring -- measured
+// `:focus-visible: false` on a real click while the outline was still drawn --
+// so deferring to it removes the ring for the mouse and keeps it for the
+// keyboard. Tabbing to any of these still shows the ring, which is what it is
+// for; a blanket `outline: none` would have taken that away too.
+//
+// Scoped to the block root so it changes nothing else on the page, and the
+// WordPress rule's `:where()` gives it zero specificity, so this beats it
+// without `!important`. Form fields are excluded: a text input is meant to show
+// where the caret is, however it was focused.
+// The default palette.
+//
+// Measured across all 40 previews before this: 32 of them painted no colour at
+// all -- white cards, grey borders, black text, and orange stars as the only
+// thing on screen that was not a neutral. The blocks were not un-styled, they
+// were un-coloured, because every accent in the stylesheet was wired to a
+// control the author had to go and find first.
+//
+// These three tokens are the accent at working strengths, declared once so a
+// card, an avatar ring and a panel heading all tint together. The `color-mix`
+// line restates each one against `--btb-accent`, so the moment an author picks
+// an Accent the whole set follows it; browsers without `color-mix` (pre-2023)
+// drop that line and keep the brand blue above it.
+.bTestimonials {
+	// Declared rather than left to each `var(--btb-accent, ...)` fallback, for
+	// the one place a fallback could not reach: Style.js paints the badge and
+	// quote-box brand stripe as `border-left: … var(--btb-accent, <Border
+	// Color>)`, so with nothing declared the stripe fell back to the grey card
+	// border and all seven badges shipped without the bar that makes a Google
+	// badge look like a Google badge. The Accent control is emitted at ID
+	// specificity and still overrides this.
+	--btb-accent: #{$brandColor};
+	--btb-wash: #{rgba($brandColor, 0.07)};
+	--btb-wash: color-mix(in srgb, var(--btb-accent, #{$brandColor}) 8%, transparent);
+	--btb-wash-strong: #{rgba($brandColor, 0.14)};
+	--btb-wash-strong: color-mix(in srgb, var(--btb-accent, #{$brandColor}) 16%, transparent);
+	--btb-ring: #{rgba($brandColor, 0.16)};
+	--btb-ring: color-mix(in srgb, var(--btb-accent, #{$brandColor}) 18%, transparent);
+
+	:focus:not(:focus-visible) {
+		outline: none;
+	}
+
+	input:focus,
+	select:focus,
+	textarea:focus {
+		outline: revert;
+	}
+}
 
 // Fractional star ratings: a grey star with the coloured one clipped over it.
 .btbStar {
@@ -38,12 +107,124 @@ $primaryColor: #382C8D;
 	padding: 0;
 	color: inherit;
 	font-family: inherit;
-	font-size: inherit;
+	// Smaller and lighter than the review it interrupts. At the review's own
+	// size and `bold` it read as part of the sentence -- "...looking at its lay
+	// Expand" -- rather than as the control that reveals the rest. `em` so it
+	// stays proportional whatever size the Review Text panel sets.
+	font-size: 0.8em;
 	line-height: inherit;
-	font-weight: bold;
+	font-weight: 600;
+	letter-spacing: 0.02em;
+	opacity: 0.85;
 	display: inline-block;
-	margin-left: 5px;
+	margin-left: 6px;
 	cursor: pointer;
+
+	&:hover,
+	&:focus-visible {
+		opacity: 1;
+		text-decoration: underline;
+	}
+}
+
+// Slider arrows.
+//
+// These shipped as Swiper's raw defaults: a bare 27x44 chevron sliver with no
+// button around it, no hover state, and -- measured on every slider layout --
+// `rgb(0, 122, 255)`, Swiper's stock iOS blue, which is not the brand colour and
+// was the last place the wrong blue survived the rebrand. The glyph was also set
+// at 44px inside a 27px box, so it overflowed its own control.
+//
+// The shape follows `.btb-stack-btn` below, which already gives the card-stack
+// layout a round button that lifts 2px -- but filled with the accent rather than
+// left as a white surface, for one measured reason. The gutter these sit in is
+// 28px and cannot grow (see the note on `.swiper` padding), so a button big
+// enough to hit overlaps the first and last card by 16px. That lands inside the
+// card's own 20px padding, clear of the text, but a white circle on a white card
+// would show as nothing but a faint ring. Filled, it reads as a control at any
+// card colour -- and it is where the accent earns its place in the design.
+//
+// Specificity is deliberate and load-bearing. Style.js emits the user's Arrow
+// Size / Colour / Background / Border settings at `#btbTestimonialsDir-x
+// .swiper-button-next` (1,1,0), or `.bTestimonials .swiper-button-next` (0,2,0)
+// on a block with no cId. Nesting one level under `.bTestimonials` puts this at
+// exactly (0,2,0): enough to beat Swiper's own (0,1,0) rules, never enough to
+// beat the ID form, and an exact tie with the no-cId form -- which Style.js then
+// wins because it is emitted inline from the body, the same tie-break the Block
+// Width rule already relies on. So every arrow control keeps working untouched.
+.bTestimonials {
+	.swiper-button-next,
+	.swiper-button-prev {
+		// Square, not Swiper's 27x44. Tied to the variable rather than written
+		// as pixels so Swiper's own `margin-top: calc(0px - size/2)` keeps the
+		// button centred, and so the mobile override below only has to change
+		// one number.
+		width: var(--swiper-navigation-size, 44px);
+		height: var(--swiper-navigation-size, 44px);
+		box-sizing: border-box;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		border-radius: 50%;
+		border: 0;
+		background: var(--btb-accent, #{$brandColor});
+		box-shadow: 0 4px 12px rgba(15, 23, 42, 0.18);
+		// Swiper's own declaration falls back to `--swiper-theme-color`, which is
+		// where the stray iOS blue came from. The chain still reads the navigation
+		// colour first, so the Arrow Colour control keeps setting the glyph.
+		color: var(--swiper-navigation-color, #ffffff);
+		transition: all 0.2s ease;
+
+		&::after {
+			// Swiper draws the chevron as an icon font sized at 100% of the box.
+			// 0.4 leaves it reading as a glyph inside a button rather than as the
+			// button itself.
+			font-size: calc(var(--swiper-navigation-size, 44px) * 0.4);
+			font-weight: 700;
+		}
+
+		// Darkened with an inset wash rather than a second colour. The background
+		// may be the accent, a theme's `--btb-accent`, or whatever the Arrow
+		// Background control was set to, and CSS cannot darken a custom property
+		// -- the wash works on all three without knowing which is in play.
+		&:hover {
+			transform: translateY(-2px);
+			box-shadow: 0 8px 18px rgba(15, 23, 42, 0.26),
+				inset 0 0 0 999px rgba(0, 0, 0, 0.14);
+		}
+
+		&:active {
+			transform: translateY(0);
+		}
+
+		// Only for the keyboard: the block-wide rule at the top of this file
+		// already drops the ring on a mouse click. The ring takes the accent, not
+		// `--swiper-navigation-color` -- that one is now the glyph, and a white
+		// glyph would draw a white ring on a white page.
+		&:focus-visible {
+			outline: 2px solid var(--btb-accent, #{$brandColor});
+			outline-offset: 3px;
+		}
+
+		// At either end of a non-looping slider. Swiper's own default is
+		// `opacity: 0.35` on a naked glyph; on a surface button the whole
+		// control needs to recede, shadow included, or a dead button still
+		// looks raised and clickable.
+		&.swiper-button-disabled {
+			opacity: 0.35;
+			box-shadow: none;
+			transform: none;
+		}
+	}
+
+	// A phone cannot spare 104px of gutter for two 44px buttons. 34px costs the
+	// cards 12px in total against the old bare chevrons, which is why the
+	// variable is what moves: Swiper re-centres from it on its own.
+	@media (max-width: $mobile-max) {
+		.swiper {
+			--swiper-navigation-size: 34px;
+		}
+	}
 }
 
 // Block Directory
@@ -99,6 +280,11 @@ $primaryColor: #382C8D;
 		.single .authorImg .img {
 			border-radius: 50%;
 			overflow: hidden;
+			// A tinted ring, so the avatar reads as part of a designed card
+			// rather than a photo dropped onto it. `box-shadow` rather than a
+			// border: the Image Border control owns the border on this element,
+			// and the ring has to sit outside whatever that is set to.
+			box-shadow: 0 0 0 3px var(--btb-ring);
 
 			img {
 				width: 100%;
@@ -111,6 +297,35 @@ $primaryColor: #382C8D;
 			display: grid;
 
 			.single {
+				// Colour on the card itself.
+				//
+				// Style.js emits `background-color`, never the `background`
+				// shorthand -- so a background IMAGE layers over whatever surface
+				// the Card panel is set to instead of fighting it, and a card with
+				// a custom colour keeps that colour with the wash on top. It also
+				// follows the card's own border-radius for free, which a corner
+				// bar or a top stripe would not: at a 14px radius either one cuts
+				// straight across the rounded corner.
+				background-image: radial-gradient(
+					115% 90% at 0% 0%,
+					var(--btb-wash) 0%,
+					transparent 58%
+				);
+				// The cards were completely inert -- no hover state anywhere in a
+				// grid of them. The lift is `transform`, and the deepening is more
+				// wash, because the Card panel owns both `box-shadow` and
+				// `border-color` at ID specificity and a hover rule here would
+				// lose to them.
+				transition: transform 0.25s ease, background-image 0.25s ease;
+
+				&:hover {
+					transform: translateY(-3px);
+					background-image: radial-gradient(
+						115% 90% at 0% 0%,
+						var(--btb-wash-strong) 0%,
+						transparent 62%
+					);
+				}
 
 				.top {
 					display: flex;
@@ -150,9 +365,14 @@ $primaryColor: #382C8D;
 					margin-top: 0px;
 					display: inline-block;
 					cursor: pointer;
-					font-size: 15px;
-					font-weight: bold;
-					margin-left: 5px;
+					// Matches the global rule above: this nested copy is more
+					// specific and would otherwise put the card layouts back to a
+					// full-size bold word in the middle of the review.
+					font-size: 0.8em;
+					font-weight: 600;
+					letter-spacing: 0.02em;
+					opacity: 0.85;
+					margin-left: 6px;
 				}
 			}
 
@@ -178,12 +398,18 @@ $primaryColor: #382C8D;
 							position: relative;
 
 
+							// The rule under the job title. It was a grey hairline
+							// that read as a gap in the card; as a short accent bar
+							// it reads as the divider it is.
 							&::after {
 								content: '';
-								width: 30px;
+								width: 34px;
+								height: 3px;
 								display: block;
-								margin: 3px auto;
-								border: var(--btb-border-width, 1px) solid var(--btb-border, #cccccc);
+								margin: 6px auto 0;
+								border: 0;
+								border-radius: 2px;
+								background: var(--btb-accent, #{$brandColor});
 							}
 						}
 
@@ -191,6 +417,29 @@ $primaryColor: #382C8D;
 							margin: 0;
 						}
 					}
+				}
+			}
+
+			// The author band on Masonry and Theme 2.
+			//
+			// Style.js paints this strip with the Header Background control,
+			// default #f9f8f8 -- an off-white that sat over the top of the card,
+			// covering exactly the corner where the card's own wash is strongest.
+			// The result was a flat pale band with a hard seam across every
+			// masonry card. Tinting it turns that band into a header instead of a
+			// gap. It layers as a background IMAGE over the control's colour, the
+			// same way the card does, so a chosen header colour still shows
+			// through -- which is why the rule above emits `background-color`
+			// rather than the `background` shorthand that used to reset this.
+			&.theme_2,
+			&.masonry-layout,
+			&.btb-masonry-layout {
+				.single .top {
+					background-image: linear-gradient(
+						180deg,
+						var(--btb-wash-strong) 0%,
+						var(--btb-wash) 100%
+					);
 				}
 			}
 
@@ -324,7 +573,7 @@ $primaryColor: #382C8D;
 						}
 
 						.info {
-							// border-left: 1px solid var(--btb-accent, #382C8D);
+							// border-left: 1px solid var(--btb-accent, #{$brandColor});
 							// padding-left: 5px;
 							display: flex;
 							align-items: center;
@@ -520,6 +769,20 @@ $primaryColor: #382C8D;
 					// higher than this is cut in half. Theme-1 pulls it up 33px and
 					// Theme-4 19px, hence the override below rather than a blanket
 					// increase that would pad every other theme for nothing.
+					//
+					// The 28px side gutter is load-bearing, not arbitrary.
+					//
+					// `overflow: hidden` clips at the padding box, so the gutter is
+					// visible track: whatever slide sits there shows through it.
+					// Slide width is the content box divided by slidesPerView, so
+					// widening the gutter narrows the slides and pulls the next one
+					// back into view -- measured, the fourth card starts at
+					// `1180 - padding`, so anything past 30px leaves a slice of it
+					// stranded at the edge. Widening this to 52px to make room for
+					// the round arrows duly parked a 22px sliver of card four in
+					// the right-hand gutter, which read as a rendering fault. The
+					// arrows overlap the first and last card instead; see the note
+					// on them above.
 					padding: 20px 28px 45px 28px;
 					overflow: hidden;
 
@@ -552,18 +815,44 @@ $primaryColor: #382C8D;
 						right: var(--swiper-navigation-sides-offset, 0px);
 					}
 
+					// Dots, matched to `.btb-stack-dot` in the card-stack layout:
+					// a neutral track colour for the ones you can go to, and the
+					// accent stretched into a pill for the one you are on. Shape
+					// carries the state as well as colour does, so it still reads
+					// for anyone who cannot separate the two.
 					.swiper-pagination {
 						bottom: 5px;
 
 						.swiper-pagination-bullet {
-							background: var(--btb-accent, #382C8D);
-							opacity: 0.4;
-							transition: opacity 0.3s, transform 0.3s;
+							width: 10px;
+							height: 10px;
+							background: var(--btb-track, #cbd5e1);
+							opacity: 1;
+							transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+
+							&:hover:not(.swiper-pagination-bullet-active) {
+								background: var(--btb-muted, #94a3b8);
+							}
 
 							&-active {
-								opacity: 1;
-								transform: scale(1.25);
+								background: var(--btb-accent, #{$brandColor});
 							}
+						}
+
+						// The pill is only safe on a static strip. With
+						// `dynamicBullets` -- which the padded slider turns on so a
+						// repeated list does not show more dots than there are
+						// testimonials -- Swiper positions the strip by translating
+						// it a whole number of equal-width bullets, so widening one
+						// of them walks the whole row out of centre. There the
+						// active dot grows instead.
+						&:not(.swiper-pagination-bullets-dynamic) .swiper-pagination-bullet-active {
+							width: 24px;
+							border-radius: 12px;
+						}
+
+						&.swiper-pagination-bullets-dynamic .swiper-pagination-bullet-active {
+							transform: scale(1.25);
 						}
 					}
 				}
@@ -815,7 +1104,7 @@ $primaryColor: #382C8D;
 .btb-facebook-badge { border-left: 4px solid var(--btb-accent, #1877F2); }
 .btb-trustpilot-badge { border-left: 4px solid var(--btb-accent, #00B67A); }
 .btb-g2-badge { border-left: 4px solid var(--btb-accent, #FF492C); }
-.btb-verified-badge { border-left: 4px solid var(--btb-accent, #382C8D); }
+.btb-verified-badge { border-left: 4px solid var(--btb-accent, #{$brandColor}); }
 .btb-review-widget { border-left: 4px solid var(--btb-accent, #6366f1); }
 
 /* --- Trust Badges Grid --- */
@@ -861,15 +1150,17 @@ $primaryColor: #382C8D;
 		.btb-input, .btb-textarea {
 			width: 100%; padding: 12px 16px; border: var(--btb-border-width, 1px) solid var(--btb-border, #cbd5e1);
 			border-radius: 8px; font-size: 14px; box-sizing: border-box;
-			&:focus { outline: none; border-color: var(--btb-accent, #382C8D); box-shadow: 0 0 0 3px rgba(56,44,141,0.1); }
+			&:focus { outline: none; border-color: var(--btb-accent, #{$brandColor}); box-shadow: 0 0 0 3px rgba($brandColor,0.1); }
 		}
 		.btb-textarea { min-height: 100px; resize: vertical; }
 		.btb-form-rating-selector { .stars { color: var(--btb-star, #f59e0b); font-size: 20px; letter-spacing: 3px; } }
 		.btb-submit-btn {
-			background: var(--btb-accent, #382C8D); color: #fff; padding: 12px 28px; border: none;
+			background: var(--btb-accent, #{$brandColor}); color: #fff; padding: 12px 28px; border: none;
 			border-radius: 8px; font-weight: 600; cursor: pointer; align-self: flex-start;
 			transition: background 0.2s;
-			&:hover { background: #331b82; background: color-mix(in srgb, var(--btb-accent, #382C8D) 85%, #000); }
+			// The flat colour is the fallback for browsers without color-mix; it
+			// has to be a darkened brand blue now, not the old darkened purple.
+			&:hover { background: color.adjust($brandColor, $lightness: -12%); background: color-mix(in srgb, var(--btb-accent, #{$brandColor}) 85%, #000); }
 		}
 	}
 }
@@ -896,13 +1187,13 @@ $primaryColor: #382C8D;
 		.btb-poll-num-btn {
 			width: 38px; height: 38px; border-radius: 8px; border: var(--btb-border-width, 1px) solid var(--btb-border, #cbd5e1);
 			background: var(--btb-surface, #fff); font-weight: 700; cursor: pointer; transition: all 0.15s;
-			&:hover { background: var(--btb-accent, #382C8D); color: #fff; border-color: var(--btb-accent, #382C8D); }
-			&.is-selected { background: var(--btb-accent, #382C8D); color: #fff; border-color: var(--btb-accent, #382C8D); transform: scale(1.1); box-shadow: 0 4px 12px rgba(56, 44, 141, 0.3); }
+			&:hover { background: var(--btb-accent, #{$brandColor}); color: #fff; border-color: var(--btb-accent, #{$brandColor}); }
+			&.is-selected { background: var(--btb-accent, #{$brandColor}); color: #fff; border-color: var(--btb-accent, #{$brandColor}); transform: scale(1.1); box-shadow: 0 4px 12px rgba($brandColor, 0.3); }
 			&:disabled { cursor: not-allowed; opacity: 0.7; }
 		}
 	}
 	.btb-poll-response-msg {
-		margin-top: 16px; font-size: 14px; font-weight: 600; color: var(--btb-accent, #382C8D);
+		margin-top: 16px; font-size: 14px; font-weight: 600; color: var(--btb-accent, #{$brandColor});
 		.btb-poll-success { color: var(--btb-success, #10b981); }
 		.btb-poll-error { color: var(--btb-muted, #64748b); }
 	}
@@ -969,7 +1260,7 @@ $primaryColor: #382C8D;
 	.btb-stat-card {
 		background: var(--btb-surface, #fff); border: var(--btb-border-width, 1px) solid var(--btb-border, #e2e8f0); border-radius: 14px;
 		padding: 24px 16px; text-align: center; box-shadow: 0 2px 10px rgba(0,0,0,0.03);
-		.btb-stat-number { font-size: 32px; font-weight: 800; color: var(--btb-accent, #382C8D); display: block; }
+		.btb-stat-number { font-size: 32px; font-weight: 800; color: var(--btb-accent, #{$brandColor}); display: block; }
 		.btb-stat-label { font-size: 13px; color: var(--btb-muted, #64748b); margin-top: 4px; }
 	}
 	@media (max-width: $tablet-max) { grid-template-columns: repeat(var(--cols-t, 2), 1fr); }
@@ -1026,7 +1317,7 @@ $primaryColor: #382C8D;
 	.btb-faq-title { font-size: 20px; font-weight: 700; margin: 0 0 16px; color: var(--btb-title, #1e293b); }
 	.btb-faq-item {
 		border: var(--btb-border-width, 1px) solid var(--btb-border, #e2e8f0); border-radius: 10px; margin-bottom: 8px; overflow: hidden;
-		&[open] { border-color: var(--btb-accent, #382C8D); }
+		&[open] { border-color: var(--btb-accent, #{$brandColor}); }
 		// Font size and weight are the Name / Review Text / Designation panels'
 		// (question, answer, author); the box itself keeps the stylesheet's
 		// border so the `[open]` accent below still marks the expanded row.
@@ -1034,7 +1325,7 @@ $primaryColor: #382C8D;
 			padding: 14px 18px; color: var(--btb-title, #1e293b);
 			cursor: pointer; list-style: none;
 			&::-webkit-details-marker { display: none; }
-			&::before { content: '+'; margin-right: 10px; font-size: 18px; color: var(--btb-accent, #382C8D); }
+			&::before { content: '+'; margin-right: 10px; font-size: 18px; color: var(--btb-accent, #{$brandColor}); }
 		}
 		&[open] .btb-faq-question::before { content: '−'; }
 		.btb-faq-answer {
@@ -1057,7 +1348,7 @@ $primaryColor: #382C8D;
 			border-radius: 50%; overflow: hidden; cursor: pointer;
 			border: var(--btb-border-width, 2px) solid var(--btb-border, #e2e8f0); transition: all 0.25s;
 			img { width: 100%; height: 100%; object-fit: cover; }
-			&.active { border: 3px solid var(--btb-accent, #382C8D); transform: scale(1.15); box-shadow: 0 4px 16px rgba(56,44,141,0.2); }
+			&.active { border: 3px solid var(--btb-accent, #{$brandColor}); transform: scale(1.15); box-shadow: 0 4px 16px rgba($brandColor,0.2); }
 		}
 	}
 	// The Card panel paints this panel rather than the transparent wrapper around
@@ -1078,7 +1369,7 @@ $primaryColor: #382C8D;
 
 	&::before {
 		content: ''; position: absolute; top: 0; bottom: 0; left: 16px;
-		width: 3px; background: linear-gradient(180deg, var(--btb-accent, #382C8D) 0%, var(--btb-track, #e2e8f0) 100%);
+		width: 3px; background: linear-gradient(180deg, var(--btb-accent, #{$brandColor}) 0%, var(--btb-track, #e2e8f0) 100%);
 	}
 
 	.btb-timeline-item {
@@ -1086,8 +1377,8 @@ $primaryColor: #382C8D;
 		.btb-timeline-dot {
 			position: absolute; left: -30px; top: 18px;
 			width: 14px; height: 14px; border-radius: 50%;
-			background: var(--btb-accent, #382C8D); border: 3px solid #fff;
-			box-shadow: 0 0 0 3px var(--btb-accent, #382C8D);
+			background: var(--btb-accent, #{$brandColor}); border: 3px solid #fff;
+			box-shadow: 0 0 0 3px var(--btb-accent, #{$brandColor});
 		}
 		.btb-timeline-card .single { margin-bottom: 0; }
 	}
@@ -1109,7 +1400,7 @@ $primaryColor: #382C8D;
 			.btb-audio-toggle {
 				display: inline-flex; align-items: center; justify-content: center;
 				padding: 0; border: 0; background: none; cursor: pointer; line-height: 0;
-				color: var(--btb-accent, #382C8D);
+				color: var(--btb-accent, #{$brandColor});
 				transition: transform 0.15s ease;
 				&:hover:not(:disabled) { transform: scale(1.08); }
 				&:disabled { cursor: default; opacity: 0.45; }
@@ -1120,7 +1411,7 @@ $primaryColor: #382C8D;
 				flex: 1; min-width: 0; cursor: pointer;
 				.btb-wave-bar {
 					flex: 1; min-width: 3px; max-width: 6px;
-					background: var(--btb-accent, #382C8D); border-radius: 2px; opacity: 0.35;
+					background: var(--btb-accent, #{$brandColor}); border-radius: 2px; opacity: 0.35;
 					transform-origin: bottom; transition: opacity 0.2s ease;
 					/* Fills left to right as the clip plays -- the waveform is
 					   the scrub track, so it has to show position. */
@@ -1219,7 +1510,7 @@ $primaryColor: #382C8D;
 			margin-bottom: 16px;
 			.btb-cs-label {
 				font-size: 11px; font-weight: 700; text-transform: uppercase;
-				letter-spacing: 1px; color: var(--btb-accent, #382C8D); margin-bottom: 6px; display: block;
+				letter-spacing: 1px; color: var(--btb-accent, #{$brandColor}); margin-bottom: 6px; display: block;
 			}
 			p { color: var(--btb-body, #475569); margin: 0; }
 		}
@@ -1260,7 +1551,7 @@ $primaryColor: #382C8D;
 		// it into the Card panel would move it to a different palette role.
 		.btb-bubble-avatar {
 			border-radius: 50%; overflow: hidden; flex-shrink: 0;
-			border: 2px solid var(--btb-accent, #382C8D);
+			border: 2px solid var(--btb-accent, #{$brandColor});
 			img { width: 100%; height: 100%; object-fit: cover; }
 		}
 		.btb-bubble-content {
@@ -1269,7 +1560,7 @@ $primaryColor: #382C8D;
 			p { color: var(--btb-body, #334155); margin: 0 0 4px; }
 			// Accent-coloured by design, so it takes the Name typography without
 			// joining the Name colour rule.
-			.btb-bubble-name { color: var(--btb-accent, #382C8D); }
+			.btb-bubble-name { color: var(--btb-accent, #{$brandColor}); }
 		}
 	}
 }
@@ -1375,11 +1666,11 @@ $primaryColor: #382C8D;
 		box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
 
 		&:hover {
-			background: var(--btb-accent, #382C8D);
+			background: var(--btb-accent, #{$brandColor});
 			color: #ffffff;
-			border-color: var(--btb-accent, #382C8D);
+			border-color: var(--btb-accent, #{$brandColor});
 			transform: translateY(-2px);
-			box-shadow: 0 6px 14px rgba(56, 44, 141, 0.25);
+			box-shadow: 0 6px 14px rgba($brandColor, 0.25);
 		}
 
 		&:active {
@@ -1405,7 +1696,7 @@ $primaryColor: #382C8D;
 			&.is-active {
 				width: 24px;
 				border-radius: 12px;
-				background: var(--btb-accent, #382C8D);
+				background: var(--btb-accent, #{$brandColor});
 			}
 
 			&:hover:not(.is-active) {
@@ -1420,14 +1711,14 @@ $primaryColor: #382C8D;
 	.single {
 		position: relative; overflow: hidden;
 		background: linear-gradient(135deg, var(--btb-surface, #ffffff) 0%, var(--btb-track, #f8fafc) 100%);
-		border-left: 5px solid var(--btb-accent, #382C8D);
+		border-left: 5px solid var(--btb-accent, #{$brandColor});
 		border-radius: 12px; padding: 24px 28px;
 		box-shadow: 0 10px 25px -5px rgba(0,0,0,0.05);
 
 		&::before {
 			content: '\201C'; position: absolute; top: 5px; right: 15px;
 			font-size: 90px; font-family: Georgia, serif;
-			color: rgba(56,44,141,0.08); line-height: 1;
+			color: rgba($brandColor,0.08); line-height: 1;
 		}
 	}
 }
@@ -1480,8 +1771,8 @@ $primaryColor: #382C8D;
 
 		&:hover {
 			transform: translateY(-3px);
-			box-shadow: 0 12px 28px rgba(56, 44, 141, 0.1), 0 4px 12px rgba(0, 0, 0, 0.03);
-			border-color: rgba(56, 44, 141, 0.25);
+			box-shadow: 0 12px 28px rgba($brandColor, 0.1), 0 4px 12px rgba(0, 0, 0, 0.03);
+			border-color: rgba($brandColor, 0.25);
 		}
 
 		.top {

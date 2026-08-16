@@ -245,14 +245,14 @@ function bpbtb_render_nps_poll_admin_page() {
 		}
 
 		.bpbtb-nps-hero {
-			background: linear-gradient(135deg, #1e1b4b 0%, #312e81 40%, #4338ca 100%);
+			background: linear-gradient(135deg, #1b2d4b 0%, #2e4d7f 40%, #146ef5 100%);
 			border-radius: 16px;
 			padding: 28px 32px;
 			color: #ffffff;
 			display: flex;
 			align-items: center;
 			justify-content: space-between;
-			box-shadow: 0 10px 25px -5px rgba(49, 46, 129, 0.25);
+			box-shadow: 0 10px 25px -5px rgba(20, 110, 245, 0.25);
 			margin-bottom: 24px;
 		}
 
@@ -272,9 +272,13 @@ function bpbtb_render_nps_poll_admin_page() {
 			color: rgba(255, 255, 255, 0.8);
 		}
 
+		/* `auto-fit` rather than a hard `repeat(4, 1fr)`: four fixed columns
+		   forced each card down to ~70px inside a phone-width admin area and
+		   pushed the last two off the screen. This drops to 2 columns and
+		   then 1 on its own, with no breakpoint to keep in sync. */
 		.bpbtb-nps-grid {
 			display: grid;
-			grid-template-columns: repeat(4, 1fr);
+			grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
 			gap: 16px;
 			margin-bottom: 24px;
 		}
@@ -291,7 +295,7 @@ function bpbtb_render_nps_poll_admin_page() {
 		.bpbtb-nps-card .nps-val {
 			font-size: 32px;
 			font-weight: 800;
-			color: #4338ca;
+			color: #146ef5;
 			margin: 4px 0;
 		}
 
@@ -349,7 +353,7 @@ function bpbtb_render_nps_poll_admin_page() {
 			width: 28px;
 			height: 28px;
 			border-radius: 6px;
-			background: #4338ca;
+			background: #146ef5;
 			color: #ffffff;
 			display: inline-flex;
 			align-items: center;
@@ -403,6 +407,110 @@ function bpbtb_render_nps_poll_admin_page() {
 			font-size: 18px;
 			font-weight: 700;
 			color: #1e293b;
+		}
+
+		/* ---------------------------------------------------------------
+		   Responsive.
+
+		   Same story as the Submissions page: no media queries at all, so
+		   at 380px this page was 495px wide with the last two stat cards
+		   off the edge. The 960px and 782px points below are the ones
+		   WordPress already uses for the admin menu and touch sizing.
+		   --------------------------------------------------------------- */
+
+		@media screen and (max-width: 960px) {
+			.bpbtb-nps-hero {
+				flex-direction: column;
+				align-items: flex-start;
+				gap: 16px;
+				padding: 24px;
+			}
+		}
+
+		@media screen and (max-width: 782px) {
+			.bpbtb-nps-wrap {
+				margin-top: 12px;
+				padding: 0 12px;
+			}
+
+			.bpbtb-nps-hero-title {
+				font-size: 20px;
+			}
+
+			.bpbtb-nps-marks-box,
+			.bpbtb-nps-table-card {
+				padding: 20px 16px;
+			}
+
+			/* The vote count moves under its bar; keeping it in the row left
+			   the bar about 40px wide and unreadable. */
+			.bpbtb-mark-row {
+				flex-wrap: wrap;
+				gap: 8px 12px;
+			}
+
+			.bpbtb-mark-badge {
+				width: auto;
+			}
+
+			.bpbtb-mark-track {
+				flex: 1 1 120px;
+			}
+
+			.bpbtb-mark-count {
+				width: auto;
+				text-align: left;
+				font-size: 12px;
+			}
+
+			/* Stacked cards, one labelled line per column.
+
+			   Core's own mobile list-table rules hide every column after
+			   `.column-primary` behind an expand toggle. This table has no
+			   primary column and no toggle button, so core would leave five
+			   columns fighting over a phone's width; these rules take the
+			   layout over completely instead. */
+			.bpbtb-nps-log-table,
+			.bpbtb-nps-log-table tbody,
+			.bpbtb-nps-log-table tr,
+			.bpbtb-nps-log-table td {
+				display: block;
+				width: auto;
+			}
+
+			.bpbtb-nps-log-table thead {
+				display: none;
+			}
+
+			.bpbtb-nps-log-table tr {
+				padding: 10px 0;
+				border-bottom: 1px solid #e2e8f0;
+			}
+
+			.bpbtb-nps-log-table tr:last-child {
+				border-bottom: none;
+			}
+
+			.bpbtb-nps-log-table td {
+				padding: 5px 12px !important;
+				text-align: left !important;
+				border: none;
+			}
+
+			.bpbtb-nps-log-table td[data-colname]::before {
+				content: attr(data-colname);
+				display: block;
+				margin-bottom: 2px;
+				font-size: 11px;
+				font-weight: 700;
+				text-transform: uppercase;
+				letter-spacing: 0.5px;
+				color: #94a3b8;
+				/* Core absolutely positions this label into a left gutter;
+				   in a stacked card it belongs above its value. */
+				position: static;
+				width: auto;
+			}
 		}
 	</style>
 
@@ -484,7 +592,8 @@ function bpbtb_render_nps_poll_admin_page() {
 				<h3><?php esc_html_e( 'Individual Submissions Log', 'b-testimonials-block' ); ?></h3>
 			</div>
 
-			<table class="wp-list-table widefat fixed striped">
+			<?php // `fixed` dropped: equal-width columns squeezed the Page / Source link to nothing long before the phone breakpoint. ?>
+			<table class="wp-list-table widefat striped bpbtb-nps-log-table">
 				<thead>
 					<tr>
 						<th style="width: 100px;"><?php esc_html_e( 'Mark', 'b-testimonials-block' ); ?></th>
@@ -509,17 +618,17 @@ function bpbtb_render_nps_poll_admin_page() {
 							$del_nonce = wp_create_nonce( 'bpbtb_delete_nps_vote_' . $vote['id'] );
 							?>
 							<tr>
-								<td>
-									<span style="display: inline-flex; width: 28px; height: 28px; border-radius: 50%; background: #4338ca; color: #fff; font-weight: 700; align-items: center; justify-content: center;">
+								<td data-colname="<?php esc_attr_e( 'Mark', 'b-testimonials-block' ); ?>">
+									<span style="display: inline-flex; width: 28px; height: 28px; border-radius: 50%; background: #146ef5; color: #fff; font-weight: 700; align-items: center; justify-content: center;">
 										<?php echo esc_html( $mk ); ?>
 									</span>
 								</td>
-								<td>
+								<td data-colname="<?php esc_attr_e( 'Category', 'b-testimonials-block' ); ?>">
 									<strong style="color: <?php echo esc_attr( $cat_clr ); ?>;">
 										<?php echo esc_html( $cat_lbl ); ?>
 									</strong>
 								</td>
-								<td>
+								<td data-colname="<?php esc_attr_e( 'Page / Source', 'b-testimonials-block' ); ?>">
 									<?php if ( ! empty( $vote['page_url'] ) ) : ?>
 										<a href="<?php echo esc_url( $vote['page_url'] ); ?>" target="_blank" rel="noopener">
 											<?php echo esc_html( ! empty( $vote['page_title'] ) ? $vote['page_title'] : $vote['page_url'] ); ?>
@@ -528,8 +637,8 @@ function bpbtb_render_nps_poll_admin_page() {
 										<em><?php esc_html_e( 'N/A', 'b-testimonials-block' ); ?></em>
 									<?php endif; ?>
 								</td>
-								<td><?php echo esc_html( isset( $vote['date'] ) ? $vote['date'] : '—' ); ?></td>
-								<td style="text-align: right;">
+								<td data-colname="<?php esc_attr_e( 'Submitted Date', 'b-testimonials-block' ); ?>"><?php echo esc_html( isset( $vote['date'] ) ? $vote['date'] : '—' ); ?></td>
+								<td data-colname="<?php esc_attr_e( 'Actions', 'b-testimonials-block' ); ?>" style="text-align: right;">
 									<a href="<?php echo esc_url( admin_url( 'edit.php?post_type=testimonial&page=bpbtb-nps-poll&action=delete_vote&vote_id=' . $vote['id'] . '&_wpnonce=' . $del_nonce ) ); ?>" style="color: #ef4444;" onclick="return confirm('<?php esc_attr_e( 'Delete this vote entry?', 'b-testimonials-block' ); ?>');">
 										<?php esc_html_e( 'Delete', 'b-testimonials-block' ); ?>
 									</a>

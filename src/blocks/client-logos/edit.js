@@ -67,10 +67,10 @@ const Edit = ( { attributes, setAttributes, clientId } ) => {
 							{/* One responsive control behind the bpl-tools device switch, as the
 							    shared Settings panel does, instead of three stacked ranges. */}
 							<PanelRow>
-								<Label mt="0">{ __( 'Columns:', 'b-testimonials-block' ) }</Label>
+								<Label mt="0">{ __( 'Device:', 'b-testimonials-block' ) }</Label>
 								<Device className="" />
 							</PanelRow>
-							<RangeControl value={ columns?.[ device ] } onChange={ ( val ) => setColumn( device, val ) } min={ 1 } max={ COLUMN_MAX[ device ] } step={ 1 } beforeIcon="grid-view" />
+							<RangeControl label={ __( 'Columns:', 'b-testimonials-block' ) } value={ columns?.[ device ] } onChange={ ( val ) => setColumn( device, val ) } min={ 1 } max={ COLUMN_MAX[ device ] } step={ 1 } beforeIcon="grid-view" />
 							<UnitControl className="mt20" label={ __( 'Column Gap:', 'b-testimonials-block' ) } labelPosition="left" value={ columnGap } onChange={ ( val ) => setAttributes( { columnGap: val } ) } units={ [ pxUnit( 30 ), perUnit( 3 ), emUnit( 2 ) ] } isResetValueOnUnitChange={ true } />
 							<UnitControl className="mt20" label={ __( 'Row Gap:', 'b-testimonials-block' ) } labelPosition="left" value={ rowGap } onChange={ ( val ) => setAttributes( { rowGap: val } ) } units={ [ pxUnit( 40 ), perUnit( 3 ), emUnit( 2.5 ) ] } isResetValueOnUnitChange={ true } />
 						</PanelBody>

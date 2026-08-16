@@ -57,53 +57,40 @@ const BeforeAfterSlider = ({ attributes = {} }) => {
     [isVertical]
   );
 
-  const pointFrom = (e) => {
-    const touch = e.touches && e.touches[0];
-    return touch ? [touch.clientX, touch.clientY] : [e.clientX, e.clientY];
-  };
+  // Drag is tracked with pointer capture on the container rather than listeners
+  // on `window`. In the editor the block lives inside the canvas iframe, and
+  // Gutenberg only re-dispatches `mousemove`/`dragover` up to the parent frame --
+  // a `mouseup` in the canvas never reached a parent-window listener, so the
+  // divider stayed glued to the pointer after the button was released. Capture
+  // keeps every move and the release on this element, in this document, so the
+  // coordinates also stay in the same space as `getBoundingClientRect()`.
+  const isMouse = (e) => "mouse" === e.pointerType;
 
-  const onMouseDown = (e) => {
-    if (isHover) {
+  const onPointerDown = (e) => {
+    // Hover mode reveals on move, so a mouse press must not start a drag. Touch
+    // and pen have no hover, so they still drag.
+    if (isHover && isMouse(e)) {
       return;
     }
+    e.currentTarget.setPointerCapture?.(e.pointerId);
     setIsDragging(true);
-    updatePos(...pointFrom(e));
+    updatePos(e.clientX, e.clientY);
   };
 
-  const onTouchStart = (e) => {
-    setIsDragging(true);
-    updatePos(...pointFrom(e));
-  };
-
-  // Hover mode still tracks touch drags, since a touch device has no hover.
-  const onMouseMove = (e) => {
-    if (isHover) {
+  const onPointerMove = (e) => {
+    if (isDragging || (isHover && isMouse(e))) {
       updatePos(e.clientX, e.clientY);
     }
   };
 
-  useEffect(() => {
-    const onWindowMove = (e) => {
-      if (isDragging) {
-        updatePos(...pointFrom(e));
-      }
-    };
-    const onEnd = () => setIsDragging(false);
-
-    if (isDragging) {
-      window.addEventListener("mousemove", onWindowMove);
-      window.addEventListener("touchmove", onWindowMove);
-      window.addEventListener("mouseup", onEnd);
-      window.addEventListener("touchend", onEnd);
+  // `lostpointercapture` covers the cases `pointerup` misses -- the browser
+  // revoking capture, or the node unmounting mid-drag.
+  const endDrag = (e) => {
+    if (e?.currentTarget?.hasPointerCapture?.(e.pointerId)) {
+      e.currentTarget.releasePointerCapture(e.pointerId);
     }
-
-    return () => {
-      window.removeEventListener("mousemove", onWindowMove);
-      window.removeEventListener("touchmove", onWindowMove);
-      window.removeEventListener("mouseup", onEnd);
-      window.removeEventListener("touchend", onEnd);
-    };
-  }, [isDragging, updatePos]);
+    setIsDragging(false);
+  };
 
   const handleKeyDown = (e) => {
     const back = isVertical ? "ArrowUp" : "ArrowLeft";
@@ -146,9 +133,15 @@ const BeforeAfterSlider = ({ attributes = {} }) => {
         className={wrapClasses}
         role="presentation"
         style={wrapStyle}
-        onMouseDown={onMouseDown}
-        onMouseMove={onMouseMove}
-        onTouchStart={onTouchStart}>
+        onPointerDown={onPointerDown}
+        onPointerMove={onPointerMove}
+        onPointerUp={endDrag}
+        onPointerCancel={endDrag}
+        onLostPointerCapture={endDrag}>
+        {/* Both halves are absolutely positioned so their labels share one box.
+            That leaves nothing in flow to give the wrapper a height on the
+            `auto` ratio, which this hidden copy of the before image restores. */}
+        <img className="ba-sizer" src={beforeUrl} alt="" aria-hidden="true" />
         <div className="ba-before">
           <img
             src={beforeUrl}

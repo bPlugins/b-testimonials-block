@@ -1,14 +1,13 @@
 @use "sass:color";
 @use './custom-icon' as *;
 
-$primaryColor: #382c8d;
 // bPlugins brand colour. Applied to icon wrappers only; the icons themselves
 // stay `currentColor` so the hover/active states can still flip them to white.
 $brandColor: #146ef5;
 
 // Custom
 .btbNowEditing {
-  outline: 2px solid $primaryColor;
+  outline: 2px solid $brandColor;
 }
 
 .btbCptNotice {
@@ -99,6 +98,23 @@ $brandColor: #146ef5;
 	// The panel title already carries its own spacing.
 	> .components-panel__body-title + * {
 		margin-top: 0;
+	}
+
+	/*
+	 * Two controls sharing a row need a gap between them.
+	 *
+	 * PanelRow is `justify-content: space-between`, which only reads as spacing
+	 * when the pair does not fill the row. Where it does -- the Image panel's
+	 * Width and Height, measured at 122px and 124px in a 246px column -- the two
+	 * controls ended up touching at exactly 0px, so the fields ran together with
+	 * no seam. A `gap` is a minimum, not a fixed amount, so the label-and-control
+	 * rows that already sit far apart are unaffected.
+	 *
+	 * The media picker is excluded on purpose: its text field and upload button
+	 * are meant to read as one joined input group, which a gap would break.
+	 */
+	.components-panel__row:not(.bPlInlineMediaUpload) {
+		gap: 12px;
 	}
 
 	// Rows inside a repeater need breathing room from their separator too.

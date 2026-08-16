@@ -201,7 +201,7 @@
         },
         "fontFamily": "Open Sans",
         "fontWeight": 700,
-        "lineHeight": "135%"
+        "lineHeight": "140%"
       }
     },
     "nameColor": {
@@ -218,7 +218,7 @@
         },
         "fontFamily": "Open Sans",
         "fontWeight": 400,
-        "lineHeight": "135%"
+        "lineHeight": "150%"
       }
     },
     "degColor": {
@@ -234,7 +234,7 @@
           "mobile": 14
         },
         "fontWeight": 400,
-        "lineHeight": "135%"
+        "lineHeight": "170%"
       }
     },
     "textColor": {

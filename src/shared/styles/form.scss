@@ -77,5 +77,15 @@
 			background: var(--btb-error-bg, #fcebec);
 			color: var(--btb-error, #b32d2e);
 		}
+
+		// The editor's "preview only" note. Without a modifier of its own it
+		// inherited the hidden default, so submitting in the editor looked like
+		// nothing happened at all. Neutral rather than success or error: the
+		// submit was neither, it simply does not run here.
+		&.is-notice {
+			display: block;
+			background: #f0f4fb;
+			color: #334155;
+		}
 	}
 }

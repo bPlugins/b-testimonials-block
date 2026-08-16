@@ -9,44 +9,49 @@
 		overflow: hidden;
 		line-height: 0;
 		user-select: none;
+		// A touch drag on the divider is a drag, not a scroll. Without this the
+		// browser claims the gesture and cancels the pointer stream mid-drag.
+		touch-action: none;
 		--pos: 50%;
+		--ba-label-gap: 12px;
 		border-radius: var(--ba-radius, 8px);
+	}
+
+	// Both halves are absolutely positioned so they share one box, which is what
+	// keeps the two corner labels on the same line: each label is placed against
+	// its own layer, and layers of different heights put them at different
+	// heights. On `auto` the height comes from this hidden copy of the before
+	// image, so the wrapper still follows that image's own proportions.
+	.ba-sizer {
+		display: block;
+		width: 100%;
+		height: auto;
+		visibility: hidden;
+		pointer-events: none;
 	}
 
 	.ba-before,
 	.ba-after {
+		position: absolute;
+		inset: 0;
+
 		img {
 			display: block;
 			width: 100%;
-			height: auto;
+			height: 100%;
+			object-fit: cover;
 		}
-	}
-
-	.ba-before {
-		position: relative;
 	}
 
 	// After sits on top, revealed on the right of the handle.
 	.ba-after {
-		position: absolute;
-		inset: 0;
 		clip-path: inset(0 0 0 var(--pos));
 	}
 
-	// A fixed ratio makes both halves fill the same box, which is the only way
-	// two images of different proportions line up along the divider. Left on
-	// `auto` the wrapper still follows the before image's own height.
-	.ba-wrap.has-ratio {
-		.ba-before,
-		.ba-after {
-			height: 100%;
-		}
-
-		.ba-before img,
-		.ba-after img {
-			height: 100%;
-			object-fit: cover;
-		}
+	// A fixed ratio crops both halves to the chosen box instead of the before
+	// image's own one, so the sizer has nothing left to measure.
+	.ba-wrap.has-ratio .ba-sizer {
+		display: none;
 	}
 
 	// Vertical: the divider runs across and After is revealed below it.
@@ -87,26 +92,66 @@
 
 	.ba-label {
 		position: absolute;
-		bottom: 12px;
+		bottom: var(--ba-label-gap, 12px);
+		max-width: calc(50% - var(--ba-label-gap, 12px) * 1.5);
 		background: var(--btb-ba-label-bg, rgba(0, 0, 0, 0.6));
 		color: var(--btb-ba-label-color, #fff);
 		padding: 4px 10px;
 		border-radius: 4px;
 		font-size: var(--ba-label-size, 13px);
 		line-height: 1.3;
+		// A label that wraps or runs past the divider is the other half of the
+		// "labels sit in the wrong place" complaint, so it stays one line and
+		// trims instead.
+		white-space: nowrap;
+		overflow: hidden;
+		text-overflow: ellipsis;
 	}
 
 	.ba-wrap.labels-top .ba-label {
 		bottom: auto;
-		top: 12px;
+		top: var(--ba-label-gap, 12px);
 	}
 
 	.ba-label-before {
-		left: 12px;
+		left: var(--ba-label-gap, 12px);
 	}
 
 	.ba-label-after {
-		right: 12px;
+		right: var(--ba-label-gap, 12px);
+	}
+
+	// Vertical reveal splits top/bottom, so the corner each label belongs to
+	// changes with it: before is the top half, after the bottom.
+	.ba-wrap.is-vertical {
+		.ba-label {
+			max-width: calc(100% - var(--ba-label-gap, 12px) * 2);
+		}
+
+		.ba-label-before {
+			top: var(--ba-label-gap, 12px);
+			bottom: auto;
+		}
+
+		.ba-label-after {
+			top: auto;
+			bottom: var(--ba-label-gap, 12px);
+			left: var(--ba-label-gap, 12px);
+			right: auto;
+		}
+	}
+
+	// On a phone the block is only a few hundred pixels wide, so the desktop
+	// inset and padding push both labels out of their corners.
+	@media (max-width: 480px) {
+		.ba-wrap {
+			--ba-label-gap: 8px;
+		}
+
+		.ba-label {
+			padding: 3px 8px;
+			font-size: calc(var(--ba-label-size, 13px) * 0.85);
+		}
 	}
 
 	.ba-handle {

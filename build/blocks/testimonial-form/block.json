@@ -105,6 +105,36 @@
       "type": "string",
       "default": "#0575e6"
     },
+    "labelColor": {
+      "type": "string"
+    },
+    "labelTypo": {
+      "type": "object",
+      "default": {}
+    },
+    "inputColor": {
+      "type": "string"
+    },
+    "inputTypo": {
+      "type": "object",
+      "default": {}
+    },
+    "placeholderColor": {
+      "type": "string"
+    },
+    "inputFocusColor": {
+      "type": "string"
+    },
+    "inputRadius": {
+      "type": "string"
+    },
+    "inputPadding": {
+      "type": "object",
+      "default": {}
+    },
+    "textareaHeight": {
+      "type": "string"
+    },
     "layout": {
       "type": "string",
       "default": "testimonial-form"

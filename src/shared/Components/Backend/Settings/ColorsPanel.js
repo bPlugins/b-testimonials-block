@@ -14,12 +14,18 @@ import { getVisualControls } from "../../../utils/visualControls";
  * @param {Function} props.setAttributes Attribute setter.
  * @param {string}   props.layout        Layout override, when the block does
  *                                       not keep it in `attributes.layout`.
+ * @param {Array}    props.exclude       Roles another panel owns on this block.
+ *                                       The shared Settings passes the card box
+ *                                       roles whenever it renders the Card
+ *                                       panel, so one pixel keeps one control.
  */
-const ColorsPanel = ({ attributes = {}, setAttributes, layout }) => {
+const ColorsPanel = ({ attributes = {}, setAttributes, layout, exclude = [] }) => {
   // Attributes are passed so the state-dependent roles can be hidden while the
   // element they paint is not on the page -- the card stack's nav buttons before
   // a second review is added, the before/after labels before an image is picked.
-  const controls = getVisualControls(layout ?? attributes.layout, attributes);
+  const controls = getVisualControls(layout ?? attributes.layout, attributes).filter(
+    ({ attr }) => ! exclude.includes(attr),
+  );
 
   if (!controls.length) {
     return null;

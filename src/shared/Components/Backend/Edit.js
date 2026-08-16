@@ -204,15 +204,23 @@ const Edit = (props) => {
       if (isClassicExplicitOff || isFreshNewBlock) {
         return (
           <div {...blockProps}>
-            <Settings
-              attributes={attributes}
-              setAttributes={setAttributes}
-              updateItem={() => {}}
-              activeIndex={activeIndex}
-              setActiveIndex={setActiveIndex}
-              clientId={clientId}
-              currentBlockName={name}
-            />
+            {/* Same reasoning as the branch above, at the other end of the
+                block's life: nothing has been chosen yet, so this block renders
+                nothing on the page and every panel but the switcher is a
+                control over a layout that does not exist. Content Source, Add
+                or Remove Cards, Elements, Excerpt & Expand, Layout and the
+                whole Style tab were all offered here, and none of them could
+                change what a visitor sees until a layout is picked. The
+                switcher is what the placeholder is for, so it is all that
+                shows; the rest appears with the layout it belongs to. */}
+            <InspectorControls>
+              <BlockSwitcher
+                clientId={clientId}
+                currentBlockName={name}
+                attributes={attributes}
+                setAttributes={setAttributes}
+              />
+            </InspectorControls>
             <BlockPlaceholder
               clientId={clientId}
               currentBlockName={name}

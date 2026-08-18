@@ -106,6 +106,14 @@
       "type": "string",
       "default": "#f9f8f8"
     },
+    "headerWash": {
+      "type": "boolean",
+      "default": true
+    },
+    "headerWashStrength": {
+      "type": "number",
+      "default": 100
+    },
     "grid2Padding": {
       "type": "object",
       "default": {
@@ -261,6 +269,30 @@
       "type": "object",
       "default": {}
     },
+    "cardWash": {
+      "type": "boolean",
+      "default": true
+    },
+    "cardWashStrength": {
+      "type": "number",
+      "default": 100
+    },
+    "cardWashColor": {
+      "type": "string"
+    },
+    "cardHoverBg": {
+      "type": "string"
+    },
+    "cardHoverBorderColor": {
+      "type": "string"
+    },
+    "cardHoverShadow": {
+      "type": "object",
+      "default": {}
+    },
+    "cardHoverLift": {
+      "type": "number"
+    },
     "image": {
       "type": "object",
       "default": {
@@ -277,6 +309,17 @@
         "side": "all",
         "radius": "50%"
       }
+    },
+    "avatarRing": {
+      "type": "boolean",
+      "default": true
+    },
+    "avatarRingWidth": {
+      "type": "number",
+      "default": 3
+    },
+    "avatarRingColor": {
+      "type": "string"
     },
     "nameTypo": {
       "type": "object",
@@ -335,6 +378,9 @@
     "textLength": {
       "type": "number",
       "default": 120
+    },
+    "starSize": {
+      "type": "number"
     }
   },
   "supports": {

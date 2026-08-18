@@ -1,6 +1,6 @@
 <?php
 /**
- * Plugin Name: B Testimonials Block
+ * Plugin Name: Testimonials
  * Description: Boost your website's credibility with b testimonials block, effortlessly showcasing customer ratings and reviews.
  * Version: 1.0.3
  * Author: bPlugins

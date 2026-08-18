@@ -11,6 +11,7 @@ import {
 } from "../../../../../bpl-tools/utils/data";
 import { getPaletteCSS } from "../../utils/visualControls";
 import { ownBoxForDevice } from "../../utils/responsiveBox";
+import { resolveArrangement } from "../../utils/layoutFeatures";
 
 const Style = ({ attributes = {}, clientId }) => {
   const {
@@ -52,6 +53,15 @@ const Style = ({ attributes = {}, clientId }) => {
     inputRadius = "",
     inputPadding = {},
     textareaHeight = "",
+    btnBg = "",
+    btnHoverBg = "",
+    btnColor = "",
+    btnHoverColor = "",
+    btnTypo = {},
+    btnPadding = {},
+    btnRadius = "",
+    btnWidth = "auto",
+    btnAlign = "start",
     pollTitleTypo = {},
     pollDescTypo = {},
     pollLabelTypo = {},
@@ -62,8 +72,82 @@ const Style = ({ attributes = {}, clientId }) => {
     pollBtnRadius = "",
     pollBtnGap = "",
     pollPadding = {},
+    pollShadow = {},
+    pollBtnShadow = {},
     pollRadius = "",
+    gradientBorder = false,
+    gradientFrom = "#0575e6",
+    gradientTo = "#7b2ff7",
+    gradientAngle = 135,
+    gradientWidth = 3,
+    showStarBadge = false,
+    starBadgeBg = "",
+    starBadgeColor = "",
+    starBadgePosition = "top-right",
+    starBadgeSize = "",
+    starBadgeRadius = "",
+    headerWash = true,
+    headerWashStrength = 100,
+    bubbleTail = true,
+    bubbleTailSize = 12,
+    bubbleTailOffset = 30,
+    bubbleTailAlign = "left",
+    bubbleTailFill = "",
+    bubbleTailLine = "",
+    badgeScoreTypo = {},
+    badgeStarsSize = "",
+    starSize = "",
+    modalOverlayColor = "",
+    modalOverlayBlur = "",
+    modalBg = "",
+    modalWidth = "",
+    modalPadding = {},
+    modalRadius = "",
+    modalCloseSize = "",
+    modalCloseColor = "",
+    modalAvatarSize = "",
+    modalNameSize = "",
+    modalDegSize = "",
+    modalStarsSize = "",
+    cardWash = true,
+    cardWashStrength = 100,
+    cardWashColor = "",
+    avatarRing = true,
+    avatarRingWidth = 3,
+    avatarRingColor = "",
+    faqRadius = "",
+    faqRowGap = "",
+    faqBg = "",
+    faqShadow = {},
+    faqQuestionPadding = {},
+    faqAnswerPadding = {},
+    cardHoverBg = "",
+    cardHoverBorderColor = "",
+    cardHoverShadow = {},
+    cardHoverLift = "",
+    badgeTitleTypo = {},
+    badgeSubtitleTypo = {},
+    badgeIconSize = "",
+    badgeIconGap = "",
+    badgePadding = {},
+    badgeRadius = "",
+    badgeShadow = {},
+    modalReviewSize = "",
   } = attributes || {};
+
+  // Declared here rather than beside the first thing that used it.
+  //
+  // It is a `const`, so every use above its old declaration sat in the temporal
+  // dead zone -- and `isSet` is the natural helper to reach for when adding a
+  // rule, which made that an easy trap to fall into. One that took the whole
+  // editor down rather than the block being worked on: Style renders inside every
+  // block, so a throw here put all of them behind "This block has encountered an
+  // error and cannot be previewed". It depends on nothing, so the top is where it
+  // belongs.
+  //
+  // 0, and an empty box side, are real values -- only absent ones are skipped.
+  const isSet = (value) =>
+    undefined !== value && null !== value && "" !== value;
 
   const cId = clientId || attributes?.cId || "";
   const mainEl = cId ? `#btbTestimonialsDir-${cId}` : ".bTestimonials";
@@ -98,6 +182,8 @@ const Style = ({ attributes = {}, clientId }) => {
     navBg,
     navHoverBg,
     navBorder,
+    navShadow,
+    sideOpacity,
   } = slider && "object" === typeof slider ? slider : {};
 
   const arrowEl = `${mainEl} .swiper-button-prev, ${mainEl} .swiper-button-next`;
@@ -105,7 +191,7 @@ const Style = ({ attributes = {}, clientId }) => {
   const navBox = "var(--swiper-navigation-size, 44px)";
 
   // Any one of these means the user has taken over the arrow's appearance.
-  const isArrowStyled = !!(navSize || navBg || navBorder);
+  const isArrowStyled = !!(navSize || navBg || navBorder || navShadow);
 
   const navVars = [
     navColor ? `--swiper-navigation-color: ${navColor};` : "",
@@ -129,6 +215,12 @@ const Style = ({ attributes = {}, clientId }) => {
         "box-sizing: border-box;",
         navBg ? `background: ${navBg};` : "",
         navBorder ? getBorderCSS(navBorder) : "",
+        // The stylesheet gives the arrow a raised drop shadow by default; this is
+        // how an author flattens it or deepens it. Emitted only when set, so an
+        // untouched block keeps the shipped shadow.
+        // getShadowCSS returns the value only, not the property -- unlike
+        // getBorderCSS above, which returns whole declarations.
+        navShadow ? `box-shadow: ${getShadowCSS(navShadow)};` : "",
       ]
         .filter(Boolean)
         .join("\n\t\t\t")
@@ -152,6 +244,39 @@ const Style = ({ attributes = {}, clientId }) => {
   ]
     .filter(Boolean)
     .join("\n\t\t\t");
+
+  // How far back the cards either side of the active one fade.
+  //
+  // The flat slider dims its neighbours to 0.75 in the stylesheet; coverflow and
+  // the 3D slider deliberately do not, because washing out the side cards is
+  // most of what made them read as grey slivers. That left the two 3D
+  // arrangements with no way to dim at all, which is the opposite problem on a
+  // pale card over a pale page -- there the rotation alone does not separate the
+  // active card from its neighbours.
+  //
+  // Restricted to `.swiper-slide-visible` on purpose. The cull rule that hides
+  // the far slides is `opacity: 0` at class specificity, and this rule is
+  // ID-scoped, so without that qualifier it would outrank the cull and bring the
+  // whole track back into view. Swiper maintains the class on every update under
+  // `watchSlidesProgress`, which the 3D arrangements set.
+  //
+  // 100 is the shipped look, so it emits nothing: no rule at all is one fewer
+  // thing to outrank, and it keeps a block saved before this control rendering
+  // exactly as it did.
+  const arrangement = resolveArrangement(attributes);
+  const is3DArrangement = ["slider-3d", "coverflow"].includes(arrangement);
+
+  // Written out rather than through the `isSet` helper below, which is declared
+  // further down the body and so is not in scope yet.
+  const hasSideOpacity =
+    undefined !== sideOpacity && null !== sideOpacity && "" !== sideOpacity;
+
+  const sideOpacityCSS =
+    is3DArrangement && hasSideOpacity && 100 !== Number(sideOpacity)
+      ? `${mainEl} .swiper-slide.swiper-slide-visible:not(.swiper-slide-active) {
+			opacity: ${Number(sideOpacity) / 100};
+		}`
+      : "";
 
   // Block width and card height, per device.
   //
@@ -276,6 +401,38 @@ const Style = ({ attributes = {}, clientId }) => {
   const cardBoxShadowCSS =
     cardBox && !cardBox.shadow ? "" : `box-shadow: ${getShadowCSS(shadow)};`;
 
+  // The card's hover state.
+  //
+  // frontend.scss already lifts the card and deepens its wash on hover, and its
+  // own comment records why it stops there: "the Card panel owns both
+  // `box-shadow` and `border-color` at ID specificity and a hover rule here
+  // would lose to them". True of the stylesheet, not of this file -- emitted
+  // here the hover rule carries the same ID and, coming later, wins. So the
+  // three the stylesheet had to leave alone get controls.
+  //
+  // Every part is conditional and the whole rule is dropped when nothing is set,
+  // so a card nobody has touched keeps the lift-and-wash it has today.
+  //
+  // `background-color` rather than the `background` shorthand, for the reason the
+  // resting rule gives: the shorthand also resets `background-image`, which is
+  // the wash -- so a hover colour would flatten the very gradient the hover state
+  // is built on.
+  //
+  // A lift of 0 is a real choice: it holds the card still, which is the only way
+  // to turn the movement off, so only an absent value is skipped.
+  const cardHoverShadowCSS = getShadowCSS(cardHoverShadow);
+
+  const cardHoverCSS = [
+    cardHoverBg ? `background-color: ${cardHoverBg};` : "",
+    cardHoverBorderColor ? `border-color: ${cardHoverBorderColor};` : "",
+    cardHoverShadowCSS ? `box-shadow: ${cardHoverShadowCSS};` : "",
+    isSet(cardHoverLift)
+      ? `transform: translateY(-${cardHoverLift}px);`
+      : "",
+  ]
+    .filter(Boolean)
+    .join(" ");
+
   // The Top panel (Style tab) paints the card's header strip -- avatar, name and
   // designation -- and is shown for Theme 2 or the masonry arrangement.
   //
@@ -290,22 +447,51 @@ const Style = ({ attributes = {}, clientId }) => {
   // belongs to theme_6, and it is drawn with `border-bottom`, not the
   // `border-right` that rule set -- so it could never have coloured anything.
 
-  // The short rule under the designation on Theme 1, which had no control of any
-  // kind -- the stylesheet fixed it at #cccccc, 1px, 30px wide.
+  // The short rule under the designation on Theme 1.
   //
-  // Written as `border-width` / `border-color` rather than the `border`
-  // shorthand so the stylesheet keeps supplying `solid`, and so setting one of
-  // the three leaves the other two exactly as they render today.
+  // These were written as `border-width` / `border-color` because the stylesheet
+  // drew the divider as a hairline: a 1px #cccccc border, 30px wide. It is not
+  // drawn that way any more -- frontend.scss paints a short accent bar instead,
+  // `width: 34px; height: 3px; border: 0; background: var(--btb-accent)`, in the
+  // `.theme_1 .single .footer .deg::after` rule. Against that markup
+  // `border-color` coloured an edge no `border-style` ever showed and
+  // `border-width` widened the same absent edge, so Color and Thickness moved
+  // nothing on any Theme 1 layout -- the 3D Flip Perspective Carousel included.
+  // Length kept working, because `width` is still `width`.
+  //
+  // Each property now names what the bar actually uses: its fill, its height and
+  // its width. Colour is only emitted once one is picked, so an untouched divider
+  // still follows the Accent role the stylesheet defers to.
   //
   // 0 is a real choice for both thickness and length -- either one removes the
   // rule -- so only an absent value is skipped.
-  const isSet = (value) =>
-    undefined !== value && null !== value && "" !== value;
+
+  /*
+   * An untouched `degDivider` arrives as `[]`, not `{}`.
+   *
+   * block.json declares `"default": {}`, but that default round-trips through
+   * PHP on its way to the client: `json_decode` turns an empty JSON object into
+   * an empty PHP array, and `wp_json_encode` sends an empty PHP array back out as
+   * `[]`. Measured on a fresh block -- `Array.isArray( attributes.degDivider )`
+   * is true.
+   *
+   * An array has a real `length`, and it is 0. So `isSet( degDivider.length )`
+   * was true on every untouched block and emitted `width: 0px`, which collapsed
+   * the bar the stylesheet draws at 34px -- the divider was invisible from the
+   * start, on every Theme 1 layout. Setting Color or Thickness then changed the
+   * colour and height of something with no width, which is why the panel looked
+   * like it did nothing at all.
+   *
+   * `color` and `width` never collided with an array property, so only `length`
+   * was affected; normalising the whole value keeps the next reader out of the
+   * same trap.
+   */
+  const divider = Array.isArray(degDivider) ? {} : degDivider || {};
 
   const degDividerCSS = [
-    isSet(degDivider?.width) ? `border-width: ${degDivider.width}px;` : "",
-    degDivider?.color ? `border-color: ${degDivider.color};` : "",
-    isSet(degDivider?.length) ? `width: ${degDivider.length}px;` : "",
+    isSet(divider.width) ? `height: ${divider.width}px;` : "",
+    divider.color ? `background: ${divider.color};` : "",
+    isSet(divider.length) ? `width: ${divider.length}px;` : "",
   ]
     .filter(Boolean)
     .join("\n\t\t\t");
@@ -475,6 +661,15 @@ const Style = ({ attributes = {}, clientId }) => {
     // The video card's caption. Its editor is bespoke, so nothing ever named
     // these two and the stylesheet's 17px/14px were the only values in play.
     ".video-item .name",
+    // The seven review badges' heading -- "Google Reviews", "Trustpilot Score",
+    // "100% Verified Reviews" and so on.
+    //
+    // `layoutControls.js` gave these blocks `cardBox` alone, so the Name,
+    // Designation and Review Text panels were all hidden and none of their text
+    // was named here either: the stylesheet's 17px/700 was the only value in
+    // play. Their `nameTypo` defaults now carry that value, so an untouched
+    // badge renders exactly as it did and the control owns it from there.
+    ".btb-badge-title",
   ];
 
   const DEG_PARTS = [
@@ -485,6 +680,13 @@ const Style = ({ attributes = {}, clientId }) => {
     ".btb-faq-author",
     ".btb-srb-count",
     ".video-item .deg",
+    // The badges' secondary line, which is one of two things depending on the
+    // block: the Verified Buyer seal renders a sentence of description, the
+    // other six a review count beside the score. Both sit at the stylesheet's
+    // 13px in the muted colour, which is the Designation role exactly, so they
+    // share one control rather than growing two that would always be set alike.
+    ".btb-badge-desc",
+    ".btb-badge-rating .count",
   ];
 
   const TEXT_PARTS = [
@@ -675,6 +877,48 @@ const Style = ({ attributes = {}, clientId }) => {
     textareaHeight
       ? `${formEl} .btb-tform-field textarea {\n\t\t\tmin-height: ${textareaHeight};\n\t\t}`
       : "",
+    // The submit button.
+    //
+    // It used to carry exactly one control -- its label -- with the colour,
+    // padding, radius, weight and size all pinned in form.scss, so the one
+    // element on the form a visitor is meant to click was the only one that
+    // could not be styled at all.
+    //
+    // `background-color` rather than the `background` shorthand, matching the
+    // card rule: the shorthand resets a background image, and that is exactly
+    // what silently killed the masonry header wash earlier.
+    //
+    // An empty Background falls through to the accent, so a form whose Accent is
+    // set gets a matching button without anyone picking the same colour twice.
+    `${formEl} .btb-tform-submit {
+			background-color: ${btnBg || "var(--btb-accent, #146ef5)"};
+			color: ${btnColor || "#ffffff"};
+			padding: ${getBoxValue(btnPadding)};
+			border-radius: ${btnRadius || "6px"};
+			justify-self: ${"full" === btnWidth ? "stretch" : btnAlign || "start"};
+			width: ${"full" === btnWidth ? "100%" : "auto"};
+			transition: background-color 0.2s ease, color 0.2s ease;
+		}`,
+    getTypoCSS(`${formEl} .btb-tform-submit`, btnTypo)?.styles || "",
+    // Only emitted when asked for. With no hover colours chosen the button keeps
+    // its base ones rather than being handed an invented darker shade, which is
+    // the same rule the slider arrows follow.
+    btnHoverBg || btnHoverColor
+      ? `${formEl} .btb-tform-submit:hover {
+			${
+        btnHoverBg
+          ? // `!important` is unavoidable here, and only here. The button's base
+            // background is an inline style written by TestimonialForm.js so that
+            // Accent applies in the editor preview too, and an inline style beats
+            // every stylesheet rule regardless of specificity -- measured, the
+            // hover colour computed as the base green with the rule in place.
+            // Matching specificity cannot win against inline; this can.
+            `background-color: ${btnHoverBg} !important;`
+          : ""
+      }
+			${btnHoverColor ? `color: ${btnHoverColor};` : ""}
+		}`
+      : "",
   ]
     .filter(Boolean)
     .join("\n\t\t");
@@ -702,6 +946,10 @@ const Style = ({ attributes = {}, clientId }) => {
   const pollBoxCSS = [
     pollPaddingCSS ? `padding: ${pollPaddingCSS};` : "",
     pollRadius ? `border-radius: ${pollRadius};` : "",
+    // The box is a flat bordered panel in the stylesheet with no shadow of its
+    // own, so this adds one rather than overriding one, and an untouched poll is
+    // unchanged. getShadowCSS returns the value only, not the whole declaration.
+    getShadowCSS(pollShadow) ? `box-shadow: ${getShadowCSS(pollShadow)};` : "",
   ]
     .filter(Boolean)
     .join("\n\t\t\t");
@@ -730,6 +978,21 @@ const Style = ({ attributes = {}, clientId }) => {
       ? `${pollEl} .btb-poll-buttons {\n\t\t\tgap: ${pollBtnGap}px;\n\t\t}`
       : "",
     pollBtnBoxCSS ? `${pollBtnEl} {\n\t\t\t${pollBtnBoxCSS}\n\t\t}` : "",
+    // Idle buttons only, and its own rule rather than joining pollBtnBoxCSS
+    // above.
+    //
+    // The stylesheet gives the picked button a lift of its own --
+    // `box-shadow: 0 4px 12px rgba(#146ef5, 0.3)` on `.is-selected`, alongside
+    // the accent fill and the 1.1 scale -- and that rule is class specificity,
+    // so a shadow emitted flat on `.btb-poll-num-btn` from an ID selector would
+    // outrank it and quietly delete the one thing marking which number the
+    // reader picked. Excluding the selected button leaves that lift standing, so
+    // the control styles the buttons it is actually about.
+    getShadowCSS(pollBtnShadow)
+      ? `${pollBtnEl}:not(.is-selected) {\n\t\t\tbox-shadow: ${getShadowCSS(
+          pollBtnShadow,
+        )};\n\t\t}`
+      : "",
     typoCSS(pollBtnEl, pollBtnTypo),
     // After the idle rule above, so the picked state wins the colour.
     pollBtnActiveColor
@@ -738,6 +1001,527 @@ const Style = ({ attributes = {}, clientId }) => {
   ]
     .filter(Boolean)
     .join("\n\t\t");
+
+  // The Gradient Border Grid's ring and score pill.
+  //
+  // `gradientBorder` defaults to false here and is declared only by that block,
+  // so every other layout emits nothing at all -- including the coverflow
+  // carousel, which renders the same theme_2 card and must keep its flat border.
+  //
+  // The ring is a masked pseudo-element. `inset` pulls it out past the card by
+  // its own width so it reads as a border rather than eating into the padding,
+  // and the two masks cancel over the content box, leaving only the ring itself
+  // painted. `border-radius: inherit` keeps it following whatever radius the
+  // Card panel sets.
+  //
+  // The @supports guard matters: without mask compositing the same rule paints a
+  // solid gradient slab over the whole card, so a browser that cannot do this
+  // gets the card's ordinary border instead of a broken one.
+  const gradientRingCSS = gradientBorder
+    ? `@supports ((-webkit-mask-composite: xor) or (mask-composite: exclude)) {
+			${mainEl} .single::before {
+				content: "";
+				position: absolute;
+				inset: -${gradientWidth}px;
+				padding: ${gradientWidth}px;
+				border-radius: inherit;
+				background: linear-gradient(${gradientAngle}deg, ${gradientFrom}, ${gradientTo});
+				-webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+				-webkit-mask-composite: xor;
+				mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+				mask-composite: exclude;
+				pointer-events: none;
+			}
+		}`
+    : "";
+
+  const starBadgeVars = [
+    starBadgeBg ? `--btb-star-badge-bg: ${starBadgeBg};` : "",
+    starBadgeColor ? `--btb-star-badge-color: ${starBadgeColor};` : "",
+    // The pill's star tracks the card's own star row rather than growing a third
+    // control for one glyph. Only emitted where the badge exists, so no other
+    // block picks up the variable.
+    showStarBadge && starIconColor
+      ? `--btb-star-badge-icon: ${starIconColor};`
+      : "",
+  ]
+    .filter(Boolean)
+    .join("\n\t\t\t");
+
+  // Which corner the score pill sits in, and how big it is.
+  //
+  // The stylesheet pins it `top: 12px; right: 12px` at a 12px font on a fully
+  // rounded pill, and there was nothing in the sidebar to move it -- so on a
+  // theme_2 card whose header already carries something in that corner the badge
+  // landed on top of it with no way out.
+  //
+  // All four insets are written on every branch, `auto` included: the shipped
+  // rule sets top and right, so a bottom-left badge that only added its own two
+  // would keep the old pair as well and stretch the pill across the card.
+  const BADGE_INSETS = {
+    "top-right": ["12px", "12px", "auto", "auto"],
+    "top-left": ["12px", "auto", "auto", "12px"],
+    "bottom-right": ["auto", "12px", "12px", "auto"],
+    "bottom-left": ["auto", "auto", "12px", "12px"],
+  };
+
+  const [badgeTop, badgeRight, badgeBottom, badgeLeft] =
+    BADGE_INSETS[starBadgePosition] || BADGE_INSETS["top-right"];
+
+  const starBadgeBox = showStarBadge
+    ? [
+        `top: ${badgeTop};`,
+        `right: ${badgeRight};`,
+        `bottom: ${badgeBottom};`,
+        `left: ${badgeLeft};`,
+        isSet(starBadgeSize) ? `font-size: ${starBadgeSize}px;` : "",
+        // 999px is the shipped value and means "fully rounded"; 0 squares the
+        // pill off, which is a real choice, so only an absent value is skipped.
+        isSet(starBadgeRadius) ? `border-radius: ${starBadgeRadius}px;` : "",
+      ]
+        .filter(Boolean)
+        .join("\n\t\t\t")
+    : "";
+
+  // The star glyph ships one pixel under the score text (11px against 12px).
+  // Scaling it with the pill rather than leaving it at 11px keeps that
+  // relationship at any size, so a 20px badge does not end up with a tiny star.
+  const starBadgeIconCSS =
+    showStarBadge && isSet(starBadgeSize)
+      ? `${mainEl} .single > .btb-star-badge .btb-star-badge-icon {
+			font-size: ${Math.max(1, Number(starBadgeSize) - 1)}px;
+		}`
+      : "";
+
+  const gradientCSS = [
+    gradientRingCSS,
+    starBadgeVars
+      ? `${mainEl} .single {\n\t\t\t${starBadgeVars}\n\t\t}`
+      : "",
+    starBadgeBox
+      ? `${mainEl} .single > .btb-star-badge {\n\t\t\t${starBadgeBox}\n\t\t}`
+      : "",
+    starBadgeIconCSS,
+  ]
+    .filter(Boolean)
+    .join("\n\t\t");
+
+  // The theme_2 header wash.
+  //
+  // The strip above the review is painted twice: the Top panel's Background
+  // Color underneath, and a translucent gradient of the accent over it. Only the
+  // colour had a control, so the wash itself could be neither softened nor taken
+  // off -- an author who set a header colour got it tinted whatever they chose.
+  //
+  // `color-mix` with no fallback on purpose. A browser without it drops the
+  // declaration and keeps the stylesheet's own wash, which is the right thing to
+  // fall back to; the alternative is resolving the accent to a literal here,
+  // where it may be a palette variable rather than a colour.
+  // Gated on the block declaring `headerWash`, which is now every block that can
+  // paint the strip -- that is, every one that declares `grid2Bg`.
+  //
+  // It used to be gated on `gradientBorder`, so the Gradient Border Grid was the
+  // only layout whose wash could be softened or switched off. Everywhere else --
+  // the coverflow carousel, the masonry arrangement, every block a reader can
+  // switch to Theme 2 -- the wash was fixed, which is what made the strip look
+  // like it had no colour control at all: the Background Color underneath moved,
+  // and the accent tint over it did not.
+  //
+  // All three selectors the stylesheet's own wash uses, or turning it off would
+  // leave the masonry arrangement still washed.
+  const paintsHeaderStrip = undefined !== attributes?.headerWash;
+  const washPct = (base) =>
+    Math.round(base * (Number(headerWashStrength) || 0)) / 100;
+
+  const headerWashCSS = paintsHeaderStrip
+    ? `${mainEl} .theme_2 .single .top,
+		${mainEl} .masonry-layout .single .top,
+		${mainEl} .btb-masonry-layout .single .top {
+			background-image: ${
+        headerWash
+          ? `linear-gradient(
+				180deg,
+				color-mix(in srgb, var(--btb-accent, #0575e6) ${washPct(16)}%, transparent) 0%,
+				color-mix(in srgb, var(--btb-accent, #0575e6) ${washPct(8)}%, transparent) 100%
+			)`
+          : "none"
+      };
+		}`
+    : "";
+
+  // The popup modal's box and text sizes.
+  //
+  // Written as custom properties on the overlay rather than as declarations on
+  // each part, so one rule feeds the stylesheet's nine `var()` fallbacks and
+  // anything left untouched keeps the value it shipped with. Emitted only where
+  // something is actually set, which is what keeps every other block -- none of
+  // which declares these -- from carrying a dead ruleset.
+  //
+  // Scoped by ID like everything else here: the overlay is rendered inside the
+  // block wrapper (it is `position: fixed`, not reparented), so two popup blocks
+  // on one page cannot style each other.
+  const modalPaddingCSS = getBoxCSS(modalPadding);
+
+  const modalVars = [
+    modalOverlayColor ? `--btb-modal-overlay: ${modalOverlayColor};` : "",
+    // 0 is a real choice -- it turns the frosting off and leaves a flat wash.
+    isSet(modalOverlayBlur) ? `--btb-modal-blur: ${modalOverlayBlur}px;` : "",
+    modalBg ? `--btb-modal-bg: ${modalBg};` : "",
+    isSet(modalWidth) ? `--btb-modal-width: ${modalWidth}px;` : "",
+    // getBoxCSS orders the sides and fills a blank one with 0, and returns
+    // nothing at all when every side is empty -- unlike getBoxValue, which would
+    // join an untouched `{ top: '', ... }` into a bare set of spaces.
+    modalPaddingCSS ? `--btb-modal-padding: ${modalPaddingCSS};` : "",
+    isSet(modalRadius) ? `--btb-modal-radius: ${modalRadius}px;` : "",
+    isSet(modalCloseSize) ? `--btb-modal-close-size: ${modalCloseSize}px;` : "",
+    modalCloseColor ? `--btb-modal-close-color: ${modalCloseColor};` : "",
+    isSet(modalAvatarSize) ? `--btb-modal-avatar: ${modalAvatarSize}px;` : "",
+    isSet(modalNameSize) ? `--btb-modal-name-size: ${modalNameSize}px;` : "",
+    isSet(modalDegSize) ? `--btb-modal-deg-size: ${modalDegSize}px;` : "",
+    isSet(modalStarsSize) ? `--btb-modal-stars-size: ${modalStarsSize}px;` : "",
+    isSet(modalReviewSize)
+      ? `--btb-modal-review-size: ${modalReviewSize}px;`
+      : "",
+  ]
+    .filter(Boolean)
+    .join("\n\t\t\t");
+
+  const modalCSS = modalVars
+    ? `${mainEl} .btb-modal-overlay {\n\t\t\t${modalVars}\n\t\t}`
+    : "";
+
+  // The rating star's size.
+  //
+  // `getStar` renders an inline SVG with `width="15px" height="15px"` on the
+  // element, so the one dimension of a rating that an author is most likely to
+  // want was fixed in the icon markup -- the Review Text panel offered a colour
+  // and nothing else. Presentation attributes lose to CSS, so a rule here takes
+  // it over without touching the icon.
+  //
+  // Left unset by default and emitting nothing at all: the layouts do not agree
+  // on a star size to begin with (the compact card sizes its own at 14px), so a
+  // default here would quietly resize several of them. Untouched blocks keep
+  // whatever they render today.
+  // The compact card's star colour.
+  //
+  // Every layout draws its stars through getStar, which writes the colour as
+  // a fill ATTRIBUTE on the <svg>. The compact card is the only one whose
+  // stylesheet also declares `fill` on `.rating svg` -- and a declaration
+  // beats an attribute, so on that layout alone the Review Text panel's Rating
+  // Icon Color moved nothing at all and only the palette role did. Measured:
+  // the star computed #f59e0b with the control set to red.
+  //
+  // Restating it here at ID specificity, after that rule, hands the star back
+  // -- the same fix the comparison table's rating cell needed further down,
+  // and for the same reason. Scoped to the one layout that has the problem so
+  // no other card's stars are repainted by a rule they never had.
+  const compactStarCSS =
+    "testimonials-compact" === layout
+      ? `${mainEl} .btb-testimonials-compact-layout .rating svg {
+			fill: ${withRole("--btb-star", starIconColor)};
+		}`
+      : "";
+  const starSizeCSS = isSet(starSize)
+    ? `${mainEl} .btbStar svg,
+		${mainEl} .rating svg {
+			width: ${starSize}px;
+			height: ${starSize}px;
+		}`
+    : "";
+
+  // The Speech Bubble card's tail.
+  //
+  // The tail is two CSS triangles under the card, and its colours could not come
+  // from the stylesheet alone. It painted `var(--btb-surface, #ffffff)`, but the
+  // card itself paints `var(--btb-surface, <Card panel Background>)` from the
+  // rule further up -- so a card coloured through the Card panel rather than the
+  // palette's Surface role got a white tail hanging off a coloured bubble. The
+  // fill is resolved here instead, where both values are in scope.
+  //
+  // `#0000` is this block's shipped Background default, which means "not set"
+  // rather than a transparent bubble, so it falls through to white the same way
+  // the stylesheet always did.
+  //
+  // The outline follows the Card border. A border confined to sides that exclude
+  // the bottom leaves the tail unoutlined rather than drawing an edge the card
+  // above it does not have.
+  const bubbleSide = (border?.side || "all").toLowerCase();
+  const bubbleLineWidth =
+    bubbleSide.includes("all") || bubbleSide.includes("bottom")
+      ? border?.width || "0px"
+      : "0px";
+
+  // Where the tail sits along the bottom edge, as the fill triangle's `left`.
+  //
+  // Size and offset were fixed in the stylesheet at 12px and 30px, so the one
+  // part that makes this layout a speech bubble rather than a plain card was the
+  // one part with nothing in the sidebar to change. All three are attributes
+  // now, and `--btb-bubble-x` is the single value the stylesheet positions both
+  // triangles from -- see the note beside its declaration there for why the
+  // outline takes the same value less one border width.
+  //
+  // The triangle is `2 * size` wide, which is why centre subtracts one size and
+  // right subtracts two: `left` alone can express every position, so no rule
+  // here has to reach for `right` and unset the stylesheet's `left`.
+  const bubbleX = (side) => {
+    if ("center" === side) {
+      return `calc(50% - ${bubbleTailSize}px)`;
+    }
+
+    if ("right" === side) {
+      return `calc(100% - ${bubbleTailOffset}px - ${bubbleTailSize * 2}px)`;
+    }
+
+    return `${bubbleTailOffset}px`;
+  };
+
+  // "Alternate" is the chat-transcript look: the tail hangs off the left of one
+  // card and the right of the next, so a column of bubbles reads as a
+  // back-and-forth rather than as one speaker. Every other value is a single
+  // position for all of them.
+  const isAlternating = "alternate" === bubbleTailAlign;
+
+  const bubbleVars = [
+    `--btb-bubble-size: ${bubbleTailSize}px;`,
+    `--btb-bubble-offset: ${bubbleTailOffset}px;`,
+    `--btb-bubble-x: ${bubbleX(isAlternating ? "left" : bubbleTailAlign)};`,
+    // The fill still follows the Card panel's Background and the palette's
+    // Surface role unless the Tail panel names a colour of its own, so a tail
+    // left alone stays part of the bubble it hangs from.
+    `--btb-bubble-fill: ${
+      bubbleTailFill
+        ? bubbleTailFill
+        : withRole(
+            "--btb-surface",
+            !isSet(background) || "#0000" === background
+              ? "#ffffff"
+              : background,
+          )
+    };`,
+    `--btb-bubble-line: ${
+      bubbleTailLine
+        ? bubbleTailLine
+        : withRole("--btb-border", border?.color || "transparent")
+    };`,
+    `--btb-bubble-line-w: ${withRole("--btb-border-width", bubbleLineWidth)};`,
+  ].join("\n\t\t\t");
+
+  const bubbleEl = `${mainEl} .btb-testimonials-speech-bubble-layout .single`;
+
+  const bubbleCSS =
+    "testimonials-speech-bubble" === layout
+      ? [
+          `${bubbleEl} {\n\t\t\t${bubbleVars}\n\t\t}`,
+          isAlternating
+            ? `${bubbleEl}:nth-child(even) {\n\t\t\t--btb-bubble-x: ${bubbleX(
+                "right",
+              )};\n\t\t}`
+            : "",
+          // Both pseudo-elements, or the outline is left hanging on its own.
+          // `content` rather than `display` so nothing else on the card shifts:
+          // the tail is absolutely positioned and out of flow either way.
+          //
+          // A size of 0 counts as off as well. The fill triangle collapses to
+          // nothing at 0 but the outline behind it is a border-width bigger, so
+          // it would survive as a couple of stray pixels in the border colour.
+          !bubbleTail || 0 === Number(bubbleTailSize)
+            ? `${bubbleEl}::before,\n\t\t${bubbleEl}::after {\n\t\t\tcontent: none;\n\t\t}`
+            : "",
+        ]
+          .filter(Boolean)
+          .join("\n\n\t\t")
+      : "";
+
+  // The card's corner wash.
+  //
+  // frontend.scss paints `.layoutSection .single` with
+  // `radial-gradient(115% 90% at 0% 0%, var(--btb-wash) 0%, transparent 58%)` --
+  // a tint of the Accent strongest at the top-left corner, deepening to
+  // `--btb-wash-strong` on hover. Neither state had a control, so the corner
+  // could be neither recoloured nor removed, and because it only deepens under
+  // the pointer it reads as a hover effect stuck on.
+  //
+  // Written as `background-image` on the card rather than by redefining
+  // `--btb-wash`: those two variables also feed the header strip's own gradient,
+  // and moving them here would tie two separate controls back together.
+  //
+  // `.single` rather than `cardBoxEl`. The audio and card-stack overrides point
+  // that at their outer box, which is not the element the stylesheet washes.
+  const cardWashEl = `${mainEl} .single`;
+  const cardWashPct = (base) =>
+    Math.round(base * (Number(cardWashStrength) || 0)) / 100;
+  const cardWashTint = (pct) =>
+    `color-mix(in srgb, ${cardWashColor || "var(--btb-accent, #0575e6)"} ${pct}%, transparent)`;
+
+  // Both states, or turning it off would leave the hover wash arriving on a card
+  // that has none at rest.
+  const cardWashCSS =
+    undefined !== attributes?.cardWash
+      ? `${cardWashEl} {
+			background-image: ${
+        cardWash
+          ? `radial-gradient(115% 90% at 0% 0%, ${cardWashTint(
+              cardWashPct(8),
+            )} 0%, transparent 58%)`
+          : "none"
+      };
+		}
+
+		${cardWashEl}:hover {
+			background-image: ${
+        cardWash
+          ? `radial-gradient(115% 90% at 0% 0%, ${cardWashTint(
+              cardWashPct(16),
+            )} 0%, transparent 62%)`
+          : "none"
+      };
+		}`
+      : "";
+
+  // The avatar's tinted ring.
+  //
+  // frontend.scss draws it as `box-shadow: 0 0 0 3px var(--btb-ring)` on
+  // `.single .authorImg .img`, and its own comment explains why it is a shadow
+  // and not a border: "the Image Border control owns the border on this element,
+  // and the ring has to sit outside whatever that is set to". Sound -- but it
+  // left the ring itself with no control of any kind. Not its colour, which is
+  // the Accent at a fixed 18% alpha, not its width, and no way to remove it. It
+  // reads as a soft halo, which is why it looks like a hover effect that cannot
+  // be turned off; there is no hover rule on the avatar anywhere.
+  //
+  // Emitted only where the block declares `avatarRing`, so the three layouts that
+  // draw their own avatar -- case study, toast, avatar list -- are untouched, the
+  // same set the Image Border control already skips.
+  //
+  // An empty colour keeps `--btb-ring`, so a ring nobody has recoloured still
+  // follows the Accent role the way it always has.
+  const avatarRingCSS =
+    undefined !== attributes?.avatarRing
+      ? `${mainEl} .single .authorImg .img {
+			box-shadow: ${
+        avatarRing
+          ? `0 0 0 ${isSet(avatarRingWidth) ? avatarRingWidth : 3}px ${
+              avatarRingColor || "var(--btb-ring)"
+            }`
+          : "none"
+      };
+		}`
+      : "";
+
+  // The FAQ Review Accordion's row box.
+  //
+  // layoutControls.js withholds the Card panel from this layout so the sidebar
+  // cannot outrank `.btb-faq-item[open] { border-color: var(--btb-accent) }`,
+  // which is what marks the expanded row. That is right for the border and only
+  // for the border -- radius, background, shadow, row gap and the two paddings
+  // were pinned in frontend.scss with nothing to reach them, so withholding one
+  // control had withheld six.
+  //
+  // Nothing here writes `border-color` or `border-width`, so the open row keeps
+  // its accent and the Colors panel keeps both.
+  const faqItemEl = `${mainEl} .btb-faq-item`;
+
+  const faqBoxCSS = [
+    faqRadius ? `border-radius: ${faqRadius};` : "",
+    // 0 is a real gap: it butts the rows into one block.
+    isSet(faqRowGap) ? `margin-bottom: ${faqRowGap}px;` : "",
+    faqBg ? `background-color: ${faqBg};` : "",
+    getShadowCSS(faqShadow) ? `box-shadow: ${getShadowCSS(faqShadow)};` : "",
+  ]
+    .filter(Boolean)
+    .join(" ");
+
+  const faqQuestionPaddingCSS = getBoxCSS(faqQuestionPadding);
+  const faqAnswerPaddingCSS = getBoxCSS(faqAnswerPadding);
+
+  const faqCSS =
+    "faq-testimonial-accordion" === layout
+      ? [
+          faqBoxCSS
+            ? `${faqItemEl} {
+			${faqBoxCSS}
+		}`
+            : "",
+          faqQuestionPaddingCSS
+            ? `${faqItemEl} .btb-faq-question {
+			padding: ${faqQuestionPaddingCSS};
+		}`
+            : "",
+          faqAnswerPaddingCSS
+            ? `${faqItemEl} .btb-faq-answer {
+			padding: ${faqAnswerPaddingCSS};
+		}`
+            : "",
+        ]
+          .filter(Boolean)
+          .join(`
+
+		`)
+      : "";
+
+  // The Trust Badges grid.
+  //
+  // This block registers its own editor, and that editor renders the Colors
+  // panel and Width & Height and nothing else -- no Card panel, no typography
+  // panels. So every size in trust-badges.scss was final: a 16px/700 title, a
+  // 14px subtitle, a 44px icon at a 14px gap, an 18px by 20px box at radius 10
+  // with no shadow, and the icon always beside the text.
+  //
+  // The Card panel would not have helped even if it were offered. Its box rule
+  // names `.btb-trust-badges-grid`, which is the wrapper of the four-badge
+  // fallback shown before any badge is added, and the grid rather than a badge
+  // in it -- so nothing in it reaches `.badge-item`, which is what both the
+  // editor and the published page render once the repeater has content.
+  //
+  // The fallback is styled alongside it, so it keeps up with the repeater.
+  const badgeItemEl = `${mainEl} .badge-item`;
+  const badgeFallbackEl = `${mainEl} .btb-trust-item`;
+
+  const badgePaddingCSS = getBoxCSS(badgePadding);
+
+  // Joined with spaces rather than newlines: these are declarations inside one
+  // rule, and CSS does not care which whitespace separates them.
+  const badgeVars = [
+    isSet(badgeIconSize) ? `--btb-badge-icon: ${badgeIconSize}px;` : "",
+    isSet(badgeIconGap) ? `--btb-badge-gap: ${badgeIconGap}px;` : "",
+    badgePaddingCSS ? `--btb-badge-padding: ${badgePaddingCSS};` : "",
+    badgeRadius ? `--btb-badge-radius: ${badgeRadius};` : "",
+  ]
+    .filter(Boolean)
+    .join(" ");
+
+  const badgeShadowCSS = getShadowCSS(badgeShadow);
+
+  const trustBadgeCSS =
+    "trust-badges" === layout
+      ? [
+          badgeVars
+            ? `${mainEl} {
+			${badgeVars}
+		}`
+            : "",
+          // The badge ships flat, so this adds a shadow rather than replacing
+          // one, and an untouched block stays flat.
+          badgeShadowCSS
+            ? `${badgeItemEl},
+		${badgeFallbackEl} {
+			box-shadow: ${badgeShadowCSS};
+		}`
+            : "",
+          // On the fallback the label is the item's own text, so the title
+          // typography lands on the item there rather than on a child of it.
+          typoCSS(
+            `${badgeItemEl} .badge-title,
+		${badgeFallbackEl}`,
+            badgeTitleTypo,
+          ),
+          typoCSS(`${badgeItemEl} .badge-subtitle`, badgeSubtitleTypo),
+        ]
+          .filter(Boolean)
+          .join(`
+
+		`)
+      : "";
 
   // These are `@import url(...)` statements, and CSS drops any @import that
   // follows a style rule -- an empty ruleset counts as a rule. So they have to
@@ -755,6 +1539,9 @@ const Style = ({ attributes = {}, clientId }) => {
     pollDescTypo,
     pollLabelTypo,
     pollBtnTypo,
+    badgeScoreTypo,
+    badgeTitleTypo,
+    badgeSubtitleTypo,
   ]
     .map((typo) => getTypoCSS("", typo)?.googleFontLink || "")
     .filter(Boolean)
@@ -789,6 +1576,24 @@ const Style = ({ attributes = {}, clientId }) => {
 		${getTypoCSS(selectorList(DEG_PARTS), degTypo)?.styles || ""}
 		${getTypoCSS(selectorList(TEXT_PARTS), textTypo)?.styles || ""}
 		${getTypoCSS(`${mainEl} .expandBtn`, expandedTypo)?.styles || ""}
+
+		${/* The badge's score, and the star row beside it.
+		     Neither maps onto a shared role: the score is a bold number the
+		     stylesheet sets at 18px/800, and the stars are five glyphs whose only
+		     real question is how big they are. Both were literals with nothing in
+		     the sidebar to change them.
+
+		     Their colours are not touched here -- the score already reads
+		     `--btb-title` and the stars `--btb-star`, so the Colors panel's Title
+		     and Rating Stars roles reach both, and painting them again from a
+		     second control would only give an author two ways to set one
+		     pixel. */ ""}
+		${getTypoCSS(`${mainEl} .btb-badge-rating .score`, badgeScoreTypo)?.styles || ""}
+		${
+      isSet(badgeStarsSize)
+        ? `${mainEl} .btb-badge-rating .stars {\n\t\t\tfont-size: ${badgeStarsSize}px;\n\t\t}`
+        : ""
+    }
  
 		
 		${mainEl} .slider-layout .swiper-slide {
@@ -871,6 +1676,13 @@ const Style = ({ attributes = {}, clientId }) => {
 			${paletteBorderCSS(border)};
 			${cardBoxShadowCSS}
 		}
+
+		${/* Hover, straight after the resting rule it has to beat. Same ID, same
+		     element, later in the sheet -- which is exactly what the stylesheet's
+		     own hover rule could not manage. */ ""}
+		${cardHoverCSS ? `${cardBoxEl}:hover {
+			${cardHoverCSS}
+		}` : ""}
 
 		${cardMarginCSS ? `${cardMarginEl} {\n\t\t\tmargin: ${cardMarginCSS};\n\t\t}` : ""}
  
@@ -961,6 +1773,39 @@ const Style = ({ attributes = {}, clientId }) => {
 
 		${/* The poll's text, scale buttons and box, on the same terms. */ ""}
 		${pollCSS}
+
+		${/* The Gradient Border Grid's ring and score pill. After the card box rule
+		     above, whose `background-color` the ring has to sit on top of. */ ""}
+		${gradientCSS}
+
+		${/* Its header wash, after the `.theme_2 .single .top` rule above that
+		     paints the colour underneath it. */ ""}
+		${headerWashCSS}
+
+		${/* The Speech Bubble tail: geometry, position, fill and outline. */ ""}
+		${bubbleCSS}
+
+		${/* The Trust Badges box, icon and text. */ ""}
+		${trustBadgeCSS}
+
+		${/* The FAQ accordion's row box. */ ""}
+		${faqCSS}
+
+		${/* The avatar ring. */ ""}
+		${avatarRingCSS}
+
+		${/* The card's corner wash, at rest and on hover. */ ""}
+		${cardWashCSS}
+
+		${/* The 3D arrangements' side-card fade. */ ""}
+		${sideOpacityCSS}
+
+		${/* The popup modal's box and text sizes, and the rating star's size. */ ""}
+		${modalCSS}
+
+		${starSizeCSS}
+
+		${compactStarCSS}
 
 		${sizeCSS("desktop")}
 

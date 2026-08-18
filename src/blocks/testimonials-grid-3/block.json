@@ -172,6 +172,30 @@
 			"type": "object",
 			"default": {}
 		},
+		"cardWash": {
+			"type": "boolean",
+			"default": true
+		},
+		"cardWashStrength": {
+			"type": "number",
+			"default": 100
+		},
+		"cardWashColor": {
+			"type": "string"
+		},
+		"cardHoverBg": {
+			"type": "string"
+		},
+		"cardHoverBorderColor": {
+			"type": "string"
+		},
+		"cardHoverShadow": {
+			"type": "object",
+			"default": {}
+		},
+		"cardHoverLift": {
+			"type": "number"
+		},
 		"imgBorder": {
 			"type": "object",
 			"default": {
@@ -181,6 +205,17 @@
 				"side": "all",
 				"radius": "50%"
 			}
+		},
+		"avatarRing": {
+			"type": "boolean",
+			"default": true
+		},
+		"avatarRingWidth": {
+			"type": "number",
+			"default": 3
+		},
+		"avatarRingColor": {
+			"type": "string"
 		},
 		"image": {
 			"type": "object",
@@ -328,6 +363,59 @@
 		"theme": {
 			"type": "string",
 			"default": "theme_2"
+		},
+		"gradientBorder": {
+			"type": "boolean",
+			"default": true
+		},
+		"gradientFrom": {
+			"type": "string",
+			"default": "#0575e6"
+		},
+		"gradientTo": {
+			"type": "string",
+			"default": "#7b2ff7"
+		},
+		"gradientAngle": {
+			"type": "number",
+			"default": 135
+		},
+		"gradientWidth": {
+			"type": "number",
+			"default": 3
+		},
+		"showStarBadge": {
+			"type": "boolean",
+			"default": true
+		},
+		"starBadgeBg": {
+			"type": "string"
+		},
+		"starBadgeColor": {
+			"type": "string"
+		},
+		"starBadgePosition": {
+			"type": "string",
+			"default": "top-right"
+		},
+		"starBadgeSize": {
+			"type": "number",
+			"default": 12
+		},
+		"starBadgeRadius": {
+			"type": "number",
+			"default": 999
+		},
+		"headerWash": {
+			"type": "boolean",
+			"default": true
+		},
+		"headerWashStrength": {
+			"type": "number",
+			"default": 100
+		},
+		"starSize": {
+			"type": "number"
 		}
 	},
 	"supports": {

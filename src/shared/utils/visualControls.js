@@ -81,7 +81,11 @@ export const LAYOUT_ROLES = {
 	// the role to colour.
 	'verified-buyer-badge': [ 'brandColor', 'surfaceColor', 'borderColor', 'borderWidth', 'titleColor', 'mutedColor' ],
 	'review-badge-widget': [ 'brandColor', 'surfaceColor', 'borderColor', 'borderWidth', 'titleColor', 'mutedColor', 'ratingColor' ],
-	'trust-badges': [ 'surfaceColor', 'borderColor', 'borderWidth', 'bodyColor' ],
+	// Secondary Text was missing while trust-badges.scss has always painted the
+	// badge subtitle `var(--btb-muted, #7b7b7b)` -- so the variable was declared
+	// by nothing and the subtitle colour could not be changed at all. The
+	// attribute was already in block.json; only the role was absent.
+	'trust-badges': [ 'surfaceColor', 'borderColor', 'borderWidth', 'bodyColor', 'mutedColor' ],
 	// No stars here -- the rating is a select -- so Rating Stars is not offered.
 	'testimonial-form': [ 'brandColor', 'surfaceColor', 'borderColor', 'borderWidth', 'titleColor', 'successColor', 'successBg', 'errorColor', 'errorBg' ],
 	'user-feedback-poll': [ 'brandColor', 'surfaceColor', 'borderColor', 'borderWidth', 'titleColor', 'mutedColor', 'trackColor', 'successColor' ],
@@ -100,11 +104,28 @@ export const LAYOUT_ROLES = {
 	'before-after': [ 'labelBgColor', 'labelTextColor', 'gripIconColor' ],
 	'case-study-card': [ 'brandColor', 'surfaceColor', 'borderColor', 'borderWidth', 'dividerColor', 'dividerWidth', 'titleColor', 'bodyColor', 'mutedColor' ],
 	'client-logos': [ 'borderColor', 'borderWidth', 'trackColor' ],
-	// No Accent for either: neither layout's stylesheet reads `--btb-accent`. The
-	// hero is a themed card in a plain wrapper, and the popup's modal is styled
-	// inline rather than through the palette.
+	// No Accent: the hero is a themed card in a plain wrapper and its stylesheet
+	// reads no `--btb-accent`.
 	'testimonials-hero': [ 'borderColor', 'borderWidth' ],
-	'testimonials-popup-modal': [ 'borderColor', 'borderWidth' ],
+	// The popup modal used to sit here with the hero, on the grounds that "the
+	// popup's modal is styled inline rather than through the palette". That was
+	// true and is the reason the block shipped with an unstyleable popup: every
+	// value was an inline style, which outranks the palette variables entirely.
+	//
+	// The modal is CSS now and its five parts read `--btb-surface`, `--btb-title`,
+	// `--btb-body`, `--btb-muted` and `--btb-star`, so those roles reach inside
+	// the popup -- which is what stops a dark palette from opening a white popup
+	// out of a dark trigger card. Each one was checked against the declaration
+	// that consumes it in frontend.scss, not assumed.
+	'testimonials-popup-modal': [
+		'surfaceColor',
+		'borderColor',
+		'borderWidth',
+		'titleColor',
+		'bodyColor',
+		'mutedColor',
+		'ratingColor',
+	],
 	// No Border Color or Width: the bubble's avatar ring is a fixed 2px in the
 	// accent colour, and the bubble itself has no border at all.
 	'testimonials-floating-bubble': [ 'brandColor', 'bodyColor', 'trackColor' ],
@@ -231,6 +252,19 @@ export const ROLE_CONDITIONS = {
 
 export const PALETTE_ALIASES = {
 	'rating-summary': { ratingColor: 'starColor' },
+	// The form's Accent no longer has a control of its own. Its "Form Colors"
+	// panel held one "Accent (button)" picker, and the Submit Button panel beside
+	// it now owns that pixel through `btnBg` -- TestimonialForm reads
+	// `btnBg || accentColor`, so the two were a second dial on one value, which
+	// is what the Card/Colors consolidation elsewhere in this plugin exists to
+	// avoid.
+	//
+	// The alias stays regardless. `accentColor` is still the button's fallback,
+	// so a form saved with an accent and no button background keeps its colour,
+	// and `--btb-accent` still reaches the `.btb-form-wrapper` rules that a page
+	// cached before the markup changed is still using. Keeping the role aliased
+	// is also what keeps the Colors panel from offering an Accent control that
+	// paints nothing in the current markup.
 	'testimonial-form': { brandColor: 'accentColor' },
 	'testimonial-stats': { brandColor: 'accentColor' },
 };

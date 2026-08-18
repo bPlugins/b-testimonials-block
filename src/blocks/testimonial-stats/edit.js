@@ -1,10 +1,10 @@
 import { useEffect } from 'react';
 import { __ } from '@wordpress/i18n';
 import { useBlockProps, InspectorControls } from '@wordpress/block-editor';
-import { PanelBody, RangeControl, TextControl, ToggleControl, Button, Dashicon, PanelRow, __experimentalUnitControl as UnitControl } from '@wordpress/components';
-import { produce } from 'immer';
+import { PanelBody, RangeControl, TextControl, ToggleControl, PanelRow, __experimentalUnitControl as UnitControl } from '@wordpress/components';
 import BlockSwitcher from '../../shared/Components/Common/BlockSwitcher';
 import SettingsTabs from '../../shared/Components/Backend/Settings/SettingsTabs';
+import ItemCards from '../../shared/Components/Backend/Settings/ItemCards';
 import usePreviewDevice, { colsForDevice, useDeviceKey } from '../../shared/utils/usePreviewDevice';
 import Label from '../../../../bpl-tools/Components/Label/Label';
 import Device from '../../../../bpl-tools/Components/Device/Device';
@@ -47,9 +47,6 @@ const Edit = ( { attributes, setAttributes, clientId } ) => {
 	}, [ clientId, setAttributes ] );
 
 	const setColumn = ( device, val ) => setAttributes( { columns: { ...columns, [ device ]: val } } );
-	const updateItem = ( i, key, val ) => setAttributes( { items: produce( items, ( d ) => { d[ i ][ key ] = val; } ) } );
-	const addItem = () => setAttributes( { items: [ ...items, { number: 100, prefix: '', suffix: '+', label: 'Label' } ] } );
-	const removeItem = ( i ) => setAttributes( { items: items.filter( ( _, idx ) => idx !== i ) } );
 
 	return (
 		<>
@@ -72,19 +69,25 @@ const Edit = ( { attributes, setAttributes, clientId } ) => {
 						</PanelBody>
 
 						<PanelBody className="bPlPanelBody" title={ __( 'Stats', 'b-testimonials-block' ) } initialOpen={ false }>
-							{ items.map( ( item, i ) => (
-								<div key={ i } className="btb-stat-row">
-									<TextControl label={ __( 'Number', 'b-testimonials-block' ) } type="number" value={ item?.number } onChange={ ( v ) => updateItem( i, 'number', Number( v ) ) } />
-									<div className="btb-stat-inline">
-										<TextControl label={ __( 'Prefix', 'b-testimonials-block' ) } value={ item?.prefix || '' } onChange={ ( v ) => updateItem( i, 'prefix', v ) } />
-										<TextControl label={ __( 'Suffix', 'b-testimonials-block' ) } value={ item?.suffix || '' } onChange={ ( v ) => updateItem( i, 'suffix', v ) } />
-									</div>
-									<TextControl label={ __( 'Label', 'b-testimonials-block' ) } value={ item?.label || '' } onChange={ ( v ) => updateItem( i, 'label', v ) } />
-									<Button isDestructive onClick={ () => removeItem( i ) }><Dashicon icon="trash" /> { __( 'Remove', 'b-testimonials-block' ) }</Button>
-									<hr />
-								</div>
-							) ) }
-							<Button variant="primary" onClick={ addItem }><Dashicon icon="plus" /> { __( 'Add stat', 'b-testimonials-block' ) }</Button>
+							{/* One stat at a time, matching the testimonial card editor. */}
+							<ItemCards
+								items={ items }
+								onChange={ ( next ) => setAttributes( { items: next } ) }
+								newItem={ { number: 100, prefix: '', suffix: '+', label: 'Label' } }
+								itemLabel={ __( 'Stat', 'b-testimonials-block' ) }
+								addLabel={ __( 'Add New Stat', 'b-testimonials-block' ) }
+							>
+								{ ( item, i, update ) => (
+									<>
+										<TextControl label={ __( 'Number', 'b-testimonials-block' ) } type="number" value={ item?.number } onChange={ ( v ) => update( 'number', Number( v ) ) } />
+										<div className="btb-stat-inline">
+											<TextControl label={ __( 'Prefix', 'b-testimonials-block' ) } value={ item?.prefix || '' } onChange={ ( v ) => update( 'prefix', v ) } />
+											<TextControl label={ __( 'Suffix', 'b-testimonials-block' ) } value={ item?.suffix || '' } onChange={ ( v ) => update( 'suffix', v ) } />
+										</div>
+										<TextControl label={ __( 'Label', 'b-testimonials-block' ) } value={ item?.label || '' } onChange={ ( v ) => update( 'label', v ) } />
+									</>
+								) }
+							</ItemCards>
 						</PanelBody>
 						</>
 					}
@@ -92,7 +95,7 @@ const Edit = ( { attributes, setAttributes, clientId } ) => {
 						<>
 						<ColorsPanel attributes={ attributes } setAttributes={ setAttributes } />
 						<SizeSpacingPanel attributes={ attributes } setAttributes={ setAttributes } />
-						<PanelBody className="bPlPanelBody" title={ __( 'Color', 'b-testimonials-block' ) } initialOpen={ false }>
+						<PanelBody className="bPlPanelBody" title={ __( 'Stat Colors', 'b-testimonials-block' ) } initialOpen={ false }>
 							<ColorControl label={ __( 'Number color', 'b-testimonials-block' ) } value={ accentColor } onChange={ ( v ) => setAttributes( { accentColor: v } ) } />
 						</PanelBody>
 

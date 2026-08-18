@@ -407,3 +407,29 @@ export const CHILD_BLOCKS_LIST = [
     badge: __("New", "b-testimonials-block"),
   },
 ];
+
+/**
+ * The four categories every child block above belongs to, in display order.
+ *
+ * Shared rather than declared inside the switcher modal, which is where these
+ * labels used to live: the canvas placeholder tags each of its cards with its
+ * category too, and two copies of the list would drift the moment one screen was
+ * renamed. `all` is a filter option, not a category a block can carry, so it is
+ * kept separate.
+ */
+export const CHILD_BLOCK_CATEGORIES = [
+  { id: "layouts", label: __("Grid & Layouts", "b-testimonials-block") },
+  { id: "social", label: __("Trust & Badges", "b-testimonials-block") },
+  { id: "media", label: __("Media & Audio", "b-testimonials-block") },
+  { id: "interactive", label: __("Forms & Polls", "b-testimonials-block") },
+];
+
+/**
+ * Label for a category id, falling back to the id so an unlisted category still
+ * renders something rather than an empty chip.
+ *
+ * @param {string} id Category id from CHILD_BLOCKS_LIST.
+ * @return {string} Human-readable label.
+ */
+export const getChildBlockCategoryLabel = (id) =>
+  CHILD_BLOCK_CATEGORIES.find((cat) => cat.id === id)?.label || id;

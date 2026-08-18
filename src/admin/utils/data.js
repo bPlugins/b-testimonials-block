@@ -16,17 +16,55 @@ const phpTabIcon = <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' w
 
 
 import welcomeBanner from '../assets/welcomeBanner';
+import { CHILD_BLOCKS_LIST } from '../../shared/utils/childBlocks';
+import { blockIcon, getLayoutSvgIcon } from '../../shared/utils/icons';
 
 const slug = 'b-testimonial';
+
+/**
+ * The icon for one demo card, by preview slug.
+ *
+ * Each card used to draw its category's icon, so all seven Grids & Lists demos
+ * carried the same four-square glyph and the tile told you nothing the category
+ * chip underneath it did not already say. These come from CHILD_BLOCKS_LIST --
+ * the same list the block inserter and the canvas picker draw from -- so a block
+ * looks like itself everywhere it appears.
+ *
+ * `b-testimonials` is the parent container and has no entry in that list, so it
+ * takes the icon the block API already gives it in the inserter. Left to the
+ * component's fallback it drew its category's four-square glyph -- the same icon
+ * as the Minimalist Reviews Grid card two along from it.
+ *
+ * @param {string} demoSlug Preview slug, i.e. the block name after `bptmb/`.
+ * @return {JSX.Element} Icon element.
+ */
+const demoBlockIcon = ( demoSlug ) => {
+	const child = CHILD_BLOCKS_LIST.find( ( block ) => block.name === `bptmb/${ demoSlug }` );
+
+	// 20px to match the category icons this replaces, which the card's own CSS
+	// then sizes to 22px alongside them.
+	return child ? getLayoutSvgIcon( child.icon, 20 ) : blockIcon.src;
+};
 
 export const dashboardInfo = (info) => {
 	const { version, isPremium, hasPro, adminUrl, demoBase = '/', licenseActiveNonce, deleteDataOnUninstall = false, uninstallNonce = '' } = info;
 	const proSuffix = isPremium ? ' Pro' : '';
 
 	return {
-		name: `B Testimonials Block${proSuffix}`,
+		/*
+		 * "Testimonials", not the plugin's registered "B Testimonials Block".
+		 *
+		 * This is the name the dashboard prints in three places -- the header
+		 * wordmark, "Welcome to {name}" on the Welcome page, and "See the {name} in
+		 * action" on Demos -- and next to the bPlugins mark in every one of them the
+		 * "B" and the "Block" are saying what the surrounding chrome already says.
+		 * The plugin's real name is untouched everywhere it identifies the plugin
+		 * rather than decorates a heading: the Plugin Name header, the readme title,
+		 * the block titles and `slug` below.
+		 */
+		name: `Testimonials${proSuffix}`,
 		displayName: `B Testimonials Block${proSuffix} - Show Customer Reviews, Ratings, Badges & Video Testimonials`,
-		description: 'B Testimonials Block is a WordPress plugin that lets you showcase customer reviews, star ratings, video testimonials, trust badges, and interactive feedback forms.',
+		description: 'Testimonials is a WordPress plugin that lets you showcase customer reviews, star ratings, video testimonials, trust badges, and interactive feedback forms.',
 		slug,
 		version,
 		isPremium,
@@ -193,6 +231,8 @@ export const demoInfo = ( demoBase = '/' ) => ( {
 			title: label,
 			type: 'iframe',
 			url: `${ demoBase }?bpbtb_demo=${ slug }`,
+			// The block's own icon rather than this group's -- see demoBlockIcon().
+			icon: demoBlockIcon( slug ),
 		} ) ),
 	} ) ),
 } );

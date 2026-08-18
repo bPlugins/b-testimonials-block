@@ -25,10 +25,62 @@ class BPBTB_Admin_Menu {
 	 */
 	const UNINSTALL_OPTION = 'bpbtb_delete_data_on_uninstall';
 
+	/**
+	 * The plugin's two PHP admin screens, by the tail of their hook suffix.
+	 *
+	 * They render in PHP rather than React but are styled to match the dashboard
+	 * this class already loads assets for -- see assets/admin-pages.css -- so
+	 * their stylesheet is registered here alongside it rather than in each page's
+	 * own file, where it would have to be duplicated.
+	 */
+	const PAGE_SCREENS = [ 'bpbtb-submissions', 'bpbtb-nps-poll' ];
+
 	public function __construct() {
 		add_action( 'admin_enqueue_scripts', [ $this, 'admin_enqueue_scripts' ] );
 		add_action( 'admin_menu', [ $this, 'admin_menu' ] );
+		add_filter( 'admin_body_class', [ $this, 'admin_body_class' ] );
 		add_action( 'wp_ajax_bpbtbSaveUninstallOption', [ $this, 'save_uninstall_option' ] );
+	}
+
+	/**
+	 * Is the screen currently loading one of the styled PHP pages?
+	 *
+	 * Matched on a substring the way the dashboard's own check is: the full hook
+	 * is `testimonial_page_<slug>`, and that prefix follows the CPT that owns the
+	 * submenu rather than anything this plugin controls.
+	 *
+	 * @param string $hook Current admin page hook suffix.
+	 * @return bool
+	 */
+	private function is_styled_page( $hook ) {
+		foreach ( self::PAGE_SCREENS as $slug ) {
+			if ( false !== strpos( $hook, $slug ) ) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	/**
+	 * Marks the two PHP pages on <body>.
+	 *
+	 * The stylesheet needs a handle outside its own wrapper to hide the notices
+	 * core prints above the page -- a white strip above a full-bleed canvas reads
+	 * as a rendering fault. The plugin's own messages are moved inside the
+	 * wrapper by each page and styled there.
+	 *
+	 * @param string $classes Existing body classes.
+	 * @return string
+	 */
+	public function admin_body_class( $classes ) {
+		$screen = function_exists( 'get_current_screen' ) ? get_current_screen() : null;
+
+		if ( $screen && $this->is_styled_page( $screen->id ) ) {
+			$classes .= ' bpbtb-admin-page-host';
+		}
+
+		return $classes;
 	}
 
 	public function admin_enqueue_scripts( $hook ) {
@@ -63,6 +115,26 @@ class BPBTB_Admin_Menu {
 			);
 
 			wp_set_script_translations( 'bpbtb-admin-dashboard', 'b-testimonials-block', plugin_dir_path( __DIR__ ) . 'languages' );
+		}
+
+		if ( $this->is_styled_page( $hook ) ) {
+			// Roboto, the family bpl-tools' dashboard stylesheet sets on everything.
+			// Not Lato: that is only used for the dashboard header's wordmark, and
+			// these screens have no header. Enqueued rather than @imported so it
+			// does not block the stylesheet behind it.
+			wp_enqueue_style(
+				'bpbtb-admin-fonts',
+				'https://fonts.googleapis.com/css2?family=Roboto:wght@100..900&display=swap',
+				[],
+				null
+			);
+
+			wp_enqueue_style(
+				'bpbtb-admin-pages',
+				plugin_dir_url( __DIR__ ) . 'assets/admin-pages.css',
+				[ 'bpbtb-admin-fonts' ],
+				BPBTB_PLUGIN_VERSION
+			);
 		}
 	}
 

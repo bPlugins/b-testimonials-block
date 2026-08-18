@@ -5,8 +5,6 @@ import {
   PanelBody,
   RangeControl,
   TextControl,
-  Button,
-  Dashicon,
   PanelRow,
   SandBox,
   __experimentalUnitControl as UnitControl,
@@ -14,6 +12,7 @@ import {
 import { produce } from "immer";
 import BlockSwitcher from "../../shared/Components/Common/BlockSwitcher";
 import SettingsTabs from "../../shared/Components/Backend/Settings/SettingsTabs";
+import ItemCards from "../../shared/Components/Backend/Settings/ItemCards";
 import { InlineDetailMediaUpload } from "../../../../bpl-tools/Components/MediaControl/MediaControl";
 import usePreviewDevice, {
   colsForDevice,
@@ -76,25 +75,6 @@ const Edit = ({ attributes, setAttributes, clientId }) => {
   const setColumn = (device, val) =>
     setAttributes({ columns: { ...columns, [device]: val } });
 
-  const updateItem = (index, key, val) => {
-    setAttributes({
-      items: produce(items, (draft) => {
-        draft[index][key] = val;
-      }),
-    });
-  };
-
-  const addItem = () =>
-    setAttributes({
-      items: [
-        ...items,
-        { videoUrl: "", poster: { url: "" }, name: "", deg: "", company: "" },
-      ],
-    });
-
-  const removeItem = (index) =>
-    setAttributes({ items: items.filter((_, i) => i !== index) });
-
   return (
     <>
       <InspectorControls>
@@ -102,7 +82,10 @@ const Edit = ({ attributes, setAttributes, clientId }) => {
           general={
             <>
               <BlockSwitcher clientId={clientId} />
-              <IconSettings attributes={attributes} setAttributes={setAttributes} />
+              <IconSettings
+                attributes={attributes}
+                setAttributes={setAttributes}
+              />
               <PanelBody
                 className="bPlPanelBody"
                 title={__("Layout", "b-testimonials-block")}>
@@ -144,59 +127,68 @@ const Edit = ({ attributes, setAttributes, clientId }) => {
                 className="bPlPanelBody"
                 title={__("Videos", "b-testimonials-block")}
                 initialOpen={false}>
-                {items.map((item, index) => (
-                  <div key={index} className="btb-video-row">
-                    <strong>
-                      {__("Video", "b-testimonials-block")} {index + 1}
-                    </strong>
-                    <TextControl
-                      label={__("Video URL", "b-testimonials-block")}
-                      placeholder="YouTube / Vimeo / .mp4"
-                      value={item?.videoUrl || ""}
-                      onChange={(val) => updateItem(index, "videoUrl", val)}
-                    />
-                    <InlineDetailMediaUpload
-                      label={__("Poster image", "b-testimonials-block")}
-                      value={item?.poster}
-                      onChange={(val) => updateItem(index, "poster", val)}
-                    />
-                    <TextControl
-                      label={__("Name", "b-testimonials-block")}
-                      value={item?.name || ""}
-                      onChange={(val) => updateItem(index, "name", val)}
-                    />
-                    <TextControl
-                      label={__("Designation", "b-testimonials-block")}
-                      value={item?.deg || ""}
-                      onChange={(val) => updateItem(index, "deg", val)}
-                    />
-                    <TextControl
-                      label={__("Company", "b-testimonials-block")}
-                      value={item?.company || ""}
-                      onChange={(val) => updateItem(index, "company", val)}
-                    />
-                    <Button isDestructive onClick={() => removeItem(index)}>
-                      <Dashicon icon="trash" /> {__("Remove", "b-testimonials-block")}
-                    </Button>
-                    <hr />
-                  </div>
-                ))}
-                <Button variant="primary" onClick={addItem}>
-                  <Dashicon icon="plus" /> {__("Add video", "b-testimonials-block")}
-                </Button>
+                {/* One video at a time, chosen from the chips -- the same editor
+                    the testimonial cards have. Every item used to be expanded at
+                    once, which at four videos ran past a screen of sidebar. */}
+                <ItemCards
+                  items={items}
+                  onChange={(next) => setAttributes({ items: next })}
+                  newItem={{
+                    videoUrl: "",
+                    poster: { url: "" },
+                    name: "",
+                    deg: "",
+                    company: "",
+                  }}
+                  itemLabel={__("Video", "b-testimonials-block")}
+                  addLabel={__("Add New Video", "b-testimonials-block")}>
+                  {(item, index, update) => (
+                    <>
+                      <TextControl
+                        label={__("Video URL", "b-testimonials-block")}
+                        placeholder="YouTube / Vimeo / .mp4"
+                        value={item?.videoUrl || ""}
+                        onChange={(val) => update("videoUrl", val)}
+                      />
+                      <InlineDetailMediaUpload
+                        label={__("Poster image", "b-testimonials-block")}
+                        value={item?.poster}
+                        onChange={(val) => update("poster", val)}
+                      />
+                      <TextControl
+                        label={__("Video Name", "b-testimonials-block")}
+                        value={item?.name || ""}
+                        onChange={(val) => update("name", val)}
+                      />
+                      <TextControl
+                        label={__("Video Designation", "b-testimonials-block")}
+                        value={item?.deg || ""}
+                        onChange={(val) => update("deg", val)}
+                      />
+                      <TextControl
+                        label={__("Company", "b-testimonials-block")}
+                        value={item?.company || ""}
+                        onChange={(val) => update("company", val)}
+                      />
+                    </>
+                  )}
+                </ItemCards>
               </PanelBody>
             </>
           }
           style={
             <>
-              <ColorsPanel attributes={attributes} setAttributes={setAttributes} />
+              <ColorsPanel
+                attributes={attributes}
+                setAttributes={setAttributes}
+              />
               <SizeSpacingPanel
                 attributes={attributes}
                 setAttributes={setAttributes}
               />
               <PanelBody
                 className="bPlPanelBody"
-                title={__("Color", "b-testimonials-block")}
+                title={__("Video Colors", "b-testimonials-block")}
                 initialOpen={false}>
                 <ColorControl
                   label={__("Play button", "b-testimonials-block")}
@@ -212,7 +204,7 @@ const Edit = ({ attributes, setAttributes, clientId }) => {
       				     is unchanged. */}
               <PanelBody
                 className="bPlPanelBody"
-                title={__("Name", "b-testimonials-block")}
+                title={__("Video Name", "b-testimonials-block")}
                 initialOpen={false}>
                 <Typography
                   className="mt10"
@@ -223,14 +215,14 @@ const Edit = ({ attributes, setAttributes, clientId }) => {
                 />
                 <ColorControl
                   className="mb10"
-                  label={__("Color", "b-testimonials-block")}
+                  label={__("Video Colors", "b-testimonials-block")}
                   value={nameColor}
                   onChange={(val) => setAttributes({ nameColor: val })}
                 />
               </PanelBody>
               <PanelBody
                 className="bPlPanelBody"
-                title={__("Designation", "b-testimonials-block")}
+                title={__("Video Designation", "b-testimonials-block")}
                 initialOpen={false}>
                 <Typography
                   className="mt10"
@@ -241,7 +233,7 @@ const Edit = ({ attributes, setAttributes, clientId }) => {
                 />
                 <ColorControl
                   className="mb10"
-                  label={__("Color", "b-testimonials-block")}
+                  label={__("Video Colors", "b-testimonials-block")}
                   value={degColor}
                   onChange={(val) => setAttributes({ degColor: val })}
                 />

@@ -136,6 +136,14 @@
       "type": "string",
       "default": "#f9f8f8"
     },
+    "headerWash": {
+      "type": "boolean",
+      "default": true
+    },
+    "headerWashStrength": {
+      "type": "number",
+      "default": 100
+    },
     "grid2Padding": {
       "type": "object",
       "default": {
@@ -196,6 +204,30 @@
       "type": "object",
       "default": {}
     },
+    "cardWash": {
+      "type": "boolean",
+      "default": true
+    },
+    "cardWashStrength": {
+      "type": "number",
+      "default": 100
+    },
+    "cardWashColor": {
+      "type": "string"
+    },
+    "cardHoverBg": {
+      "type": "string"
+    },
+    "cardHoverBorderColor": {
+      "type": "string"
+    },
+    "cardHoverShadow": {
+      "type": "object",
+      "default": {}
+    },
+    "cardHoverLift": {
+      "type": "number"
+    },
     "imgBorder": {
       "type": "object",
       "default": {
@@ -205,6 +237,17 @@
         "side": "all",
         "radius": "50%"
       }
+    },
+    "avatarRing": {
+      "type": "boolean",
+      "default": true
+    },
+    "avatarRingWidth": {
+      "type": "number",
+      "default": 3
+    },
+    "avatarRingColor": {
+      "type": "string"
     },
     "image": {
       "type": "object",
@@ -323,6 +366,38 @@
     "layout": {
       "type": "string",
       "default": "faq-testimonial-accordion"
+    },
+    "faqRadius": {
+      "type": "string"
+    },
+    "faqRowGap": {
+      "type": "number"
+    },
+    "faqBg": {
+      "type": "string"
+    },
+    "faqShadow": {
+      "type": "object",
+      "default": {}
+    },
+    "faqQuestionPadding": {
+      "type": "object",
+      "default": {}
+    },
+    "faqAnswerPadding": {
+      "type": "object",
+      "default": {}
+    },
+    "faqExclusive": {
+      "type": "boolean",
+      "default": false
+    },
+    "faqFirstOpen": {
+      "type": "boolean",
+      "default": false
+    },
+    "starSize": {
+      "type": "number"
     }
   },
   "supports": {

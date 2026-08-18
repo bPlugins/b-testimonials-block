@@ -372,588 +372,284 @@ function bpbtb_render_nps_poll_admin_page() {
 	$cats  = bpbtb_get_nps_categories();
 
 	// phpcs:ignore WordPress.Security.NonceVerification.Recommended
-	$msg = isset( $_GET['msg'] ) ? sanitize_key( wp_unslash( $_GET['msg'] ) ) : '';
+	$msg          = isset( $_GET['msg'] ) ? sanitize_key( wp_unslash( $_GET['msg'] ) ) : '';
+	$btb_max_mark = isset( $stats['max_mark'] ) ? (int) $stats['max_mark'] : 10;
 	?>
-	<style>
-		.bpbtb-nps-wrap {
-			max-width: 1280px;
-			/* auto left/right centres the page in the admin content area; the
-			   old `0` left margin pinned it to the edge on wide screens. */
-			margin: 24px auto 40px;
-			padding: 0 20px;
-			box-sizing: border-box;
-			font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
-		}
 
-		.bpbtb-nps-hero {
-			background: linear-gradient(135deg, #1b2d4b 0%, #2e4d7f 40%, #146ef5 100%);
-			border-radius: 16px;
-			padding: 28px 32px;
-			color: #ffffff;
-			display: flex;
-			align-items: center;
-			justify-content: space-between;
-			box-shadow: 0 10px 25px -5px rgba(20, 110, 245, 0.25);
-			margin-bottom: 24px;
-		}
+	<div class="bpbtb-admin-page">
 
-		.bpbtb-nps-hero-title {
-			margin: 0 0 6px 0;
-			font-size: 24px;
-			font-weight: 800;
-			color: #ffffff;
-			display: flex;
-			align-items: center;
-			gap: 10px;
-		}
+		<div class="bpbtb-admin-main">
+			<div class="bpbtb-admin-wrap">
+				<?php if ( 'deleted' === $msg ) : ?>
+					<div class="notice notice-success is-dismissible"><p><?php esc_html_e( 'Poll response entry deleted.', 'b-testimonials-block' ); ?></p></div>
+				<?php elseif ( 'cleared' === $msg ) : ?>
+					<div class="notice notice-success is-dismissible"><p><?php esc_html_e( 'All poll response entries cleared.', 'b-testimonials-block' ); ?></p></div>
+				<?php elseif ( 'categories_saved' === $msg ) : ?>
+					<div class="notice notice-success is-dismissible"><p><?php esc_html_e( 'Category settings saved. Existing responses were re-sorted into the new bands.', 'b-testimonials-block' ); ?></p></div>
+				<?php elseif ( 'categories_reset' === $msg ) : ?>
+					<div class="notice notice-success is-dismissible"><p><?php esc_html_e( 'Category settings restored to the NPS defaults.', 'b-testimonials-block' ); ?></p></div>
+				<?php endif; ?>
 
-		.bpbtb-nps-hero-desc {
-			margin: 0;
-			font-size: 14px;
-			color: rgba(255, 255, 255, 0.8);
-		}
+				<header class="bpbtb-hero">
+					<span class="bpbtb-eyebrow"><?php esc_html_e( 'Feedback Poll', 'b-testimonials-block' ); ?></span>
+					<h1><?php esc_html_e( 'Feedback & NPS Poll', 'b-testimonials-block' ); ?></h1>
+					<p><?php esc_html_e( 'Track and analyze all visitor Net Promoter Score (NPS) marks submitted on your site.', 'b-testimonials-block' ); ?></p>
+				</header>
 
-		.bpbtb-nps-grid {
-			display: grid;
-			grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
-			gap: 16px;
-			margin-bottom: 24px;
-		}
-
-		.bpbtb-nps-card {
-			background: #ffffff;
-			border: 1px solid #e2e8f0;
-			border-radius: 14px;
-			padding: 20px 24px;
-			box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
-			text-align: center;
-		}
-
-		.bpbtb-nps-card .nps-val {
-			font-size: 32px;
-			font-weight: 800;
-			color: #146ef5;
-			margin: 4px 0;
-		}
-
-		.bpbtb-nps-card .nps-lbl {
-			font-size: 13px;
-			font-weight: 600;
-			color: #64748b;
-		}
-
-		.bpbtb-nps-marks-box {
-			background: #ffffff;
-			border: 1px solid #e2e8f0;
-			border-radius: 16px;
-			padding: 28px;
-			box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04);
-			margin-bottom: 28px;
-		}
-
-		.bpbtb-nps-marks-box h3 {
-			margin: 0 0 8px 0;
-			font-size: 18px;
-			font-weight: 700;
-			color: #1e293b;
-		}
-
-		.bpbtb-nps-marks-box p {
-			margin: 0 0 20px 0;
-			font-size: 13px;
-			color: #64748b;
-		}
-
-		.bpbtb-marks-list {
-			display: flex;
-			flex-direction: column;
-			gap: 10px;
-		}
-
-		.bpbtb-mark-row {
-			display: flex;
-			align-items: center;
-			gap: 14px;
-			font-size: 13px;
-		}
-
-		.bpbtb-mark-badge {
-			width: 64px;
-			font-weight: 700;
-			color: #1e293b;
-			display: flex;
-			align-items: center;
-			gap: 6px;
-		}
-
-		.bpbtb-mark-pill {
-			width: 28px;
-			height: 28px;
-			border-radius: 6px;
-			background: #146ef5;
-			color: #ffffff;
-			display: inline-flex;
-			align-items: center;
-			justify-content: center;
-			font-weight: 700;
-			font-size: 13px;
-		}
-
-		.bpbtb-mark-track {
-			flex: 1;
-			height: 12px;
-			background: #f1f5f9;
-			border-radius: 6px;
-			overflow: hidden;
-		}
-
-		.bpbtb-mark-fill {
-			height: 100%;
-			border-radius: 6px;
-			transition: width 0.4s ease;
-		}
-
-		/* Painted from the category settings so a custom colour reaches the
-		   bars as well as the log's labels. */
-		.bpbtb-mark-fill.promoter { background: <?php echo esc_html( $cats['colors']['promoter'] ); ?>; }
-		.bpbtb-mark-fill.passive { background: <?php echo esc_html( $cats['colors']['passive'] ); ?>; }
-		.bpbtb-mark-fill.detractor { background: <?php echo esc_html( $cats['colors']['detractor'] ); ?>; }
-
-		.bpbtb-mark-count {
-			width: 90px;
-			text-align: right;
-			font-weight: 600;
-			color: #475569;
-		}
-
-		/* Category settings */
-		.bpbtb-cat-grid {
-			display: grid;
-			gap: 10px;
-			margin-top: 16px;
-		}
-
-		.bpbtb-cat-row {
-			display: flex;
-			align-items: flex-end;
-			flex-wrap: wrap;
-			gap: 12px;
-			padding: 12px;
-			border: 1px solid #e2e8f0;
-			border-radius: 10px;
-			background: #f8fafc;
-		}
-
-		.bpbtb-cat-swatch {
-			width: 6px;
-			align-self: stretch;
-			border-radius: 3px;
-			flex: none;
-		}
-
-		.bpbtb-cat-cell {
-			display: flex;
-			flex-direction: column;
-			gap: 4px;
-			flex: 1 1 160px;
-			min-width: 0;
-			font-size: 12px;
-			font-weight: 600;
-			color: #64748b;
-		}
-
-		.bpbtb-cat-cell-sm {
-			flex: 0 1 130px;
-		}
-
-		.bpbtb-cat-cell input {
-			width: 100%;
-			box-sizing: border-box;
-		}
-
-		.bpbtb-cat-cell input[type="color"] {
-			height: 32px;
-			padding: 2px;
-		}
-
-		.bpbtb-cat-range {
-			flex: 1 1 150px;
-			font-size: 12px;
-			color: #475569;
-			padding-bottom: 6px;
-		}
-
-		.bpbtb-cat-note {
-			font-size: 12px;
-			color: #64748b;
-			font-style: normal;
-		}
-
-		.bpbtb-cat-actions {
-			display: flex;
-			align-items: center;
-			flex-wrap: wrap;
-			gap: 10px;
-			margin-top: 16px;
-		}
-
-		.bpbtb-nps-table-card {
-			background: #ffffff;
-			border: 1px solid #e2e8f0;
-			border-radius: 16px;
-			padding: 24px;
-			box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04);
-		}
-
-		.bpbtb-table-hdr {
-			display: flex;
-			align-items: center;
-			justify-content: space-between;
-			margin-bottom: 16px;
-		}
-
-		.bpbtb-table-hdr h3 {
-			margin: 0;
-			font-size: 18px;
-			font-weight: 700;
-			color: #1e293b;
-		}
-		/* ---------------------------------------------------------------
-		   Responsive.
-
-		   Same story as the Submissions page: no media queries at all, so
-		   at 380px this page was 495px wide with the last two stat cards
-		   off the edge. The 960px and 782px points below are the ones
-		   WordPress already uses for the admin menu and touch sizing.
-		   --------------------------------------------------------------- */
-
-		@media screen and (max-width: 960px) {
-			.bpbtb-nps-hero {
-				flex-direction: column;
-				align-items: flex-start;
-				gap: 16px;
-				padding: 24px;
-			}
-		}
-
-		@media screen and (max-width: 782px) {
-			.bpbtb-nps-wrap {
-				margin-top: 12px;
-				padding: 0 12px;
-			}
-
-			.bpbtb-nps-hero-title {
-				font-size: 20px;
-			}
-
-			.bpbtb-nps-marks-box,
-			.bpbtb-nps-table-card {
-				padding: 20px 16px;
-			}
-
-			/* The vote count moves under its bar; keeping it in the row left
-			   the bar about 40px wide and unreadable. */
-			.bpbtb-mark-row {
-				flex-wrap: wrap;
-				gap: 8px 12px;
-			}
-
-			.bpbtb-mark-badge {
-				width: auto;
-			}
-
-			.bpbtb-mark-track {
-				flex: 1 1 120px;
-			}
-
-			.bpbtb-mark-count {
-				width: auto;
-				text-align: left;
-				font-size: 12px;
-			}
-
-			/* Stacked cards, one labelled line per column.
-
-			   Core's own mobile list-table rules hide every column after
-			   `.column-primary` behind an expand toggle. This table has no
-			   primary column and no toggle button, so core would leave five
-			   columns fighting over a phone's width; these rules take the
-			   layout over completely instead. */
-			.bpbtb-nps-log-table,
-			.bpbtb-nps-log-table tbody,
-			.bpbtb-nps-log-table tr,
-			.bpbtb-nps-log-table td {
-				display: block;
-				width: auto;
-			}
-
-			.bpbtb-nps-log-table thead {
-				display: none;
-			}
-
-			.bpbtb-nps-log-table tr {
-				padding: 10px 0;
-				border-bottom: 1px solid #e2e8f0;
-			}
-
-			.bpbtb-nps-log-table tr:last-child {
-				border-bottom: none;
-			}
-
-			.bpbtb-nps-log-table td {
-				padding: 5px 12px !important;
-				text-align: left !important;
-				border: none;
-			}
-
-			.bpbtb-nps-log-table td[data-colname]::before {
-				content: attr(data-colname);
-				display: block;
-				margin-bottom: 2px;
-				font-size: 11px;
-				font-weight: 700;
-				text-transform: uppercase;
-				letter-spacing: 0.5px;
-				color: #94a3b8;
-				/* Core absolutely positions this label into a left gutter,
-				   where it lands on top of the value once the row is
-				   stacked. `!important` rather than a longer selector
-				   because core's own rule
-				   `.wp-list-table tr:not(.inline-edit-row):not(.no-items)
-				    td:not(.column-primary)::before`
-				   scores higher than anything reasonable here, and matching
-				   it exactly would leave the outcome resting on stylesheet
-				   order. */
-				position: static !important;
-				width: auto !important;
-				overflow: visible !important;
-				white-space: normal !important;
-			}
-		}
-	</style>
-
-	<div class="bpbtb-nps-wrap">
-		<?php if ( 'deleted' === $msg ) : ?>
-			<div class="notice notice-success is-dismissible"><p><?php esc_html_e( 'Poll response entry deleted.', 'b-testimonials-block' ); ?></p></div>
-		<?php elseif ( 'cleared' === $msg ) : ?>
-			<div class="notice notice-success is-dismissible"><p><?php esc_html_e( 'All poll response entries cleared.', 'b-testimonials-block' ); ?></p></div>
-		<?php elseif ( 'categories_saved' === $msg ) : ?>
-			<div class="notice notice-success is-dismissible"><p><?php esc_html_e( 'Category settings saved. Existing responses were re-sorted into the new bands.', 'b-testimonials-block' ); ?></p></div>
-		<?php elseif ( 'categories_reset' === $msg ) : ?>
-			<div class="notice notice-success is-dismissible"><p><?php esc_html_e( 'Category settings restored to the NPS defaults.', 'b-testimonials-block' ); ?></p></div>
-		<?php endif; ?>
-
-		<div class="bpbtb-nps-hero">
-			<div>
-				<h1 class="bpbtb-nps-hero-title">
-					<span class="dashicons dashicons-chart-pie" style="font-size: 28px; width: 28px; height: 28px;"></span>
-					<?php esc_html_e( 'Feedback & NPS Poll', 'b-testimonials-block' ); ?>
-				</h1>
-				<p class="bpbtb-nps-hero-desc">
-					<?php esc_html_e( 'Track and analyze all visitor Net Promoter Score (NPS) marks submitted on your site.', 'b-testimonials-block' ); ?>
-				</p>
-			</div>
-			<?php if ( ! empty( $votes ) ) : ?>
-				<a href="<?php echo esc_url( wp_nonce_url( admin_url( 'edit.php?post_type=testimonial&page=bpbtb-nps-poll&action=clear_all' ), 'bpbtb_clear_all_nps_votes' ) ); ?>" class="button button-secondary" onclick="return confirm('<?php esc_attr_e( 'Are you sure you want to clear all poll responses?', 'b-testimonials-block' ); ?>');" style="background: rgba(255,255,255,0.15); color: #fff; border-color: rgba(255,255,255,0.3);">
-					<?php esc_html_e( 'Clear All Responses', 'b-testimonials-block' ); ?>
-				</a>
-			<?php endif; ?>
-		</div>
-
-		<!-- Summary Stat Cards -->
-		<div class="bpbtb-nps-grid">
-			<div class="bpbtb-nps-card">
-				<div class="nps-val"><?php echo esc_html( $stats['nps_score'] ); ?></div>
-				<div class="nps-lbl"><?php esc_html_e( 'Net Promoter Score (NPS)', 'b-testimonials-block' ); ?></div>
-			</div>
-			<div class="bpbtb-nps-card">
-				<div class="nps-val"><?php echo esc_html( $stats['total'] ); ?></div>
-				<div class="nps-lbl"><?php esc_html_e( 'Total Marks Selected', 'b-testimonials-block' ); ?></div>
-			</div>
-			<div class="bpbtb-nps-card">
-				<div class="nps-val"><?php echo esc_html( $stats['avg'] ); ?> / 10</div>
-				<div class="nps-lbl"><?php esc_html_e( 'Average Selected Mark', 'b-testimonials-block' ); ?></div>
-			</div>
-			<div class="bpbtb-nps-card">
-				<div class="nps-val" style="color: <?php echo esc_attr( $cats['colors']['promoter'] ); ?>;"><?php echo esc_html( $stats['promoter_pct'] ); ?>%</div>
-				<div class="nps-lbl">
-					<?php
-					printf(
-						/* translators: 1: promoter label, 2: lowest promoter mark, 3: highest mark on the scale */
-						esc_html__( '%1$s (Marks %2$d-%3$d)', 'b-testimonials-block' ),
-						esc_html( $cats['labels']['promoter'] ),
-						(int) $cats['promoter_min'],
-						(int) max( 10, $stats['max_mark'] )
-					);
-					?>
-				</div>
-			</div>
-		</div>
-
-		<!-- Selected Marks Breakdown -->
-		<div class="bpbtb-nps-marks-box">
-			<h3><?php esc_html_e( 'Selected Marks Breakdown', 'b-testimonials-block' ); ?></h3>
-			<p><?php esc_html_e( 'Number of times each specific mark score was selected by visitors.', 'b-testimonials-block' ); ?></p>
-
-			<div class="bpbtb-marks-list">
-				<?php
-				$max_m = isset( $stats['max_mark'] ) ? $stats['max_mark'] : 10;
-				for ( $m = $max_m; $m >= 0; $m-- ) :
-					$count = isset( $stats['counts'][ $m ] ) ? $stats['counts'][ $m ] : 0;
-					$pct   = $stats['total'] > 0 ? round( ( $count / $stats['total'] ) * 100 ) : 0;
-					$cls   = bpbtb_get_nps_category_for_mark( $m )['key'];
-					?>
-					<div class="bpbtb-mark-row">
-						<div class="bpbtb-mark-badge">
-							<span class="bpbtb-mark-pill <?php echo esc_attr( $cls ); ?>"><?php echo esc_html( $m ); ?></span>
-						</div>
-						<div class="bpbtb-mark-track">
-							<div class="bpbtb-mark-fill <?php echo esc_attr( $cls ); ?>" style="width: <?php echo esc_attr( $pct ); ?>%;"></div>
-						</div>
-						<div class="bpbtb-mark-count">
-							<strong><?php echo esc_html( $count ); ?></strong> <?php esc_html_e( 'votes', 'b-testimonials-block' ); ?> (<?php echo esc_html( $pct ); ?>%)
+				<div class="bpbtb-stats-row">
+					<div class="bpbtb-stat-box">
+						<div class="bpbtb-stat-num"><?php echo esc_html( $stats['nps_score'] ); ?></div>
+						<div class="bpbtb-stat-label"><?php esc_html_e( 'Net Promoter Score', 'b-testimonials-block' ); ?></div>
+					</div>
+					<div class="bpbtb-stat-box">
+						<div class="bpbtb-stat-num"><?php echo esc_html( $stats['total'] ); ?></div>
+						<div class="bpbtb-stat-label"><?php esc_html_e( 'Total Marks Selected', 'b-testimonials-block' ); ?></div>
+					</div>
+					<div class="bpbtb-stat-box">
+						<div class="bpbtb-stat-num"><?php echo esc_html( $stats['avg'] ); ?> / 10</div>
+						<div class="bpbtb-stat-label"><?php esc_html_e( 'Average Selected Mark', 'b-testimonials-block' ); ?></div>
+					</div>
+					<div class="bpbtb-stat-box">
+						<?php // The one number that keeps its own colour: it counts a band the user named and coloured. ?>
+						<div class="bpbtb-stat-num" style="color: <?php echo esc_attr( $cats['colors']['promoter'] ); ?>;"><?php echo esc_html( $stats['promoter_pct'] ); ?>%</div>
+						<div class="bpbtb-stat-label">
+							<?php
+							printf(
+								/* translators: 1: promoter label, 2: lowest promoter mark, 3: highest mark on the scale */
+								esc_html__( '%1$s (Marks %2$d-%3$d)', 'b-testimonials-block' ),
+								esc_html( $cats['labels']['promoter'] ),
+								(int) $cats['promoter_min'],
+								(int) max( 10, $btb_max_mark )
+							);
+							?>
 						</div>
 					</div>
-				<?php endfor; ?>
-			</div>
-		</div>
-
-		<!-- Category Bands -->
-		<div class="bpbtb-nps-marks-box">
-			<h3><?php esc_html_e( 'Category Settings', 'b-testimonials-block' ); ?></h3>
-			<p>
-				<?php esc_html_e( 'A response is sorted into a category by the mark the visitor picked — the category is not stored on the response, so changing these re-sorts every existing entry as well as new ones.', 'b-testimonials-block' ); ?>
-			</p>
-
-			<form method="post" class="bpbtb-cat-form">
-				<?php wp_nonce_field( 'bpbtb_save_nps_categories', 'bpbtb_categories_nonce' ); ?>
-
-				<div class="bpbtb-cat-grid">
-					<?php
-					$rows = [
-						'promoter'  => [
-							/* translators: %d: lowest mark in the band */
-							'range' => sprintf( __( 'Marks %1$d and above', 'b-testimonials-block' ), $cats['promoter_min'] ),
-							'field' => 'promoter_min',
-						],
-						'passive'   => [
-							/* translators: 1: lowest mark in the band, 2: highest mark in the band */
-							'range' => sprintf( __( 'Marks %1$d to %2$d', 'b-testimonials-block' ), $cats['passive_min'], $cats['promoter_min'] - 1 ),
-							'field' => 'passive_min',
-						],
-						'detractor' => [
-							/* translators: %d: highest mark in the band */
-							'range' => sprintf( __( 'Marks 0 to %d', 'b-testimonials-block' ), max( 0, $cats['passive_min'] - 1 ) ),
-							'field' => '',
-						],
-					];
-
-					foreach ( $rows as $key => $row ) :
-						?>
-						<div class="bpbtb-cat-row">
-							<div class="bpbtb-cat-swatch" style="background: <?php echo esc_attr( $cats['colors'][ $key ] ); ?>;"></div>
-
-							<label class="bpbtb-cat-cell">
-								<span><?php esc_html_e( 'Label', 'b-testimonials-block' ); ?></span>
-								<input type="text" name="label_<?php echo esc_attr( $key ); ?>" value="<?php echo esc_attr( $cats['labels'][ $key ] ); ?>" />
-							</label>
-
-							<label class="bpbtb-cat-cell bpbtb-cat-cell-sm">
-								<span><?php esc_html_e( 'Color', 'b-testimonials-block' ); ?></span>
-								<input type="color" name="color_<?php echo esc_attr( $key ); ?>" value="<?php echo esc_attr( $cats['colors'][ $key ] ); ?>" />
-							</label>
-
-							<label class="bpbtb-cat-cell bpbtb-cat-cell-sm">
-								<span><?php esc_html_e( 'Starts at mark', 'b-testimonials-block' ); ?></span>
-								<?php if ( $row['field'] ) : ?>
-									<input type="number" min="<?php echo 'promoter_min' === $row['field'] ? 1 : 0; ?>" max="10" name="<?php echo esc_attr( $row['field'] ); ?>" value="<?php echo esc_attr( 'promoter_min' === $row['field'] ? $cats['promoter_min'] : $cats['passive_min'] ); ?>" />
-								<?php else : ?>
-									<em class="bpbtb-cat-note"><?php esc_html_e( 'everything below', 'b-testimonials-block' ); ?></em>
-								<?php endif; ?>
-							</label>
-
-							<span class="bpbtb-cat-range"><?php echo esc_html( $row['range'] ); ?></span>
-						</div>
-					<?php endforeach; ?>
 				</div>
 
-				<p class="bpbtb-cat-actions">
-					<button type="submit" name="bpbtb_save_nps_categories" value="1" class="button button-primary">
-						<?php esc_html_e( 'Save Categories', 'b-testimonials-block' ); ?>
-					</button>
-					<button type="submit" name="bpbtb_reset_nps_categories" value="1" class="button button-secondary">
-						<?php esc_html_e( 'Reset to NPS defaults', 'b-testimonials-block' ); ?>
-					</button>
-					<span class="bpbtb-cat-note">
-						<?php esc_html_e( 'Defaults (9 and 7) are the standard NPS bands — change them only if this poll is not a Net Promoter Score, or the number stops being comparable to anyone else’s.', 'b-testimonials-block' ); ?>
+				<?php // Same bar as the Submissions screen: what the page is showing on the left, the one action on the right. ?>
+				<div class="bpbtb-nav-toolbar">
+					<span class="bpbtb-toolbar-note">
+						<?php
+						printf(
+							/* translators: %s: number of poll responses recorded. */
+							esc_html( _n( '%s response recorded', '%s responses recorded', count( $votes ), 'b-testimonials-block' ) ),
+							'<strong>' . esc_html( number_format_i18n( count( $votes ) ) ) . '</strong>'
+						);
+						?>
 					</span>
-				</p>
-			</form>
-		</div>
 
-		<!-- Recent Submissions Table -->
-		<div class="bpbtb-nps-table-card">
-			<div class="bpbtb-table-hdr">
-				<h3><?php esc_html_e( 'Individual Submissions Log', 'b-testimonials-block' ); ?></h3>
-			</div>
-
-			<?php // `fixed` dropped: equal-width columns squeezed the Page / Source link to nothing long before the phone breakpoint. ?>
-			<table class="wp-list-table widefat striped bpbtb-nps-log-table">
-				<thead>
-					<tr>
-						<th style="width: 100px;"><?php esc_html_e( 'Mark', 'b-testimonials-block' ); ?></th>
-						<th><?php esc_html_e( 'Category', 'b-testimonials-block' ); ?></th>
-						<th><?php esc_html_e( 'Page / Source', 'b-testimonials-block' ); ?></th>
-						<th><?php esc_html_e( 'Submitted Date', 'b-testimonials-block' ); ?></th>
-						<th style="width: 80px; text-align: right;"><?php esc_html_e( 'Actions', 'b-testimonials-block' ); ?></th>
-					</tr>
-				</thead>
-				<tbody>
-					<?php if ( empty( $votes ) ) : ?>
-						<tr>
-							<td colspan="5" style="text-align: center; padding: 24px; color: #64748b;">
-								<?php esc_html_e( 'No Feedback & NPS Poll marks submitted yet.', 'b-testimonials-block' ); ?>
-							</td>
-						</tr>
-					<?php else : ?>
-						<?php foreach ( array_slice( $votes, 0, 50 ) as $vote ) :
-							$mk = isset( $vote['mark'] ) ? (int) $vote['mark'] : 0;
-							$band    = bpbtb_get_nps_category_for_mark( $mk );
-							$cat_lbl = $band['label'];
-							$cat_clr = $band['color'];
-							$del_nonce = wp_create_nonce( 'bpbtb_delete_nps_vote_' . $vote['id'] );
-							?>
-							<tr>
-								<td data-colname="<?php esc_attr_e( 'Mark', 'b-testimonials-block' ); ?>">
-									<span style="display: inline-flex; width: 28px; height: 28px; border-radius: 50%; background: #146ef5; color: #fff; font-weight: 700; align-items: center; justify-content: center;">
-										<?php echo esc_html( $mk ); ?>
-									</span>
-								</td>
-								<td data-colname="<?php esc_attr_e( 'Category', 'b-testimonials-block' ); ?>">
-									<strong style="color: <?php echo esc_attr( $cat_clr ); ?>;">
-										<?php echo esc_html( $cat_lbl ); ?>
-									</strong>
-								</td>
-								<td data-colname="<?php esc_attr_e( 'Page / Source', 'b-testimonials-block' ); ?>">
-									<?php if ( ! empty( $vote['page_url'] ) ) : ?>
-										<a href="<?php echo esc_url( $vote['page_url'] ); ?>" target="_blank" rel="noopener">
-											<?php echo esc_html( ! empty( $vote['page_title'] ) ? $vote['page_title'] : $vote['page_url'] ); ?>
-										</a>
-									<?php else : ?>
-										<em><?php esc_html_e( 'N/A', 'b-testimonials-block' ); ?></em>
-									<?php endif; ?>
-								</td>
-								<td data-colname="<?php esc_attr_e( 'Submitted Date', 'b-testimonials-block' ); ?>"><?php echo esc_html( isset( $vote['date'] ) ? $vote['date'] : '—' ); ?></td>
-								<td data-colname="<?php esc_attr_e( 'Actions', 'b-testimonials-block' ); ?>" style="text-align: right;">
-									<a href="<?php echo esc_url( admin_url( 'edit.php?post_type=testimonial&page=bpbtb-nps-poll&action=delete_vote&vote_id=' . $vote['id'] . '&_wpnonce=' . $del_nonce ) ); ?>" style="color: #ef4444;" onclick="return confirm('<?php esc_attr_e( 'Delete this vote entry?', 'b-testimonials-block' ); ?>');">
-										<?php esc_html_e( 'Delete', 'b-testimonials-block' ); ?>
-									</a>
-								</td>
-							</tr>
-						<?php endforeach; ?>
+					<?php if ( ! empty( $votes ) ) : ?>
+						<div class="bpbtb-toolbar-actions">
+							<a
+								href="<?php echo esc_url( wp_nonce_url( admin_url( 'edit.php?post_type=testimonial&page=bpbtb-nps-poll&action=clear_all' ), 'bpbtb_clear_all_nps_votes' ) ); ?>"
+								class="bpbtb-btn is-danger"
+								onclick="return confirm('<?php esc_attr_e( 'Are you sure you want to clear all poll responses?', 'b-testimonials-block' ); ?>');"
+							>
+								<?php esc_html_e( 'Clear All Responses', 'b-testimonials-block' ); ?>
+							</a>
+						</div>
 					<?php endif; ?>
-				</tbody>
-			</table>
+				</div>
+
+				<div class="bpbtb-card">
+					<div class="bpbtb-section-head">
+						<h3><?php esc_html_e( 'Selected Marks Breakdown', 'b-testimonials-block' ); ?></h3>
+						<p><?php esc_html_e( 'Number of times each specific mark score was selected by visitors.', 'b-testimonials-block' ); ?></p>
+					</div>
+
+					<div class="bpbtb-marks-list">
+						<?php
+						for ( $m = $btb_max_mark; $m >= 0; $m-- ) :
+							$count = isset( $stats['counts'][ $m ] ) ? $stats['counts'][ $m ] : 0;
+							$pct   = $stats['total'] > 0 ? round( ( $count / $stats['total'] ) * 100 ) : 0;
+							$band  = bpbtb_get_nps_category_for_mark( $m );
+							?>
+							<div class="bpbtb-mark-row">
+								<?php
+								/*
+								 * The band's colour fills the pill only for marks that were
+								 * actually picked. Colouring all eleven turned the column
+								 * into a traffic-light gradient in which the marks with
+								 * votes were no easier to find than the ones without.
+								 */
+								?>
+								<span
+									class="bpbtb-mark-pill<?php echo $count > 0 ? ' has-votes' : ''; ?>"
+									<?php echo $count > 0 ? 'style="background: ' . esc_attr( $band['color'] ) . ';"' : ''; ?>
+								><?php echo esc_html( $m ); ?></span>
+
+								<div class="bpbtb-mark-track">
+									<div class="bpbtb-mark-fill" style="width: <?php echo esc_attr( $pct ); ?>%; background: <?php echo esc_attr( $band['color'] ); ?>;"></div>
+								</div>
+
+								<div class="bpbtb-mark-count">
+									<?php
+									printf(
+										/* translators: 1: vote count, 2: share of all votes as a percentage. */
+										esc_html( _n( '%1$s vote (%2$s%%)', '%1$s votes (%2$s%%)', $count, 'b-testimonials-block' ) ),
+										'<strong>' . esc_html( number_format_i18n( $count ) ) . '</strong>',
+										esc_html( number_format_i18n( $pct ) )
+									);
+									?>
+								</div>
+							</div>
+						<?php endfor; ?>
+					</div>
+				</div>
+
+				<div class="bpbtb-card">
+					<div class="bpbtb-section-head">
+						<h3><?php esc_html_e( 'Category Settings', 'b-testimonials-block' ); ?></h3>
+						<p><?php esc_html_e( 'A response is sorted into a category by the mark the visitor picked — the category is not stored on the response, so changing these re-sorts every existing entry as well as new ones.', 'b-testimonials-block' ); ?></p>
+					</div>
+
+					<form method="post" class="bpbtb-cat-form">
+						<?php wp_nonce_field( 'bpbtb_save_nps_categories', 'bpbtb_categories_nonce' ); ?>
+
+						<div class="bpbtb-cat-grid">
+							<?php
+							$rows = [
+								'promoter'  => [
+									/* translators: %d: lowest mark in the band */
+									'range' => sprintf( __( 'Marks %1$d and above', 'b-testimonials-block' ), $cats['promoter_min'] ),
+									'field' => 'promoter_min',
+								],
+								'passive'   => [
+									/* translators: 1: lowest mark in the band, 2: highest mark in the band */
+									'range' => sprintf( __( 'Marks %1$d to %2$d', 'b-testimonials-block' ), $cats['passive_min'], $cats['promoter_min'] - 1 ),
+									'field' => 'passive_min',
+								],
+								'detractor' => [
+									/* translators: %d: highest mark in the band */
+									'range' => sprintf( __( 'Marks 0 to %d', 'b-testimonials-block' ), max( 0, $cats['passive_min'] - 1 ) ),
+									'field' => '',
+								],
+							];
+
+							foreach ( $rows as $key => $row ) :
+								?>
+								<div class="bpbtb-cat-row">
+									<div class="bpbtb-cat-swatch" style="background: <?php echo esc_attr( $cats['colors'][ $key ] ); ?>;"></div>
+
+									<label class="bpbtb-cat-cell">
+										<span><?php esc_html_e( 'Label', 'b-testimonials-block' ); ?></span>
+										<input type="text" name="label_<?php echo esc_attr( $key ); ?>" value="<?php echo esc_attr( $cats['labels'][ $key ] ); ?>" />
+									</label>
+
+									<label class="bpbtb-cat-cell">
+										<span><?php esc_html_e( 'Color', 'b-testimonials-block' ); ?></span>
+										<input type="color" name="color_<?php echo esc_attr( $key ); ?>" value="<?php echo esc_attr( $cats['colors'][ $key ] ); ?>" />
+									</label>
+
+									<label class="bpbtb-cat-cell">
+										<span><?php esc_html_e( 'Starts at mark', 'b-testimonials-block' ); ?></span>
+										<?php if ( $row['field'] ) : ?>
+											<input type="number" min="<?php echo 'promoter_min' === $row['field'] ? 1 : 0; ?>" max="10" name="<?php echo esc_attr( $row['field'] ); ?>" value="<?php echo esc_attr( 'promoter_min' === $row['field'] ? $cats['promoter_min'] : $cats['passive_min'] ); ?>" />
+										<?php else : ?>
+											<em class="bpbtb-cat-note"><?php esc_html_e( 'everything below', 'b-testimonials-block' ); ?></em>
+										<?php endif; ?>
+									</label>
+
+									<span class="bpbtb-cat-range"><?php echo esc_html( $row['range'] ); ?></span>
+								</div>
+							<?php endforeach; ?>
+						</div>
+
+						<p class="bpbtb-cat-actions">
+							<button type="submit" name="bpbtb_save_nps_categories" value="1" class="bpbtb-btn">
+								<?php esc_html_e( 'Save Categories', 'b-testimonials-block' ); ?>
+							</button>
+							<button type="submit" name="bpbtb_reset_nps_categories" value="1" class="bpbtb-btn is-ghost">
+								<?php esc_html_e( 'Reset to NPS defaults', 'b-testimonials-block' ); ?>
+							</button>
+							<span class="bpbtb-cat-note">
+								<?php esc_html_e( 'Defaults (9 and 7) are the standard NPS bands — change them only if this poll is not a Net Promoter Score, or the number stops being comparable to anyone else’s.', 'b-testimonials-block' ); ?>
+							</span>
+						</p>
+					</form>
+				</div>
+
+				<div class="bpbtb-nps-table-card">
+					<div class="bpbtb-section-head">
+						<h3><?php esc_html_e( 'Individual Submissions Log', 'b-testimonials-block' ); ?></h3>
+						<p><?php esc_html_e( 'The 50 most recent marks, newest first.', 'b-testimonials-block' ); ?></p>
+					</div>
+
+					<?php
+					/*
+					 * The same table class the Submissions screen uses, rather than core's
+					 * `wp-list-table widefat striped`: one table style for both screens, and
+					 * the phone layout comes from the shared `data-label` rules -- which is
+					 * why the cells below carry `data-label` and not core's `data-colname`.
+					 */
+					?>
+					<table class="bpbtb-modern-table">
+						<thead>
+							<tr>
+								<th style="width: 90px;"><?php esc_html_e( 'Mark', 'b-testimonials-block' ); ?></th>
+								<th style="width: 140px;"><?php esc_html_e( 'Category', 'b-testimonials-block' ); ?></th>
+								<th><?php esc_html_e( 'Page / Source', 'b-testimonials-block' ); ?></th>
+								<th style="width: 200px;"><?php esc_html_e( 'Submitted Date', 'b-testimonials-block' ); ?></th>
+								<th style="width: 90px; text-align: right;"><?php esc_html_e( 'Actions', 'b-testimonials-block' ); ?></th>
+							</tr>
+						</thead>
+						<tbody>
+							<?php if ( empty( $votes ) ) : ?>
+								<tr>
+									<td colspan="5">
+										<div class="bpbtb-empty">
+											<span class="dashicons dashicons-chart-bar"></span>
+											<h3><?php esc_html_e( 'No poll marks submitted yet.', 'b-testimonials-block' ); ?></h3>
+											<p><?php esc_html_e( 'Marks visitors pick in the Feedback & NPS Poll block will show up here.', 'b-testimonials-block' ); ?></p>
+										</div>
+									</td>
+								</tr>
+							<?php else : ?>
+								<?php
+								foreach ( array_slice( $votes, 0, 50 ) as $vote ) :
+									$mk        = isset( $vote['mark'] ) ? (int) $vote['mark'] : 0;
+									$band      = bpbtb_get_nps_category_for_mark( $mk );
+									$del_nonce = wp_create_nonce( 'bpbtb_delete_nps_vote_' . $vote['id'] );
+									?>
+									<tr>
+										<td data-label="<?php esc_attr_e( 'Mark', 'b-testimonials-block' ); ?>">
+											<span class="bpbtb-log-mark" style="background: <?php echo esc_attr( $band['color'] ); ?>;">
+												<?php echo esc_html( $mk ); ?>
+											</span>
+										</td>
+										<td data-label="<?php esc_attr_e( 'Category', 'b-testimonials-block' ); ?>">
+											<span class="bpbtb-log-cat" style="color: <?php echo esc_attr( $band['color'] ); ?>;">
+												<?php echo esc_html( $band['label'] ); ?>
+											</span>
+										</td>
+										<td data-label="<?php esc_attr_e( 'Page / Source', 'b-testimonials-block' ); ?>">
+											<?php if ( ! empty( $vote['page_url'] ) ) : ?>
+												<a href="<?php echo esc_url( $vote['page_url'] ); ?>" target="_blank" rel="noopener">
+													<?php echo esc_html( ! empty( $vote['page_title'] ) ? $vote['page_title'] : $vote['page_url'] ); ?>
+												</a>
+											<?php else : ?>
+												<em class="bpbtb-cell-sub"><?php esc_html_e( 'N/A', 'b-testimonials-block' ); ?></em>
+											<?php endif; ?>
+										</td>
+										<td data-label="<?php esc_attr_e( 'Submitted Date', 'b-testimonials-block' ); ?>" class="bpbtb-cell-meta">
+											<?php echo esc_html( isset( $vote['date'] ) ? $vote['date'] : '—' ); ?>
+										</td>
+										<td data-label="<?php esc_attr_e( 'Actions', 'b-testimonials-block' ); ?>" class="bpbtb-cell-actions">
+											<a
+												href="<?php echo esc_url( admin_url( 'edit.php?post_type=testimonial&page=bpbtb-nps-poll&action=delete_vote&vote_id=' . $vote['id'] . '&_wpnonce=' . $del_nonce ) ); ?>"
+												class="bpbtb-row-action is-delete"
+												onclick="return confirm('<?php esc_attr_e( 'Delete this vote entry?', 'b-testimonials-block' ); ?>');"
+											>
+												<?php esc_html_e( 'Delete', 'b-testimonials-block' ); ?>
+											</a>
+										</td>
+									</tr>
+								<?php endforeach; ?>
+							<?php endif; ?>
+						</tbody>
+					</table>
+				</div>
+			</div>
 		</div>
 	</div>
 	<?php

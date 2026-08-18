@@ -1,10 +1,10 @@
 import { useEffect } from 'react';
 import { __ } from '@wordpress/i18n';
 import { useBlockProps, InspectorControls } from '@wordpress/block-editor';
-import { PanelBody, RangeControl, ToggleControl, TextControl, Button, Dashicon, PanelRow, __experimentalUnitControl as UnitControl } from '@wordpress/components';
-import { produce } from 'immer';
+import { PanelBody, RangeControl, ToggleControl, TextControl, PanelRow, __experimentalUnitControl as UnitControl } from '@wordpress/components';
 import BlockSwitcher from '../../shared/Components/Common/BlockSwitcher';
 import SettingsTabs from '../../shared/Components/Backend/Settings/SettingsTabs';
+import ItemCards from '../../shared/Components/Backend/Settings/ItemCards';
 import { InlineDetailMediaUpload } from '../../../../bpl-tools/Components/MediaControl/MediaControl';
 import usePreviewDevice, { colsForDevice, useDeviceKey } from '../../shared/utils/usePreviewDevice';
 import Label from '../../../../bpl-tools/Components/Label/Label';
@@ -48,13 +48,6 @@ const Edit = ( { attributes, setAttributes, clientId } ) => {
 
 	const setColumn = ( device, val ) => setAttributes( { columns: { ...columns, [ device ]: val } } );
 
-	const updateLogo = ( index, key, val ) => {
-		setAttributes( { logos: produce( logos, ( draft ) => { draft[ index ][ key ] = val; } ) } );
-	};
-
-	const addLogo = () => setAttributes( { logos: [ ...logos, { img: { url: '' }, link: '' } ] } );
-
-	const removeLogo = ( index ) => setAttributes( { logos: logos.filter( ( _, i ) => i !== index ) } );
 
 	return (
 		<>
@@ -76,27 +69,28 @@ const Edit = ( { attributes, setAttributes, clientId } ) => {
 						</PanelBody>
 
 						<PanelBody className="bPlPanelBody" title={ __( 'Logos', 'b-testimonials-block' ) } initialOpen={ false }>
-							{ logos.map( ( logo, index ) => (
-								<div key={ index } className="btb-logo-row">
-									{/* bpl-tools picker: same { id, url, alt } shape, and it also
-									    accepts a pasted URL, which the raw button did not. */}
-									<InlineDetailMediaUpload
-										label={ __( 'Logo', 'b-testimonials-block' ) }
-										value={ logo?.img }
-										onChange={ ( val ) => updateLogo( index, 'img', val ) }
-									/>
+							{/* One logo at a time, matching the testimonial card editor. */}
+							<ItemCards
+								items={ logos }
+								onChange={ ( next ) => setAttributes( { logos: next } ) }
+								newItem={ { img: { url: '' }, link: '' } }
+								itemLabel={ __( 'Logo', 'b-testimonials-block' ) }
+								addLabel={ __( 'Add New Logo', 'b-testimonials-block' ) }
+							>
+								{ ( logo, index, update ) => (
+									<>
+										{/* bpl-tools picker: same { id, url, alt } shape, and it also
+										    accepts a pasted URL, which the raw button did not. */}
+										<InlineDetailMediaUpload
+											label={ __( 'Logo', 'b-testimonials-block' ) }
+											value={ logo?.img }
+											onChange={ ( val ) => update( 'img', val ) }
+										/>
 
-									<TextControl placeholder={ __( 'Link (optional)', 'b-testimonials-block' ) } value={ logo?.link || '' } onChange={ ( val ) => updateLogo( index, 'link', val ) } />
-
-									<Button isDestructive onClick={ () => removeLogo( index ) } label={ __( 'Remove', 'b-testimonials-block' ) }>
-										<Dashicon icon="trash" />
-									</Button>
-								</div>
-							) ) }
-
-							<Button variant="primary" onClick={ addLogo }>
-								<Dashicon icon="plus" /> { __( 'Add logo', 'b-testimonials-block' ) }
-							</Button>
+										<TextControl label={ __( 'Link (optional)', 'b-testimonials-block' ) } value={ logo?.link || '' } onChange={ ( val ) => update( 'link', val ) } />
+									</>
+								) }
+							</ItemCards>
 						</PanelBody>
 						</>
 					}

@@ -13,13 +13,21 @@
 		grid-template-columns: repeat(var(--cols-d, 3), minmax(0, 1fr));
 	}
 
+	// Every value here was pinned: an 18px by 20px box at radius 10 with the
+	// icon locked beside the text at a 14px gap, and no shadow. The block
+	// registers its own editor and renders neither the Card panel nor anything
+	// else that reaches `.badge-item`, so none of it could be changed -- the
+	// Style tab was the Colors panel and Width & Height, and that was all.
+	//
+	// Each now reads a custom property Style.js only declares once the matching
+	// control is set, so an untouched block renders exactly as it did.
 	.badge-item {
 		display: flex;
 		align-items: center;
-		gap: 14px;
-		padding: 18px 20px;
+		gap: var(--btb-badge-gap, 14px);
+		padding: var(--btb-badge-padding, 18px 20px);
 		border: var(--btb-border-width, 1px) solid var(--btb-border, #ececec);
-		border-radius: 10px;
+		border-radius: var(--btb-badge-radius, 10px);
 		background: var(--btb-surface, #fff);
 
 		// Body Text is offered for this layout: the old front-end item read it,
@@ -27,9 +35,18 @@
 		color: var(--btb-body, inherit);
 	}
 
+	// Icon above the text rather than beside it. The fallback rendering that
+	// shows before any badge is added stacks and centres, so the repeater could
+	// not be made to match the layout it replaces.
+	.badge-item.is-icon-top {
+		flex-direction: column;
+		align-items: center;
+		text-align: center;
+	}
+
 	.badge-icon {
-		width: 44px;
-		height: 44px;
+		width: var(--btb-badge-icon, 44px);
+		height: var(--btb-badge-icon, 44px);
 		object-fit: contain;
 		flex: 0 0 auto;
 	}

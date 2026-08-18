@@ -21,9 +21,15 @@ import { produce } from "immer";
 
 // Settings Components
 import IconSettings from "./IconSettings";
+import BadgeScorePanel from "./BadgeScorePanel";
 import ColorsPanel from "./ColorsPanel";
+import FaqStylePanel from "./FaqStylePanel";
+import GradientBorderPanel from "./GradientBorderPanel";
+import ItemCards from "./ItemCards";
 import PollStylePanel from "./PollStylePanel";
+import PopupModalPanel from "./PopupModalPanel";
 import SizeSpacingPanel from "./SizeSpacingPanel";
+import SpeechBubblePanel from "./SpeechBubblePanel";
 import Label from "../../../../../../bpl-tools/Components/Label/Label";
 import { ColorControl } from "../../../../../../bpl-tools/Components/ColorControl/ColorControl";
 import { InlineDetailMediaUpload } from "../../../../../../bpl-tools/Components/MediaControl/MediaControl";
@@ -47,7 +53,11 @@ import {
   resolveArrangement,
   supportsArrangement,
 } from "../../../utils/layoutFeatures";
-import { getLayoutControls } from "../../../utils/layoutControls";
+import {
+  getLayoutControls,
+  SCORED_BADGE_LAYOUTS,
+  TYPO_PANEL_LABELS,
+} from "../../../utils/layoutControls";
 import { getVisualControls, ROLE_LABELS } from "../../../utils/visualControls";
 import { boxForDevice, setBoxForDevice } from "../../../utils/responsiveBox";
 import {
@@ -72,8 +82,15 @@ const Settings = ({
     rowGap = "40px",
     // Block Width, Card Height, Block Margin and Card Margin are read by
     // SizeSpacingPanel rather than here -- see the panel it renders below.
-    degDivider = {},
+    // Not `degDivider` directly: an untouched value arrives as `[]` rather than
+    // `{}` -- block.json's empty-object default becomes an empty PHP array on the
+    // way to the client and re-encodes as an array. `[].length` is 0, so the
+    // Length slider read itself as 0 while the divider was drawing at the
+    // stylesheet's 34px. Normalised where it is read, as Style.js does before
+    // emitting the rule.
+    degDivider: degDividerRaw = {},
     marquee = {},
+    toast = {},
     pauseInEditor = false,
     layout = "default",
     theme = "default",
@@ -103,6 +120,7 @@ const Settings = ({
     degColor = "#7B7B7B",
     textTypo = {},
     textColor = "#000",
+    starSize,
     expandedTypo = {},
     expandColor = "",
     expandHoverColor = "",
@@ -120,6 +138,9 @@ const Settings = ({
     dataSource = "manual",
     query = {},
   } = attributes || {};
+
+  // See the note on the destructured name above.
+  const degDivider = Array.isArray(degDividerRaw) ? {} : degDividerRaw || {};
 
   const elements = {
     img: true,
@@ -142,11 +163,15 @@ const Settings = ({
     pauseOnHover: marqueePauseOnHover = true,
   } = marquee && "object" === typeof marquee ? marquee : {};
 
+  const { speed: toastSpeed = 4, pauseOnHover: toastPauseOnHover = false } =
+    toast && "object" === typeof toast ? toast : {};
+
   const {
     autoPlay = true,
     autoPlayDelay = 3,
     mouseWheel = true,
     navigation = true,
+    loop = true,
     // Undefined until touched, so each arrangement keeps its own preset.
     coverRotate,
     coverDepth,
@@ -162,6 +187,14 @@ const Settings = ({
     navBg,
     navHoverBg,
     navBorder,
+    navShadow,
+    // The three that were fixed in Slider.js and the stylesheet: how far apart
+    // the coverflow pushes its cards, whether Swiper paints its own depth
+    // shadows, and how far the side cards fade. All undefined until touched, so
+    // each arrangement keeps the look it ships with.
+    coverStretch,
+    slideShadows = false,
+    sideOpacity,
   } = slider && typeof slider === "object" ? slider : {};
 
   const singleItemBlocks = [
@@ -181,7 +214,6 @@ const Settings = ({
     "testimonial-stats",
     "comparison-testimonial-table",
     "faq-testimonial-accordion",
-    "testimonials-card-stack",
   ];
   const isSingleTestimonial =
     layout === "single" || layout === "testimonials-single";
@@ -202,6 +234,14 @@ const Settings = ({
   );
   // The two that run Swiper's coverflow engine and so have 3D numbers to tune.
   const is3DArrangement = ["slider-3d", "coverflow"].includes(arrangement);
+
+  // The Name and Designation panels are two shared roles rather than two card
+  // parts, so on the review badges -- where they style a badge heading and a
+  // review count -- they are titled for what they actually move. Every other
+  // layout falls through to the card's own wording.
+  const typoLabels = TYPO_PANEL_LABELS[layout] || {};
+  const nameLabel = typoLabels.name || __("Name", "b-testimonials-block");
+  const degLabel = typoLabels.deg || __("Designation", "b-testimonials-block");
 
   // The excerpt cut and the Expand/Less toggle belong to the review text, so
   // they follow whether the layout prints it -- not how many items it shows.
@@ -260,7 +300,8 @@ const Settings = ({
   // control means taking over that name too, or consolidating would cost the
   // accuracy the palette labels were written for.
   const cardBackgroundLabel =
-    ROLE_LABELS[layout]?.surfaceColor || __("Background Color", "b-testimonials-block");
+    ROLE_LABELS[layout]?.surfaceColor ||
+    __("Background Color", "b-testimonials-block");
 
   // Cleared from the Colors panel means unset, not "transparent": getPaletteCSS
   // skips an empty value, so the Card value is what paints again and is what
@@ -274,7 +315,9 @@ const Settings = ({
 
   const setCardBackground = (val) =>
     setAttributes(
-      ownsSurface ? { background: val, surfaceColor: val } : { background: val },
+      ownsSurface
+        ? { background: val, surfaceColor: val }
+        : { background: val },
     );
 
   const cardBorderValue = {
@@ -332,6 +375,54 @@ const Settings = ({
   const hasRatingColor =
     controls.ratingIcon && rendersPart("icon") && themeHasRating;
 
+  // The same consolidation the Card box got, for the four text roles.
+  //
+  // The Colors panel's Headings, Secondary Text, Body Text and Rating Stars
+  // paint the same four elements the Name, Designation and Review Text panels
+  // do, and Style.js writes each as `color: var(--btb-title, <nameColor>)` --
+  // the role is the value, the panel's own attribute only the fallback. So
+  // wherever both were offered the panel's picker was dead from the moment the
+  // role had a value, with nothing on screen to say why. Measured on one block
+  // with both set: the role won all four, and 17 blocks offered at least one
+  // such pair.
+  //
+  // Resolved the way the card was -- the panel keeps the control, the role is
+  // dropped from the Colors panel, and the control writes both. Writing both is
+  // what keeps the variable reaching the elements no per-part rule names, and
+  // what keeps a post saved with only the old attribute painting.
+  //
+  // Each pair is taken over only where the panel is actually on screen AND the
+  // layout offers the role; otherwise the Colors panel stays its only home, the
+  // same way it does for a block with its own editor and no Card panel.
+  const textRoleOwners = [
+    {
+      role: "titleColor",
+      attr: "nameColor",
+      shown: controls.nameStyle && rendersPart("name"),
+    },
+    {
+      role: "mutedColor",
+      attr: "degColor",
+      shown: controls.degStyle && rendersPart("deg"),
+    },
+    { role: "bodyColor", attr: "textColor", shown: hasTextStyle },
+    { role: "ratingColor", attr: "starIconColor", shown: hasRatingColor },
+  ].filter((pair) => pair.shown && paletteRoles.includes(pair.role));
+
+  const textRoles = textRoleOwners.map((pair) => pair.role);
+  const ownsRole = (role) => textRoles.includes(role);
+
+  // Reads the role while it has a value, so the control shows what is actually
+  // on screen; falls back to the panel's own attribute for posts saved before
+  // the role existed, and for layouts where the role was never offered.
+  const textColorValue = (role, own) =>
+    ownsRole(role) && isSet(attributes[role]) ? attributes[role] : own;
+
+  const setTextColor = (role, attr) => (val) =>
+    setAttributes(
+      ownsRole(role) ? { [attr]: val, [role]: val } : { [attr]: val },
+    );
+
   // Which of the Layout panel's three grid controls the current arrangement can
   // actually act on. The arrangement decides this, not the block: the same card
   // list becomes a grid, a single column, a scrolling row or a Swiper track, and
@@ -363,7 +454,8 @@ const Settings = ({
   const ROW_GAP_INERT = ["marquee", "slider", "slider-3d", "coverflow"];
 
   const showColumns = controls.columns && !COLUMNS_INERT.includes(arrangement);
-  const showColumnGap = controls.gaps && !COLUMN_GAP_INERT.includes(arrangement);
+  const showColumnGap =
+    controls.gaps && !COLUMN_GAP_INERT.includes(arrangement);
   const showRowGap = controls.gaps && !ROW_GAP_INERT.includes(arrangement);
 
   // The Layout panel is empty unless at least one of its four controls applies.
@@ -371,11 +463,7 @@ const Settings = ({
   // use, so a layout left with none of them and no Arrangement or Theme select
   // gets no empty panel.
   const hasLayoutPanel =
-    canArrange ||
-    controls.theme ||
-    showColumns ||
-    showColumnGap ||
-    showRowGap;
+    canArrange || controls.theme || showColumns || showColumnGap || showRowGap;
 
   const addItem = () => {
     setAttributes({
@@ -436,7 +524,8 @@ const Settings = ({
   // following it.
   const imageSize = (key, forDevice) => {
     const value = image?.[key];
-    const perDevice = value && "object" === typeof value ? value : { desktop: value };
+    const perDevice =
+      value && "object" === typeof value ? value : { desktop: value };
 
     if ("mobile" === forDevice) {
       return perDevice.mobile ?? perDevice.tablet ?? perDevice.desktop;
@@ -503,7 +592,11 @@ const Settings = ({
                             value: "cpt",
                           },
                         ]}
-                        onChange={(val) => setAttributes({ dataSource: val })}
+                        onChange={(val) =>
+                          setAttributes({
+                            dataSource: val,
+                          })
+                        }
                       />
 
                       {"cpt" === dataSource && (
@@ -513,7 +606,10 @@ const Settings = ({
                             value={query?.number || 6}
                             onChange={(val) =>
                               setAttributes({
-                                query: { ...query, number: val },
+                                query: {
+                                  ...query,
+                                  number: val,
+                                },
                               })
                             }
                             min={1}
@@ -540,7 +636,10 @@ const Settings = ({
                             ]}
                             onChange={(val) =>
                               setAttributes({
-                                query: { ...query, orderBy: val },
+                                query: {
+                                  ...query,
+                                  orderBy: val,
+                                },
                               })
                             }
                           />
@@ -559,7 +658,12 @@ const Settings = ({
                               },
                             ]}
                             onChange={(val) =>
-                              setAttributes({ query: { ...query, order: val } })
+                              setAttributes({
+                                query: {
+                                  ...query,
+                                  order: val,
+                                },
+                              })
                             }
                           />
 
@@ -740,6 +844,20 @@ const Settings = ({
                     const labels = fieldLabels[layout];
                     if (!labels) return null;
 
+                    // Every control below carries an `mt*` class on purpose.
+                    //
+                    // bpl-tools sets `.components-base-control { margin-bottom:
+                    // 0 !important }`, so a WordPress control contributes no
+                    // spacing of its own here and each call site has to supply
+                    // its own top margin. The layout-specific rows under each
+                    // panel asked for `mt5`, half the `mt10` the rest of this
+                    // file uses -- and a control with no `help` line has nothing
+                    // else to space it, so a field and the next field's label
+                    // ended up 5px apart while the ones with help looked fine.
+                    // The poll's Low and High Scale Label pair was the clearest
+                    // case. `mt10` throughout, so the rhythm does not depend on
+                    // whether a given field happens to carry help text.
+
                     return (
                       <PanelBody
                         className="bPlPanelBody"
@@ -750,7 +868,9 @@ const Settings = ({
                             label={__(labels.title, "b-testimonials-block")}
                             value={attributes.badgeTitle ?? ""}
                             onChange={(val) =>
-                              setAttributes({ badgeTitle: val })
+                              setAttributes({
+                                badgeTitle: val,
+                              })
                             }
                             help={
                               labels.titleHelp
@@ -764,7 +884,9 @@ const Settings = ({
                             label={__(labels.desc, "b-testimonials-block")}
                             value={attributes.badgeDesc ?? ""}
                             onChange={(val) =>
-                              setAttributes({ badgeDesc: val })
+                              setAttributes({
+                                badgeDesc: val,
+                              })
                             }
                             help={
                               labels.descHelp
@@ -778,7 +900,9 @@ const Settings = ({
                             label={__(labels.score, "b-testimonials-block")}
                             value={attributes.badgeScore ?? ""}
                             onChange={(val) =>
-                              setAttributes({ badgeScore: val })
+                              setAttributes({
+                                badgeScore: val,
+                              })
                             }
                             help={
                               labels.scoreHelp
@@ -792,7 +916,9 @@ const Settings = ({
                             label={__(labels.count, "b-testimonials-block")}
                             value={attributes.badgeCount ?? ""}
                             onChange={(val) =>
-                              setAttributes({ badgeCount: val })
+                              setAttributes({
+                                badgeCount: val,
+                              })
                             }
                             help={
                               labels.countHelp
@@ -816,7 +942,7 @@ const Settings = ({
                               )}
                             </Label>
                             <TextControl
-                              className="mt5"
+                              className="mt10"
                               label={__("Minimum Mark", "b-testimonials-block")}
                               type="number"
                               value={attributes.minScore ?? 0}
@@ -831,7 +957,7 @@ const Settings = ({
                               )}
                             />
                             <TextControl
-                              className="mt5"
+                              className="mt10"
                               label={__("Maximum Mark", "b-testimonials-block")}
                               type="number"
                               value={attributes.maxScore ?? 10}
@@ -846,25 +972,29 @@ const Settings = ({
                               )}
                             />
                             <TextControl
-                              className="mt5"
+                              className="mt10"
                               label={__(
                                 "Low Scale Label",
                                 "b-testimonials-block",
                               )}
                               value={attributes.lowLabel ?? "Not likely"}
                               onChange={(val) =>
-                                setAttributes({ lowLabel: val })
+                                setAttributes({
+                                  lowLabel: val,
+                                })
                               }
                             />
                             <TextControl
-                              className="mt5"
+                              className="mt10"
                               label={__(
                                 "High Scale Label",
                                 "b-testimonials-block",
                               )}
                               value={attributes.highLabel ?? "Very likely"}
                               onChange={(val) =>
-                                setAttributes({ highLabel: val })
+                                setAttributes({
+                                  highLabel: val,
+                                })
                               }
                             />
                           </>
@@ -884,12 +1014,14 @@ const Settings = ({
                               )}
                             </Label>
                             <TextControl
-                              className="mt5"
+                              className="mt10"
                               label={__("5-Star Count", "b-testimonials-block")}
                               type="number"
                               value={attributes.star5Count ?? ""}
                               onChange={(val) =>
-                                setAttributes({ star5Count: val })
+                                setAttributes({
+                                  star5Count: val,
+                                })
                               }
                               help={__(
                                 "Overrides automatic count from items",
@@ -897,39 +1029,47 @@ const Settings = ({
                               )}
                             />
                             <TextControl
-                              className="mt5"
+                              className="mt10"
                               label={__("4-Star Count", "b-testimonials-block")}
                               type="number"
                               value={attributes.star4Count ?? ""}
                               onChange={(val) =>
-                                setAttributes({ star4Count: val })
+                                setAttributes({
+                                  star4Count: val,
+                                })
                               }
                             />
                             <TextControl
-                              className="mt5"
+                              className="mt10"
                               label={__("3-Star Count", "b-testimonials-block")}
                               type="number"
                               value={attributes.star3Count ?? ""}
                               onChange={(val) =>
-                                setAttributes({ star3Count: val })
+                                setAttributes({
+                                  star3Count: val,
+                                })
                               }
                             />
                             <TextControl
-                              className="mt5"
+                              className="mt10"
                               label={__("2-Star Count", "b-testimonials-block")}
                               type="number"
                               value={attributes.star2Count ?? ""}
                               onChange={(val) =>
-                                setAttributes({ star2Count: val })
+                                setAttributes({
+                                  star2Count: val,
+                                })
                               }
                             />
                             <TextControl
-                              className="mt5"
+                              className="mt10"
                               label={__("1-Star Count", "b-testimonials-block")}
                               type="number"
                               value={attributes.star1Count ?? ""}
                               onChange={(val) =>
-                                setAttributes({ star1Count: val })
+                                setAttributes({
+                                  star1Count: val,
+                                })
                               }
                             />
                           </>
@@ -949,36 +1089,42 @@ const Settings = ({
                               )}
                             </Label>
                             <TextControl
-                              className="mt5"
+                              className="mt10"
                               label={__(
                                 "Column 1 Header",
                                 "b-testimonials-block",
                               )}
                               value={attributes.col1Header ?? "Customer"}
                               onChange={(val) =>
-                                setAttributes({ col1Header: val })
+                                setAttributes({
+                                  col1Header: val,
+                                })
                               }
                             />
                             <TextControl
-                              className="mt5"
+                              className="mt10"
                               label={__(
                                 "Column 2 Header",
                                 "b-testimonials-block",
                               )}
                               value={attributes.col2Header ?? "Rating"}
                               onChange={(val) =>
-                                setAttributes({ col2Header: val })
+                                setAttributes({
+                                  col2Header: val,
+                                })
                               }
                             />
                             <TextControl
-                              className="mt5"
+                              className="mt10"
                               label={__(
                                 "Column 3 Header",
                                 "b-testimonials-block",
                               )}
                               value={attributes.col3Header ?? "Review"}
                               onChange={(val) =>
-                                setAttributes({ col3Header: val })
+                                setAttributes({
+                                  col3Header: val,
+                                })
                               }
                             />
 
@@ -1020,17 +1166,25 @@ const Settings = ({
                                       "b-testimonials-block",
                                     )}
                                   </strong>
-                                  <div style={{ display: "flex", gap: "4px" }}>
+                                  <div
+                                    style={{
+                                      display: "flex",
+                                      gap: "4px",
+                                    }}>
                                     <Button
                                       isSmall
                                       variant="secondary"
                                       onClick={() => {
                                         const newItems = [
                                           ...items.slice(0, rowIdx + 1),
-                                          { ...items[rowIdx] },
+                                          {
+                                            ...items[rowIdx],
+                                          },
                                           ...items.slice(rowIdx + 1),
                                         ];
-                                        setAttributes({ items: newItems });
+                                        setAttributes({
+                                          items: newItems,
+                                        });
                                       }}
                                       title={__(
                                         "Duplicate Row",
@@ -1047,7 +1201,9 @@ const Settings = ({
                                           const newItems = items.filter(
                                             (_, i) => i !== rowIdx,
                                           );
-                                          setAttributes({ items: newItems });
+                                          setAttributes({
+                                            items: newItems,
+                                          });
                                         }}
                                         title={__(
                                           "Remove Row",
@@ -1060,7 +1216,7 @@ const Settings = ({
                                 </div>
 
                                 <TextControl
-                                  className="mt5"
+                                  className="mt10"
                                   label={__(
                                     "Customer Name",
                                     "b-testimonials-block",
@@ -1070,12 +1226,14 @@ const Settings = ({
                                     const newItems = produce(items, (draft) => {
                                       draft[rowIdx].name = val;
                                     });
-                                    setAttributes({ items: newItems });
+                                    setAttributes({
+                                      items: newItems,
+                                    });
                                   }}
                                 />
 
                                 <NumberControl
-                                  className="mt5"
+                                  className="mt10"
                                   label={__(
                                     "Rating (1 - 5)",
                                     "b-testimonials-block",
@@ -1087,14 +1245,16 @@ const Settings = ({
                                       draft[rowIdx].rating =
                                         parseFloat(val) || 5;
                                     });
-                                    setAttributes({ items: newItems });
+                                    setAttributes({
+                                      items: newItems,
+                                    });
                                   }}
                                   min={1}
                                   max={5}
                                 />
 
                                 <TextareaControl
-                                  className="mt5"
+                                  className="mt10"
                                   label={__(
                                     "Review / Content",
                                     "b-testimonials-block",
@@ -1104,7 +1264,9 @@ const Settings = ({
                                     const newItems = produce(items, (draft) => {
                                       draft[rowIdx].reviewText = val;
                                     });
-                                    setAttributes({ items: newItems });
+                                    setAttributes({
+                                      items: newItems,
+                                    });
                                   }}
                                 />
                               </div>
@@ -1123,7 +1285,9 @@ const Settings = ({
                                       "Great product and excellent support!",
                                   },
                                 ];
-                                setAttributes({ items: newItems });
+                                setAttributes({
+                                  items: newItems,
+                                });
                               }}
                               style={{
                                 width: "100%",
@@ -1142,462 +1306,97 @@ const Settings = ({
                                 borderColor: "#e2e8f0",
                               }}
                             />
-                            <Label>
-                              {__(
+                            {/* Was one expanded box per question. A FAQ block is
+                                the one most likely to run to a dozen entries, so
+                                it gained the most from the selector. */}
+                            <ItemCards
+                              items={items}
+                              onChange={(next) =>
+                                setAttributes({
+                                  items: next,
+                                })
+                              }
+                              newItem={{
+                                name: "What is your refund policy?",
+                                reviewText:
+                                  "We offer a 30-day money-back guarantee with no questions asked.",
+                                deg: "Customer Support",
+                              }}
+                              itemLabel={__("FAQ", "b-testimonials-block")}
+                              label={__(
                                 "FAQ Questions & Answers:",
                                 "b-testimonials-block",
                               )}
-                            </Label>
-                            {items.map((faqItem, faqIdx) => (
-                              <div
-                                key={faqIdx}
-                                className="mt10 btb-section-card"
-                                style={{
-                                  border: "1px solid #e2e8f0",
-                                  borderRadius: "8px",
-                                  padding: "12px",
-                                  background: "#f8fafc",
-                                }}>
-                                <div
-                                  style={{
-                                    display: "flex",
-                                    justifyContent: "space-between",
-                                    alignItems: "center",
-                                  }}>
-                                  <strong
-                                    style={{
-                                      fontSize: "12px",
-                                      color: "#334155",
-                                    }}>
-                                    {__(
-                                      `FAQ ${faqIdx + 1}`,
+                              addLabel={__(
+                                "Add New Question",
+                                "b-testimonials-block",
+                              )}>
+                              {(faqItem, faqIdx, update) => (
+                                <>
+                                  <TextControl
+                                    label={__(
+                                      "Question Text",
                                       "b-testimonials-block",
                                     )}
-                                  </strong>
-                                  <div style={{ display: "flex", gap: "4px" }}>
-                                    <Button
-                                      isSmall
-                                      variant="secondary"
-                                      onClick={() => {
-                                        const newItems = [
-                                          ...items.slice(0, faqIdx + 1),
-                                          { ...items[faqIdx] },
-                                          ...items.slice(faqIdx + 1),
-                                        ];
-                                        setAttributes({ items: newItems });
-                                      }}
-                                      title={__(
-                                        "Duplicate Question",
-                                        "b-testimonials-block",
-                                      )}>
-                                      <Dashicon icon="admin-page" />
-                                    </Button>
-                                    {items.length > 1 && (
-                                      <Button
-                                        isDestructive
-                                        isSmall
-                                        variant="tertiary"
-                                        onClick={() => {
-                                          const newItems = items.filter(
-                                            (_, i) => i !== faqIdx,
-                                          );
-                                          setAttributes({ items: newItems });
-                                        }}
-                                        title={__(
-                                          "Remove Question",
-                                          "b-testimonials-block",
-                                        )}>
-                                        <Dashicon icon="no" />
-                                      </Button>
-                                    )}
-                                  </div>
-                                </div>
-
-                                <TextControl
-                                  className="mt5"
-                                  label={__(
-                                    "Question Text",
-                                    "b-testimonials-block",
-                                  )}
-                                  value={faqItem.name ?? ""}
-                                  onChange={(val) => {
-                                    const newItems = produce(items, (draft) => {
-                                      draft[faqIdx].name = val;
-                                    });
-                                    setAttributes({ items: newItems });
-                                  }}
-                                />
-
-                                <TextareaControl
-                                  className="mt5"
-                                  label={__(
-                                    "Answer Content",
-                                    "b-testimonials-block",
-                                  )}
-                                  value={faqItem.reviewText ?? ""}
-                                  onChange={(val) => {
-                                    const newItems = produce(items, (draft) => {
-                                      draft[faqIdx].reviewText = val;
-                                    });
-                                    setAttributes({ items: newItems });
-                                  }}
-                                />
-
-                                <TextControl
-                                  className="mt5"
-                                  label={__(
-                                    "Author / Subtext (Optional)",
-                                    "b-testimonials-block",
-                                  )}
-                                  value={faqItem.deg ?? ""}
-                                  onChange={(val) => {
-                                    const newItems = produce(items, (draft) => {
-                                      draft[faqIdx].deg = val;
-                                    });
-                                    setAttributes({ items: newItems });
-                                  }}
-                                />
-                              </div>
-                            ))}
-
-                            <Button
-                              className="mt15"
-                              variant="secondary"
-                              onClick={() => {
-                                const newItems = [
-                                  ...items,
-                                  {
-                                    name: "What is your refund policy?",
-                                    reviewText:
-                                      "We offer a 30-day money-back guarantee with no questions asked.",
-                                    deg: "Customer Support",
-                                  },
-                                ];
-                                setAttributes({ items: newItems });
-                              }}
-                              style={{
-                                width: "100%",
-                                justifyContent: "center",
-                              }}>
-                              <Dashicon icon="plus" />
-                              {__("Add New Question", "b-testimonials-block")}
-                            </Button>
-                          </>
-                        )}
-                        {layout === "testimonials-avatar-list" && (
-                          <>
-                            <hr
-                              style={{
-                                margin: "15px 0",
-                                borderColor: "#e2e8f0",
-                              }}
-                            />
-                            <Label>
-                              {__(
-                                "Avatar Testimonial Items:",
-                                "b-testimonials-block",
-                              )}
-                            </Label>
-                            {items.map((avItem, avIdx) => (
-                              <div
-                                key={avIdx}
-                                className="mt10 btb-section-card"
-                                style={{
-                                  border: "1px solid #e2e8f0",
-                                  borderRadius: "8px",
-                                  padding: "12px",
-                                  background: "#f8fafc",
-                                }}>
-                                <div
-                                  style={{
-                                    display: "flex",
-                                    justifyContent: "space-between",
-                                    alignItems: "center",
-                                  }}>
-                                  <strong
-                                    style={{
-                                      fontSize: "12px",
-                                      color: "#334155",
-                                    }}>
-                                    {__(
-                                      `Avatar ${avIdx + 1}`,
+                                    value={faqItem.name ?? ""}
+                                    onChange={(val) => update("name", val)}
+                                  />
+                                  <TextareaControl
+                                    label={__(
+                                      "Answer Content",
                                       "b-testimonials-block",
                                     )}
-                                  </strong>
-                                  <div style={{ display: "flex", gap: "4px" }}>
-                                    <Button
-                                      isSmall
-                                      variant="secondary"
-                                      onClick={() => {
-                                        const newItems = [
-                                          ...items.slice(0, avIdx + 1),
-                                          { ...items[avIdx] },
-                                          ...items.slice(avIdx + 1),
-                                        ];
-                                        setAttributes({ items: newItems });
-                                      }}
-                                      title={__(
-                                        "Duplicate Avatar",
-                                        "b-testimonials-block",
-                                      )}>
-                                      <Dashicon icon="admin-page" />
-                                    </Button>
-                                    {items.length > 1 && (
-                                      <Button
-                                        isDestructive
-                                        isSmall
-                                        variant="tertiary"
-                                        onClick={() => {
-                                          const newItems = items.filter(
-                                            (_, i) => i !== avIdx,
-                                          );
-                                          setAttributes({ items: newItems });
-                                        }}
-                                        title={__(
-                                          "Remove Avatar",
-                                          "b-testimonials-block",
-                                        )}>
-                                        <Dashicon icon="no" />
-                                      </Button>
-                                    )}
-                                  </div>
-                                </div>
-
-                                <Label className="mt5">
-                                  {__("Avatar Image:", "b-testimonials-block")}
-                                </Label>
-                                <InlineDetailMediaUpload
-                                  value={avItem.img || {}}
-                                  type={["image"]}
-                                  onChange={(val) => {
-                                    const newItems = produce(items, (draft) => {
-                                      draft[avIdx].img = val;
-                                    });
-                                    setAttributes({ items: newItems });
-                                  }}
-                                />
-
-                                <TextControl
-                                  className="mt5"
-                                  label={__("Name", "b-testimonials-block")}
-                                  value={avItem.name ?? ""}
-                                  onChange={(val) => {
-                                    const newItems = produce(items, (draft) => {
-                                      draft[avIdx].name = val;
-                                    });
-                                    setAttributes({ items: newItems });
-                                  }}
-                                />
-
-                                <TextControl
-                                  className="mt5"
-                                  label={__(
-                                    "Designation",
-                                    "b-testimonials-block",
-                                  )}
-                                  value={avItem.deg ?? ""}
-                                  onChange={(val) => {
-                                    const newItems = produce(items, (draft) => {
-                                      draft[avIdx].deg = val;
-                                    });
-                                    setAttributes({ items: newItems });
-                                  }}
-                                />
-
-                                <TextareaControl
-                                  className="mt5"
-                                  label={__(
-                                    "Review Text",
-                                    "b-testimonials-block",
-                                  )}
-                                  value={avItem.reviewText ?? ""}
-                                  onChange={(val) => {
-                                    const newItems = produce(items, (draft) => {
-                                      draft[avIdx].reviewText = val;
-                                    });
-                                    setAttributes({ items: newItems });
-                                  }}
-                                />
-                              </div>
-                            ))}
-
-                            <Button
-                              className="mt15"
-                              variant="secondary"
-                              onClick={() => {
-                                const newItems = [
-                                  ...items,
-                                  {
-                                    img: {
-                                      url: "https://templates.bplugins.com/wp-content/uploads/2025/02/p-29.png",
-                                    },
-                                    name: "John Doe",
-                                    deg: "Developer",
-                                    reviewText:
-                                      "Fantastic product and smooth experience.",
-                                  },
-                                ];
-                                setAttributes({ items: newItems });
-                              }}
-                              style={{
-                                width: "100%",
-                                justifyContent: "center",
-                              }}>
-                              <Dashicon icon="plus" />
-                              {__(
-                                "Add New Avatar Item",
-                                "b-testimonials-block",
-                              )}
-                            </Button>
-                          </>
-                        )}
-                        {layout === "testimonials-card-stack" && (
-                          <>
-                            <hr
-                              style={{
-                                margin: "15px 0",
-                                borderColor: "#e2e8f0",
-                              }}
-                            />
-                            <Label>
-                              {__(
-                                "Stacked Cards Management:",
-                                "b-testimonials-block",
-                              )}
-                            </Label>
-                            {items.map((stkItem, stkIdx) => (
-                              <div
-                                key={stkIdx}
-                                className="mt10 btb-section-card"
-                                style={{
-                                  border: "1px solid #e2e8f0",
-                                  borderRadius: "8px",
-                                  padding: "12px",
-                                  background: "#f8fafc",
-                                }}>
-                                <div
-                                  style={{
-                                    display: "flex",
-                                    justifyContent: "space-between",
-                                    alignItems: "center",
-                                  }}>
-                                  <strong
-                                    style={{
-                                      fontSize: "12px",
-                                      color: "#334155",
-                                    }}>
-                                    {__(
-                                      `Card ${stkIdx + 1}`,
+                                    value={faqItem.reviewText ?? ""}
+                                    onChange={(val) =>
+                                      update("reviewText", val)
+                                    }
+                                  />
+                                  <TextControl
+                                    label={__(
+                                      "Author / Subtext (Optional)",
                                       "b-testimonials-block",
                                     )}
-                                  </strong>
-                                  <div style={{ display: "flex", gap: "4px" }}>
-                                    <Button
-                                      isSmall
-                                      variant="secondary"
-                                      onClick={() => {
-                                        const newItems = [
-                                          ...items.slice(0, stkIdx + 1),
-                                          { ...items[stkIdx] },
-                                          ...items.slice(stkIdx + 1),
-                                        ];
-                                        setAttributes({ items: newItems });
-                                      }}
-                                      title={__(
-                                        "Duplicate Card",
-                                        "b-testimonials-block",
-                                      )}>
-                                      <Dashicon icon="admin-page" />
-                                    </Button>
-                                    {items.length > 1 && (
-                                      <Button
-                                        isDestructive
-                                        isSmall
-                                        variant="tertiary"
-                                        onClick={() => {
-                                          const newItems = items.filter(
-                                            (_, i) => i !== stkIdx,
-                                          );
-                                          setAttributes({ items: newItems });
-                                        }}
-                                        title={__(
-                                          "Remove Card",
-                                          "b-testimonials-block",
-                                        )}>
-                                        <Dashicon icon="no" />
-                                      </Button>
-                                    )}
-                                  </div>
-                                </div>
-
-                                <TextControl
-                                  className="mt5"
-                                  label={__("Name", "b-testimonials-block")}
-                                  value={stkItem.name ?? ""}
-                                  onChange={(val) => {
-                                    const newItems = produce(items, (draft) => {
-                                      draft[stkIdx].name = val;
-                                    });
-                                    setAttributes({ items: newItems });
-                                  }}
-                                />
-
-                                <TextControl
-                                  className="mt5"
-                                  label={__(
-                                    "Designation",
-                                    "b-testimonials-block",
-                                  )}
-                                  value={stkItem.deg ?? ""}
-                                  onChange={(val) => {
-                                    const newItems = produce(items, (draft) => {
-                                      draft[stkIdx].deg = val;
-                                    });
-                                    setAttributes({ items: newItems });
-                                  }}
-                                />
-
-                                <TextareaControl
-                                  className="mt5"
-                                  label={__(
-                                    "Review Text",
-                                    "b-testimonials-block",
-                                  )}
-                                  value={stkItem.reviewText ?? ""}
-                                  onChange={(val) => {
-                                    const newItems = produce(items, (draft) => {
-                                      draft[stkIdx].reviewText = val;
-                                    });
-                                    setAttributes({ items: newItems });
-                                  }}
-                                />
-                              </div>
-                            ))}
-
-                            <Button
-                              className="mt15"
-                              variant="secondary"
-                              onClick={() => {
-                                const newItems = [
-                                  ...items,
-                                  {
-                                    name: "John Doe",
-                                    deg: "Developer",
-                                    reviewText:
-                                      "Excellent service and top quality output.",
-                                  },
-                                ];
-                                setAttributes({ items: newItems });
-                              }}
-                              style={{
-                                width: "100%",
-                                justifyContent: "center",
-                              }}>
-                              <Dashicon icon="plus" />
-                              {__("Add New Stack Card", "b-testimonials-block")}
-                            </Button>
+                                    value={faqItem.deg ?? ""}
+                                    onChange={(val) => update("deg", val)}
+                                  />
+                                </>
+                              )}
+                            </ItemCards>
                           </>
                         )}
+                        {/*
+                          The avatar list had a second editor here -- "Avatar
+                          Testimonial Items", every item expanded, with its own
+                          Add and Remove. It edited the same `items` array, with
+                          the same four fields, as the "Add or Remove Testimonial
+                          Cards" panel above: that block is not in
+                          singleItemBlocks, so it always got both. Two editors for
+                          one array, and the one below drew a fifth Add button on a
+                          panel that already had one.
+
+                          Removed rather than kept in sync. Nothing is lost -- the
+                          panel above edits image, name, designation and review
+                          text through the card selector, which is the same UI in
+                          less space.
+                        */}
+                        {/*
+                          The stacked cards' own editor stood here and never once
+                          rendered. It sits inside the panel that returns null
+                          unless `fieldLabels[layout]` exists, and
+                          testimonials-card-stack is the one entry in
+                          singleItemBlocks with no fieldLabels entry -- so the
+                          panel bailed before reaching it. Measured on the block:
+                          the sidebar offered Select / Switch Block, Elements,
+                          Excerpt & Expand, Layout, Autoplay and Advanced, and
+                          nothing at all for adding, removing or editing a card.
+
+                          Dropping the block from singleItemBlocks hands it the
+                          shared card panel instead, which is the right editor for
+                          it: the fields there are gated by rendersPart, so it
+                          shows name, designation and review text and leaves out
+                          the parts this layout does not draw. A stack of
+                          testimonials was never a single-item block.
+                        */}
                       </PanelBody>
                     );
                   })()}
@@ -1627,13 +1426,7 @@ const Settings = ({
                               )
                         }>
                         {!isSingleItemBlock && items?.length > 1 && (
-                          <div
-                            className="btb-card-selector-list mb15"
-                            style={{
-                              display: "flex",
-                              flexWrap: "wrap",
-                              gap: "6px",
-                            }}>
+                          <div className="btb-card-selector-list mb15">
                             {items.map((_, idx) => (
                               <Button
                                 key={idx}
@@ -1684,10 +1477,7 @@ const Settings = ({
                             {isAudio && (
                               <>
                                 <Label className="mt10">
-                                  {__(
-                                    "Audio File:",
-                                    "b-testimonials-block",
-                                  )}
+                                  {__("Audio File:", "b-testimonials-block")}
                                 </Label>
                                 <InlineDetailMediaUpload
                                   value={currentItem?.audio || {}}
@@ -1702,14 +1492,12 @@ const Settings = ({
                             )}
 
                             <TextControl
-                              className="mt10"
                               label={__("Name", "b-testimonials-block")}
                               value={name}
                               onChange={(val) => updateItem("name", val)}
                             />
 
                             <TextControl
-                              className="mt10"
                               label={__(
                                 "Company / Designation",
                                 "b-testimonials-block",
@@ -1755,7 +1543,10 @@ const Settings = ({
                                     const newSections = sections.map(
                                       (sec, i) =>
                                         i === secIdx
-                                          ? { ...sec, [field]: val }
+                                          ? {
+                                              ...sec,
+                                              [field]: val,
+                                            }
                                           : sec,
                                     );
                                     updateItem("sections", newSections);
@@ -1771,7 +1562,10 @@ const Settings = ({
                                   const addSection = () => {
                                     const newSections = [
                                       ...sections,
-                                      { title: "New Section", content: "" },
+                                      {
+                                        title: "New Section",
+                                        content: "",
+                                      },
                                     ];
                                     updateItem("sections", newSections);
                                   };
@@ -1827,7 +1621,7 @@ const Settings = ({
                                             )}
                                           </div>
                                           <TextControl
-                                            className="mt5"
+                                            className="mt10"
                                             label={__(
                                               "Section Title",
                                               "b-testimonials-block",
@@ -1842,7 +1636,7 @@ const Settings = ({
                                             }
                                           />
                                           <TextareaControl
-                                            className="mt5"
+                                            className="mt10"
                                             label={__(
                                               "Section Content",
                                               "b-testimonials-block",
@@ -1878,7 +1672,6 @@ const Settings = ({
                               </>
                             ) : (
                               <TextareaControl
-                                className="mt10"
                                 label={__(
                                   "Review / Quote Text",
                                   "b-testimonials-block",
@@ -1893,7 +1686,6 @@ const Settings = ({
                             {(!isSingleItemBlock || isSingleTestimonial) &&
                               !isCaseStudy && (
                                 <NumberControl
-                                  className="mt10"
                                   label={__("Rating:", "b-testimonials-block")}
                                   labelPosition="left"
                                   value={rating}
@@ -1907,7 +1699,7 @@ const Settings = ({
                               )}
 
                             {!isSingleItemBlock && (
-                              <PanelRow className="itemAction mt10 mb15">
+                              <PanelRow className="itemAction mb15">
                                 {1 < items?.length && (
                                   <Button
                                     className="removeItem"
@@ -2072,13 +1864,12 @@ const Settings = ({
                         <>
                           <RangeControl
                             className="mt10"
-                            label={__(
-                              "Excerpt length",
-                              "b-testimonials-block",
-                            )}
+                            label={__("Excerpt length", "b-testimonials-block")}
                             value={textLength}
                             onChange={(val) =>
-                              setAttributes({ textLength: val })
+                              setAttributes({
+                                textLength: val,
+                              })
                             }
                             min={10}
                             max={1000}
@@ -2136,7 +1927,9 @@ const Settings = ({
                           <SelectControl
                             value={arrangement}
                             onChange={(val) =>
-                              setAttributes({ arrangement: val })
+                              setAttributes({
+                                arrangement: val,
+                              })
                             }
                             options={arrangementOpt}
                           />
@@ -2190,7 +1983,10 @@ const Settings = ({
                             value={columns[device]}
                             onChange={(val) => {
                               setAttributes({
-                                columns: { ...columns, [device]: val },
+                                columns: {
+                                  ...columns,
+                                  [device]: val,
+                                },
                               });
                             }}
                             min={1}
@@ -2225,7 +2021,11 @@ const Settings = ({
                           label={__("Column Gap:", "b-testimonials-block")}
                           labelPosition="left"
                           value={columnGap}
-                          onChange={(val) => setAttributes({ columnGap: val })}
+                          onChange={(val) =>
+                            setAttributes({
+                              columnGap: val,
+                            })
+                          }
                           units={[pxUnit(30), perUnit(3), emUnit(2)]}
                           isResetValueOnUnitChange={true}
                         />
@@ -2237,7 +2037,11 @@ const Settings = ({
                           label={__("Row Gap:", "b-testimonials-block")}
                           labelPosition="left"
                           value={rowGap}
-                          onChange={(val) => setAttributes({ rowGap: val })}
+                          onChange={(val) =>
+                            setAttributes({
+                              rowGap: val,
+                            })
+                          }
                           units={[pxUnit(40), perUnit(3), emUnit(2.5)]}
                           isResetValueOnUnitChange={true}
                         />
@@ -2295,7 +2099,9 @@ const Settings = ({
                           labelPosition="left"
                           checked={pauseInEditor}
                           onChange={(val) =>
-                            setAttributes({ pauseInEditor: val })
+                            setAttributes({
+                              pauseInEditor: val,
+                            })
                           }
                           help={__(
                             "Editor only. The slider keeps playing on your site.",
@@ -2312,6 +2118,21 @@ const Settings = ({
                         onChange={(val) =>
                           updateObject("slider", "mouseWheel", val)
                         }
+                      />
+
+                      {/* Looping was hardcoded on in Slider.js with no way to
+                            turn it off. On by default, so an existing block is
+                            unchanged. */}
+                      <ToggleControl
+                        className="mt10"
+                        label={__("Loop", "b-testimonials-block")}
+                        labelPosition="left"
+                        checked={loop}
+                        help={__(
+                          "Runs the slider in a continuous circle. Off shows each review once and rewinds to the first, and the arrows dim at each end.",
+                          "b-testimonials-block",
+                        )}
+                        onChange={(val) => updateObject("slider", "loop", val)}
                       />
 
                       <ToggleControl
@@ -2420,6 +2241,23 @@ const Settings = ({
                             onChange={(val) =>
                               updateObject("slider", "navBorder", val)
                             }
+                          />
+
+                          {/* The arrow is a raised surface button by default --
+                              it carries a drop shadow so it reads as a control
+                              floating over the card edge it overlaps. That shadow
+                              was the one part of it with no control, so an author
+                              who wanted a flat arrow had no way to ask for one.
+                              Left undefined until touched, like the rest of these,
+                              so the stylesheet's own shadow stands. */}
+                          <ShadowControl
+                            className="mt20"
+                            label={__("Arrow Shadow:", "b-testimonials-block")}
+                            value={navShadow}
+                            onChange={(val) =>
+                              updateObject("slider", "navShadow", val)
+                            }
+                            produce={produce}
                           />
                         </>
                       )}
@@ -2538,6 +2376,79 @@ const Settings = ({
                               "b-testimonials-block",
                             )}
                           />
+
+                          {/* Column Gap is hidden for these two arrangements --
+                              a real gap holds the side cards away from the
+                              centre one and flattens the effect -- so this is
+                              the spacing control a coverflow actually has.
+                              Swiper applies it along the track before the
+                              rotation, which moves the cards apart without
+                              breaking the overlap the effect is made of. It was
+                              fixed at 0. */}
+                          <RangeControl
+                            className="mt20"
+                            label={__("Card Spread", "b-testimonials-block")}
+                            value={coverStretch}
+                            onChange={(val) =>
+                              updateObject("slider", "coverStretch", val)
+                            }
+                            min={-120}
+                            max={200}
+                            step={5}
+                            allowReset
+                            resetFallbackValue={undefined}
+                            help={__(
+                              "Pushes the side cards outward. Negative values stack them tighter.",
+                              "b-testimonials-block",
+                            )}
+                          />
+
+                          {/* The stylesheet dims the flat slider's neighbours
+                              to 75% but deliberately leaves these two alone,
+                              because washing out a rotated card is most of what
+                              made the side cards read as grey slivers. That
+                              left no way to dim them at all, which is the wrong
+                              answer on a pale card over a pale page. */}
+                          <RangeControl
+                            label={__(
+                              "Side Card Opacity (%)",
+                              "b-testimonials-block",
+                            )}
+                            value={sideOpacity}
+                            onChange={(val) =>
+                              updateObject("slider", "sideOpacity", val)
+                            }
+                            min={10}
+                            max={100}
+                            step={5}
+                            allowReset
+                            resetFallbackValue={undefined}
+                            help={__(
+                              "Fades the cards either side of the active one. 100% leaves them solid.",
+                              "b-testimonials-block",
+                            )}
+                          />
+
+                          {/* Swiper's own coverflow shading, which used to be
+                              hardcoded off: it fills the whole slide box, and
+                              on Theme 1 and Theme 4 the slide is taller than
+                              the card so the shadow showed above it as a grey
+                              rectangle. The stylesheet insets the overlay by
+                              that headroom now, so the option can be offered.
+                              Still off by default -- the cards carry their own
+                              shadow from the Card panel. */}
+                          <ToggleControl
+                            className="mt20"
+                            label={__("Slide shadows", "b-testimonials-block")}
+                            checked={!!slideShadows}
+                            onChange={(val) =>
+                              updateObject("slider", "slideShadows", val)
+                            }
+                            help={__(
+                              "Shades the side cards as they rotate away, on top of the card's own shadow.",
+                              "b-testimonials-block",
+                            )}
+                          />
                         </>
                       )}
                     </PanelBody>
@@ -2611,13 +2522,142 @@ const Settings = ({
                         labelPosition="left"
                         checked={pauseInEditor}
                         onChange={(val) =>
-                          setAttributes({ pauseInEditor: val })
+                          setAttributes({
+                            pauseInEditor: val,
+                          })
                         }
                         help={__(
                           "Editor only, so cards hold still while you style them. The marquee keeps scrolling on your site.",
                           "b-testimonials-block",
                         )}
                       />
+                    </PanelBody>
+                  )}
+
+                  {/* The toast rotates through the reviews on a timer, and that
+                      timer was a bare 4000 in Layout.js -- the one setting a
+                      live-notification block is really made of. */}
+                  {"social-proof-toast" === layout && (
+                    <PanelBody
+                      className="bPlPanelBody"
+                      title={__("Notification", "b-testimonials-block")}
+                      initialOpen={false}>
+                      <RangeControl
+                        label={__(
+                          "Rotation Interval (seconds)",
+                          "b-testimonials-block",
+                        )}
+                        value={toastSpeed}
+                        onChange={(val) => updateObject("toast", "speed", val)}
+                        min={1}
+                        max={60}
+                        step={1}
+                        allowReset
+                        resetFallbackValue={4}
+                        help={__(
+                          "How long each review stays up before the next one.",
+                          "b-testimonials-block",
+                        )}
+                      />
+
+                      <ToggleControl
+                        className="mt10"
+                        label={__("Pause on hover", "b-testimonials-block")}
+                        labelPosition="left"
+                        checked={toastPauseOnHover}
+                        onChange={(val) =>
+                          updateObject("toast", "pauseOnHover", val)
+                        }
+                        help={__(
+                          "Holds the current review while the pointer is over it, so it can be read.",
+                          "b-testimonials-block",
+                        )}
+                      />
+                    </PanelBody>
+                  )}
+
+                  {/* Both of these are what a reader expects an accordion to do,
+                      and neither existed: the rows were plain `<details>` with no
+                      group and no initial state, so every one could be open at
+                      once and none opened on load. */}
+                  {"faq-testimonial-accordion" === layout && (
+                    <PanelBody
+                      className="bPlPanelBody"
+                      title={__("Accordion", "b-testimonials-block")}
+                      initialOpen={false}>
+                      <ToggleControl
+                        label={__("One at a time", "b-testimonials-block")}
+                        labelPosition="left"
+                        checked={!!attributes.faqExclusive}
+                        onChange={(val) =>
+                          setAttributes({
+                            faqExclusive: val,
+                          })
+                        }
+                        help={__(
+                          "Opening a row closes the others. Uses the browser's own accordion grouping, so an older browser simply leaves them independent.",
+                          "b-testimonials-block",
+                        )}
+                      />
+
+                      <ToggleControl
+                        className="mt10"
+                        label={__("Open first row", "b-testimonials-block")}
+                        labelPosition="left"
+                        checked={!!attributes.faqFirstOpen}
+                        onChange={(val) =>
+                          setAttributes({
+                            faqFirstOpen: val,
+                          })
+                        }
+                        help={__(
+                          "The first answer starts expanded. A reader can still close it.",
+                          "b-testimonials-block",
+                        )}
+                      />
+                    </PanelBody>
+                  )}
+
+                  {/* The stack had next/prev buttons, dots and drag-to-swipe, but
+                      no way to advance on its own -- the only multi-item layout
+                      that moves and had no autoplay. */}
+                  {"testimonials-card-stack" === layout && (
+                    <PanelBody
+                      className="bPlPanelBody"
+                      title={__("Autoplay", "b-testimonials-block")}
+                      initialOpen={false}>
+                      <ToggleControl
+                        label={__("Autoplay", "b-testimonials-block")}
+                        labelPosition="left"
+                        checked={!!attributes.stackAutoPlay}
+                        onChange={(val) =>
+                          setAttributes({
+                            stackAutoPlay: val,
+                          })
+                        }
+                        help={__(
+                          "Advances the deck on its own, and pauses while the pointer is over it. Editor stays still so you can style it.",
+                          "b-testimonials-block",
+                        )}
+                      />
+
+                      {attributes.stackAutoPlay && (
+                        <RangeControl
+                          className="mt20"
+                          label={__("Delay (seconds)", "b-testimonials-block")}
+                          value={attributes.stackAutoPlayDelay}
+                          onChange={(val) =>
+                            setAttributes({
+                              stackAutoPlayDelay: val,
+                            })
+                          }
+                          min={1}
+                          max={30}
+                          step={1}
+                          allowReset
+                          resetFallbackValue={5}
+                        />
+                      )}
                     </PanelBody>
                   )}
                 </>
@@ -2629,7 +2669,7 @@ const Settings = ({
                     attributes={attributes}
                     setAttributes={setAttributes}
                     layout={layout}
-                    exclude={cardRoles}
+                    exclude={[...cardRoles, ...textRoles]}
                   />
 
                   {/* Block Width, Card Height, Block Margin and Card Margin, in
@@ -2658,6 +2698,50 @@ const Settings = ({
                     />
                   )}
 
+                  {/* The FAQ layout is denied the Card panel so the [open] row
+                      keeps its accent border -- which had also withheld the
+                      radius, background, shadow, gap and padding that border
+                      colour has nothing to do with. */}
+                  {"faq-testimonial-accordion" === layout && (
+                    <FaqStylePanel
+                      attributes={attributes}
+                      setAttributes={setAttributes}
+                    />
+                  )}
+
+                  {/* Gated on the attribute rather than on the layout: the
+                      Gradient Border Grid's layout is `default`, the same value
+                      the plain grid carries, so there is nothing in `layout` to
+                      tell them apart. Only that block declares this one. */}
+                  {undefined !== attributes.gradientBorder && (
+                    <GradientBorderPanel
+                      attributes={attributes}
+                      setAttributes={setAttributes}
+                    />
+                  )}
+
+                  {/* The tail's size, position and colours. Gated on the
+                      attribute on the same terms as the panel above -- the
+                      Speech Bubble Cards block is the only one that declares
+                      it, and no other layout draws a tail for it to move. */}
+                  {undefined !== attributes.bubbleTail && (
+                    <SpeechBubblePanel
+                      attributes={attributes}
+                      setAttributes={setAttributes}
+                    />
+                  )}
+
+                  {/* The popup a trigger card opens. Everything else on this tab
+                      styles the cards in the grid; until the modal's inline
+                      styles were moved into the stylesheet, nothing reached the
+                      popup itself. */}
+                  {"testimonials-popup-modal" === layout && (
+                    <PopupModalPanel
+                      attributes={attributes}
+                      setAttributes={setAttributes}
+                    />
+                  )}
+
                   {/* The four rules behind this panel name seven selectors:
                       `.layoutSection .single` and six widgets. On the layouts
                       that build their card out of anything else -- timeline,
@@ -2676,6 +2760,50 @@ const Settings = ({
                         value={cardBackgroundValue}
                         onChange={setCardBackground}
                       />
+                      {/* The corner tint over that colour.
+                          A radial gradient of the Accent at the top-left, which
+                          deepens on hover -- so it reads as a hover effect that
+                          cannot be switched off. It had no control of any kind:
+                          not the colour, not the strength, and no way to remove
+                          it and leave the flat Background Color above. */}
+                      <ToggleControl
+                        label={__("Corner wash", "b-testimonials-block")}
+                        checked={!!attributes.cardWash}
+                        onChange={(val) => setAttributes({ cardWash: val })}
+                        help={__(
+                          "A tint in the card's top-left corner that deepens on hover. Off leaves the Background Color flat.",
+                          "b-testimonials-block",
+                        )}
+                      />
+
+                      {attributes.cardWash && (
+                        <>
+                          <RangeControl
+                            className="mt10"
+                            label={__("Wash Strength (%)", "b-testimonials-block")}
+                            value={attributes.cardWashStrength}
+                            onChange={(val) =>
+                              setAttributes({ cardWashStrength: val })
+                            }
+                            min={0}
+                            max={300}
+                            step={5}
+                            allowReset
+                            resetFallbackValue={100}
+                          />
+
+                          {/* Empty follows the Accent colour, which is what the
+                              wash has always been mixed from. */}
+                          <ColorControl
+                            className="mt10 mb10"
+                            label={__("Wash Color", "b-testimonials-block")}
+                            value={attributes.cardWashColor}
+                            onChange={(val) =>
+                              setAttributes({ cardWashColor: val })
+                            }
+                          />
+                        </>
+                      )}
 
                       {/* Per device, like Block Width and Card Height. The
                           padding that suits a three-column desktop grid is a lot
@@ -2717,8 +2845,70 @@ const Settings = ({
                       <ShadowControl
                         label={__("Shadow:", "sound-cloud")}
                         value={shadow}
-                        onChange={(val) => setAttributes({ shadow: val })}
+                        onChange={(val) =>
+                          setAttributes({
+                            shadow: val,
+                          })
+                        }
                         produce={produce}
+                      />
+
+                      {/* Hover.
+                          The cards already lift and deepen their wash on hover,
+                          but none of it could be changed: the wash is derived
+                          from Accent, and the stylesheet could not offer a hover
+                          background, border or shadow at all -- as the comment on
+                          that rule says, the Card panel emits all three at ID
+                          specificity, so a `:hover` rule in frontend.scss lost to
+                          the resting state every time. Emitted from Style.js
+                          instead, where it wins.
+
+                          Every one is empty until set, so a card nobody has
+                          touched keeps exactly the lift-and-wash it has today. */}
+                      <hr />
+
+                      <Label>{__("Hover:", "b-testimonials-block")}</Label>
+
+                      <ColorControl
+                        className="mt10 mb10"
+                        label={__("Background Color", "b-testimonials-block")}
+                        value={attributes.cardHoverBg}
+                        onChange={(val) => setAttributes({ cardHoverBg: val })}
+                      />
+
+                      {/* Colour only. Width, style and radius would have to match
+                          the resting border to avoid the card resizing under the
+                          pointer, so they stay the Border control's above. */}
+                      <ColorControl
+                        className="mb10"
+                        label={__("Border Color", "b-testimonials-block")}
+                        value={attributes.cardHoverBorderColor}
+                        onChange={(val) =>
+                          setAttributes({ cardHoverBorderColor: val })
+                        }
+                      />
+
+                      <ShadowControl
+                        label={__("Shadow:", "b-testimonials-block")}
+                        value={attributes.cardHoverShadow}
+                        onChange={(val) =>
+                          setAttributes({ cardHoverShadow: val })
+                        }
+                        produce={produce}
+                      />
+
+                      {/* 0 is a real choice -- it holds the card still, which is
+                          the only way to turn the lift off. */}
+                      <RangeControl
+                        className="mt10"
+                        label={__("Lift (px)", "b-testimonials-block")}
+                        value={attributes.cardHoverLift}
+                        onChange={(val) => setAttributes({ cardHoverLift: val })}
+                        min={0}
+                        max={24}
+                        step={1}
+                        allowReset
+                        resetFallbackValue={3}
                       />
                     </PanelBody>
                   )}
@@ -2774,8 +2964,63 @@ const Settings = ({
                           className=""
                           label={__("Border", "b-testimonials-block")}
                           value={imgBorder}
-                          onChange={(val) => setAttributes({ imgBorder: val })}
+                          onChange={(val) =>
+                            setAttributes({
+                              imgBorder: val,
+                            })
+                          }
                         />
+                      )}
+                      {/* The tinted halo outside the border above.
+                          It is a `box-shadow`, not a border -- the Border control
+                          owns that -- and it had no control at all: a fixed 3px
+                          of the Accent at 18% alpha, with no way to recolour,
+                          resize or remove it. Same gate as the Border, since the
+                          rule behind it names the same element. */}
+                      {controls.imageBorder && (
+                        <>
+                          <ToggleControl
+                            className="mt10"
+                            label={__("Outer ring", "b-testimonials-block")}
+                            checked={!!attributes.avatarRing}
+                            onChange={(val) =>
+                              setAttributes({ avatarRing: val })
+                            }
+                            help={__(
+                              "A soft halo just outside the avatar's border.",
+                              "b-testimonials-block",
+                            )}
+                          />
+
+                          {attributes.avatarRing && (
+                            <>
+                              <RangeControl
+                                className="mt10"
+                                label={__("Ring Width (px)", "b-testimonials-block")}
+                                value={attributes.avatarRingWidth}
+                                onChange={(val) =>
+                                  setAttributes({ avatarRingWidth: val })
+                                }
+                                min={0}
+                                max={20}
+                                step={1}
+                                allowReset
+                                resetFallbackValue={3}
+                              />
+
+                              {/* Empty follows the Accent colour at the alpha it
+                                  ships with, which is what it has always done. */}
+                              <ColorControl
+                                className="mt10 mb10"
+                                label={__("Ring Color", "b-testimonials-block")}
+                                value={attributes.avatarRingColor}
+                                onChange={(val) =>
+                                  setAttributes({ avatarRingColor: val })
+                                }
+                              />
+                            </>
+                          )}
+                        </>
                       )}
                     </PanelBody>
                   )}
@@ -2783,21 +3028,25 @@ const Settings = ({
                   {controls.nameStyle && rendersPart("name") && (
                     <PanelBody
                       className="bPlPanelBody"
-                      title={__("Name", "b-testimonials-block")}
+                      title={nameLabel}
                       initialOpen={false}>
                       <Typography
                         className="mt10"
                         label={__("Typography", "b-testimonials-block")}
                         value={nameTypo}
-                        onChange={(val) => setAttributes({ nameTypo: val })}
+                        onChange={(val) =>
+                          setAttributes({
+                            nameTypo: val,
+                          })
+                        }
                         produce={produce}
                       />
 
                       <ColorControl
                         className="mb10"
                         label={__("Color", "b-testimonials-block")}
-                        value={nameColor}
-                        onChange={(val) => setAttributes({ nameColor: val })}
+                        value={textColorValue("titleColor", nameColor)}
+                        onChange={setTextColor("titleColor", "nameColor")}
                       />
                     </PanelBody>
                   )}
@@ -2805,21 +3054,25 @@ const Settings = ({
                   {controls.degStyle && rendersPart("deg") && (
                     <PanelBody
                       className="bPlPanelBody"
-                      title={__("Designation", "b-testimonials-block")}
+                      title={degLabel}
                       initialOpen={false}>
                       <Typography
                         className="mt10"
                         label={__("Typography", "b-testimonials-block")}
                         value={degTypo}
-                        onChange={(val) => setAttributes({ degTypo: val })}
+                        onChange={(val) =>
+                          setAttributes({
+                            degTypo: val,
+                          })
+                        }
                         produce={produce}
                       />
 
                       <ColorControl
                         className="mb10"
                         label={__("Color", "b-testimonials-block")}
-                        value={degColor}
-                        onChange={(val) => setAttributes({ degColor: val })}
+                        value={textColorValue("mutedColor", degColor)}
+                        onChange={setTextColor("mutedColor", "degColor")}
                       />
 
                       {/* The short rule under the designation. Only Theme 1
@@ -2837,7 +3090,10 @@ const Settings = ({
                             value={degDivider?.color || ""}
                             onChange={(val) =>
                               setAttributes({
-                                degDivider: { ...degDivider, color: val },
+                                degDivider: {
+                                  ...degDivider,
+                                  color: val,
+                                },
                               })
                             }
                           />
@@ -2847,7 +3103,10 @@ const Settings = ({
                             value={degDivider?.width}
                             onChange={(val) =>
                               setAttributes({
-                                degDivider: { ...degDivider, width: val },
+                                degDivider: {
+                                  ...degDivider,
+                                  width: val,
+                                },
                               })
                             }
                             min={0}
@@ -2864,7 +3123,10 @@ const Settings = ({
                             value={degDivider?.length}
                             onChange={(val) =>
                               setAttributes({
-                                degDivider: { ...degDivider, length: val },
+                                degDivider: {
+                                  ...degDivider,
+                                  length: val,
+                                },
                               })
                             }
                             min={0}
@@ -2874,6 +3136,16 @@ const Settings = ({
                         </>
                       )}
                     </PanelBody>
+                  )}
+
+                  {/* Straight after Badge Title and Review Count, which are the
+                      other two lines of the same widget. Absent on the Verified
+                      Buyer seal, the one badge that renders no score. */}
+                  {SCORED_BADGE_LAYOUTS.includes(layout) && (
+                    <BadgeScorePanel
+                      attributes={attributes}
+                      setAttributes={setAttributes}
+                    />
                   )}
 
                   {/* The rating colour is written inline by getStar rather than
@@ -2896,33 +3168,72 @@ const Settings = ({
                             className="mt10"
                             label={__("Typography", "b-testimonials-block")}
                             value={textTypo}
-                            onChange={(val) => setAttributes({ textTypo: val })}
+                            onChange={(val) =>
+                              setAttributes({
+                                textTypo: val,
+                              })
+                            }
                             produce={produce}
                           />
 
                           <ColorControl
                             className="mb10"
                             label={__("Color", "b-testimonials-block")}
-                            value={textColor}
-                            onChange={(val) =>
-                              setAttributes({ textColor: val })
-                            }
+                            value={textColorValue("bodyColor", textColor)}
+                            onChange={setTextColor("bodyColor", "textColor")}
                           />
                         </>
                       )}
 
                       {hasRatingColor && (
-                        <ColorControl
-                          className="mb10"
-                          label={__(
-                            "Rating Icon Color",
-                            "b-testimonials-block",
-                          )}
-                          value={starIconColor}
-                          onChange={(val) =>
-                            setAttributes({ starIconColor: val })
-                          }
-                        />
+                        <>
+                          <ColorControl
+                            className="mb10"
+                            label={__(
+                              "Rating Icon Color",
+                              "b-testimonials-block",
+                            )}
+                            value={textColorValue("ratingColor", starIconColor)}
+                            onChange={setTextColor(
+                              "ratingColor",
+                              "starIconColor",
+                            )}
+                          />
+
+                          {/* The colour has always been here; the size never
+                              was. `getStar` renders the star as an inline SVG
+                              with `width="15px" height="15px"` written on the
+                              element, so the size lived in the icon markup
+                              rather than in any attribute -- the one dimension
+                              of a rating an author is most likely to want.
+
+                              Left empty rather than defaulted to 15: the layouts
+                              do not agree on a star size to begin with (the
+                              compact card sizes its own at 14px), so a default
+                              here would quietly resize several of them. */}
+                          <RangeControl
+                            className="mb10"
+                            label={__(
+                              "Rating Icon Size (px)",
+                              "b-testimonials-block",
+                            )}
+                            value={starSize}
+                            onChange={(val) =>
+                              setAttributes({
+                                starSize: val,
+                              })
+                            }
+                            min={8}
+                            max={48}
+                            step={1}
+                            allowReset
+                            resetFallbackValue={undefined}
+                            help={__(
+                              "Leave empty to keep each layout's own star size.",
+                              "b-testimonials-block",
+                            )}
+                          />
+                        </>
                       )}
                     </PanelBody>
                   )}
@@ -2939,7 +3250,11 @@ const Settings = ({
                         className="mt10"
                         label={__("Typography", "b-testimonials-block")}
                         value={expandedTypo}
-                        onChange={(val) => setAttributes({ expandedTypo: val })}
+                        onChange={(val) =>
+                          setAttributes({
+                            expandedTypo: val,
+                          })
+                        }
                         produce={produce}
                       />
 
@@ -2947,7 +3262,11 @@ const Settings = ({
                         className="mb10"
                         label={__("Color", "b-testimonials-block")}
                         value={expandColor}
-                        onChange={(val) => setAttributes({ expandColor: val })}
+                        onChange={(val) =>
+                          setAttributes({
+                            expandColor: val,
+                          })
+                        }
                       />
 
                       <ColorControl
@@ -2955,7 +3274,9 @@ const Settings = ({
                         label={__("Hover Color", "b-testimonials-block")}
                         value={expandHoverColor}
                         onChange={(val) =>
-                          setAttributes({ expandHoverColor: val })
+                          setAttributes({
+                            expandHoverColor: val,
+                          })
                         }
                       />
                     </PanelBody>
@@ -2969,20 +3290,26 @@ const Settings = ({
                     (theme === "theme_2" || "masonry" === arrangement) && (
                       <PanelBody
                         className="bPlPanelBody"
-                        title={__("Top", "b-testimonials-block")}
+                        title={__("Header Strip", "b-testimonials-block")}
                         initialOpen={false}>
                         <ColorControl
                           className="mb10"
                           label={__("Background Color", "b-testimonials-block")}
                           value={grid2Bg}
-                          onChange={(val) => setAttributes({ grid2Bg: val })}
+                          onChange={(val) =>
+                            setAttributes({
+                              grid2Bg: val,
+                            })
+                          }
                         />
 
                         <BoxControl
                           label={__("Padding", "b-testimonials-block")}
                           values={grid2Padding}
                           onChange={(val) =>
-                            setAttributes({ grid2Padding: val })
+                            setAttributes({
+                              grid2Padding: val,
+                            })
                           }
                           resetValues={{
                             top: "10px",
@@ -3001,9 +3328,51 @@ const Settings = ({
                           label={__("Border", "b-testimonials-block")}
                           value={grid2Border}
                           onChange={(val) =>
-                            setAttributes({ grid2Border: val })
+                            setAttributes({
+                              grid2Border: val,
+                            })
                           }
                         />
+
+                        {/* The wash painted over the colour above.
+                            Without these two the Background Color moved and the
+                            accent tint on top of it did not, so the strip read as
+                            though it had no colour control at all. They used to
+                            live in the Gradient Border Grid's own panel, which
+                            left every other Theme 2 layout -- the coverflow
+                            carousel among them -- with a fixed wash. */}
+                        <ToggleControl
+                          className="mt10"
+                          label={__("Accent wash", "b-testimonials-block")}
+                          checked={!!attributes.headerWash}
+                          onChange={(val) =>
+                            setAttributes({ headerWash: val })
+                          }
+                          help={__(
+                            "A gradient of the Accent color over the strip. Off leaves the Background Color on its own.",
+                            "b-testimonials-block",
+                          )}
+                        />
+
+                        {attributes.headerWash && (
+                          <RangeControl
+                            className="mt10"
+                            label={__("Wash Strength (%)", "b-testimonials-block")}
+                            value={attributes.headerWashStrength}
+                            onChange={(val) =>
+                              setAttributes({ headerWashStrength: val })
+                            }
+                            min={0}
+                            max={300}
+                            step={5}
+                            allowReset
+                            resetFallbackValue={100}
+                            help={__(
+                              "100% is the shipped tint. Lower lets the Background Color through; higher deepens it.",
+                              "b-testimonials-block",
+                            )}
+                          />
+                        )}
                       </PanelBody>
                     )}
                 </>

@@ -136,6 +136,35 @@
       "type": "object",
       "default": {}
     },
+    "badgeTitleTypo": {
+      "type": "object",
+      "default": {}
+    },
+    "badgeSubtitleTypo": {
+      "type": "object",
+      "default": {}
+    },
+    "badgeIconSize": {
+      "type": "number"
+    },
+    "badgeIconGap": {
+      "type": "number"
+    },
+    "badgeIconPosition": {
+      "type": "string",
+      "default": "left"
+    },
+    "badgePadding": {
+      "type": "object",
+      "default": {}
+    },
+    "badgeRadius": {
+      "type": "string"
+    },
+    "badgeShadow": {
+      "type": "object",
+      "default": {}
+    },
     "degDivider": {
       "type": "object",
       "default": {}

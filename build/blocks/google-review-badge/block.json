@@ -111,6 +111,14 @@
       "type": "string",
       "default": "#f9f8f8"
     },
+    "headerWash": {
+      "type": "boolean",
+      "default": true
+    },
+    "headerWashStrength": {
+      "type": "number",
+      "default": 100
+    },
     "grid2Padding": {
       "type": "object",
       "default": {
@@ -171,6 +179,30 @@
       "type": "object",
       "default": {}
     },
+    "cardWash": {
+      "type": "boolean",
+      "default": true
+    },
+    "cardWashStrength": {
+      "type": "number",
+      "default": 100
+    },
+    "cardWashColor": {
+      "type": "string"
+    },
+    "cardHoverBg": {
+      "type": "string"
+    },
+    "cardHoverBorderColor": {
+      "type": "string"
+    },
+    "cardHoverShadow": {
+      "type": "object",
+      "default": {}
+    },
+    "cardHoverLift": {
+      "type": "number"
+    },
     "imgBorder": {
       "type": "object",
       "default": {
@@ -180,6 +212,17 @@
         "side": "all",
         "radius": "50%"
       }
+    },
+    "avatarRing": {
+      "type": "boolean",
+      "default": true
+    },
+    "avatarRingWidth": {
+      "type": "number",
+      "default": 3
+    },
+    "avatarRingColor": {
+      "type": "string"
     },
     "image": {
       "type": "object",
@@ -192,35 +235,45 @@
       "type": "object",
       "default": {
         "fontSize": {
-          "desktop": 16,
-          "tablet": 16,
-          "mobile": 14
+          "desktop": 17,
+          "tablet": 17,
+          "mobile": 16
         },
-        "fontFamily": "Open Sans",
-        "fontWeight": 700,
-        "lineHeight": "140%"
+        "fontWeight": 700
       }
     },
     "nameColor": {
       "type": "string",
-      "default": "#000"
+      "default": "#1e293b"
     },
     "degTypo": {
       "type": "object",
       "default": {
         "fontSize": {
-          "desktop": 14,
-          "tablet": 14,
-          "mobile": 14
-        },
-        "fontFamily": "Open Sans",
-        "fontWeight": 400,
-        "lineHeight": "150%"
+          "desktop": 13,
+          "tablet": 13,
+          "mobile": 13
+        }
       }
     },
     "degColor": {
       "type": "string",
-      "default": "#7B7B7B"
+      "default": "#64748b"
+    },
+    "badgeScoreTypo": {
+      "type": "object",
+      "default": {
+        "fontSize": {
+          "desktop": 18,
+          "tablet": 18,
+          "mobile": 18
+        },
+        "fontWeight": 800
+      }
+    },
+    "badgeStarsSize": {
+      "type": "number",
+      "default": 16
     },
     "textTypo": {
       "type": "object",
@@ -323,6 +376,9 @@
     "badgeCount": {
       "type": "string",
       "default": ""
+    },
+    "starSize": {
+      "type": "number"
     }
   },
   "supports": {

@@ -101,6 +101,14 @@
 				"image": false
 			}
 		},
+		"fieldLabels": {
+			"type": "object",
+			"default": {}
+		},
+		"fieldPlaceholders": {
+			"type": "object",
+			"default": {}
+		},
 		"accentColor": {
 			"type": "string",
 			"default": "#0575e6"
@@ -150,6 +158,55 @@
 		"cardMargin": {
 			"type": "object",
 			"default": {}
+		},
+		"btnBg": {
+			"type": "string",
+			"default": ""
+		},
+		"btnHoverBg": {
+			"type": "string",
+			"default": ""
+		},
+		"btnColor": {
+			"type": "string",
+			"default": "#ffffff"
+		},
+		"btnHoverColor": {
+			"type": "string",
+			"default": ""
+		},
+		"btnTypo": {
+			"type": "object",
+			"default": {
+				"fontSize": {
+					"desktop": 15,
+					"tablet": 15,
+					"mobile": 15
+				},
+				"fontWeight": 600,
+				"lineHeight": "150%"
+			}
+		},
+		"btnPadding": {
+			"type": "object",
+			"default": {
+				"top": "11px",
+				"right": "24px",
+				"bottom": "11px",
+				"left": "24px"
+			}
+		},
+		"btnRadius": {
+			"type": "string",
+			"default": "6px"
+		},
+		"btnWidth": {
+			"type": "string",
+			"default": "auto"
+		},
+		"btnAlign": {
+			"type": "string",
+			"default": "start"
 		}
 	},
 	"supports": {

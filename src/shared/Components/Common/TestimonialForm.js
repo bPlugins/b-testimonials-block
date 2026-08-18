@@ -31,7 +31,10 @@ const TestimonialForm = ( { attributes = {}, isBackend = false } ) => {
 		buttonText = '',
 		successMessage = '',
 		fields = {},
+		fieldLabels = {},
+		fieldPlaceholders = {},
 		accentColor,
+		btnBg = '',
 		badgeTitle = '',
 		badgeCount = ''
 	} = attributes;
@@ -47,6 +50,23 @@ const TestimonialForm = ( { attributes = {}, isBackend = false } ) => {
 			{ input }
 		</div>
 	);
+
+	// Every visible label and placeholder was a hardcoded `__()` string, so the
+	// form could only ever ask for "Name", "Email", "Designation" -- there was no
+	// way to word a question for the site, or to translate one on a site that is
+	// not running in the plugin's own locale. Placeholders did not exist at all.
+	//
+	// Empty means "use the shipped wording", not "blank": that keeps the default
+	// form identical to what it renders today and leaves the strings translatable
+	// through the usual .po route for anyone who has not overridden them.
+	const labelFor = ( key, fallback ) => fieldLabels?.[ key ] || fallback;
+
+	// `undefined` rather than `''` so React omits the attribute entirely instead
+	// of writing `placeholder=""`.
+	const placeholderFor = ( key ) => fieldPlaceholders?.[ key ] || undefined;
+
+	// The two required fields carry a marker after whatever they are called.
+	const required = ( label ) => `${ label } *`;
 
 	return (
 		<div className="bTestimonialForm">
@@ -85,52 +105,60 @@ const TestimonialForm = ( { attributes = {}, isBackend = false } ) => {
 				) }
 
 				{ field(
-					`${ __( 'Name', 'b-testimonials-block' ) } *`,
+					required( labelFor( 'name', __( 'Name', 'b-testimonials-block' ) ) ),
 					// Not `name`: that is one of WordPress's public query vars, and
 					// WP::parse_request() reads those out of $_POST as well as $_GET.
 					// A submit that reached the page URL therefore asked WordPress for
 					// a post whose slug was whatever the visitor typed, and got the
 					// 404 template. The endpoint accepts the old name too, for pages
 					// cached with the previous markup.
-					<input type="text" name="btb_name" required />
+					<input type="text" name="btb_name" required placeholder={ placeholderFor( 'name' ) } />
 				) }
 
 				{ fields?.email && field(
-					__( 'Email', 'b-testimonials-block' ),
-					<input type="email" name="email" />
+					labelFor( 'email', __( 'Email', 'b-testimonials-block' ) ),
+					<input type="email" name="email" placeholder={ placeholderFor( 'email' ) } />
 				) }
 
 				{ fields?.designation && field(
-					__( 'Designation', 'b-testimonials-block' ),
-					<input type="text" name="designation" />
+					labelFor( 'designation', __( 'Designation', 'b-testimonials-block' ) ),
+					<input type="text" name="designation" placeholder={ placeholderFor( 'designation' ) } />
 				) }
 
 				{ fields?.company && field(
-					__( 'Company', 'b-testimonials-block' ),
-					<input type="text" name="company" />
+					labelFor( 'company', __( 'Company', 'b-testimonials-block' ) ),
+					<input type="text" name="company" placeholder={ placeholderFor( 'company' ) } />
 				) }
 
+				{/* No placeholder: a select shows its selected option, so there is
+				    nowhere for one to appear. */}
 				{ fields?.rating && field(
-					__( 'Rating', 'b-testimonials-block' ),
+					labelFor( 'rating', __( 'Rating', 'b-testimonials-block' ) ),
 					<select name="rating" defaultValue="5">
 						{ [ 5, 4, 3, 2, 1 ].map( ( n ) => <option key={ n } value={ n }>{ n }</option> ) }
 					</select>
 				) }
 
+				{/* Nor here -- a file input renders the browser's own button and
+				    "no file selected" text, neither of which `placeholder` reaches. */}
 				{ fields?.image && field(
-					__( 'Photo', 'b-testimonials-block' ),
+					labelFor( 'image', __( 'Photo', 'b-testimonials-block' ) ),
 					<input type="file" name="image" accept="image/*" />
 				) }
 
 				{ field(
-					`${ __( 'Review', 'b-testimonials-block' ) } *`,
-					<textarea name="review" required />
+					required( labelFor( 'review', __( 'Review', 'b-testimonials-block' ) ) ),
+					<textarea name="review" required placeholder={ placeholderFor( 'review' ) } />
 				) }
 
 				<button
 					type="submit"
 					className="btb-tform-submit"
-					style={ { backgroundColor: accentColor } }
+					// Inline, so it outranks every stylesheet -- which is why the new
+					// Background control painted nothing until it was named here.
+					// `btnBg` first: the button's own colour is the more specific
+					// choice, and Accent stays the default when it is empty.
+					style={ { backgroundColor: btnBg || accentColor } }
 				>
 					{ button }
 				</button>

@@ -1,10 +1,10 @@
 import { useEffect } from 'react';
 import { __ } from '@wordpress/i18n';
 import { useBlockProps, InspectorControls } from '@wordpress/block-editor';
-import { PanelBody, RangeControl, TextControl, Button, Dashicon, PanelRow, __experimentalUnitControl as UnitControl } from '@wordpress/components';
-import { produce } from 'immer';
+import { PanelBody, RangeControl, TextControl, PanelRow, __experimentalUnitControl as UnitControl } from '@wordpress/components';
 import BlockSwitcher from '../../shared/Components/Common/BlockSwitcher';
 import SettingsTabs from '../../shared/Components/Backend/Settings/SettingsTabs';
+import ItemCards from '../../shared/Components/Backend/Settings/ItemCards';
 import { InlineDetailMediaUpload } from '../../../../bpl-tools/Components/MediaControl/MediaControl';
 import usePreviewDevice, { colsForDevice, useDeviceKey } from '../../shared/utils/usePreviewDevice';
 import Label from '../../../../bpl-tools/Components/Label/Label';
@@ -12,6 +12,7 @@ import Device from '../../../../bpl-tools/Components/Device/Device';
 import { emUnit, perUnit, pxUnit } from '../../../../bpl-tools/utils/options';
 import ColorsPanel from '../../shared/Components/Backend/Settings/ColorsPanel';
 import SizeSpacingPanel from '../../shared/Components/Backend/Settings/SizeSpacingPanel';
+import TrustBadgePanel from '../../shared/Components/Backend/Settings/TrustBadgePanel';
 import Style from '../../shared/Components/Common/Style';
 import IconSettings from '../../shared/Components/Backend/Settings/IconSettings';
 import BlockIcon from '../../shared/Components/Common/BlockIcon';
@@ -31,7 +32,13 @@ const gridVars = ( { columns, columnGap, rowGap } ) => ( {
 } );
 
 const Edit = ( { attributes, setAttributes, clientId } ) => {
-	const { items = [], columns, columnGap, rowGap } = attributes;
+	const { items = [], columns, columnGap, rowGap, badgeIconSize, badgeIconPosition = 'left' } = attributes;
+
+	// The icon size reaches a picked icon through BlockIcon's own prop rather
+	// than through CSS: BlockIcon writes width and height inline, which no
+	// selector can outrank. A per-badge size set in the Icons panel still wins,
+	// because BlockIcon reads `icon.size || size`.
+	const iconBox = badgeIconSize || 32;
 
 	// The device switch below is the editor's own preview device, so picking a
 	// device there resizes the canvas and every other panel follows it. It used
@@ -49,9 +56,6 @@ const Edit = ( { attributes, setAttributes, clientId } ) => {
 	}, [ clientId, setAttributes ] );
 
 	const setColumn = ( device, val ) => setAttributes( { columns: { ...columns, [ device ]: val } } );
-	const updateItem = ( i, key, val ) => setAttributes( { items: produce( items, ( d ) => { d[ i ][ key ] = val; } ) } );
-	const addItem = () => setAttributes( { items: [ ...items, { img: { url: '' }, title: '', subtitle: '' } ] } );
-	const removeItem = ( i ) => setAttributes( { items: items.filter( ( _, idx ) => idx !== i ) } );
 
 	return (
 		<>
@@ -74,20 +78,26 @@ const Edit = ( { attributes, setAttributes, clientId } ) => {
 						</PanelBody>
 
 						<PanelBody className="bPlPanelBody" title={ __( 'Badges', 'b-testimonials-block' ) } initialOpen={ false }>
-							{ items.map( ( item, i ) => (
-								<div key={ i } className="btb-badge-row">
-									<InlineDetailMediaUpload
-										label={ __( 'Icon', 'b-testimonials-block' ) }
-										value={ item?.img }
-										onChange={ ( val ) => updateItem( i, 'img', val ) }
-									/>
-									<TextControl label={ __( 'Title', 'b-testimonials-block' ) } value={ item?.title || '' } onChange={ ( v ) => updateItem( i, 'title', v ) } />
-									<TextControl label={ __( 'Subtitle', 'b-testimonials-block' ) } value={ item?.subtitle || '' } onChange={ ( v ) => updateItem( i, 'subtitle', v ) } />
-									<Button isDestructive onClick={ () => removeItem( i ) }><Dashicon icon="trash" /> { __( 'Remove', 'b-testimonials-block' ) }</Button>
-									<hr />
-								</div>
-							) ) }
-							<Button variant="primary" onClick={ addItem }><Dashicon icon="plus" /> { __( 'Add badge', 'b-testimonials-block' ) }</Button>
+							{/* One badge at a time, matching the testimonial card editor. */}
+							<ItemCards
+								items={ items }
+								onChange={ ( next ) => setAttributes( { items: next } ) }
+								newItem={ { img: { url: '' }, title: '', subtitle: '' } }
+								itemLabel={ __( 'Badge', 'b-testimonials-block' ) }
+								addLabel={ __( 'Add New Badge', 'b-testimonials-block' ) }
+							>
+								{ ( item, i, update ) => (
+									<>
+										<InlineDetailMediaUpload
+											label={ __( 'Icon', 'b-testimonials-block' ) }
+											value={ item?.img }
+											onChange={ ( val ) => update( 'img', val ) }
+										/>
+										<TextControl label={ __( 'Title', 'b-testimonials-block' ) } value={ item?.title || '' } onChange={ ( v ) => update( 'title', v ) } />
+										<TextControl label={ __( 'Subtitle', 'b-testimonials-block' ) } value={ item?.subtitle || '' } onChange={ ( v ) => update( 'subtitle', v ) } />
+									</>
+								) }
+							</ItemCards>
 						</PanelBody>
 						</>
 					}
@@ -95,6 +105,7 @@ const Edit = ( { attributes, setAttributes, clientId } ) => {
 						<>
 						<ColorsPanel attributes={ attributes } setAttributes={ setAttributes } />
 						<SizeSpacingPanel attributes={ attributes } setAttributes={ setAttributes } />
+						<TrustBadgePanel attributes={ attributes } setAttributes={ setAttributes } />
 						</>
 					}
 				/>
@@ -104,7 +115,7 @@ const Edit = ( { attributes, setAttributes, clientId } ) => {
 				<Style attributes={ attributes } clientId={ clientId } />
 				<div className="badges-grid" style={ { ...gridVars( attributes ), '--cols-d': colsForDevice( attributes.columns, previewDevice, 3 ) } }>
 					{ items.map( ( item, i ) => (
-						<div className="badge-item" key={ i }>
+						<div className={ `badge-item${ 'top' === badgeIconPosition ? ' is-icon-top' : '' }` } key={ i }>
 							{/* Falls back to the Icons panel, as the front end does, so a
 							    badge with no image of its own still shows its icon here. */}
 							{ item?.img?.url ? (
@@ -112,9 +123,9 @@ const Edit = ( { attributes, setAttributes, clientId } ) => {
 							) : (
 								<BlockIcon
 									icon={ getIcon( attributes, `trust${ i }` ) }
-									size={ 32 }
+									size={ iconBox }
 									renderFallback={ ( color ) => (
-										<svg viewBox="0 0 24 24" width="32" height="32">
+										<svg viewBox="0 0 24 24" width={ iconBox } height={ iconBox }>
 											<path fill={ color } d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4z" />
 										</svg>
 									) }

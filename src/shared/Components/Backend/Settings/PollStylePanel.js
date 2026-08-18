@@ -6,7 +6,10 @@ import {
   __experimentalBoxControl as BoxControl,
 } from "@wordpress/components";
 
+import { produce } from "immer";
+
 import Typography from "../../../../../../bpl-tools/Components/Typography/Typography";
+import ShadowControl from "../../../../../../bpl-tools/Components/Deprecated/ShadowControl/ShadowControl";
 import { ColorControl } from "../../../../../../bpl-tools/Components/ColorControl/ColorControl";
 import {
   emUnit,
@@ -50,6 +53,8 @@ const PollStylePanel = ({ attributes = {}, setAttributes }) => {
     pollBtnGap,
     pollPadding = {},
     pollRadius,
+    pollShadow,
+    pollBtnShadow,
   } = attributes;
 
   const set = (key) => (val) => setAttributes({ [key]: val });
@@ -155,6 +160,21 @@ const PollStylePanel = ({ attributes = {}, setAttributes }) => {
           )}
         />
 
+        {/* The buttons ship flat -- a 1px border over the surface colour and
+            nothing else -- so this adds a shadow rather than replacing one.
+
+            It is applied to the idle buttons only. The picked button carries a
+            lift of its own from the stylesheet, and that is one of the three
+            things marking it as chosen alongside the accent fill and the slight
+            scale, so it keeps it. */}
+        <ShadowControl
+          className="mt20"
+          label={__("Button Shadow:", "b-testimonials-block")}
+          value={pollBtnShadow}
+          onChange={set("pollBtnShadow")}
+          produce={produce}
+        />
+
         <p className="description">
           {__(
             "Button colors are in the Colors panel: Number Button Background, Border Color and Accent for the selected button.",
@@ -186,6 +206,16 @@ const PollStylePanel = ({ attributes = {}, setAttributes }) => {
           onChange={set("pollRadius")}
           units={[pxUnit(16), perUnit(2), emUnit(1), remUnit(1)]}
           isResetValueOnUnitChange={true}
+        />
+
+        {/* The box is a flat bordered panel in the stylesheet with no shadow at
+            all, so an untouched poll is unchanged until this is set. */}
+        <ShadowControl
+          className="mt20"
+          label={__("Box Shadow:", "b-testimonials-block")}
+          value={pollShadow}
+          onChange={set("pollShadow")}
+          produce={produce}
         />
 
         <p className="description">

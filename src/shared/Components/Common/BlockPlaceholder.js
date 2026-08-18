@@ -5,6 +5,7 @@ import { dispatch } from '@wordpress/data';
 import { createBlock } from '@wordpress/blocks';
 import { getLayoutSvgIcon } from '../../utils/icons';
 import { clickable } from '../../utils/a11y';
+import { getChildBlockCategoryLabel } from '../../utils/childBlocks';
 import BlockSwitcherModal, { CHILD_BLOCKS_LIST } from './BlockSwitcherModal';
 
 const BlockPlaceholder = ({ clientId, currentBlockName, setAttributes }) => {
@@ -25,8 +26,16 @@ const BlockPlaceholder = ({ clientId, currentBlockName, setAttributes }) => {
 
 	return (
 		<div className="btb-my-testimonials-feeds">
-			<h2>{__('Select Your Testimonial Block', 'b-testimonials-block')}</h2>
-			<h3>{__('Choose from the popular testimonial layouts or click below for all 40+ layouts', 'b-testimonials-block')}</h3>
+			{/* Eyebrow, title, one line of description: the same opening the
+			    plugin's Demo & Help dashboard uses, so the picker reads as part of
+			    the same product. The description was an <h3> before -- the same tag
+			    as the card titles below it, which put the page's subtitle and its
+			    twelve card headings on one level. */}
+			<header className="btbPickerHero">
+				<span className="btbPickerEyebrow">{__('Testimonial Layouts', 'b-testimonials-block')}</span>
+				<h2>{__('Select Your Testimonial Block', 'b-testimonials-block')}</h2>
+				<p>{__('Choose from the popular testimonial layouts or click below for all 40+ layouts', 'b-testimonials-block')}</p>
+			</header>
 
 			<div className="items-list">
 				{canvasBlocks.map((item) => (
@@ -38,6 +47,10 @@ const BlockPlaceholder = ({ clientId, currentBlockName, setAttributes }) => {
 						<div className="icon">
 							{getLayoutSvgIcon(item.icon, 24)}
 						</div>
+						{/* The dashboard's demo cards carry their category here, and
+						    every child block has one -- so the chip is on every card
+						    rather than only the few that also have a badge. */}
+						<span className="btbItemCat">{getChildBlockCategoryLabel(item.category)}</span>
 						<h3>{item.title}</h3>
 						<p>{item.desc}</p>
 						{item.badge && <span className="btbItemBadge">{item.badge}</span>}

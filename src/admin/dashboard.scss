@@ -27,3 +27,76 @@
 .bPlDashboard .proFeatures {
     display: none !important;
 }
+
+/*
+ * Demos: give each block's card the colour of its category.
+ *
+ * The route already assigns every category an accent -- blue for Grids & Lists,
+ * amber for Marquee & Toasts, teal for Badges & Trust and so on -- and hands it
+ * to each card as `--accent`. Until now that accent only reached the little icon
+ * tile and the category chip: all 40 cards sat on flat white, so a wall of them
+ * read as one undifferentiated grid, and the tint the component does paint over
+ * the whole card was set to `opacity: 0` and only faded in on hover.
+ *
+ * This lifts that wash to rest state, so a block's demo card carries its
+ * category's colour before you touch it and the groups are legible at a glance.
+ *
+ * Written here rather than in bpl-tools/Admin/Demos: seven plugins in this
+ * install render that component, and only this one wants the change. Same reason
+ * the overrides above live here. Three classes deep so it outranks the
+ * component's own two-class `.bPlDashboardDemos .card` without !important.
+ *
+ * `color-mix` with a plain fallback ahead of it, matching how the component
+ * writes its own accent tints -- a browser without it drops the whole
+ * declaration and keeps the white card, which is exactly what it had before.
+ */
+.bPlDashboard .bPlDashboardDemos .card {
+    background: #ffffff;
+    background:
+        linear-gradient(
+            150deg,
+            color-mix(in srgb, var(--accent) 16%, transparent) 0%,
+            color-mix(in srgb, var(--accent) 5%, transparent) 46%,
+            transparent 78%
+        ),
+        #ffffff;
+    border-color: rgba(27, 46, 75, 0.1);
+    border-color: color-mix(in srgb, var(--accent) 24%, transparent);
+
+    /*
+     * The icon tile and category chip are accent-at-14% over whatever is behind
+     * them, which was white. On a card that is now tinted with the same colour
+     * they had almost nothing left to stand out against, so they are mixed
+     * against white instead of transparent -- opaque, and still clearly the
+     * lighter shape on the card.
+     */
+    .cardIcon,
+    .cardCat {
+        background: color-mix(in srgb, var(--accent) 20%, #ffffff);
+    }
+
+    /*
+     * Each card now draws its own block's icon instead of its category's -- see
+     * demoBlockIcon() in src/admin/utils/data.js -- and those come from the same
+     * set the inserter and the canvas picker use, which is stroke-drawn: every one
+     * carries `fill="none"` with the shape in `stroke`.
+     *
+     * The component styles `.cardIcon svg { fill: currentColor }`, and a
+     * stylesheet beats a presentation attribute, so that declaration overrode
+     * `fill="none"` and turned every outline glyph into a solid blob. The same
+     * hazard is guarded the same way in src/shared/styles/editor.scss.
+     *
+     * Scoped to this plugin rather than fixed in bpl-tools/Admin/Demos: the other
+     * plugins rendering that component pass filled category icons that need the
+     * declaration as it stands.
+     */
+    .cardIcon svg[fill="none"] {
+        fill: none;
+    }
+
+    &:hover {
+        /* The component's own hover wash sits on top of this, so the card still
+           deepens on hover rather than only lifting. */
+        border-color: var(--accent);
+    }
+}

@@ -1,4 +1,4 @@
-=== B Testimonials Block ===
+=== Testimonials – Customer Reviews, Ratings, Badges & Video Testimonials ===
 Contributors: bplugins, abuhayat, btechnologies, himur98
 Donate link: https://www.buymeacoffee.com/abuhayat
 Tags: testimonials, review, rating, block, Gutenberg block
@@ -9,7 +9,7 @@ Requires PHP: 7.2
 License: GPLv3 or later
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
-Boost website credibility and social proof with B Testimonials Block, showcasing customer ratings, reviews, video testimonials, and badges.
+Boost website credibility and social proof with Testimonials, showcasing customer ratings, reviews, video testimonials, and badges.
 
 == Description ==
 
@@ -17,7 +17,7 @@ Boost website credibility and social proof with B Testimonials Block, showcasing
 
 [bplugins](https://bplugins.com/products/b-testimonials-block/) | [Documentation](https://bplugins.com/docs/b-testimonials-block/) | [Support](https://bplugins.com/support/) | [Demo](https://bplugins.com/products/b-testimonials-block/#demos)
 
-B Testimonials Block makes it easy to build high-converting testimonial sections without writing a single line of code. Choose from 40+ modern child block layouts including Grids, Sliders, Carousels, Continuous Marquees, Speech Bubbles, Timelines, Card Stacks, Floating Avatars, and Official Social Badges (Google, Trustpilot, G2, Facebook, Capterra).
+Testimonials Block makes it easy to build high-converting testimonial sections without writing a single line of code. Choose from 40+ modern child block layouts including Grids, Sliders, Carousels, Continuous Marquees, Speech Bubbles, Timelines, Card Stacks, Floating Avatars, and Official Social Badges (Google, Trustpilot, G2, Facebook, Capterra).
 
 You can manage your testimonials centrally using the built-in **Testimonials Custom Post Type (CPT)** or input review items manually right on the page canvas. Collect feedback directly from site visitors with the **Testimonial Form** block and manage customer submissions in your WordPress Admin Submissions dashboard.
 
@@ -34,7 +34,7 @@ You can manage your testimonials centrally using the built-in **Testimonials Cus
 - **Full Typography & Color Controls**: Comprehensive font family, size, line-height, font-weight, and color settings for reviewer name, designation, review text, and star rating icons.
 - **Excerpt & Read More Control**: Set custom review text excerpt length limiters with expandable Read More / Show Less buttons.
 
-=== How to Use B Testimonials Block – Quick Start Guide ===
+=== How to Use Testimonials Block – Quick Start Guide ===
 
 Getting started is quick and easy!
 
@@ -62,11 +62,11 @@ Getting started is quick and easy!
 
 == Frequently Asked Questions ==
 
-= Is B Testimonials Block free to use? =
-Yes! B Testimonials Block is a free Gutenberg block plugin packed with 40+ layouts, trust badges, CPT integration, and admin submission management.
+= Is Testimonials free to use? =
+Yes! Testimonials is a free Gutenberg block plugin packed with 40+ layouts, trust badges, CPT integration, and admin submission management.
 
 = Does it work with any WordPress theme? =
-Yes, B Testimonials Block is fully responsive and compatible with all standard WordPress themes and block-based site editors.
+Yes, Testimonials is fully responsive and compatible with all standard WordPress themes and block-based site editors.
 
 = Can I collect testimonials from website visitors? =
 Yes! You can insert the **Testimonial Form** block on any page. Submissions are saved as `pending` under **Testimonials → Submissions** for admin review and approval.
@@ -102,8 +102,3 @@ You can post your questions on the [WordPress.org support forum](https://wordpre
 
 = 1.0.0 =
 * Initial public release with a single Testimonials block.
-
-== Upgrade Notice ==
-
-= 1.0.3 =
-Major update — now includes 40+ free block layouts, social proof badges, customer submissions dashboard, NPS polls, and important security hardening. Fully backward compatible with existing blocks.

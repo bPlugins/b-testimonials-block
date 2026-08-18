@@ -98,16 +98,38 @@ const FeedbackPoll = ({ attributes = {}, isBackend, bt, bd }) => {
   );
 };
 
-const SocialProofToast = ({ items = [], bt, bd, isBackend, activeIndex }) => {
+const SocialProofToast = ({
+  items = [],
+  bt,
+  bd,
+  isBackend,
+  activeIndex,
+  toast = {},
+}) => {
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [isHovered, setIsHovered] = useState(false);
+
+  // How fast the notifications cycle, and whether hovering holds one still.
+  //
+  // The rotation was a bare 4000 in this effect -- the one setting a "live
+  // social proof notification" is really made of, with nothing in the sidebar to
+  // change it. Stored in seconds, because that is how an author thinks about it.
+  const { speed = 4, pauseOnHover = false } = toast || {};
+  const delay = Math.max(1, Number(speed) || 4) * 1000;
 
   useEffect(() => {
     if (isBackend || items.length <= 1) return;
+    // Hovering pauses by tearing the timer down and rebuilding it on leave,
+    // rather than by tracking elapsed time: a notification the reader has
+    // stopped on should stay up as long as they are on it, then start its full
+    // interval again, not finish the remainder of an interval they interrupted.
+    if (pauseOnHover && isHovered) return;
+
     const interval = setInterval(() => {
       setCurrentIndex((prev) => (prev + 1) % items.length);
-    }, 4000);
+    }, delay);
     return () => clearInterval(interval);
-  }, [isBackend, items.length]);
+  }, [isBackend, items.length, delay, pauseOnHover, isHovered]);
 
   const activeItemIndex = isBackend
     ? activeIndex < items.length
@@ -117,7 +139,14 @@ const SocialProofToast = ({ items = [], bt, bd, isBackend, activeIndex }) => {
   const currentItem = items[activeItemIndex] || {};
 
   return (
-    <div className="btb-toast-wrapper">
+    <div
+      className="btb-toast-wrapper"
+      {...(pauseOnHover && !isBackend
+        ? {
+            onMouseEnter: () => setIsHovered(true),
+            onMouseLeave: () => setIsHovered(false),
+          }
+        : {})}>
       <div className="btb-toast-card" key={activeItemIndex}>
         <div className="btb-toast-avatar">
           <img
@@ -197,6 +226,47 @@ const Layout = ({
   const [selectedAvatarIdx, setSelectedAvatarIdx] = useState(0);
   const [cardStackIdx, setCardStackIdx] = useState(0);
   const [activeModalItem, setActiveModalItem] = useState(null);
+  const [stackHovered, setStackHovered] = useState(false);
+
+  // The Stacked Review Cards deck advancing on its own.
+  //
+  // It is driven from here rather than from the block's `view.js`, which is where
+  // a DOM-side autoplay would naturally have gone. That script never runs: it
+  // hooks DOMContentLoaded and queries `.btb-card-stack-wrapper`, but
+  // `shared/view.js` mounts React on the same event, so the wrapper does not
+  // exist yet when it looks -- measured, the deck's `is-top` classes and its
+  // next/prev buttons all come from React below, and an autoplay added to that
+  // script sat dead. (Its drag-to-swipe is dead for the same reason; see the
+  // note in that file.)
+  //
+  // Declared at the top level of the component because the card-stack branch is
+  // an early return further down, and a hook cannot live behind one. The guard
+  // is inside the effect instead, so every other layout runs it and exits.
+  const stackAutoPlay = !!attributes?.stackAutoPlay;
+  const stackDelay =
+    Math.max(1, Number(attributes?.stackAutoPlayDelay) || 5) * 1000;
+  const stackCount = items.length;
+
+  useEffect(() => {
+    if ("testimonials-card-stack" !== layout) return;
+    // Not in the editor: the deck should hold still while it is being styled,
+    // the same way the marquee's Pause while editing works.
+    if (isBackend || !stackAutoPlay || stackCount <= 1) return;
+    if (stackHovered) return;
+
+    const timer = setInterval(() => {
+      setCardStackIdx((prev) => (prev + 1) % stackCount);
+    }, stackDelay);
+
+    return () => clearInterval(timer);
+  }, [
+    layout,
+    isBackend,
+    stackAutoPlay,
+    stackDelay,
+    stackCount,
+    stackHovered,
+  ]);
   const itemProps = {
     attributes,
     setActiveIndex,
@@ -574,6 +644,13 @@ const Layout = ({
     // moved the editor preview only. Where the repeater has content it now
     // drives the page, with the Icons panel supplying the artwork for any badge
     // whose image is empty.
+    // Icon size reaches a picked icon through BlockIcon's `size` prop rather
+    // than CSS -- BlockIcon writes width and height inline, which no selector
+    // outranks. A per-badge size in the Icons panel still wins, since BlockIcon
+    // reads `icon.size || size`.
+    const iconBox = attributes.badgeIconSize || 32;
+    const iconTop = "top" === attributes.badgeIconPosition;
+
     const badgeItems = Array.isArray(attributes.items) ? attributes.items : [];
     const hasRepeater = badgeItems.some(
       (it) => it && (it.img?.url || it.title || it.subtitle),
@@ -587,7 +664,9 @@ const Layout = ({
               const slot = trustItems[index];
 
               return (
-                <div className="badge-item" key={index}>
+                <div
+                  className={`badge-item${iconTop ? " is-icon-top" : ""}`}
+                  key={index}>
                   {item?.img?.url ? (
                     <img
                       className="badge-icon"
@@ -597,10 +676,10 @@ const Layout = ({
                   ) : (
                     <BlockIcon
                       icon={getIcon(attributes, slot?.slot || `trust${index}`)}
-                      size={32}
+                      size={iconBox}
                       defaultColor={slot?.color || BRAND_COLOR}
                       renderFallback={(color) => (
-                        <svg viewBox="0 0 24 24" width="32" height="32">
+                        <svg viewBox="0 0 24 24" width={iconBox} height={iconBox}>
                           <path fill={color} d={slot?.d || trustItems[0].d} />
                         </svg>
                       )}
@@ -910,6 +989,7 @@ const Layout = ({
         bd={bd}
         isBackend={isBackend}
         activeIndex={activeIndex}
+        toast={attributes?.toast}
       />
     );
   }
@@ -951,11 +1031,31 @@ const Layout = ({
   }
 
   if (layout === "faq-testimonial-accordion") {
+    // The two settings every accordion has, and this one had neither: rows could
+    // all be open at once and none opened on load.
+    //
+    // "One at a time" is the native `name` attribute on `<details>`, not a click
+    // handler -- browsers make a named group exclusive themselves, so it keeps
+    // working with JavaScript off and needs no state here. The name is scoped to
+    // the block's own clientId, or two accordions on one page would close each
+    // other's rows.
+    const { faqExclusive = false, faqFirstOpen = false } = attributes || {};
+    const groupName = faqExclusive
+      ? `btb-faq-${attributes?.cId || "group"}`
+      : undefined;
+
     return (
       <div className="btb-faq-accordion">
         <h4 className="btb-faq-title">{bt || "Frequently Asked Questions"}</h4>
         {items.map((item, i) => (
-          <details key={i} className="btb-faq-item">
+          <details
+            key={i}
+            className="btb-faq-item"
+            name={groupName}
+            // `defaultOpen` is not a thing on <details>; `open` is, and React
+            // treats it as a controlled-ish prop. Only the first row takes it,
+            // and only as the initial state -- the reader can still close it.
+            open={faqFirstOpen && 0 === i ? true : undefined}>
             <summary className="btb-faq-question">
               {item.name || `Question ${i + 1}`}
             </summary>
@@ -1287,106 +1387,58 @@ const Layout = ({
           ))}
         </div>
 
+        {/* The popup used to be built entirely out of inline styles -- overlay
+            colour, panel background, width, padding, radius, the close button
+            and every one of the five text parts. Inline styles outrank even the
+            ID-scoped rules Style.js emits, so the whole Style tab missed the one
+            thing this block exists to show: the panel stayed #fff however the
+            palette was set, which on a dark palette opened a white popup out of
+            a dark card.
+
+            Everything below is class-driven now. The stylesheet carries the
+            same values it had inline, so an untouched block is unchanged, and
+            the parts are named in Style.js's selector lists so the Card, Image,
+            Name, Designation and Review Text panels all reach inside. */}
         {activeModalItem && (
           <div
             className="btb-modal-overlay"
             role="presentation"
             onClick={(e) =>
               e.target === e.currentTarget && setActiveModalItem(null)
-            }
-            style={{
-              position: "fixed",
-              inset: 0,
-              background: "rgba(0,0,0,0.6)",
-              backdropFilter: "blur(4px)",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              zIndex: 999999,
-              padding: "20px",
-            }}>
+            }>
             <div
               className="btb-modal-content-box"
               role="dialog"
               aria-modal="true"
-              aria-label={activeModalItem?.name || "Testimonial"}
-              style={{
-                background: "#fff",
-                borderRadius: "16px",
-                maxWidth: "540px",
-                width: "100%",
-                padding: "28px",
-                position: "relative",
-                boxShadow: "0 20px 40px rgba(0,0,0,0.2)",
-                animation: "btbToastSlide 0.3s ease",
-              }}>
+              aria-label={activeModalItem?.name || "Testimonial"}>
               <button
                 type="button"
-                onClick={() => setActiveModalItem(null)}
-                style={{
-                  position: "absolute",
-                  top: "16px",
-                  right: "16px",
-                  background: "none",
-                  border: "none",
-                  fontSize: "24px",
-                  cursor: "pointer",
-                  color: "#64748b",
-                  lineHeight: 1,
-                }}>
+                className="btb-modal-close"
+                onClick={() => setActiveModalItem(null)}>
                 ×
               </button>
-              <div
-                style={{
-                  display: "flex",
-                  gap: "16px",
-                  alignItems: "center",
-                  marginBottom: "18px",
-                }}>
+              <div className="btb-modal-head">
                 <img
+                  className="btb-modal-avatar"
                   src={
                     activeModalItem.img?.url ||
                     "https://templates.bplugins.com/wp-content/uploads/2025/02/p-29.png"
                   }
                   alt={activeModalItem.name || ""}
-                  style={{
-                    width: "60px",
-                    height: "60px",
-                    borderRadius: "50%",
-                    objectFit: "cover",
-                  }}
                 />
-                <div>
-                  <h3
-                    style={{
-                      margin: 0,
-                      fontSize: "18px",
-                      fontWeight: 700,
-                      color: "#0f172a",
-                    }}>
+                <div className="btb-modal-meta">
+                  <h3 className="btb-modal-name">
                     {activeModalItem.name || "John Doe"}
                   </h3>
-                  <span style={{ fontSize: "13px", color: "#64748b" }}>
+                  <span className="btb-modal-deg">
                     {activeModalItem.deg || ""}
                   </span>
-                  <div
-                    style={{
-                      color: "#f59e0b",
-                      fontSize: "16px",
-                      marginTop: "4px",
-                    }}>
+                  <div className="btb-modal-rating">
                     {"★".repeat(activeModalItem.rating || 5)}
                   </div>
                 </div>
               </div>
-              <p
-                style={{
-                  margin: 0,
-                  fontSize: "15px",
-                  color: "#334155",
-                  lineHeight: "1.6",
-                  fontStyle: "italic",
-                }}>
+              <p className="btb-modal-review">
                 &quot;{activeModalItem.reviewText || ""}&quot;
               </p>
             </div>
@@ -1456,7 +1508,13 @@ const Layout = ({
 
     return (
       <div
-        className={`btb-card-stack-wrapper ${isBackend ? "is-editing" : ""}`}>
+        className={`btb-card-stack-wrapper ${isBackend ? "is-editing" : ""}`}
+        {...(stackAutoPlay && !isBackend
+          ? {
+              onMouseEnter: () => setStackHovered(true),
+              onMouseLeave: () => setStackHovered(false),
+            }
+          : {})}>
         <div
           className="btb-card-stack-layout"
           data-active-index={activeIdx}

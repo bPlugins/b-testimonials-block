@@ -354,6 +354,63 @@ function bpbtb_demo_case_studies() {
 	return $items;
 }
 }
+/**
+ * A video-still poster for the Video Testimonials preview, as a data URI.
+ *
+ * `poster` defaults to an empty URL, and VideoCard only sets a background image
+ * when it has one -- so all three demo cards fell back to the stylesheet's flat
+ * #1a1a1a frame. Three identical dark rectangles hid the one thing the block is
+ * for: a thumbnail you click to play. Drawn here rather than shipped or fetched,
+ * for the same reason as the avatars above -- the preview must not depend on a
+ * third-party host, and a YouTube thumbnail URL would.
+ *
+ * Composition is set by the play button, which the block centres over the frame
+ * at a fixed 62px. The figure sits in the right third so the two never touch, and
+ * its head is deliberately much wider than that button -- drawn head-height and
+ * they read as two buttons side by side instead of a person behind a play control.
+ *
+ * @param string $initials Two letters, matching this person's avatar elsewhere.
+ * @param string $from     Gradient start, and the colour of the initials.
+ * @param string $to       Gradient end.
+ * @return string data: URI.
+ */
+if ( ! function_exists( 'bpbtb_demo_video_poster' ) ) {
+function bpbtb_demo_video_poster( $initials, $from, $to ) {
+	$id  = 'v' . substr( md5( $initials . $from ), 0, 6 );
+	// 16:9, matching the frame's aspect-ratio exactly, so `cover` crops nothing.
+	$svg = '<svg xmlns="http://www.w3.org/2000/svg" width="800" height="450" viewBox="0 0 800 450">'
+		. '<defs><linearGradient id="' . $id . '" x1="0" y1="0" x2="1" y2="1">'
+		. '<stop offset="0" stop-color="' . esc_attr( $to ) . '"/>'
+		. '<stop offset="1" stop-color="' . esc_attr( $from ) . '"/>'
+		. '</linearGradient>'
+		// A radial fade, not a flat disc: at one opacity the lit patch drew its own
+		// visible circular edge across the frame, which looked like a shape someone
+		// had put there rather than light falling on a wall.
+		. '<radialGradient id="' . $id . 'l" cx="0.5" cy="0.5" r="0.5">'
+		. '<stop offset="0" stop-color="#ffffff" stop-opacity="0.16"/>'
+		. '<stop offset="1" stop-color="#ffffff" stop-opacity="0"/>'
+		. '</radialGradient></defs>'
+		. '<rect width="800" height="450" fill="url(#' . $id . ')"/>'
+		// Out-of-focus room: two soft discs, a lit patch behind the figure and a
+		// darker band along the floor, so the frame reads as a place someone is
+		// sitting in rather than as flat colour.
+		. '<circle cx="140" cy="108" r="100" fill="#ffffff" opacity="0.07"/>'
+		. '<circle cx="262" cy="326" r="52" fill="#ffffff" opacity="0.05"/>'
+		. '<circle cx="640" cy="250" r="215" fill="url(#' . $id . 'l)"/>'
+		. '<rect y="358" width="800" height="92" fill="#000000" opacity="0.14"/>'
+		// Head and shoulders, cropped by the bottom edge the way an interview
+		// shot is framed.
+		. '<path d="M512 450 Q512 305 640 305 Q768 305 768 450 Z" fill="#ffffff" opacity="0.88"/>'
+		. '<circle cx="640" cy="225" r="86" fill="#ffffff" opacity="0.88"/>'
+		. '<text x="640" y="227" text-anchor="middle" dominant-baseline="central"'
+		. ' font-family="-apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif"'
+		. ' font-size="58" font-weight="600"'
+		. ' fill="' . esc_attr( $from ) . '">' . esc_html( $initials ) . '</text>'
+		. '</svg>';
+
+	return 'data:image/svg+xml;base64,' . base64_encode( $svg ); // phpcs:ignore WordPress.PHP.DiscouragedPHPFunctions.obfuscation_base64_encode
+}
+}
 
 /**
  * Three video testimonials, in that block's own item shape.
@@ -367,14 +424,18 @@ function bpbtb_demo_case_studies() {
  * trailer -- a real, embeddable video rather than a made-up ID that would show a
  * player error.
  *
+ * The initials and colours are the ones the same three people carry in
+ * bpbtb_demo_items() above, so a visitor moving between previews sees one
+ * consistent cast rather than three unrelated sets.
+ *
  * @return array
  */
 if ( ! function_exists( 'bpbtb_demo_videos' ) ) {
 function bpbtb_demo_videos() {
 	$people = [
-		[ __( 'Amelia Hartwell', 'b-testimonials-block' ), __( 'Head of Product', 'b-testimonials-block' ), __( 'Northwind', 'b-testimonials-block' ) ],
-		[ __( 'Rajesh Menon', 'b-testimonials-block' ), __( 'Engineering Manager', 'b-testimonials-block' ), __( 'Blue Harbour', 'b-testimonials-block' ) ],
-		[ __( 'Sofia Almeida', 'b-testimonials-block' ), __( 'Marketing Director', 'b-testimonials-block' ), __( 'Lumen', 'b-testimonials-block' ) ],
+		[ __( 'Amelia Hartwell', 'b-testimonials-block' ), __( 'Head of Product', 'b-testimonials-block' ), __( 'Northwind', 'b-testimonials-block' ), 'AH', '#146ef5', '#0a2f6b' ],
+		[ __( 'Rajesh Menon', 'b-testimonials-block' ), __( 'Engineering Manager', 'b-testimonials-block' ), __( 'Blue Harbour', 'b-testimonials-block' ), 'RM', '#0f57c4', '#082a5e' ],
+		[ __( 'Sofia Almeida', 'b-testimonials-block' ), __( 'Marketing Director', 'b-testimonials-block' ), __( 'Lumen', 'b-testimonials-block' ), 'SA', '#4d90f8', '#14356d' ],
 	];
 
 	$items = [];
@@ -382,7 +443,7 @@ function bpbtb_demo_videos() {
 	foreach ( $people as $person ) {
 		$items[] = [
 			'videoUrl' => 'https://www.youtube.com/watch?v=aqz-KE-bpKQ',
-			'poster'   => [ 'url' => '' ],
+			'poster'   => [ 'url' => bpbtb_demo_video_poster( $person[3], $person[4], $person[5] ) ],
 			'name'     => $person[0],
 			'deg'      => $person[1],
 			'company'  => $person[2],

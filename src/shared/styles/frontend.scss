@@ -443,6 +443,65 @@ $brandColor: #146ef5;
 				}
 			}
 
+			// The gradient border ring and the corner score pill.
+			//
+			// Both belong to the Gradient Border Grid, whose name and description
+			// promised "gradient border cards with star badges" while nothing in
+			// this file drew either -- the only gradient on a theme_2 card is the
+			// header wash above, which is a background, not a border, and the block
+			// rendered the same star row every other theme does.
+			//
+			// Only the geometry lives here. Whether the ring is drawn at all, and in
+			// which colours, comes from Style.js at ID specificity: the ring is
+			// opt-in per block, and no other block that renders theme_2 -- the
+			// coverflow carousel among them -- declares the attributes that switch
+			// it on, so this stays inert for them.
+			//
+			// The ring is a masked pseudo-element rather than a real border. The
+			// Card panel already emits `border-*` and `background-color` on
+			// `.single` from an ID selector, so a border here would lose to it, and
+			// `border-image` -- the other way to put a gradient on a border --
+			// squares off the corners it is drawn on, which is the wrong trade for a
+			// card whose radius is a style control.
+			&.theme_2 {
+				.single {
+					// The ring is inset negative, so it sits outside the card and
+					// needs the card to be its containing block.
+					position: relative;
+
+					> .btb-star-badge {
+						position: absolute;
+						top: 12px;
+						right: 12px;
+						z-index: 2;
+						display: inline-flex;
+						align-items: center;
+						gap: 4px;
+						padding: 3px 9px;
+						border-radius: 999px;
+						font-size: 12px;
+						font-weight: 700;
+						line-height: 1.5;
+						white-space: nowrap;
+						background: var(--btb-star-badge-bg, rgba(15, 23, 42, 0.82));
+						color: var(--btb-star-badge-color, #fff);
+
+						.btb-star-badge-icon {
+							// Its own colour so the star reads against the pill even
+							// when the score text is recoloured. Style.js feeds the
+							// first from the Review Text panel's Star color, so the
+							// pill's star and the card's star row cannot disagree;
+							// `--btb-star` is the palette role behind it.
+							color: var(
+								--btb-star-badge-icon,
+								var(--btb-star, #fbbf24)
+							);
+							font-size: 11px;
+						}
+					}
+				}
+			}
+
 			&.theme_2 {
 				.single {
 					display: flex;
@@ -965,6 +1024,32 @@ $brandColor: #146ef5;
 			&.coverflow-layout.theme_4 {
 				.swiper-slide {
 					padding-top: 50px;
+				}
+
+				// Swiper's own coverflow shadows, behind the Slide Shadows
+				// toggle in the Slider panel.
+				//
+				// Swiper paints them as an overlay filling the whole slide box,
+				// and on these two themes the slide is 50px taller than the card
+				// so the avatar can overhang it -- so the overlay covered that
+				// empty strip as well and read as a grey rectangle floating above
+				// the card. That is why the option was hardcoded off before it
+				// had a control.
+				//
+				// Insetting the overlay by the same padding keeps the shadow on
+				// the card itself. The radius is inherited so it does not square
+				// off a rounded one.
+				//
+				// `bottom` and `height` together, not `top` alone: Swiper's own
+				// rule is `top: 0; height: 100%`, so moving only the top edge
+				// would slide the whole overlay down and hang it 50px past the
+				// bottom of the card instead of shrinking it.
+				.swiper-slide-shadow-left,
+				.swiper-slide-shadow-right {
+					top: 50px;
+					bottom: 0;
+					height: auto;
+					border-radius: inherit;
 				}
 			}
 		}
@@ -1560,7 +1645,19 @@ $brandColor: #146ef5;
 			p { color: var(--btb-body, #334155); margin: 0 0 4px; }
 			// Accent-coloured by design, so it takes the Name typography without
 			// joining the Name colour rule.
-			.btb-bubble-name { color: var(--btb-accent, #{$brandColor}); }
+			//
+			// `display: block` is what separates it from the review. The review
+			// text carries `display: initial` so the Expand toggle can sit inline
+			// at the end of the sentence -- which also left this span running on
+			// from it, so the name printed hard against the toggle as
+			// "ExpandJohn Doe" with nothing between them. A margin alone would not
+			// have fixed it: the two were on the same line, so the name belongs on
+			// its own.
+			.btb-bubble-name {
+				color: var(--btb-accent, #{$brandColor});
+				display: block;
+				margin-top: 8px;
+			}
 		}
 	}
 }
@@ -1730,13 +1827,76 @@ $brandColor: #146ef5;
 		border-radius: 16px; padding: 20px; position: relative;
 		box-shadow: 0 4px 12px rgba(0,0,0,0.03); margin-bottom: 20px;
 
+		// The tail, drawn twice: an outline triangle behind a fill triangle.
+		//
+		// A CSS triangle is made *of* borders -- the shape is a zero-size box whose
+		// left and right borders are transparent and whose top border is the
+		// colour -- so the element has no border property left to outline itself
+		// with. That is why the card's own 1px edge stopped dead at the card and
+		// the tail hung below it as a bare shape, which reads as a stray triangle
+		// rather than as part of the bubble.
+		//
+		// Two stacked triangles is the fix: the one behind is a whole border-width
+		// bigger on every side, so what shows past the fill is a band along the two
+		// slanted edges -- the tail's outline. Both bases sit on the card's bottom
+		// edge, so the outline never crosses into the card and doubles up on its
+		// bottom border.
+		//
+		// With a border width of 0 the two triangles are the same size and the
+		// outline hides behind the fill, so a card with no border keeps a plain
+		// tail without needing a second rule.
+		--btb-bubble-size: 12px;
+		--btb-bubble-offset: 30px;
+
+		// Where the tail sits along the bottom edge, as the left inset of the
+		// fill triangle. One value rather than a left/right switch, so the
+		// Tail panel's Position control is a single declaration Style.js
+		// overrides: centre is `50% - size` and right is
+		// `100% - offset - 2 * size`, both of which `left` can express.
+		//
+		// The outline behind it is a whole border-width bigger, so it takes the
+		// same value less one border-width to keep the two concentric.
+		--btb-bubble-x: var(--btb-bubble-offset);
+
+		&::before,
 		&::after {
-			content: ''; position: absolute; bottom: -12px; left: 30px;
-			width: 0; height: 0;
-			border-left: 12px solid transparent;
-			border-right: 12px solid transparent;
-			border-top: 12px solid var(--btb-surface, #ffffff);
-			filter: drop-shadow(0 2px 1px rgba(0,0,0,0.05));
+			content: '';
+			position: absolute;
+			width: 0;
+			height: 0;
+			border-left-style: solid;
+			border-right-style: solid;
+			border-top-style: solid;
+			border-left-color: transparent;
+			border-right-color: transparent;
+		}
+
+		// Outline.
+		&::before {
+			$grow: calc(var(--btb-bubble-size) + var(--btb-bubble-line-w, 1px));
+
+			bottom: calc(-1 * #{$grow});
+			left: calc(var(--btb-bubble-x) - var(--btb-bubble-line-w, 1px));
+			border-left-width: #{$grow};
+			border-right-width: #{$grow};
+			border-top-width: #{$grow};
+			border-top-color: var(--btb-bubble-line, #e2e8f0);
+			// On the outline rather than the fill, so the whole tail casts one
+			// shadow instead of the fill casting a second one over the outline.
+			filter: drop-shadow(0 2px 1px rgba(0, 0, 0, 0.05));
+		}
+
+		// Fill. Painted after the outline, so it sits on top of it.
+		&::after {
+			bottom: calc(-1 * var(--btb-bubble-size));
+			left: var(--btb-bubble-x);
+			border-left-width: var(--btb-bubble-size);
+			border-right-width: var(--btb-bubble-size);
+			border-top-width: var(--btb-bubble-size);
+			// Style.js resolves this from the Card panel's Background as well as
+			// the palette's Surface role -- the tail used to read `--btb-surface`
+			// alone, so a card coloured from the Card panel kept a white tail.
+			border-top-color: var(--btb-bubble-fill, var(--btb-surface, #ffffff));
 		}
 	}
 }
@@ -1832,6 +1992,13 @@ $brandColor: #146ef5;
 			svg {
 				width: 14px;
 				height: 14px;
+
+				// Style.js restates this from an ID selector with the Rating Icon
+				// Color behind it. It has to: getStar writes the star's colour as a
+				// fill ATTRIBUTE, and a fill declaration here is CSS, so this rule
+				// beat the attribute outright and left that control dead on this
+				// layout alone -- measured, the star computed #f59e0b with the
+				// control set to red. Kept as the no-JS fallback.
 				fill: var(--btb-star, #f59e0b);
 			}
 		}
@@ -1875,5 +2042,119 @@ $brandColor: #146ef5;
 	cursor: pointer;
 	transition: box-shadow 0.2s, transform 0.2s;
 	&:hover { box-shadow: 0 8px 30px rgba(0,0,0,0.12); transform: translateY(-3px); }
+}
+
+.btb-popup-modal-card-trigger {
+	cursor: pointer;
+}
+
+/* The popup itself.
+ *
+ * Every declaration here was an inline style on the element until now, which is
+ * why nothing in the sidebar could reach the panel a reader actually opens. The
+ * values are unchanged; what is new is that they are overridable -- the four
+ * custom properties are written by Style.js from the Popup panel, and the
+ * colours fall through to the palette roles so a dark palette no longer opens a
+ * white popup.
+ *
+ * The overlay is fixed to the viewport and outside the block wrapper's flow, so
+ * it is a top-level rule rather than nested under `.bTestimonials`. Style.js
+ * scopes its own version by ID, which is what keeps two popup blocks on one page
+ * from styling each other.
+ */
+.btb-modal-overlay {
+	position: fixed;
+	inset: 0;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	padding: 20px;
+	// Above a sticky theme header, which is the one thing on a page that
+	// routinely outranks a modal.
+	z-index: 999999;
+	background: var(--btb-modal-overlay, rgba(0, 0, 0, 0.6));
+	backdrop-filter: blur(var(--btb-modal-blur, 4px));
+
+	.btb-modal-content-box {
+		position: relative;
+		width: 100%;
+		max-width: var(--btb-modal-width, 540px);
+		padding: var(--btb-modal-padding, 28px);
+		border-radius: var(--btb-modal-radius, 16px);
+		// Three layers, narrowest first: the Popup panel's own Background, then
+		// the palette's Card Surface role, then the shipped white. That order is
+		// what lets a dark palette recolour the popup without anyone opening the
+		// Popup panel, while an explicit choice there still wins.
+		background: var(--btb-modal-bg, var(--btb-surface, #ffffff));
+		box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+		animation: btbToastSlide 0.3s ease;
+		box-sizing: border-box;
+	}
+
+	.btb-modal-close {
+		position: absolute;
+		top: 16px;
+		right: 16px;
+		background: none;
+		border: 0;
+		padding: 0;
+		line-height: 1;
+		cursor: pointer;
+		font-size: var(--btb-modal-close-size, 24px);
+		color: var(--btb-modal-close-color, var(--btb-muted, #64748b));
+	}
+
+	.btb-modal-head {
+		display: flex;
+		align-items: center;
+		gap: 16px;
+		margin-bottom: 18px;
+	}
+
+	.btb-modal-avatar {
+		width: var(--btb-modal-avatar, 60px);
+		height: var(--btb-modal-avatar, 60px);
+		border-radius: 50%;
+		object-fit: cover;
+		flex-shrink: 0;
+	}
+
+	// The popup's four text parts keep their own sizes rather than joining the
+	// Name / Designation / Review Text panels.
+	//
+	// Those three panels already style the trigger card behind the overlay, and
+	// the popup is deliberately the larger presentation of the same testimonial
+	// -- 18px against the card's 16px, an italic 15px review against a plain
+	// one. Folding them together would collapse that difference the moment
+	// anyone touched a size, so the Popup panel carries its own.
+	//
+	// Colours are the opposite case: these read the palette roles, so the Colors
+	// panel's Title, Muted, Body and Rating Stars reach inside the popup with no
+	// control of their own needed.
+	.btb-modal-name {
+		margin: 0;
+		font-size: var(--btb-modal-name-size, 18px);
+		font-weight: 700;
+		color: var(--btb-title, #0f172a);
+	}
+
+	.btb-modal-deg {
+		font-size: var(--btb-modal-deg-size, 13px);
+		color: var(--btb-muted, #64748b);
+	}
+
+	.btb-modal-rating {
+		margin-top: 4px;
+		font-size: var(--btb-modal-stars-size, 16px);
+		color: var(--btb-star, #f59e0b);
+	}
+
+	.btb-modal-review {
+		margin: 0;
+		font-size: var(--btb-modal-review-size, 15px);
+		line-height: 1.6;
+		font-style: italic;
+		color: var(--btb-body, #334155);
+	}
 }
 

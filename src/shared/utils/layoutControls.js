@@ -1,3 +1,5 @@
+import { __ } from "@wordpress/i18n";
+
 /**
  * Which inspector controls each layout can actually act on.
  *
@@ -81,9 +83,21 @@ const CARD_STYLE = {
 /**
  * The single-widget blocks whose whole widget is `.btb-badge-card`, which is one
  * of the seven selectors the Card panel's background/padding/border/shadow rule
- * names. Nothing else in the sidebar reaches them.
+ * names.
+ *
+ * The Card panel used to be all they had, which left every font size in them a
+ * stylesheet literal: the heading at 17px/700, the secondary line at 13px, the
+ * score at 18px/800 and the star row at 16px, none of them reachable from the
+ * sidebar. Two of those four map onto shared roles -- Style.js names
+ * `.btb-badge-title` alongside the other Name parts and `.btb-badge-desc` /
+ * `.btb-badge-rating .count` alongside the Designation ones -- so those two
+ * panels are offered here. The score and the stars have no shared role and get
+ * their own panel instead.
+ *
+ * No `textStyle`: nothing in a badge is a review paragraph, so the Review Text
+ * panel would open onto a selector list that names none of this markup.
  */
-const BADGE = { cardBox: true };
+const BADGE = { cardBox: true, nameStyle: true, degStyle: true };
 
 export const LAYOUT_CONTROLS = {
   // -- Themed cards in `.layoutSection` -------------------------------------
@@ -263,6 +277,59 @@ export const CONTROL_CONDITIONS = {
     columns: (attributes) => (attributes?.items?.length || 0) > 2,
   },
 };
+
+/**
+ * Per-layout titles for the shared typography panels.
+ *
+ * The Name, Designation and Review Text panels are three roles shared by forty
+ * blocks, so their default titles have to describe a testimonial card. On the
+ * review badges they do not: the Name panel styles a heading like "Google
+ * Reviews", and the Designation panel a review count or a line of description.
+ * Offering the control under the card's name would leave an author guessing
+ * which of the two lines in front of them it moves.
+ *
+ * Only the badges are listed. Every other layout keeps the default titles, so
+ * this renames nothing that reads correctly today.
+ *
+ * @see ROLE_LABELS in visualControls.js, which does the same for the Colors
+ *      panel's per-role labels.
+ */
+const BADGE_TITLE_LABEL = __("Badge Title", "b-testimonials-block");
+const REVIEW_COUNT_LABEL = __("Review Count", "b-testimonials-block");
+
+export const TYPO_PANEL_LABELS = {
+  "google-review-badge": { name: BADGE_TITLE_LABEL, deg: REVIEW_COUNT_LABEL },
+  "capterra-review-badge": { name: BADGE_TITLE_LABEL, deg: REVIEW_COUNT_LABEL },
+  "facebook-review-badge": { name: BADGE_TITLE_LABEL, deg: REVIEW_COUNT_LABEL },
+  "trustpilot-review-badge": {
+    name: BADGE_TITLE_LABEL,
+    deg: REVIEW_COUNT_LABEL,
+  },
+  "g2-review-badge": { name: BADGE_TITLE_LABEL, deg: REVIEW_COUNT_LABEL },
+  "review-badge-widget": { name: BADGE_TITLE_LABEL, deg: REVIEW_COUNT_LABEL },
+  // The only badge that renders a sentence rather than a count.
+  "verified-buyer-badge": {
+    name: BADGE_TITLE_LABEL,
+    deg: __("Description", "b-testimonials-block"),
+  },
+};
+
+/**
+ * The badges that render a score and a star row, and so have something for the
+ * Badge Score panel to act on.
+ *
+ * The Verified Buyer seal is the one that does not -- it renders a heading and a
+ * line of description and nothing else -- so it is absent rather than shown a
+ * panel that moves nothing.
+ */
+export const SCORED_BADGE_LAYOUTS = [
+  "google-review-badge",
+  "capterra-review-badge",
+  "facebook-review-badge",
+  "trustpilot-review-badge",
+  "g2-review-badge",
+  "review-badge-widget",
+];
 
 const NONE = {
   elements: [],

@@ -6,7 +6,7 @@ import { getLayoutSvgIcon } from '../../utils/icons';
 import { clickable } from '../../utils/a11y';
 
 // Moved to utils/childBlocks so it can be shared with the inserter icons.
-import { CHILD_BLOCKS_LIST } from '../../utils/childBlocks';
+import { CHILD_BLOCKS_LIST, CHILD_BLOCK_CATEGORIES } from '../../utils/childBlocks';
 
 export { CHILD_BLOCKS_LIST };
 
@@ -87,12 +87,11 @@ const BlockSwitcherModal = ({ isOpen, onRequestClose, clientId, currentBlockName
 		return matchesCategory && matchesSearch;
 	});
 
+	// The category labels are shared with the canvas placeholder's card chips; only
+	// the "all" filter is local, since no block carries it.
 	const categories = [
 		{ id: 'all', label: __('All 40 Blocks', 'b-testimonials-block') },
-		{ id: 'layouts', label: __('Grid & Layouts', 'b-testimonials-block') },
-		{ id: 'social', label: __('Trust & Badges', 'b-testimonials-block') },
-		{ id: 'media', label: __('Media & Audio', 'b-testimonials-block') },
-		{ id: 'interactive', label: __('Forms & Polls', 'b-testimonials-block') },
+		...CHILD_BLOCK_CATEGORIES,
 	];
 
 	let activeChildName = '';
@@ -150,7 +149,9 @@ const BlockSwitcherModal = ({ isOpen, onRequestClose, clientId, currentBlockName
 							<button
 								key={cat.id}
 								type="button"
-								className={`btb-cat-chip ${activeCategory === cat.id ? 'is-active' : ''}`}
+								// `is-<id>` carries the category's accent to the chip's dot,
+								// from the one accent map in editor.scss.
+								className={`btb-cat-chip is-${cat.id} ${activeCategory === cat.id ? 'is-active' : ''}`}
 								onClick={() => setActiveCategory(cat.id)}
 							>
 								{cat.label}
@@ -186,7 +187,9 @@ const BlockSwitcherModal = ({ isOpen, onRequestClose, clientId, currentBlockName
 						return (
 							<div
 								key={item.name}
-								className={`btb-modern-card ${isCurrent ? 'is-active' : ''}`}
+								// `<category>-item` tints the card with its category's accent,
+								// the same class the canvas placeholder's cards carry.
+								className={`btb-modern-card ${item.category}-item ${isCurrent ? 'is-active' : ''}`}
 								{...clickable(() => handleSelectChildBlock(item.name), item.title)}
 							>
 								<div className="btb-modern-card-header">

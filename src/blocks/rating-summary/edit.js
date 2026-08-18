@@ -67,7 +67,7 @@ const Edit = ( { attributes, setAttributes, clientId } ) => {
 						<>
 						<ColorsPanel attributes={ attributes } setAttributes={ setAttributes } />
 						<SizeSpacingPanel attributes={ attributes } setAttributes={ setAttributes } />
-						<PanelBody className="bPlPanelBody" title={ __( 'Color', 'b-testimonials-block' ) } initialOpen={ false }>
+						<PanelBody className="bPlPanelBody" title={ __( 'Summary Colors', 'b-testimonials-block' ) } initialOpen={ false }>
 							<ColorControl label={ __( 'Star color', 'b-testimonials-block' ) } value={ starColor } onChange={ ( val ) => setAttributes( { starColor: val } ) } />
 						</PanelBody>
 						</>

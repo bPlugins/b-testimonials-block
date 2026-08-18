@@ -1,6 +1,27 @@
 import '../../shared/styles/frontend.scss';
 import '../../shared/view';
 
+/**
+ * NOTE: none of the code below currently runs, and it is left in place only
+ * because removing it is a separate change from the one that found it.
+ *
+ * `../../shared/view` registers its own DOMContentLoaded listener when it is
+ * imported on line 2, and that listener is what mounts React. This file's
+ * listener is registered second, so it runs immediately afterwards -- before
+ * React has committed anything -- and `querySelectorAll('.btb-card-stack-wrapper')`
+ * at the bottom matches nothing. `initCardStack` is never called.
+ *
+ * Measured rather than inferred: on a published page the deck's `is-top` /
+ * `is-behind-*` classes and its working next/prev buttons all come from the
+ * React branch in `shared/Components/Common/Layout/Layout.js`, and sampling the
+ * layout's `data-active-index` after this script's `updateStackDisplay` would
+ * have run shows it untouched. Autoplay was implemented in that React branch for
+ * this reason; the drag-to-swipe below has simply never worked on the front end.
+ *
+ * `testimonial-stats/view.js` hits the same race and works around it with
+ * `setTimeout(initStats, 100)` / `setTimeout(initStats, 500)`, which is the shape
+ * a fix here would take -- or better, an explicit hook after `initTestimonials`.
+ */
 document.addEventListener('DOMContentLoaded', () => {
 	const initCardStack = (wrapper) => {
 		const layout = wrapper.querySelector('.btb-card-stack-layout');

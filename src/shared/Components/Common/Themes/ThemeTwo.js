@@ -14,9 +14,17 @@ const ThemeTwo = ({
   setActiveIndex,
   isBackend,
 }) => {
-  const { starIconColor, grid2Bg } = attributes || {};
+  const { starIconColor, grid2Bg, showStarBadge } = attributes || {};
 
   const { img = {}, reviewText = "", rating = 5 } = item || {};
+
+  // The corner score pill. Only the Gradient Border Grid declares
+  // `showStarBadge`, so every other block rendering this theme reads `undefined`
+  // here and is unchanged -- the attribute is both the control and the gate.
+  //
+  // The numeric score rather than a second row of stars: the star row above
+  // already says how many, and repeating it in a pill would say it twice.
+  const badgeScore = Math.min(5, Math.max(0, Number(rating) || 0));
 
   return (
     <div
@@ -25,6 +33,15 @@ const ThemeTwo = ({
         isBackend && index === activeIndex ? "btbNowEditing" : ""
       }`}
       {...editorClickable(isBackend, () => setActiveIndex(index))}>
+      {showStarBadge && (
+        <span className="btb-star-badge">
+          <span className="btb-star-badge-icon" aria-hidden="true">
+            ★
+          </span>
+          {badgeScore.toFixed(1)}
+        </span>
+      )}
+
       <div className="top">
         <RatingIcon
           attributes={attributes}

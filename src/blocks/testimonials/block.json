@@ -2,8 +2,8 @@
 	"$schema": "https://schemas.wp.org/trunk/block.json",
 	"apiVersion": 3,
 	"name": "bptmb/b-testimonials",
-	"title": "B Testimonials Block",
-	"description": "Boost your website's credibility with b testimonials block, effortlessly showcasing customer ratings and reviews.",
+	"title": "Testimonials",
+	"description": "Boost your website's credibility with testimonials, effortlessly showcasing customer ratings and reviews.",
 	"category": "bplugins",
 	"keywords": [
 		"testimonials",
@@ -202,6 +202,30 @@
 			"type": "object",
 			"default": {}
 		},
+		"cardWash": {
+			"type": "boolean",
+			"default": true
+		},
+		"cardWashStrength": {
+			"type": "number",
+			"default": 100
+		},
+		"cardWashColor": {
+			"type": "string"
+		},
+		"cardHoverBg": {
+			"type": "string"
+		},
+		"cardHoverBorderColor": {
+			"type": "string"
+		},
+		"cardHoverShadow": {
+			"type": "object",
+			"default": {}
+		},
+		"cardHoverLift": {
+			"type": "number"
+		},
 		"image": {
 			"type": "object",
 			"default": {
@@ -218,6 +242,17 @@
 				"side": "all",
 				"radius": "50%"
 			}
+		},
+		"avatarRing": {
+			"type": "boolean",
+			"default": true
+		},
+		"avatarRingWidth": {
+			"type": "number",
+			"default": 3
+		},
+		"avatarRingColor": {
+			"type": "string"
 		},
 		"nameTypo": {
 			"type": "object",
@@ -281,6 +316,14 @@
 			"type": "string",
 			"default": "#f9f8f8"
 		},
+		"headerWash": {
+			"type": "boolean",
+			"default": true
+		},
+		"headerWashStrength": {
+			"type": "number",
+			"default": 100
+		},
 		"grid2Padding": {
 			"type": "object",
 			"default": {
@@ -338,6 +381,9 @@
 				"orderBy": "date",
 				"order": "desc"
 			}
+		},
+		"starSize": {
+			"type": "number"
 		}
 	},
 	"supports": {

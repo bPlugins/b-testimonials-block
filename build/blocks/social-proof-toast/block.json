@@ -169,6 +169,10 @@
         "left": "15px"
       }
     },
+    "blockAlign": {
+      "type": "string",
+      "default": ""
+    },
     "blockMargin": {
       "type": "object",
       "default": {}
@@ -332,9 +336,27 @@
           "img": {
             "url": "https://templates.bplugins.com/wp-content/uploads/2025/02/p-29.png"
           },
-          "name": "John Doe",
-          "deg": "Developer",
-          "reviewText": "It is a long-established fact that a reader will be distracted by the readable content of a page when looking at its layout",
+          "name": "Amelia Hartwell",
+          "deg": "Head of Product",
+          "reviewText": "Just left a 5-star review",
+          "rating": 5
+        },
+        {
+          "img": {
+            "url": "https://templates.bplugins.com/wp-content/uploads/2025/02/p-29.png"
+          },
+          "name": "Rajesh Menon",
+          "deg": "Engineering Manager",
+          "reviewText": "Bought the annual plan",
+          "rating": 5
+        },
+        {
+          "img": {
+            "url": "https://templates.bplugins.com/wp-content/uploads/2025/02/p-29.png"
+          },
+          "name": "Sofia Almeida",
+          "deg": "Marketing Director",
+          "reviewText": "Just left a 5-star review",
           "rating": 5
         }
       ]
@@ -367,6 +389,10 @@
         "speed": 4,
         "pauseOnHover": false
       }
+    },
+    "pauseInEditor": {
+      "type": "boolean",
+      "default": false
     },
     "starSize": {
       "type": "number"

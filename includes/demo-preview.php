@@ -106,6 +106,41 @@ function bpbtb_demo_preview_attributes( $slug ) {
 	if ( 'before-after' === $slug ) {
 		$attributes['beforeImg'] = [ 'url' => bpbtb_demo_compare_image( 'BEFORE', '#64748b', '#334155', '#94a3b8' ) ];
 		$attributes['afterImg']  = [ 'url' => bpbtb_demo_compare_image( 'AFTER', '#146ef5', '#0b3f9e', '#7cc0ff' ) ];
+
+		/*
+		 * Held to 720px rather than filling the column.
+		 *
+		 * The sample pair is drawn at 800x500 and the block stretches its image
+		 * to whatever width it is given, so in a wide column the comparison ran
+		 * past its own artwork -- upscaled, and tall enough that the drag handle
+		 * and the rest of the page could not be seen at once. 720 keeps it under
+		 * the artwork's own width, so nothing is enlarged.
+		 *
+		 * Style.js pairs `max-width` with auto side margins, so this centres the
+		 * demo as well as sizing it. Tablet and mobile are left empty: the block
+		 * is already narrower than 720px there, and a width set for one device
+		 * would only freeze it.
+		 */
+		$attributes['blockWidth'] = [
+			'desktop' => '720px',
+			'tablet'  => '',
+			'mobile'  => '',
+		];
+	}
+
+	if ( in_array( $slug, bpbtb_demo_compact_blocks(), true ) ) {
+		/*
+		 * The badges and the toast paint narrower than the column -- around
+		 * 280px and 380px -- so on a full-width page they sit against the left
+		 * edge. The Demos screen centres the same list inside its preview stage;
+		 * on a real page that is the block's own Alignment control, in Width &
+		 * Height.
+		 *
+		 * Set here rather than by wrapping each one in a centred group, so what
+		 * this page shows is a setting an author can find and change, and the
+		 * markup copied off it carries no wrapper to unpick.
+		 */
+		$attributes['blockAlign'] = 'center';
 	}
 
 	return $attributes;
@@ -930,3 +965,107 @@ function bpbtb_demo_preview_title( $slug ) {
 	return __( 'Block preview', 'b-testimonials-block' );
 }
 }
+
+/**
+ * Where a block's live demo lives.
+ *
+ * Every demo link in the plugin -- the Demos screen, the All Blocks screen, the
+ * canvas picker and the switcher modal -- resolves through this one function, so
+ * moving the demos off this install is a change in one place rather than four.
+ *
+ * Today it returns this site's own preview page, which is live, interactive and
+ * cannot go stale. To serve the demos from a hosted site instead, filter it:
+ *
+ *     add_filter( 'bpbtb_demo_url', function ( $url, $slug ) {
+ *         return 'https://demo.example.com/testimonials/' . $slug . '/';
+ *     }, 10, 2 );
+ *
+ * The slug is passed through so the hosted URLs need not keep this page's query
+ * string -- a path per block, a subdomain, anything the host prefers.
+ *
+ * @param string $slug Preview slug, e.g. `testimonials-slider`.
+ * @return string Absolute URL.
+ */
+if ( ! function_exists( 'bpbtb_demo_url' ) ) {
+function bpbtb_demo_url( $slug ) {
+	$url = add_query_arg( BPBTB_DEMO_QUERY_VAR, $slug, home_url( '/' ) );
+
+	/**
+	 * Filters one block's demo URL.
+	 *
+	 * @param string $url  The resolved URL.
+	 * @param string $slug Preview slug.
+	 */
+	return (string) apply_filters( 'bpbtb_demo_url', $url, $slug );
+}
+}
+
+/**
+ * Where the whole collection is browsed.
+ *
+ * Locally there is no demo index page -- each preview stands alone -- so this
+ * points at the dashboard's Demos screen, which is the local index. A hosted
+ * demo site would have a real one; filter this to it.
+ *
+ * @return string Absolute URL.
+ */
+if ( ! function_exists( 'bpbtb_demo_index_url' ) ) {
+function bpbtb_demo_index_url() {
+	$url = admin_url( 'edit.php?post_type=testimonial&page=bpbtb-dashboard#/demos' );
+
+	/**
+	 * Filters the URL of the demo index.
+	 *
+	 * @param string $url The resolved URL.
+	 */
+	return (string) apply_filters( 'bpbtb_demo_index_url', $url );
+}
+}
+
+/**
+ * Demo URL for every block that has one, keyed by preview slug.
+ *
+ * Built from the registry, so a block switched off on the All Blocks screen has
+ * no entry and nothing offers a link to a preview that would 404.
+ *
+ * @return array<string, string> preview slug => demo URL.
+ */
+if ( ! function_exists( 'bpbtb_demo_urls' ) ) {
+function bpbtb_demo_urls() {
+	$urls = [];
+
+	foreach ( array_keys( bpbtb_demo_previewable_blocks() ) as $slug ) {
+		$urls[ $slug ] = bpbtb_demo_url( $slug );
+	}
+
+	return $urls;
+}
+}
+
+/**
+ * Hand the editor the demo URLs.
+ *
+ * The block editor has no equivalent of the dashboard's `data-info` element, and
+ * forty blocks means forty editor script handles to attach this to. `wp-blocks`
+ * is a dependency of all of them and is always present in the editor, so one
+ * inline script ahead of it reaches every block with no per-block wiring.
+ *
+ * Resolved in PHP rather than assembled in JS: the URLs are filterable, and a
+ * base plus a pattern in JavaScript could not follow a filter that changes the
+ * shape of the URL rather than just its host.
+ */
+if ( ! function_exists( 'bpbtb_demo_editor_data' ) ) {
+function bpbtb_demo_editor_data() {
+	wp_add_inline_script(
+		'wp-blocks',
+		'window.bpbtbDemos = ' . wp_json_encode(
+			[
+				'index' => bpbtb_demo_index_url(),
+				'urls'  => bpbtb_demo_urls(),
+			]
+		) . ';',
+		'before'
+	);
+}
+}
+add_action( 'enqueue_block_editor_assets', 'bpbtb_demo_editor_data' );

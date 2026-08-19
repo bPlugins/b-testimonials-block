@@ -2575,6 +2575,27 @@ const Settings = ({
                           "b-testimonials-block",
                         )}
                       />
+
+                      {/* The same escape hatch the Slider and Marquee panels
+                          offer. The rotation now runs on the canvas, which is
+                          what the block is; this is for styling one particular
+                          review without it cycling away mid-edit. Selecting a
+                          card in the Reviews panel also jumps the preview to it. */}
+                      <ToggleControl
+                        className="mt10"
+                        label={__("Pause while editing", "b-testimonials-block")}
+                        labelPosition="left"
+                        checked={pauseInEditor}
+                        onChange={(val) =>
+                          setAttributes({
+                            pauseInEditor: val,
+                          })
+                        }
+                        help={__(
+                          "Holds the notification on the card you have selected, on the canvas only. The published page keeps cycling.",
+                          "b-testimonials-block",
+                        )}
+                      />
                     </PanelBody>
                   )}
 

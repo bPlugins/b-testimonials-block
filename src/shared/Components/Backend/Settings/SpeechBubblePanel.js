@@ -1,5 +1,6 @@
 import { __ } from "@wordpress/i18n";
 import {
+  Button,
   PanelBody,
   RangeControl,
   SelectControl,
@@ -34,9 +35,32 @@ const SpeechBubblePanel = ({ attributes = {}, setAttributes }) => {
     bubbleTailAlign = "left",
     bubbleTailFill,
     bubbleTailLine,
+    surfaceColor,
+    borderColor,
+    background,
+    border = {},
   } = attributes;
 
   const set = (key) => (val) => setAttributes({ [key]: val });
+
+  // What the tail is painted with right now.
+  //
+  // Both pickers stay empty until an author sets one, which is what keeps the
+  // tail following the card -- but an empty ColorControl paints its swatch
+  // transparent, so the panel showed no colour at all while the tail on the
+  // canvas was plainly blue. There was nothing to say where that blue came
+  // from, or anything to nudge if you wanted it a shade off.
+  //
+  // So the swatch shows the resolved colour instead. It is resolved the way
+  // Style.js resolves the two custom properties -- palette role first, then the
+  // Card panel's own value -- and `#0000` is this block's shipped Background
+  // default meaning "not set", which is why it falls through to white there
+  // rather than reading as a transparent tail.
+  const effectiveFill =
+    surfaceColor || (background && "#0000" !== background ? background : "#ffffff");
+  const effectiveLine = borderColor || border?.color || "transparent";
+
+  const followsCard = ! bubbleTailFill && ! bubbleTailLine;
 
   // Centre puts the tail at the middle of the card's bottom edge, so there is
   // no edge left for an offset to measure from.
@@ -133,30 +157,56 @@ const SpeechBubblePanel = ({ attributes = {}, setAttributes }) => {
             />
           )}
 
-          {/* Both left unset by default, in which case the tail keeps following
-              the Card panel's Background and Border -- which is what stops a
-              coloured bubble from growing a white tail. These take over only
-              once a colour is actually picked. */}
+          {/* Seeded with what the tail is painted with, so the swatch shows a
+              colour rather than an empty square -- but the attribute stays
+              unset until one is picked, which is what keeps a tail nobody has
+              touched following the card. Picking the same colour it already
+              shows is a no-op on the canvas and a deliberate pin here: the tail
+              stops following from that point on, and Follow the card below puts
+              it back. */}
           <ColorControl
             className="mt20 mb10"
             label={__("Tail Color", "b-testimonials-block")}
-            value={bubbleTailFill}
+            value={bubbleTailFill || effectiveFill}
             onChange={set("bubbleTailFill")}
           />
 
           <ColorControl
             className="mb10"
             label={__("Tail Outline", "b-testimonials-block")}
-            value={bubbleTailLine}
+            value={bubbleTailLine || effectiveLine}
             onChange={set("bubbleTailLine")}
           />
 
-          <p className="description">
-            {__(
-              "Left empty, both follow the Card panel's Background and Border.",
-              "b-testimonials-block",
-            )}
-          </p>
+          {followsCard ? (
+            <p className="description">
+              {__(
+                "Following the Card panel's Background and Border. Pick a colour to pin the tail to it instead.",
+                "b-testimonials-block",
+              )}
+            </p>
+          ) : (
+            <>
+              {/* The only way back. ColorControl's own reset writes a colour,
+                  so it cannot clear one; without this a picked tail could never
+                  be handed back to the card. */}
+              <Button
+                variant="secondary"
+                isSmall
+                onClick={() =>
+                  setAttributes({ bubbleTailFill: "", bubbleTailLine: "" })
+                }>
+                {__("Follow the card again", "b-testimonials-block")}
+              </Button>
+
+              <p className="description">
+                {__(
+                  "Pinned. The tail keeps these colours when the card's Background or Border changes.",
+                  "b-testimonials-block",
+                )}
+              </p>
+            </>
+          )}
         </>
       )}
     </PanelBody>

@@ -2,6 +2,7 @@ import { __ } from "@wordpress/i18n";
 import {
   PanelBody,
   PanelRow,
+  SelectControl,
   __experimentalUnitControl as UnitControl,
   __experimentalBoxControl as BoxControl,
 } from "@wordpress/components";
@@ -17,6 +18,7 @@ import {
 } from "../../../../../../bpl-tools/utils/options";
 import { useDeviceKey } from "../../../utils/usePreviewDevice";
 import { boxForDevice, setBoxForDevice } from "../../../utils/responsiveBox";
+import { SHRINK_TO_FIT_LAYOUTS } from "../../../utils/layoutControls";
 
 /**
  * Block Width, Card Height, Block Margin and Card Margin.
@@ -35,6 +37,10 @@ import { boxForDevice, setBoxForDevice } from "../../../utils/responsiveBox";
  * is why this panel is never gated by utils/layoutControls.js the way the Card,
  * Image and typography panels are.
  *
+ * Alignment is the exception to that: it is only offered on the layouts whose
+ * widget is narrower than its column, because those are the only ones it can
+ * move. See SHRINK_TO_FIT_LAYOUTS.
+ *
  * The device switch no longer takes a `device` / `setDevice` pair. It reads the
  * editor's own preview device, which every other switch in the sidebar now does
  * too, so they cannot disagree and there is nothing left to pass between them.
@@ -48,7 +54,11 @@ const SizeSpacingPanel = ({ attributes = {}, setAttributes }) => {
     cardHeight = {},
     cardMargin = {},
     blockMargin = {},
+    blockAlign = "",
+    layout = "default",
   } = attributes;
+
+  const canAlign = SHRINK_TO_FIT_LAYOUTS.includes(layout);
 
   const device = useDeviceKey();
 
@@ -104,6 +114,27 @@ const SizeSpacingPanel = ({ attributes = {}, setAttributes }) => {
             "b-testimonials-block",
           )}
         />
+
+        {/* Not per device. A badge is the same width on a phone as on a
+            desktop, so an alignment that changed with the viewport would be a
+            setting to keep in step rather than one to use. */}
+        {canAlign && (
+          <SelectControl
+            className="mt20"
+            label={__("Alignment", "b-testimonials-block")}
+            value={blockAlign}
+            onChange={(val) => setAttributes({ blockAlign: val })}
+            options={[
+              { label: __("Left", "b-testimonials-block"), value: "" },
+              { label: __("Center", "b-testimonials-block"), value: "center" },
+              { label: __("Right", "b-testimonials-block"), value: "right" },
+            ]}
+            help={__(
+              "Where this badge sits in its column. It is narrower than the column, so left is where it lands on its own.",
+              "b-testimonials-block",
+            )}
+          />
+        )}
       </PanelBody>
 
       <PanelBody

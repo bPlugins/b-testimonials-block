@@ -33,15 +33,26 @@
 		border-radius: 10px;
 	}
 
+	// Hovering the cell, not the logo itself.
+	//
+	// `img:hover` needed the pointer to land on the picture, which on the editor
+	// canvas it often never does: a linked logo puts an `<a>` over it and the
+	// editor takes links out of the pointer's way so a click selects the block
+	// instead of following them. The colour came back on the published page and
+	// stayed grey while editing.
+	//
+	// The cell is also the better target on the page. It carries the padding
+	// once a surface is set, so a pointer just inside the tile now counts as
+	// being on that logo rather than on nothing.
 	.is-grayscale .logo-item img {
 		filter: grayscale(1);
 		opacity: 0.7;
 		transition: filter 0.25s ease, opacity 0.25s ease;
+	}
 
-		&:hover {
-			filter: grayscale(0);
-			opacity: 1;
-		}
+	.is-grayscale .logo-item:hover img {
+		filter: grayscale(0);
+		opacity: 1;
 	}
 
 	@media ( max-width: $tablet-max ) {

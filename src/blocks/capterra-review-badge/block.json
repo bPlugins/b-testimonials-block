@@ -155,6 +155,10 @@
 				"left": "15px"
 			}
 		},
+		"blockAlign": {
+			"type": "string",
+			"default": ""
+		},
 		"blockMargin": {
 			"type": "object",
 			"default": {}

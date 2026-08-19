@@ -3,6 +3,7 @@ import Header from '../../../../bpl-tools/Admin/Header';
 
 const navigation = [
 	{ name: 'Welcome', href: '/welcome' },
+	{ name: 'All Blocks', href: '/all-blocks' },
 	{ name: 'Demos', href: '/demos' },
 	{ name: 'Settings', href: '/settings' },
 ];

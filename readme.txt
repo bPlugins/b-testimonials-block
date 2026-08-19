@@ -2,10 +2,10 @@
 Contributors: bplugins, abuhayat, btechnologies, himur98
 Donate link: https://www.buymeacoffee.com/abuhayat
 Tags: testimonials, review, rating, block, Gutenberg block
-Requires at least: 6.5
-Tested up to: 7.0
-Stable tag: 1.0.3
-Requires PHP: 7.2
+Requires at least: 6.1
+Tested up to: 7.1
+Stable tag: 1.0.4
+Requires PHP: 7.4
 License: GPLv3 or later
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -78,6 +78,36 @@ Yes. Create your testimonials once under **Testimonials → Add New**, then set 
 You can post your questions on the [WordPress.org support forum](https://wordpress.org/support/plugin/b-testimonials-block/) or visit [bPlugins Support](https://bplugins.com/support/).
 
 == Changelog ==
+
+= 1.0.4 – Controls, Editor Parity & Alignment =
+**New controls**
+* **Popup:** the Popup Modal Review Trigger's modal was built entirely from inline styles, so no panel could reach it and it always opened white out of a dark card. Overlay colour and blur, panel background, width, padding, radius, the close button, the avatar and every text size are now controls.
+* **Poll Style:** typography for the title, description, scale labels and buttons, plus button size, radius, gap, box padding, radius, shadow and the two button text colours — all of which were fixed values in the stylesheet.
+* **Badge Score:** score typography and star row size for the six badges that show a rating.
+* **FAQ Review Accordion:** corner radius, background, shadow, row gap and the question and answer padding.
+* **Trust Badges:** Badge Box, Badge Icon and Badge Text panels — padding, corner radius, shadow, icon size, icon position, gap and typography.
+* **Testimonial Form:** field label, placeholder and input styling, plus field name colour and typography. The same input controls were added to the Feedback & NPS Poll.
+* **Badge Logo:** a size control for the Google, Capterra, Facebook, Trustpilot and G2 marks. They stay unswappable — they are trademarks — but their size is now yours.
+* **Alignment:** the review badges and Social Proof Toast are narrower than their column and always sat against its left edge. They can now be centred or right-aligned.
+* **Card:** Corner wash and card hover colour, reaching every card the Card panel paints.
+* **Card details:** header strip background, avatar ring and card corner tint.
+* **Icon:** Icon Size now applies to a block's built-in artwork, not only to an icon picked from the library.
+
+**Improvements**
+* **Gradient Border Grid** now draws the gradient border and star badges its name promises, instead of rendering as the plain grid with an inverted card.
+* Trust Badges' Icon panel follows the Badges repeater — one slot per badge, shown one at a time behind a row of chips, with its own Add New Badge button.
+* The Speech Bubble tail's colour pickers show the colour actually in use instead of an empty swatch, with a Follow the card again button to hand it back to the Card panel.
+* Social Proof Toast ships with three notifications, so the rotation it exists to show is visible the moment it is inserted.
+* Evened out control spacing across the inspector panels.
+
+**Fixes**
+* Trust Badges' editor preview drew the same blue shield for every badge while the published page drew a shield, a tick and an amber star. Both now draw the same thing.
+* Trust Badges' Icon Size reached only one of the block's two rendering paths, and lost to a per-badge value that no longer had a control to clear it.
+* Corner wash and card hover opened on the review badges, Social Proof Toast, Star Rating Bars, Avatar Reviews List, Customer Case Study and Comparison Review Table and moved nothing.
+* Client Logos restores each logo's colour on hover inside the editor, not only on the published page.
+* The Before / After slider now releases from the pointer when the drag ends in the editor.
+* Corrected the mislabelled Bars & Tracks control on the Feedback & NPS Poll, which painted the card background.
+* Removed the Testimonial Form's duplicate Form Colors panel.
 
 = 1.0.3 – Major Feature Expansion & Security Hardening =
 * **New:** Expanded from a single Testimonials block to **40+ modern child block layouts** — including Grids, Sliders, Carousels, Masonry, Marquee Tickers, Speech Bubbles, Timelines, Card Stacks, Floating Avatars, Hero Layouts, Quote Boxes, Popup Modals, Video & Audio Testimonials, and more.

@@ -111,11 +111,41 @@ const Edit = ( { attributes, setAttributes, clientId } ) => {
 			<div { ...useBlockProps( { className: 'bClientLogos' } ) } id={ `btbTestimonialsDir-${ clientId }` }>
 				<Style attributes={ attributes } clientId={ clientId } />
 				<div className={ `logos-grid ${ grayscale ? 'is-grayscale' : '' } ${ attributes.trackColor || attributes.borderColor ? 'has-surface' : '' }` } style={ { ...gridVars( attributes ), '--cols-d': colsForDevice( attributes.columns, previewDevice, 4 ) } }>
-					{ logos.map( ( logo, index ) => (
-						<div className="logo-item" key={ index }>
-							{ logo?.img?.url && <img src={ logo.img.url } alt={ logo?.img?.alt || '' } /> }
-						</div>
-					) ) }
+					{ logos.map( ( logo, index ) => {
+						/*
+						 * The same markup the front end builds -- see the `client-logos`
+						 * branch of Layout.js.
+						 *
+						 * Two things were missing here. An empty slot rendered nothing at
+						 * all, so adding a logo and not yet picking an image left a hole
+						 * in the editor while the page showed the placeholder; and a logo
+						 * with a link rendered as a bare `<img>`, so nothing on the canvas
+						 * said it was a link. Both now match, which is also what makes the
+						 * hover and surface styling in logos.scss land on the same
+						 * elements in both places.
+						 *
+						 * The anchor is safe on the canvas: the editor cancels navigation
+						 * for links inside a block, the way it does for core's own.
+						 */
+						const img = (
+							<img
+								src={ logo?.img?.url || 'https://templates.bplugins.com/wp-content/uploads/2025/02/p-29.png' }
+								alt={ logo?.img?.alt || '' }
+							/>
+						);
+
+						return (
+							<div className="logo-item" key={ index }>
+								{ logo?.link ? (
+									<a href={ logo.link } target="_blank" rel="noopener noreferrer">
+										{ img }
+									</a>
+								) : (
+									img
+								) }
+							</div>
+						);
+					} ) }
 				</div>
 			</div>
 		</>

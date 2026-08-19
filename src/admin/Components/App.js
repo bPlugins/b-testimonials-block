@@ -7,10 +7,11 @@ import OurPlugins from '../../../../bpl-tools/Admin/OurPlugins';
 import Settings from '../../../../bpl-tools/Admin/Settings';
 
 import Layout from './Layout';
-import { demoInfo, welcomeInfo } from '../utils/data';
+import AllBlocks from './AllBlocks';
+import { allBlocksInfo, demoInfo, welcomeInfo } from '../utils/data';
 
 const App = (props) => {
-	const { adminUrl, demoBase } = props;
+	const { adminUrl, demoBase, demoUrls } = props;
 
 	return (
 		<Router>
@@ -20,7 +21,15 @@ const App = (props) => {
 					<Route path="welcome" element={<Welcome {...props} {...welcomeInfo(adminUrl)} />} />
 					{/* The previews are served by this install, so the demo
 					    cards need the site's own address. */}
-					<Route path="demos" element={<Demos {...props} demoInfo={demoInfo(demoBase)} />} />
+					<Route path="demos" element={<Demos {...props} demoInfo={demoInfo(demoBase, demoUrls)} />} />
+					{/* Every block with a switch, the plugin's own page rather
+					    than a bpl-tools one -- no other plugin here has forty
+					    blocks to thin out. Same `demoBase`, so a card's Live
+					    Demo opens the preview this install serves. */}
+					<Route
+						path="all-blocks"
+						element={<AllBlocks {...props} allBlocks={allBlocksInfo(demoBase, demoUrls)} />}
+					/>
 					{/* Reached from the Header's top-right button, which links to
 					    `#our-plugins`. Intentionally not in Layout's nav. */}
 					<Route path="our-plugins" element={<OurPlugins {...props} />} />

@@ -6,7 +6,9 @@ import { createBlock } from '@wordpress/blocks';
 import { getLayoutSvgIcon } from '../../utils/icons';
 import { clickable } from '../../utils/a11y';
 import { getChildBlockCategoryLabel } from '../../utils/childBlocks';
-import BlockSwitcherModal, { CHILD_BLOCKS_LIST } from './BlockSwitcherModal';
+import { getDemoIndexUrl } from '../../utils/demoUrl';
+import DemoLink from './DemoLink';
+import BlockSwitcherModal, { registeredChildBlocks } from './BlockSwitcherModal';
 
 const BlockPlaceholder = ({ clientId, currentBlockName, setAttributes }) => {
 	const [isModalOpen, setIsModalOpen] = useState(false);
@@ -21,8 +23,14 @@ const BlockPlaceholder = ({ clientId, currentBlockName, setAttributes }) => {
 		}
 	};
 
-	// Only show the first 12 popular blocks on the canvas page editor
-	const canvasBlocks = CHILD_BLOCKS_LIST.slice(0, 12);
+	// Only show the first 12 popular blocks on the canvas page editor.
+	//
+	// Taken from what is registered rather than from the full list, so a block
+	// switched off on the All Blocks screen leaves this picker too -- otherwise
+	// the twelve cards could include one that inserts nothing.
+	const canvasBlocks = registeredChildBlocks().slice(0, 12);
+
+	const demoIndex = getDemoIndexUrl();
 
 	return (
 		<div className="btb-my-testimonials-feeds">
@@ -35,6 +43,21 @@ const BlockPlaceholder = ({ clientId, currentBlockName, setAttributes }) => {
 				<span className="btbPickerEyebrow">{__('Testimonial Layouts', 'b-testimonials-block')}</span>
 				<h2>{__('Select Your Testimonial Block', 'b-testimonials-block')}</h2>
 				<p>{__('Choose from the popular testimonial layouts or click below for all 40+ layouts', 'b-testimonials-block')}</p>
+				{/* One link for the whole collection, for the author who wants to
+				    look before picking. Absent unless a demo index was supplied,
+				    so it cannot become a link to nowhere once the demos move to
+				    a hosted site. */}
+				{demoIndex && (
+					<a
+						className="btbPickerDemoAll"
+						href={demoIndex}
+						target="_blank"
+						rel="noreferrer"
+					>
+						{__('Browse all live demos', 'b-testimonials-block')}
+						{getLayoutSvgIcon('external', 13)}
+					</a>
+				)}
 			</header>
 
 			<div className="items-list">
@@ -54,6 +77,11 @@ const BlockPlaceholder = ({ clientId, currentBlockName, setAttributes }) => {
 						<h3>{item.title}</h3>
 						<p>{item.desc}</p>
 						{item.badge && <span className="btbItemBadge">{item.badge}</span>}
+						{/* Pinned to the bottom of the card by CSS rather than
+						    shown on hover: a hover-only link is unreachable on a
+						    touch screen and invisible to anyone who does not
+						    happen to sweep the pointer across the card. */}
+						<DemoLink blockName={item.name} title={item.title} />
 					</div>
 				))}
 			</div>

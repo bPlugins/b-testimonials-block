@@ -672,6 +672,66 @@ svg.btb-inserter-icon[fill="none"] * {
   color: rgba(27, 46, 75, 0.65);
 }
 
+/* The footer became a row once the demo joined the choice, and the demo is a
+   square rather than a second labelled button: "Use This Layout" is the card's
+   action and it has to fit on one line at this card width, which it stopped
+   doing the moment a word sat beside it. The name lives in the title attribute
+   instead -- see DemoLink. */
+.btb-modern-card-footer {
+  display: flex;
+  align-items: stretch;
+  gap: 8px;
+
+  /* Narrower side padding than the button had on its own. The grid's columns
+     bottom out at 240px, which leaves 156px here once the card's padding, the
+     gap and the demo square are taken out -- and "Currently Selected" needs all
+     but a few of them. Buying back 12px keeps the longest label on one line at
+     the narrowest column the grid can produce. */
+  .btb-modern-select-btn {
+    flex: 1 1 auto;
+    width: auto;
+    min-width: 0;
+    padding-right: 10px;
+    padding-left: 10px;
+  }
+}
+
+.btb-modern-demo-btn {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  text-decoration: none;
+  box-shadow: none;
+  /* Quieter than the button beside it: looking is the lighter of the two
+     actions, and two boxes of equal weight said they were the same thing. */
+  color: rgba(27, 46, 75, 0.5);
+  background: #ffffff;
+  border: 1px solid rgba(27, 46, 75, 0.2);
+  transition: color 0.18s ease, border-color 0.18s ease;
+
+  svg {
+    flex: none;
+  }
+
+  &:hover {
+    color: var(--accent);
+    border-color: var(--accent);
+    text-decoration: none;
+  }
+
+  &:focus {
+    box-shadow: none;
+    outline: none;
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 1px;
+  }
+}
+
 .btb-modern-select-btn {
   width: 100%;
   padding: 8px 16px;
@@ -974,6 +1034,38 @@ svg.btb-inserter-icon[fill="none"] * {
       font-style: normal;
       color: var(--btb-pick-content);
     }
+
+    /* Quiet by design: it sits under the page's own title, and the twelve cards
+       below it are the thing to act on. */
+    .btbPickerDemoAll {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 13px;
+      font-weight: 600;
+      text-decoration: none;
+      box-shadow: none;
+      color: var(--btb-pick-primary);
+
+      &:hover {
+        text-decoration: underline;
+      }
+
+      /* Pointer clicks must not leave a ring behind; keyboard focus must. */
+      &:focus {
+        box-shadow: none;
+        outline: none;
+      }
+
+      &:focus-visible {
+        outline: 2px solid var(--btb-pick-primary);
+        outline-offset: 2px;
+      }
+
+      svg {
+        flex: none;
+      }
+    }
   }
 
   .items-list {
@@ -1099,6 +1191,52 @@ svg.btb-inserter-icon[fill="none"] * {
         background: var(--accent);
         border-radius: 0;
       }
+
+      /* Pinned to the foot of the card rather than left after the description,
+         so the twelve links form a line across the grid instead of stepping up
+         and down with each description's length.
+         `align-self` keeps the hit area to the words: the card is one big
+         button, and a full-width link across it would swallow clicks meant for
+         the card. */
+      .btbDemoLink {
+        margin-top: auto;
+        align-self: flex-start;
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        font-size: 12px;
+        font-weight: 600;
+        text-decoration: none;
+        box-shadow: none;
+        color: rgba(27, 46, 75, 0.55);
+        transition: color 0.18s ease;
+
+        svg {
+          flex: none;
+        }
+
+        &:focus {
+          box-shadow: none;
+          outline: none;
+        }
+
+        &:focus-visible {
+          outline: 2px solid var(--accent);
+          outline-offset: 2px;
+        }
+      }
+
+      /* Legible only once the card is the one being considered, so the grid
+         reads as titles and descriptions rather than as twelve links. */
+      &:hover .btbDemoLink,
+      .btbDemoLink:hover,
+      .btbDemoLink:focus-visible {
+        color: var(--accent);
+      }
+
+      .btbDemoLink:hover {
+        text-decoration: underline;
+      }
     }
   }
 
@@ -1139,4 +1277,20 @@ svg.btb-inserter-icon[fill="none"] * {
       grid-template-columns: 1fr;
     }
   }
+}
+
+/*
+ * The switcher modal with nothing to show.
+ *
+ * Reachable without a search term now that the All Blocks screen can switch
+ * every layout off, so the grid needs something to say rather than collapsing
+ * to an empty box.
+ */
+.btb-modal-empty {
+	grid-column: 1 / -1;
+	margin: 0;
+	padding: 40px 20px;
+	text-align: center;
+	font-size: 14px;
+	color: #64748b;
 }

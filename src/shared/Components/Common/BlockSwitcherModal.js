@@ -1,9 +1,10 @@
 import { useState, useEffect } from 'react';
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import { dispatch, useSelect } from '@wordpress/data';
-import { createBlock } from '@wordpress/blocks';
+import { createBlock, getBlockType } from '@wordpress/blocks';
 import { getLayoutSvgIcon } from '../../utils/icons';
 import { clickable } from '../../utils/a11y';
+import DemoLink from './DemoLink';
 
 // Moved to utils/childBlocks so it can be shared with the inserter icons.
 import { CHILD_BLOCKS_LIST, CHILD_BLOCK_CATEGORIES } from '../../utils/childBlocks';
@@ -11,6 +12,24 @@ import { CHILD_BLOCKS_LIST, CHILD_BLOCK_CATEGORIES } from '../../utils/childBloc
 export { CHILD_BLOCKS_LIST };
 
 export const ALLOWED_CHILD_BLOCKS = CHILD_BLOCKS_LIST.map((b) => b.name);
+
+/**
+ * The child blocks this editor actually has.
+ *
+ * `CHILD_BLOCKS_LIST` is a hand-kept list of every block the plugin ships, which
+ * is the right source for icons and labels but the wrong one for a picker: the
+ * All Blocks screen can switch a block off, and a block switched off is never
+ * registered, so offering it here handed the author a card that inserted
+ * nothing.
+ *
+ * Asked of the registry rather than of the option that drives it. The editor
+ * already knows what it has, the answer cannot drift from what the inserter
+ * shows, and nothing has to be passed from PHP into the editor to find out.
+ *
+ * @return {Array} Entries from CHILD_BLOCKS_LIST whose block is registered.
+ */
+export const registeredChildBlocks = () =>
+	CHILD_BLOCKS_LIST.filter((block) => !! getBlockType(block.name));
 
 const BlockSwitcherModal = ({ isOpen, onRequestClose, clientId, currentBlockName }) => {
 	const [activeCategory, setActiveCategory] = useState('all');
@@ -78,7 +97,9 @@ const BlockSwitcherModal = ({ isOpen, onRequestClose, clientId, currentBlockName
 		}
 	};
 
-	const filteredBlocks = CHILD_BLOCKS_LIST.filter((item) => {
+	const availableBlocks = registeredChildBlocks();
+
+	const filteredBlocks = availableBlocks.filter((item) => {
 		const matchesCategory = activeCategory === 'all' || item.category === activeCategory;
 		const matchesSearch =
 			!searchQuery ||
@@ -89,9 +110,18 @@ const BlockSwitcherModal = ({ isOpen, onRequestClose, clientId, currentBlockName
 
 	// The category labels are shared with the canvas placeholder's card chips; only
 	// the "all" filter is local, since no block carries it.
+	// Counted rather than written out: with blocks switchable off, "All 40
+	// Blocks" over a grid of thirty-six is the chip contradicting the page.
+	// The category chips drop out entirely once nothing in them is left.
 	const categories = [
-		{ id: 'all', label: __('All 40 Blocks', 'b-testimonials-block') },
-		...CHILD_BLOCK_CATEGORIES,
+		{
+			id: 'all',
+			/* translators: %d is how many blocks are available. */
+			label: sprintf(__('All %d Blocks', 'b-testimonials-block'), availableBlocks.length),
+		},
+		...CHILD_BLOCK_CATEGORIES.filter((cat) =>
+			availableBlocks.some((block) => block.category === cat.id),
+		),
 	];
 
 	let activeChildName = '';
@@ -182,6 +212,21 @@ const BlockSwitcherModal = ({ isOpen, onRequestClose, clientId, currentBlockName
 
 				{/* Custom Modern Cards Grid Container with Single Scrollbar */}
 				<div className="btb-custom-modal-grid">
+					{/* An empty grid is now reachable without a search term: every
+					    layout in a category can be switched off on the All Blocks
+					    screen, and all of them can. Saying so beats an empty box
+					    that reads as a broken modal. */}
+					{! filteredBlocks.length && (
+						<p className="btb-modal-empty">
+							{searchQuery
+								? __('No layout matches that search.', 'b-testimonials-block')
+								: __(
+									'No layouts are switched on. Turn some back on under Testimonials → Demo & Help → All Blocks.',
+									'b-testimonials-block',
+								)}
+						</p>
+					)}
+
 					{filteredBlocks.map((item) => {
 						const isCurrent = item.name === activeChildName;
 						return (
@@ -207,6 +252,10 @@ const BlockSwitcherModal = ({ isOpen, onRequestClose, clientId, currentBlockName
 									<p className="btb-modern-card-desc">{item.desc}</p>
 								</div>
 
+								{/* The demo sits beside the choice rather than
+								    replacing it: the card's job is still to
+								    switch the layout, and looking first is the
+								    lighter of the two actions. */}
 								<div className="btb-modern-card-footer">
 									<button
 										type="button"
@@ -218,6 +267,13 @@ const BlockSwitcherModal = ({ isOpen, onRequestClose, clientId, currentBlockName
 									>
 										{isCurrent ? __('Currently Selected', 'b-testimonials-block') : __('Use This Layout', 'b-testimonials-block')}
 									</button>
+									<DemoLink
+										blockName={item.name}
+										title={item.title}
+										className="btb-modern-demo-btn"
+										label=""
+										iconSize={15}
+									/>
 								</div>
 							</div>
 						);

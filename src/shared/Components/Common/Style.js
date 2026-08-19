@@ -43,6 +43,7 @@ const Style = ({ attributes = {}, clientId }) => {
     cardHeight = {},
     cardMargin = {},
     blockMargin = {},
+    blockAlign = "",
     degDivider = {},
     labelTypo = {},
     labelColor = "",
@@ -560,6 +561,27 @@ const Style = ({ attributes = {}, clientId }) => {
       .join("\n\t\t\t");
 
   const blockMarginCSS = blockMarginSides(ownBoxForDevice(blockMargin, "desktop"));
+
+  // Where a shrink-to-fit widget sits in its column.
+  //
+  // Only the badges and the toast are offered this -- their card is narrower
+  // than the column and so had nowhere to go but the left edge, while every
+  // other layout fills its column and would be unmoved by it. The panel gates
+  // it; see SHRINK_TO_FIT_LAYOUTS.
+  //
+  // A flex container on the block's own box, rather than `text-align` or auto
+  // margins. `text-align: center` would centre the badge's own lines of text
+  // along with it, and auto margins do nothing to `.btb-badge-card`, which is
+  // `display: inline-flex`. Making the box a flex row centres whatever width
+  // the widget turns out to have, which is the point: the right value differs
+  // per badge and none of them should have to be measured.
+  //
+  // Nothing is emitted while the value is empty, so a block nobody has aligned
+  // keeps the block layout it has today.
+  const BLOCK_ALIGN_JUSTIFY = { center: "center", right: "flex-end" };
+  const blockAlignCSS = BLOCK_ALIGN_JUSTIFY[blockAlign]
+    ? `${widthEl} {\n\t\t\tdisplay: flex;\n\t\t\tjustify-content: ${BLOCK_ALIGN_JUSTIFY[blockAlign]};\n\t\t}`
+    : "";
 
   // Block Margin's per-device rules cannot ride along in sizeCSS the way Padding
   // and Card Margin do.
@@ -1866,6 +1888,8 @@ const Style = ({ attributes = {}, clientId }) => {
 		${/* Last, so an explicit side beats the auto centring the per-device Block
 		     Width rules above apply -- including the ones inside the media queries. */ ""}
 		${blockMarginCSS ? `${widthEl} {\n\t\t\t${blockMarginCSS}\n\t\t}` : ""}
+
+		${blockAlignCSS}
 
 		${blockMarginBreakpoints}
 	`,

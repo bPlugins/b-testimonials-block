@@ -26,6 +26,56 @@ class BPBTB_Admin_Menu {
 	const UNINSTALL_OPTION = 'bpbtb_delete_data_on_uninstall';
 
 	/**
+	 * Option holding the blocks an administrator has switched off.
+	 *
+	 * A list of full block names (`bptmb/testimonials-slider`). Absent means
+	 * every block is on, which is what a site that never opens the All Blocks
+	 * page gets.
+	 *
+	 * Stored as the blocks that are OFF rather than the blocks that are ON, so a
+	 * block added in a later release arrives switched on without the option
+	 * having to be migrated.
+	 */
+	const DISABLED_BLOCKS_OPTION = 'bpbtb_disabled_blocks';
+
+	/**
+	 * The one block that cannot be switched off.
+	 *
+	 * Every other block is its child -- `parent` in their block.json names it --
+	 * so switching this off would take all forty with it and leave the All Blocks
+	 * page unable to switch any of them back on.
+	 */
+	const PARENT_BLOCK = 'bptmb/b-testimonials';
+
+	/**
+	 * The blocks currently switched off.
+	 *
+	 * Read by the registration loop in the plugin's main file, so it is static:
+	 * that runs on `init`, before this class has any part in the request.
+	 *
+	 * @return string[] Block names.
+	 */
+	public static function disabled_blocks() {
+		$stored = get_option( self::DISABLED_BLOCKS_OPTION, [] );
+
+		if ( ! is_array( $stored ) ) {
+			return [];
+		}
+
+		// The parent is filtered on read as well as on write: an option edited
+		// by hand, or left over from an earlier version, cannot lock the site
+		// out of its own blocks.
+		return array_values(
+			array_filter(
+				array_map( 'strval', $stored ),
+				static function ( $name ) {
+					return self::PARENT_BLOCK !== $name;
+				}
+			)
+		);
+	}
+
+	/**
 	 * The plugin's two PHP admin screens, by the tail of their hook suffix.
 	 *
 	 * They render in PHP rather than React but are styled to match the dashboard
@@ -40,6 +90,7 @@ class BPBTB_Admin_Menu {
 		add_action( 'admin_menu', [ $this, 'admin_menu' ] );
 		add_filter( 'admin_body_class', [ $this, 'admin_body_class' ] );
 		add_action( 'wp_ajax_bpbtbSaveUninstallOption', [ $this, 'save_uninstall_option' ] );
+		add_action( 'wp_ajax_bpbtbSaveDisabledBlocks', [ $this, 'save_disabled_blocks' ] );
 	}
 
 	/**
@@ -156,13 +207,23 @@ class BPBTB_Admin_Menu {
 			data-info="<?php echo esc_attr( wp_json_encode( [
 				'version'               => BPBTB_PLUGIN_VERSION,
 				'adminUrl'              => admin_url(),
-				// Base for the live block previews on the Demos route. Taken
-				// from home_url() rather than assembled in JS so the previews
-				// follow the site's real address -- subdirectory installs, a
+				// Base for the dashboard's own links back into wp-admin.
+				// Taken from home_url() rather than assembled in JS so it
+				// follows the site's real address -- subdirectory installs, a
 				// custom domain or a changed scheme included.
 				'demoBase'              => home_url( '/' ),
+				// The demo links themselves, resolved rather than assembled
+				// here: bpbtb_demo_url() is the one place that decides where a
+				// demo lives, so pointing the plugin at a hosted demo site is a
+				// filter rather than an edit in every screen that links to one.
+				// Keyed by preview slug; a block switched off has no entry.
+				'demoUrls'              => function_exists( 'bpbtb_demo_urls' ) ? bpbtb_demo_urls() : [],
+				'demoIndex'             => function_exists( 'bpbtb_demo_index_url' ) ? bpbtb_demo_index_url() : '',
 				'deleteDataOnUninstall' => (bool) get_option( self::UNINSTALL_OPTION, false ),
 				'uninstallNonce'        => wp_create_nonce( self::NONCE_ACTION ),
+				// The All Blocks page. Names of the blocks currently switched
+				// off, so the page paints its switches without a round trip.
+				'disabledBlocks'        => self::disabled_blocks(),
 			] ) ); ?>"
 		>
 		</div>
@@ -202,6 +263,79 @@ class BPBTB_Admin_Menu {
 					: __( 'Plugin data will be kept when the plugin is uninstalled.', 'b-testimonials-block' ),
 			]
 		);
+	}
+	/**
+	 * Persist the All Blocks page's switches.
+	 *
+	 * Takes the whole list rather than one block at a time: the page has Activate
+	 * All and Deactivate All, and forty requests where one will do is forty
+	 * chances to end up with a half-written list.
+	 *
+	 * Names are validated against what is actually registered, so the option
+	 * cannot collect entries for blocks that do not exist.
+	 */
+	public function save_disabled_blocks() {
+		$nonce = isset( $_POST['nonce'] ) ? sanitize_text_field( wp_unslash( $_POST['nonce'] ) ) : '';
+
+		if ( ! wp_verify_nonce( $nonce, self::NONCE_ACTION ) ) {
+			wp_send_json_error( [ 'message' => __( 'Invalid security token.', 'b-testimonials-block' ) ] );
+		}
+
+		if ( ! current_user_can( 'manage_options' ) ) {
+			wp_send_json_error( [ 'message' => __( 'You do not have permission to perform this action.', 'b-testimonials-block' ) ] );
+		}
+
+		$raw = isset( $_POST['disabled'] ) ? wp_unslash( $_POST['disabled'] ) : [];
+
+		if ( ! is_array( $raw ) ) {
+			$raw = [];
+		}
+
+		// Registered names are the only ones accepted -- but a block that is
+		// currently switched off is not registered, so its own name would fail
+		// that test and switch itself back on. The stored list is allowed
+		// through alongside.
+		$known = array_merge( $this->registered_block_names(), self::disabled_blocks() );
+
+		$disabled = array_values(
+			array_unique(
+				array_filter(
+					array_map( 'sanitize_text_field', $raw ),
+					static function ( $name ) use ( $known ) {
+						return self::PARENT_BLOCK !== $name && in_array( $name, $known, true );
+					}
+				)
+			)
+		);
+
+		update_option( self::DISABLED_BLOCKS_OPTION, $disabled );
+
+		wp_send_json_success(
+			[
+				'disabled' => $disabled,
+				/* translators: %d is how many blocks are switched off. */
+				'message'  => $disabled
+					? sprintf( _n( '%d block switched off.', '%d blocks switched off.', count( $disabled ), 'b-testimonials-block' ), count( $disabled ) )
+					: __( 'Every block is switched on.', 'b-testimonials-block' ),
+			]
+		);
+	}
+
+	/**
+	 * This plugin's registered block names.
+	 *
+	 * @return string[]
+	 */
+	private function registered_block_names() {
+		$names = [];
+
+		foreach ( WP_Block_Type_Registry::get_instance()->get_all_registered() as $name => $type ) {
+			if ( 0 === strpos( $name, 'bptmb/' ) ) {
+				$names[] = $name;
+			}
+		}
+
+		return $names;
 	}
 }
 

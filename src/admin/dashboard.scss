@@ -100,3 +100,42 @@
         border-color: var(--accent);
     }
 }
+
+/*
+ * All Blocks: the icon tile on bpl-tools' shared Blocks page.
+ *
+ * The shared rule paints `.icon svg { fill: <primary> !important }` on the
+ * assumption that a block icon is a solid glyph. Thirty-eight of this plugin's
+ * forty are Lucide-style outlines -- they declare `fill="none"` and draw with
+ * `stroke` -- and a CSS `fill` outranks that attribute, so every one of them was
+ * filled solid. Their stroke meanwhile is `currentColor`, which nothing here
+ * set, so it fell through to the card's text colour: a primary-coloured shape
+ * with a black outline around it.
+ *
+ * So the tile sets the colour once and each icon is left to use it the way it
+ * was drawn.
+ *
+ * Written here rather than in bpl-tools/Admin/Blocks for the reason the Demos
+ * override above gives -- seven plugins in this install render that component,
+ * and this is an answer to what *this* plugin's icons are made of. The selectors
+ * are one level deeper than the shared rule, so `!important` against
+ * `!important` is settled by specificity rather than by load order.
+ */
+.bPlDashboard .bPlDashboardBlocks .dashboardBlocks .block .icon {
+    color: var(--bpl-dashboard-primary-color);
+
+    svg[fill="none"] {
+        fill: none !important;
+        stroke: currentColor !important;
+    }
+
+    /*
+     * The two that really are solid -- the container block's own glyph and the
+     * amber star -- keep being filled, now from the tile's colour rather than
+     * from a second copy of it. The shared rule already forced them to the
+     * primary colour, so this changes nothing about how they look.
+     */
+    svg:not([fill="none"]) {
+        fill: currentColor !important;
+    }
+}

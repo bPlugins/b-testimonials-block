@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Testimonials
  * Description: Boost your website's credibility with b testimonials block, effortlessly showcasing customer ratings and reviews.
- * Version: 1.0.3
+ * Version: 1.0.4
  * Author: bPlugins
  * Author URI: http://bplugins.com
  * Requires at least: 6.5
@@ -84,7 +84,7 @@ class BPBTB_Testimonials_Block{
 
         // Constant
         if ( ! defined( 'BPBTB_PLUGIN_VERSION' ) ) {
-            define( 'BPBTB_PLUGIN_VERSION', $is_local ? time() : '1.0.3' );
+            define( 'BPBTB_PLUGIN_VERSION', $is_local ? time() : '1.0.4' );
         }
         if ( ! defined( 'BTB_PLUGIN_VERSION' ) ) {
             define( 'BTB_PLUGIN_VERSION', BPBTB_PLUGIN_VERSION );
@@ -117,9 +117,27 @@ class BPBTB_Testimonials_Block{
 		// Each sub-block lives in src/blocks/<name>/ and is compiled to build/blocks/<name>/.
 		$blocks_dir = __DIR__ . '/build/blocks';
 
+		// Blocks an administrator has switched off on the All Blocks page.
+		//
+		// Skipped here rather than unregistered afterwards: an unregistered block
+		// has already had its editor script and stylesheet enqueued, so the only
+		// thing switching one off would have saved is the inserter entry.
+		//
+		// A block already used on a page still renders -- its markup and its
+		// render.php are untouched -- but the editor no longer knows the type, so
+		// it shows the "not supported" placeholder there. That is the same trade
+		// every block-toggle screen makes, and it is why the page says so.
+		$disabled = class_exists( 'BPBTB_Admin_Menu' )
+			? BPBTB_Admin_Menu::disabled_blocks()
+			: [];
+
 		if ( is_dir( $blocks_dir ) ) {
 			foreach ( glob( $blocks_dir . '/*', GLOB_ONLYDIR ) as $block ) {
 				if ( file_exists( $block . '/block.json' ) ) {
+					if ( $disabled && in_array( $this->block_name( $block ), $disabled, true ) ) {
+						continue;
+					}
+
 					register_block_type( $block );
 				}
 			}
@@ -127,6 +145,22 @@ class BPBTB_Testimonials_Block{
 			// Fallback for the legacy single-block build layout.
 			register_block_type( __DIR__ . '/build' );
 		}
+	}
+
+	/**
+	 * The registered name a built block directory declares.
+	 *
+	 * Read from block.json rather than derived from the folder, because the two
+	 * do not always match: `build/blocks/testimonials` registers
+	 * `bptmb/b-testimonials`.
+	 *
+	 * @param string $dir Block directory.
+	 * @return string Block name, or '' when it cannot be read.
+	 */
+	private function block_name( $dir ) {
+		$metadata = wp_json_file_decode( $dir . '/block.json', [ 'associative' => true ] );
+
+		return isset( $metadata['name'] ) ? (string) $metadata['name'] : '';
 	}
 
 	/**

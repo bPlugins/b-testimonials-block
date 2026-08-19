@@ -345,6 +345,32 @@ export const SCORED_BADGE_LAYOUTS = [
  * absent because their logo is a real icon slot, so its size belongs to the Icon
  * panel and a second control here would set the same pixel twice.
  */
+/**
+ * The layouts whose widget is narrower than the column it sits in.
+ *
+ * A review badge paints around 280px and the toast 380px, both shrink-to-fit --
+ * `.btb-badge-card` is `display: inline-flex` and `.btb-toast-card` carries a
+ * 380px max-width -- so in a full-width column they sit against the left edge
+ * with empty space beside them, and nothing in the sidebar moved them. Every
+ * other layout is a grid, a slider or a card that fills its column, where an
+ * alignment control would be a control that changes nothing.
+ *
+ * The same eight the demo previews centre inside their stage, measured there
+ * across all forty blocks -- see `bpbtb_demo_compact_blocks()` in
+ * includes/demo-preview.php. Kept as two lists because one is PHP and one is
+ * JS, not because they answer different questions.
+ */
+export const SHRINK_TO_FIT_LAYOUTS = [
+  "google-review-badge",
+  "capterra-review-badge",
+  "g2-review-badge",
+  "trustpilot-review-badge",
+  "facebook-review-badge",
+  "verified-buyer-badge",
+  "review-badge-widget",
+  "social-proof-toast",
+];
+
 export const BRAND_LOGO_LAYOUTS = [
   "google-review-badge",
   "capterra-review-badge",

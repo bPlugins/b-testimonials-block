@@ -105,9 +105,35 @@ const SocialProofToast = ({
   isBackend,
   activeIndex,
   toast = {},
+  pauseInEditor = false,
 }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isHovered, setIsHovered] = useState(false);
+
+  /*
+   * The rotation runs in the editor too.
+   *
+   * It used to stop dead on `isBackend`, so the one thing this block is -- a
+   * notification that cycles -- could only be seen by previewing the page. The
+   * slider and the marquee both animate in the editor and both offer "Pause
+   * while editing" for when they get in the way; this now follows that
+   * convention rather than being the one animated layout that never moves.
+   */
+  const isPaused = isBackend && pauseInEditor;
+
+  /*
+   * Picking a card in the sidebar jumps the preview to it.
+   *
+   * Without this the author would select card 3, watch the rotation carry on
+   * from wherever it was, and be styling something they cannot see. Syncing on
+   * `activeIndex` keeps the selection meaningful while the cycle continues from
+   * that card.
+   */
+  useEffect(() => {
+    if (isBackend && activeIndex < items.length) {
+      setCurrentIndex(activeIndex);
+    }
+  }, [isBackend, activeIndex, items.length]);
 
   // How fast the notifications cycle, and whether hovering holds one still.
   //
@@ -118,7 +144,7 @@ const SocialProofToast = ({
   const delay = Math.max(1, Number(speed) || 4) * 1000;
 
   useEffect(() => {
-    if (isBackend || items.length <= 1) return;
+    if (isPaused || items.length <= 1) return;
     // Hovering pauses by tearing the timer down and rebuilding it on leave,
     // rather than by tracking elapsed time: a notification the reader has
     // stopped on should stay up as long as they are on it, then start its full
@@ -129,19 +155,23 @@ const SocialProofToast = ({
       setCurrentIndex((prev) => (prev + 1) % items.length);
     }, delay);
     return () => clearInterval(interval);
-  }, [isBackend, items.length, delay, pauseOnHover, isHovered]);
+  }, [isPaused, items.length, delay, pauseOnHover, isHovered]);
 
-  const activeItemIndex = isBackend
+  // Paused in the editor, the card being edited is the one to show; otherwise
+  // the cycle decides, in the editor as on the page.
+  const activeItemIndex = isPaused
     ? activeIndex < items.length
       ? activeIndex
       : 0
-    : currentIndex;
+    : currentIndex < items.length
+      ? currentIndex
+      : 0;
   const currentItem = items[activeItemIndex] || {};
 
   return (
     <div
       className="btb-toast-wrapper"
-      {...(pauseOnHover && !isBackend
+      {...(pauseOnHover
         ? {
             onMouseEnter: () => setIsHovered(true),
             onMouseLeave: () => setIsHovered(false),
@@ -988,6 +1018,7 @@ const Layout = ({
         isBackend={isBackend}
         activeIndex={activeIndex}
         toast={attributes?.toast}
+        pauseInEditor={attributes?.pauseInEditor}
       />
     );
   }

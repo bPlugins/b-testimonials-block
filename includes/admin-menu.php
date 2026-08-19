@@ -91,6 +91,28 @@ class BPBTB_Admin_Menu {
 		add_filter( 'admin_body_class', [ $this, 'admin_body_class' ] );
 		add_action( 'wp_ajax_bpbtbSaveUninstallOption', [ $this, 'save_uninstall_option' ] );
 		add_action( 'wp_ajax_bpbtbSaveDisabledBlocks', [ $this, 'save_disabled_blocks' ] );
+		add_action( 'enqueue_block_editor_assets', [ $this, 'editor_disabled_blocks' ] );
+	}
+
+	/**
+	 * Tell the editor which blocks are switched off.
+	 *
+	 * All forty blocks share one editor bundle -- see src/blocks/index.js -- and
+	 * that bundle registers every one of them on the client whatever this plugin
+	 * registered on the server. Skipping a block in onInit() therefore no longer
+	 * keeps it out of the inserter on its own, so the bundle unregisters the ones
+	 * named here after its imports have run.
+	 *
+	 * Attached to `wp-blocks`, which every block editor screen loads and which
+	 * the bundle itself depends on, so the list is on the page before the bundle
+	 * reads it.
+	 */
+	public function editor_disabled_blocks() {
+		wp_add_inline_script(
+			'wp-blocks',
+			'window.bpbtbDisabledBlocks = ' . wp_json_encode( self::disabled_blocks() ) . ';',
+			'before'
+		);
 	}
 
 	/**

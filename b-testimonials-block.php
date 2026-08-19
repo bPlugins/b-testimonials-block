@@ -29,6 +29,7 @@ class BPBTB_Testimonials_Block{
         add_action('init', [$this, 'onInit']);
         add_filter('block_categories_all', [$this, 'register_block_category']);
         add_filter('block_type_metadata', [$this, 'set_block_asset_version']);
+        add_action( 'enqueue_block_editor_assets', [ $this, 'enqueue_editor_bundle' ] );
 
         // Redirect to Demo & Help page on first activation.
         register_activation_hook( __FILE__, [ $this, 'on_activation' ] );
@@ -145,6 +146,51 @@ class BPBTB_Testimonials_Block{
 			// Fallback for the legacy single-block build layout.
 			register_block_type( __DIR__ . '/build' );
 		}
+	}
+
+	/**
+	 * Load the editor bundle the forty blocks share.
+	 *
+	 * They used to have one `editorScript` each, which compiled the same shared
+	 * code -- the Edit component, every settings panel, bpl-tools and its 3.3 MB
+	 * icon library -- forty times over, and came to 137 MB of build output. They
+	 * now compile to one bundle; see src/blocks/index.js for why.
+	 *
+	 * Enqueued here rather than named in each block.json, because a file named in
+	 * forty of them is registered under forty handles: the editor printed a
+	 * <script> tag for each, the browser ran the same bundle forty times, and
+	 * every run after the first re-registered blocks the first had already
+	 * registered. One handle, one tag, one execution.
+	 *
+	 * Only the script. `editorStyle` stays in block.json: a stylesheet linked
+	 * forty times costs a tag and no behaviour, and it is how the editor gets CSS
+	 * into the iframed canvas -- worth forty duplicate <link>s to keep that path
+	 * exactly as it was.
+	 *
+	 * The blocks are still registered from their own block.json in onInit(), so
+	 * `render.php`, `viewScript` and the front-end styles are untouched -- a
+	 * visitor still loads only what the page actually uses.
+	 */
+	public function enqueue_editor_bundle() {
+		$asset_file = __DIR__ . '/build/blocks/index.asset.php';
+
+		if ( ! file_exists( $asset_file ) ) {
+			return;
+		}
+
+		$asset = require $asset_file;
+
+		wp_enqueue_script(
+			'bpbtb-blocks-editor',
+			plugin_dir_url( __FILE__ ) . 'build/blocks/index.js',
+			$asset['dependencies'],
+			$asset['version'],
+			true
+		);
+
+		// register_block_type() did this from block.json's `textdomain` while the
+		// scripts were named there. Nothing else would now.
+		wp_set_script_translations( 'bpbtb-blocks-editor', 'b-testimonials-block', __DIR__ . '/languages' );
 	}
 
 	/**

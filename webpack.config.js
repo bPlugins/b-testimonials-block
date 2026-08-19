@@ -45,6 +45,11 @@ module.exports = {
 	entry: {
 		...defaultConfig.entry(),
 		'admin-dashboard': './src/admin/dashboard.js',
+		// The one editor bundle for all forty blocks -- see src/blocks/index.js
+		// for why. Named to match what wp-scripts derives from the
+		// `"editorScript": "file:../index.js"` in each block.json, so the two
+		// agree on one entry rather than producing two of the same thing.
+		'blocks/index': './src/blocks/index.js',
 	},
 	plugins: [
 		...plugins,

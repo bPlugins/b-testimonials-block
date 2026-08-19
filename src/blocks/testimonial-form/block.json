@@ -216,12 +216,9 @@
 		],
 		"html": false
 	},
-	"editorScript": [
-		"file:./index.js"
-	],
-	"editorStyle": "file:./index.css",
+	"editorStyle": "file:../index.css",
 	"style": [
-		"file:./index.css",
+		"file:../index.css",
 		"file:./view.css"
 	],
 	"render": "file:./render.php",

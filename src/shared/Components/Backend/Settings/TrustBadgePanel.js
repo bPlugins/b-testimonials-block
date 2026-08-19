@@ -124,7 +124,7 @@ const TrustBadgePanel = ({ attributes = {}, setAttributes }) => {
           step={1}
           allowReset
           help={__(
-            "Applies to an uploaded image and to a picked icon. A per-badge size in the Icons panel still wins.",
+            "Applies to an uploaded image, a picked icon and the built-in artwork alike.",
             "b-testimonials-block",
           )}
         />

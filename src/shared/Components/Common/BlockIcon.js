@@ -3,7 +3,7 @@ import { BRAND_COLOR } from "../../utils/icons";
 /**
  * Resolve the colour for an icon slot, used by the built-in SVG fallbacks too.
  *
- * @param {Object} icon     Icon slot value: { svg, color, size }.
+ * @param {Object} icon     Icon slot value: { svg, color, size, strokeColor }.
  * @param {string} fallback Colour to use when nothing is set.
  * @return {string} A CSS colour.
  */
@@ -23,8 +23,12 @@ export const resolveIconColor = (icon = {}, fallback = BRAND_COLOR) => {
  * Font Awesome and Bootstrap paths, which declare no fill, pick up the colour.
  *
  * When no icon has been picked the `renderFallback` render-prop is used and
- * handed the resolved colour, so the colour control still works on the built-in
- * artwork without the user having to choose an icon first.
+ * handed the resolved colour and size, so both controls still work on the
+ * built-in artwork without the user having to choose an icon first. The size
+ * has to travel as an argument because the fallback is the caller's own markup:
+ * the picked icon is sized by the wrapper this file writes, which the fallback
+ * never gets, so every call site had its own hardcoded width and height and the
+ * Icon Size control moved nothing until an icon was chosen.
  *
  * Stroke colour is deliberately opt-in rather than defaulted to the fill.
  * Font Awesome and Bootstrap glyphs are solid shapes carrying no stroke at all,
@@ -36,13 +40,17 @@ export const resolveIconColor = (icon = {}, fallback = BRAND_COLOR) => {
  * @param {Object}   props
  * @param {Object}   props.icon           Icon slot value.
  * @param {number}   props.size           Default size in px.
+ * @param {boolean}  props.lockSize       Ignore the slot's own size.
  * @param {string}   props.className      Extra classes for the wrapper.
  * @param {string}   props.defaultColor   Colour the fallback uses when none is set.
- * @param {Function} props.renderFallback (color) => node, used when no icon is picked.
+ * @param {Function} props.renderFallback (color, box) => node, used when no icon
+ *                                        is picked. `box` is the resolved size
+ *                                        in px, as a number.
  */
 const BlockIcon = ({
   icon = {},
   size = 36,
+  lockSize = false,
   className = "",
   defaultColor = BRAND_COLOR,
   renderFallback,
@@ -52,9 +60,15 @@ const BlockIcon = ({
   const strokeClass = strokeColor ? " btb-icon-stroke" : "";
   const strokeVar = strokeColor ? { "--btb-icon-stroke": strokeColor } : {};
 
+  // The slot's own size wins, since it is the more specific of the two -- but
+  // `lockSize` turns that off for a block whose icon box is a block-level
+  // control. There the slot has no size control at all, so a value left over
+  // from before would be an override with no UI to clear it.
+  const boxPx = (!lockSize && icon.size) || size;
+
   if (!svg) {
     const fallback = renderFallback
-      ? renderFallback(resolveIconColor(icon, defaultColor))
+      ? renderFallback(resolveIconColor(icon, defaultColor), boxPx)
       : null;
 
     if (!fallback || !strokeColor) {
@@ -73,7 +87,7 @@ const BlockIcon = ({
     );
   }
 
-  const box = `${icon.size || size}px`;
+  const box = `${boxPx}px`;
 
   return (
     <span

@@ -14,11 +14,11 @@ import BeforeAfterSlider from "../BeforeAfterSlider";
 import TestimonialForm from "../TestimonialForm";
 
 import { clickable, editorClickable } from "../../../utils/a11y";
-import { BRAND_COLOR } from "../../../utils/icons";
 import BlockIcon from "../BlockIcon";
 import VideoCard from "../VideoCard";
 import AudioPlayer from "../AudioPlayer";
 import { getIcon } from "../../../utils/blockIcons";
+import { TRUST_BADGE_ART, getTrustBadgeArt } from "../../../utils/trustBadgeArt";
 import { ARRANGEMENTS, resolveArrangement } from "../../../utils/layoutFeatures";
 
 /**
@@ -534,12 +534,12 @@ const Layout = ({
             icon={getIcon(attributes, "badge")}
             size={36}
             className="btb-badge-brand-logo"
-            renderFallback={(color) => (
+            renderFallback={(color, box) => (
               <svg
                 className="btb-badge-brand-logo"
                 viewBox="0 0 24 24"
-                width="36"
-                height="36">
+                width={box}
+                height={box}>
                 <path
                   fill={color}
                   d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm-2 16l-4-4 1.41-1.41L10 14.17l6.59-6.59L18 9l-8 8z"
@@ -572,12 +572,12 @@ const Layout = ({
             icon={getIcon(attributes, "badge")}
             size={36}
             className="btb-badge-brand-logo"
-            renderFallback={(color) => (
+            renderFallback={(color, box) => (
               <svg
                 className="btb-badge-brand-logo"
                 viewBox="0 0 24 24"
-                width="36"
-                height="36">
+                width={box}
+                height={box}>
                 <path
                   fill={color}
                   d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"
@@ -599,33 +599,19 @@ const Layout = ({
   }
 
   if (layout === "trust-badges") {
-    // The star keeps its own amber default; the rest use the brand colour.
-    const trustItems = [
-      {
-        slot: "trust0",
-        label: bt || "Secure & Verified",
-        color: BRAND_COLOR,
-        d: "M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4z",
-      },
-      {
-        slot: "trust1",
-        label: bd || "Money-Back Guarantee",
-        color: BRAND_COLOR,
-        d: "M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z",
-      },
-      {
-        slot: "trust2",
-        label: bs || "5-Star Support",
-        color: "#FF9D28",
-        d: "M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z",
-      },
-      {
-        slot: "trust3",
-        label: bc || "Trusted by 10K+ Users",
-        color: BRAND_COLOR,
-        d: "M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z",
-      },
+    // Artwork from the shared list, so the editor preview draws the same badge
+    // this does; only the labels below belong to this branch, since they are
+    // read from the generic badge fields and used by the fallback alone.
+    const TRUST_LABELS = [
+      bt || "Secure & Verified",
+      bd || "Money-Back Guarantee",
+      bs || "5-Star Support",
+      bc || "Trusted by 10K+ Users",
     ];
+    const trustItems = TRUST_BADGE_ART.map((art, index) => ({
+      ...art,
+      label: TRUST_LABELS[index],
+    }));
 
     // The Columns and Gap controls only reached this block's editor preview --
     // the front end grid was a fixed repeat(4, 1fr). Same custom properties the
@@ -646,8 +632,10 @@ const Layout = ({
     // whose image is empty.
     // Icon size reaches a picked icon through BlockIcon's `size` prop rather
     // than CSS -- BlockIcon writes width and height inline, which no selector
-    // outranks. A per-badge size in the Icons panel still wins, since BlockIcon
-    // reads `icon.size || size`.
+    // outranks. `lockSize` on both calls below is what makes this the one that
+    // lands: the slot's own size normally wins, and this block's Icons panel
+    // offers none, so an old saved value would override a control it can no
+    // longer be cleared from.
     const iconBox = attributes.badgeIconSize || 32;
     const iconTop = "top" === attributes.badgeIconPosition;
 
@@ -661,7 +649,9 @@ const Layout = ({
         <div className="bTrustBadges">
           <div className="badges-grid" style={gridVars}>
             {badgeItems.map((item, index) => {
-              const slot = trustItems[index];
+              // Four drawings, no limit on badges: a fifth repeats the
+              // first, which is what the helper does.
+              const slot = getTrustBadgeArt(index);
 
               return (
                 <div
@@ -674,13 +664,17 @@ const Layout = ({
                       alt={item.img.alt || ""}
                     />
                   ) : (
+                    /* `trust${index}` rather than the art's own slot: the
+                       drawings repeat past the fourth badge but the icon slots
+                       do not -- the Icon panel names one per badge. */
                     <BlockIcon
-                      icon={getIcon(attributes, slot?.slot || `trust${index}`)}
+                      icon={getIcon(attributes, `trust${index}`)}
                       size={iconBox}
-                      defaultColor={slot?.color || BRAND_COLOR}
+                      lockSize
+                      defaultColor={slot.color}
                       renderFallback={(color) => (
-                        <svg viewBox="0 0 24 24" width={iconBox} height={iconBox}>
-                          <path fill={color} d={slot?.d || trustItems[0].d} />
+                        <svg className="badge-icon" viewBox="0 0 24 24" width={iconBox} height={iconBox}>
+                          <path fill={color} d={slot.d} />
                         </svg>
                       )}
                     />
@@ -703,12 +697,16 @@ const Layout = ({
       <div className="btb-trust-badges-grid" style={gridVars}>
         {trustItems.map((it) => (
           <div className="btb-trust-item" key={it.slot}>
+            {/* The four-badge fallback, shown until a badge is added. It kept
+                its own hardcoded 32px, so Icon Size moved the repeater's icons
+                and did nothing at all here. */}
             <BlockIcon
               icon={getIcon(attributes, it.slot)}
-              size={32}
+              size={iconBox}
+              lockSize
               defaultColor={it.color}
               renderFallback={(color) => (
-                <svg viewBox="0 0 24 24" width="32" height="32">
+                <svg className="badge-icon" viewBox="0 0 24 24" width={iconBox} height={iconBox}>
                   <path fill={color} d={it.d} />
                 </svg>
               )}

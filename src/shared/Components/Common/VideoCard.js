@@ -105,8 +105,8 @@ const VideoCard = ({ item, accentColor, playIcon = {}, SandBox }) => {
               icon={playIcon}
               size={26}
               defaultColor="currentColor"
-              renderFallback={(color) => (
-                <svg viewBox="0 0 24 24" width="26" height="26" fill={color}>
+              renderFallback={(color, box) => (
+                <svg viewBox="0 0 24 24" width={box} height={box} fill={color}>
                   <path d="M8 5v14l11-7z" />
                 </svg>
               )}

@@ -17,6 +17,7 @@ import Style from '../../shared/Components/Common/Style';
 import IconSettings from '../../shared/Components/Backend/Settings/IconSettings';
 import BlockIcon from '../../shared/Components/Common/BlockIcon';
 import { getIcon } from '../../shared/utils/blockIcons';
+import { getTrustBadgeArt } from '../../shared/utils/trustBadgeArt';
 
 import './edit.scss';
 import '../../shared/styles/trust-badges.scss';
@@ -36,8 +37,10 @@ const Edit = ( { attributes, setAttributes, clientId } ) => {
 
 	// The icon size reaches a picked icon through BlockIcon's own prop rather
 	// than through CSS: BlockIcon writes width and height inline, which no
-	// selector can outrank. A per-badge size set in the Icons panel still wins,
-	// because BlockIcon reads `icon.size || size`.
+	// selector can outrank. `lockSize` below is what makes this the one that
+	// lands: BlockIcon otherwise prefers the slot's own size, and on this block
+	// alone the Icons panel offers none, so an old saved value would override a
+	// control it can no longer be cleared from.
 	const iconBox = badgeIconSize || 32;
 
 	// The device switch below is the editor's own preview device, so picking a
@@ -117,16 +120,24 @@ const Edit = ( { attributes, setAttributes, clientId } ) => {
 					{ items.map( ( item, i ) => (
 						<div className={ `badge-item${ 'top' === badgeIconPosition ? ' is-icon-top' : '' }` } key={ i }>
 							{/* Falls back to the Icons panel, as the front end does, so a
-							    badge with no image of its own still shows its icon here. */}
+							    badge with no image of its own still shows its icon here.
+
+							    The built-in drawing and its colour come from the shared
+							    list for the same reason. This preview used to draw the
+							    shield for every badge in the brand colour, so a block
+							    that published as a shield, a tick and an amber star was
+							    three identical blue shields while you were editing it. */}
 							{ item?.img?.url ? (
 								<img className="badge-icon" src={ item.img.url } alt={ item?.img?.alt || '' } />
 							) : (
 								<BlockIcon
 									icon={ getIcon( attributes, `trust${ i }` ) }
 									size={ iconBox }
+									lockSize
+									defaultColor={ getTrustBadgeArt( i ).color }
 									renderFallback={ ( color ) => (
-										<svg viewBox="0 0 24 24" width={ iconBox } height={ iconBox }>
-											<path fill={ color } d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4z" />
+										<svg className="badge-icon" viewBox="0 0 24 24" width={ iconBox } height={ iconBox }>
+											<path fill={ color } d={ getTrustBadgeArt( i ).d } />
 										</svg>
 									) }
 								/>

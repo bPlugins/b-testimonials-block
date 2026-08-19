@@ -128,8 +128,8 @@ const AudioPlayer = ({ src = "", playIcon = {}, isBackend }) => {
           <BlockIcon
             icon={playIcon}
             size={40}
-            renderFallback={(color) => (
-              <svg viewBox="0 0 24 24" width="40" height="40" aria-hidden="true">
+            renderFallback={(color, box) => (
+              <svg viewBox="0 0 24 24" width={box} height={box} aria-hidden="true">
                 <circle cx="12" cy="12" r="11" fill={color} opacity="0.1" />
                 <path
                   fill={color}

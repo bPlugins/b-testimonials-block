@@ -203,7 +203,7 @@
 		},
 		"cardWash": {
 			"type": "boolean",
-			"default": true
+			"default": false
 		},
 		"cardWashStrength": {
 			"type": "number",

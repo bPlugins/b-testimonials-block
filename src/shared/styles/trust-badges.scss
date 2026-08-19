@@ -51,6 +51,17 @@
 		flex: 0 0 auto;
 	}
 
+	// A picked icon renders its own wrapper, which BlockIcon sizes inline from
+	// the same control -- so it needs no width here, only the same refusal to be
+	// squeezed. Without it the icon is a flex item with the default
+	// `flex-shrink: 1`, and a badge whose title runs long shrinks the icon
+	// instead of wrapping the text: the size control moved a number that the row
+	// then took straight back.
+	.badge-item > .btb-custom-icon,
+	.badge-item > .btb-icon-stroke {
+		flex: 0 0 auto;
+	}
+
 	.badge-title {
 		margin: 0;
 		font-size: 16px;

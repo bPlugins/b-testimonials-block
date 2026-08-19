@@ -22,6 +22,7 @@ import { produce } from "immer";
 // Settings Components
 import IconSettings from "./IconSettings";
 import BadgeScorePanel from "./BadgeScorePanel";
+import BadgeLogoPanel from "./BadgeLogoPanel";
 import ColorsPanel from "./ColorsPanel";
 import FaqStylePanel from "./FaqStylePanel";
 import GradientBorderPanel from "./GradientBorderPanel";
@@ -56,6 +57,7 @@ import {
 import {
   getLayoutControls,
   SCORED_BADGE_LAYOUTS,
+  BRAND_LOGO_LAYOUTS,
   TYPO_PANEL_LABELS,
 } from "../../../utils/layoutControls";
 import { getVisualControls, ROLE_LABELS } from "../../../utils/visualControls";
@@ -3143,6 +3145,16 @@ const Settings = ({
                       Buyer seal, the one badge that renders no score. */}
                   {SCORED_BADGE_LAYOUTS.includes(layout) && (
                     <BadgeScorePanel
+                      attributes={attributes}
+                      setAttributes={setAttributes}
+                    />
+                  )}
+
+                  {/* Only the five whose mark is a fixed trademark. The other
+                      two badges draw a real icon slot, so their size is the
+                      Icon panel's Icon Size. */}
+                  {BRAND_LOGO_LAYOUTS.includes(layout) && (
+                    <BadgeLogoPanel
                       attributes={attributes}
                       setAttributes={setAttributes}
                     />

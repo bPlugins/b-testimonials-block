@@ -69,13 +69,6 @@ $brandColor: #146ef5;
 	cursor: text;
 }
 
-// Each icon slot groups a picker, a colour and a size control.
-.btb-icon-slot + .btb-icon-slot {
-	margin-top: 20px;
-	padding-top: 20px;
-	border-top: 1px solid #e2e8f0;
-}
-
 /*
  * Vertical rhythm for inspector controls.
  *

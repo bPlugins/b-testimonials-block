@@ -331,6 +331,28 @@ export const SCORED_BADGE_LAYOUTS = [
   "review-badge-widget",
 ];
 
+/**
+ * The badges whose logo is a fixed third-party mark.
+ *
+ * Google, Capterra, Facebook, Trustpilot and G2 draw their own wordmark or
+ * glyph, and blockIcons.js deliberately keeps them out of the icon controls:
+ * they are other companies' trademarks, and a swapped or recoloured logo stops
+ * working as a recognisable review badge.
+ *
+ * Size is not that. Making the mark bigger or smaller leaves it the same mark,
+ * and it was the one thing about these five with no control at all -- a 36px
+ * literal in Layout.js, whatever the badge sat next to. The other two badges are
+ * absent because their logo is a real icon slot, so its size belongs to the Icon
+ * panel and a second control here would set the same pixel twice.
+ */
+export const BRAND_LOGO_LAYOUTS = [
+  "google-review-badge",
+  "capterra-review-badge",
+  "facebook-review-badge",
+  "trustpilot-review-badge",
+  "g2-review-badge",
+];
+
 const NONE = {
   elements: [],
   theme: false,

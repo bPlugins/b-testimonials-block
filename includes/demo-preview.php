@@ -150,19 +150,54 @@ function bpbtb_demo_avatar( $initials, $bg ) {
  * purpose -- shipping real companies' marks in a plugin would be using their
  * trademarks without permission.
  *
+ * Each brand gets its own glyph. They used to share one -- a filled circle with
+ * a white centre -- so the only thing telling the four apart was the wordmark
+ * text and the fill colour. The strip renders `filter: grayscale(1)` until a
+ * logo is hovered, which takes the colour out too, so all four read as the same
+ * mark repeated: a logo strip that shows nothing a logo strip is for. Shape is
+ * the only thing that survives greyscale, so shape is what differs now.
+ *
  * @param string $text Company name.
- * @param string $fg   Text colour.
+ * @param string $fg   Text and glyph colour.
+ * @param string $mark Which glyph to draw; an unknown name falls back to the
+ *                     original circle, so an added brand still renders.
  * @return string data: URI.
  */
 if ( ! function_exists( 'bpbtb_demo_logo' ) ) {
-function bpbtb_demo_logo( $text, $fg ) {
+function bpbtb_demo_logo( $text, $fg, $mark = 'dot' ) {
+	$fill = esc_attr( $fg );
+
+	// Each is drawn inside the box the old circle occupied -- roughly x 9-43,
+	// y 15-49 -- so the wordmark beside it still starts at x 50 whichever mark
+	// a brand carries.
+	$marks = [
+		// Northwind: a compass needle.
+		'compass' => '<path d="M26 15 L36 47 L26 40 L16 47 Z" fill="' . $fill . '"/>',
+		// Blue Harbour: two waves.
+		'waves'   => '<path d="M11 27 q7.5 -7 15 0 t15 0 M11 38 q7.5 -7 15 0 t15 0"'
+			. ' fill="none" stroke="' . $fill . '" stroke-width="4.5" stroke-linecap="round"/>',
+		// Lumen: a four-point spark.
+		'spark'   => '<path d="M26 14 L30.5 27.5 L44 32 L30.5 36.5 L26 50 L21.5 36.5 L8 32 L21.5 27.5 Z"'
+			. ' fill="' . $fill . '"/>',
+		// Vantage: three ascending bars.
+		'bars'    => '<g fill="' . $fill . '">'
+			. '<rect x="12" y="34" width="7" height="13" rx="2"/>'
+			. '<rect x="22" y="26" width="7" height="21" rx="2"/>'
+			. '<rect x="32" y="17" width="7" height="30" rx="2"/>'
+			. '</g>',
+	];
+
+	$glyph = isset( $marks[ $mark ] )
+		? $marks[ $mark ]
+		: '<circle cx="26" cy="32" r="13" fill="' . $fill . '"/>'
+			. '<circle cx="26" cy="32" r="5.5" fill="#ffffff"/>';
+
 	$svg = '<svg xmlns="http://www.w3.org/2000/svg" width="200" height="64" viewBox="0 0 200 64">'
-		. '<circle cx="26" cy="32" r="13" fill="' . esc_attr( $fg ) . '"/>'
-		. '<circle cx="26" cy="32" r="5.5" fill="#ffffff"/>'
+		. $glyph
 		. '<text x="50" y="33" dominant-baseline="central"'
 		. ' font-family="-apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif"'
 		. ' font-size="19" font-weight="700" letter-spacing="-0.4"'
-		. ' fill="' . esc_attr( $fg ) . '">' . esc_html( $text ) . '</text>'
+		. ' fill="' . $fill . '">' . esc_html( $text ) . '</text>'
 		. '</svg>';
 
 	return 'data:image/svg+xml;base64,' . base64_encode( $svg ); // phpcs:ignore WordPress.PHP.DiscouragedPHPFunctions.obfuscation_base64_encode
@@ -170,23 +205,23 @@ function bpbtb_demo_logo( $text, $fg ) {
 }
 
 /**
- * Five wordmarks for the Client Logos preview.
+ * Four wordmarks for the Client Logos preview.
  *
  * @return array
  */
 if ( ! function_exists( 'bpbtb_demo_logos' ) ) {
 function bpbtb_demo_logos() {
 	$brands = [
-		[ 'Northwind', '#146ef5' ],
-		[ 'Blue Harbour', '#0f57c4' ],
-		[ 'Lumen', '#1e293b' ],
-		[ 'Vantage', '#475569' ],
+		[ 'Northwind', '#146ef5', 'compass' ],
+		[ 'Blue Harbour', '#0f57c4', 'waves' ],
+		[ 'Lumen', '#1e293b', 'spark' ],
+		[ 'Vantage', '#475569', 'bars' ],
 	];
 
 	$logos = [];
 	foreach ( $brands as $brand ) {
 		$logos[] = [
-			'img'  => [ 'url' => bpbtb_demo_logo( $brand[0], $brand[1] ) ],
+			'img'  => [ 'url' => bpbtb_demo_logo( $brand[0], $brand[1], $brand[2] ) ],
 			'link' => '',
 		];
 	}

@@ -181,7 +181,7 @@
     },
     "cardWash": {
       "type": "boolean",
-      "default": true
+      "default": false
     },
     "cardWashStrength": {
       "type": "number",
@@ -270,6 +270,9 @@
         },
         "fontWeight": 800
       }
+    },
+    "badgeLogoSize": {
+      "type": "number"
     },
     "badgeStarsSize": {
       "type": "number",

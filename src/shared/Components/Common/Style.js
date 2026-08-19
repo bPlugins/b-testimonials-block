@@ -96,6 +96,7 @@ const Style = ({ attributes = {}, clientId }) => {
     bubbleTailLine = "",
     badgeScoreTypo = {},
     badgeStarsSize = "",
+    badgeLogoSize = "",
     starSize = "",
     modalOverlayColor = "",
     modalOverlayBlur = "",
@@ -400,6 +401,33 @@ const Style = ({ attributes = {}, clientId }) => {
   const cardBoxEl = `${mainEl} ${cardBox?.selector || ".single"}`;
   const cardBoxShadowCSS =
     cardBox && !cardBox.shadow ? "" : `box-shadow: ${getShadowCSS(shadow)};`;
+
+  // The widgets that build their card out of neither `.single` nor a wrapper
+  // around one. The Card panel's surface rule has always named them; the corner
+  // wash and the hover state did not, so both were dead on every one of them --
+  // toast, the seven review badges, the star bars, the avatar panel, the case
+  // study tile and the comparison table. The wash in particular is a
+  // background-image layered over that rule's background-color, so any element
+  // in one list and not the other gets a control that moves half its box.
+  const CARD_WIDGETS = [
+    ".btb-star-rating-bars",
+    ".btb-badge-card",
+    ".btb-stat-card",
+    ".btb-toast-card",
+    ".btb-avatar-detail",
+    ".btb-trust-badges-grid",
+    ".btb-case-study",
+    ".btb-comparison-table",
+  ];
+  const scopeAll = (selectors, suffix = "") =>
+    selectors.map((sel) => `${mainEl} ${sel}${suffix}`).join(",\n\t\t");
+
+  // Surface, padding, border and shadow, and the hover state of the same box.
+  const cardPaintEl = scopeAll([cardBox?.selector || ".single", ...CARD_WIDGETS]);
+  const cardPaintHoverEl = scopeAll(
+    [cardBox?.selector || ".single", ...CARD_WIDGETS],
+    ":hover",
+  );
 
   // The card's hover state.
   //
@@ -1346,8 +1374,18 @@ const Style = ({ attributes = {}, clientId }) => {
   // and moving them here would tie two separate controls back together.
   //
   // `.single` rather than `cardBoxEl`. The audio and card-stack overrides point
-  // that at their outer box, which is not the element the stylesheet washes.
-  const cardWashEl = `${mainEl} .single`;
+  // that at their outer box, which is not the element the stylesheet washes --
+  // washing the wrapper would leave the themed card inside it carrying the
+  // stylesheet's own wash as well, so the card would end up with two.
+  //
+  // The widgets are named alongside it. Without them the toggle opened on a
+  // review badge, the toast, the star bars, the avatar panel, the case study and
+  // the comparison table and moved nothing at all, which is what made the
+  // control look broken on some cards and not others. Those blocks default the
+  // toggle off, so none of them gains a tint it never had -- see their
+  // block.json.
+  const cardWashEl = scopeAll([".single", ...CARD_WIDGETS]);
+  const cardWashHoverEl = scopeAll([".single", ...CARD_WIDGETS], ":hover");
   const cardWashPct = (base) =>
     Math.round(base * (Number(cardWashStrength) || 0)) / 100;
   const cardWashTint = (pct) =>
@@ -1367,7 +1405,7 @@ const Style = ({ attributes = {}, clientId }) => {
       };
 		}
 
-		${cardWashEl}:hover {
+		${cardWashHoverEl} {
 			background-image: ${
         cardWash
           ? `radial-gradient(115% 90% at 0% 0%, ${cardWashTint(
@@ -1594,6 +1632,26 @@ const Style = ({ attributes = {}, clientId }) => {
         ? `${mainEl} .btb-badge-rating .stars {\n\t\t\tfont-size: ${badgeStarsSize}px;\n\t\t}`
         : ""
     }
+
+		${/* The brand mark's box. Google, Capterra, Facebook, Trustpilot and G2
+		     each draw their own logo at a hardcoded 36px in Layout.js, and the
+		     icon controls skip them on purpose -- the marks are other companies'
+		     trademarks -- which left the size with no control either.
+
+		     A rule rather than a prop: the SVG's own `width` and `height` are
+		     presentation attributes, and any selector naming the element beats
+		     them, so nothing in Layout.js has to change.
+
+		     The other two badges carry the same class but are not offered the
+		     control: their logo is a real icon slot, so its size is the Icon
+		     panel's Icon Size. With no control the attribute stays unset and no
+		     rule is written, which is what keeps the two from having two ways to
+		     set one pixel. */ ""}
+		${
+      isSet(badgeLogoSize)
+        ? `${mainEl} .btb-badge-brand-logo {\n\t\t\twidth: ${badgeLogoSize}px;\n\t\t\theight: ${badgeLogoSize}px;\n\t\t}`
+        : ""
+    }
  
 		
 		${mainEl} .slider-layout .swiper-slide {
@@ -1654,15 +1712,7 @@ const Style = ({ attributes = {}, clientId }) => {
 		     `.btb-faq-item` is deliberately absent: the stylesheet recolours its
 		     border on `[open]` to mark the expanded row, and an ID-scoped border
 		     from here would outrank that. */ ""}
-		${cardBoxEl},
-		${mainEl} .btb-star-rating-bars,
-		${mainEl} .btb-badge-card,
-		${mainEl} .btb-stat-card,
-		${mainEl} .btb-toast-card,
-		${mainEl} .btb-avatar-detail,
-		${mainEl} .btb-trust-badges-grid,
-		${mainEl} .btb-case-study,
-		${mainEl} .btb-comparison-table {
+		${cardPaintEl} {
 			${/* `background-color`, not the `background` shorthand. The shorthand
 			     also resets `background-image`, which erased the quote box's
 			     `linear-gradient(135deg, var(--btb-surface), var(--btb-track))`
@@ -1680,7 +1730,7 @@ const Style = ({ attributes = {}, clientId }) => {
 		${/* Hover, straight after the resting rule it has to beat. Same ID, same
 		     element, later in the sheet -- which is exactly what the stylesheet's
 		     own hover rule could not manage. */ ""}
-		${cardHoverCSS ? `${cardBoxEl}:hover {
+		${cardHoverCSS ? `${cardPaintHoverEl} {
 			${cardHoverCSS}
 		}` : ""}
 

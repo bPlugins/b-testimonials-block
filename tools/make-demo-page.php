@@ -136,19 +136,93 @@ $bpbtb_groups = [
  * Built through serialize_block() rather than by writing the comment by hand:
  * that is the same function core's own serialiser uses, so the attribute JSON is
  * escaped exactly the way the editor expects to read it back.
+ *
+ * `$anchor` gives the heading an id, which is what the contents list at the top
+ * links to. Written as core's own `anchor` attribute as well as an `id` on the
+ * tag, so the editor shows it in the block panel rather than treating it as
+ * markup it did not write.
  */
-$bpbtb_heading = function ( $text, $level ) {
-	$tag  = 'h' . (int) $level;
-	$html = "\n" . '<' . $tag . ' class="wp-block-heading">' . esc_html( $text ) . '</' . $tag . '>' . "\n";
+$bpbtb_heading = function ( $text, $level, $anchor = '' ) {
+	$tag = 'h' . (int) $level;
+	$id  = $anchor ? ' id="' . esc_attr( $anchor ) . '"' : '';
+
+	$html = "\n" . '<' . $tag . ' class="wp-block-heading"' . $id . '>' . esc_html( $text ) . '</' . $tag . '>' . "\n";
+
+	// h2 is core/heading's default level, so it carries no attribute.
+	$attrs = 2 === (int) $level ? [] : [ 'level' => (int) $level ];
+
+	if ( $anchor ) {
+		$attrs['anchor'] = $anchor;
+	}
 
 	return serialize_block(
 		[
 			'blockName'    => 'core/heading',
-			// h2 is core/heading's default level, so it carries no attribute.
-			'attrs'        => 2 === (int) $level ? [] : [ 'level' => (int) $level ],
+			'attrs'        => $attrs,
 			'innerBlocks'  => [],
 			'innerHTML'    => $html,
 			'innerContent' => [ $html ],
+		]
+	);
+};
+
+/**
+ * One core/paragraph block.
+ *
+ * Takes markup rather than text, because the intro carries a link. Callers pass
+ * escaped values in; nothing here comes from user input.
+ */
+$bpbtb_paragraph = function ( $html ) {
+	$markup = "\n" . '<p>' . $html . '</p>' . "\n";
+
+	return serialize_block(
+		[
+			'blockName'    => 'core/paragraph',
+			'attrs'        => [],
+			'innerBlocks'  => [],
+			'innerHTML'    => $markup,
+			'innerContent' => [ $markup ],
+		]
+	);
+};
+
+/**
+ * The contents list at the top, as one core/list of links.
+ *
+ * A real list of core/list-item blocks rather than a paragraph of links, so it
+ * is a single block to select and delete on a site that wants the demos without
+ * the index. Forty blocks is a lot of page to scroll otherwise.
+ *
+ * @param array<string, string> $links Anchor => label, in page order.
+ */
+$bpbtb_list = function ( $links ) {
+	$items = [];
+
+	foreach ( $links as $bpbtb_anchor => $bpbtb_label ) {
+		$html = '<li><a href="#' . esc_attr( $bpbtb_anchor ) . '">' . esc_html( $bpbtb_label ) . '</a></li>';
+
+		$items[] = [
+			'blockName'    => 'core/list-item',
+			'attrs'        => [],
+			'innerBlocks'  => [],
+			'innerHTML'    => $html,
+			'innerContent' => [ $html ],
+		];
+	}
+
+	return serialize_block(
+		[
+			'blockName'    => 'core/list',
+			'attrs'        => [],
+			'innerBlocks'  => $items,
+			'innerHTML'    => '<ul class="wp-block-list"></ul>',
+			// A null marks where each inner block goes: that is how core's own
+			// serialiser interleaves children with the wrapper's own markup.
+			'innerContent' => array_merge(
+				[ "\n" . '<ul class="wp-block-list">' ],
+				array_fill( 0, count( $items ), null ),
+				[ '</ul>' . "\n" ]
+			),
 		]
 	);
 };
@@ -200,7 +274,21 @@ $bpbtb_registered = bpbtb_demo_previewable_blocks();
 $bpbtb_parts      = [];
 $bpbtb_listed     = [];
 $bpbtb_missing    = [];
+$bpbtb_toc        = [];
 $bpbtb_count      = 0;
+
+/**
+ * The block's own one-line description, from its block.json.
+ *
+ * Read off the registry rather than written out again here: the sidebar, the
+ * inserter and this page then say the same thing about a block, and a
+ * description edited in block.json reaches the page on the next run.
+ */
+$bpbtb_describe = function ( $name ) {
+	$type = WP_Block_Type_Registry::get_instance()->get_registered( $name );
+
+	return ( $type && ! empty( $type->description ) ) ? $type->description : '';
+};
 
 foreach ( $bpbtb_groups as $bpbtb_group ) {
 	list( $bpbtb_group_title, $bpbtb_group_blocks ) = $bpbtb_group;
@@ -224,14 +312,29 @@ foreach ( $bpbtb_groups as $bpbtb_group ) {
 		// slug so re-running the script produces byte-identical content.
 		$bpbtb_attrs['cId'] = substr( md5( $bpbtb_slug ), 0, 10 );
 
-		$bpbtb_section[] = $bpbtb_heading( $bpbtb_label, 3 );
+		// Prefixed, because the anchor is an id on a page that is not only this
+		// script's: a bare `trust-badges` is the sort of id a theme or another
+		// plugin might already be using.
+		$bpbtb_anchor = 'bptmb-' . $bpbtb_slug;
+		$bpbtb_desc   = $bpbtb_describe( $bpbtb_registered[ $bpbtb_slug ] );
+
+		$bpbtb_section[] = $bpbtb_heading( $bpbtb_label, 3, $bpbtb_anchor );
+
+		if ( $bpbtb_desc ) {
+			$bpbtb_section[] = $bpbtb_paragraph( '<em>' . esc_html( $bpbtb_desc ) . '</em>' );
+		}
+
 		$bpbtb_section[] = $bpbtb_block( $bpbtb_registered[ $bpbtb_slug ], $bpbtb_attrs );
 
 		++$bpbtb_count;
 	}
 
 	if ( $bpbtb_section ) {
-		array_unshift( $bpbtb_section, $bpbtb_heading( $bpbtb_group_title, 2 ) );
+		$bpbtb_group_anchor = 'bptmb-group-' . sanitize_title( $bpbtb_group_title );
+
+		$bpbtb_toc[ $bpbtb_group_anchor ] = $bpbtb_group_title;
+
+		array_unshift( $bpbtb_section, $bpbtb_heading( $bpbtb_group_title, 2, $bpbtb_group_anchor ) );
 		$bpbtb_parts[] = implode( "\n\n", $bpbtb_section );
 	}
 }
@@ -241,7 +344,9 @@ foreach ( $bpbtb_groups as $bpbtb_group ) {
 $bpbtb_extra = array_diff( array_keys( $bpbtb_registered ), $bpbtb_listed );
 
 if ( $bpbtb_extra ) {
-	$bpbtb_section = [ $bpbtb_heading( 'Uncategorised', 2 ) ];
+	$bpbtb_toc['bptmb-group-uncategorised'] = 'Uncategorised';
+
+	$bpbtb_section = [ $bpbtb_heading( 'Uncategorised', 2, 'bptmb-group-uncategorised' ) ];
 
 	foreach ( $bpbtb_extra as $bpbtb_slug ) {
 		$bpbtb_type  = WP_Block_Type_Registry::get_instance()->get_registered( $bpbtb_registered[ $bpbtb_slug ] );
@@ -250,7 +355,14 @@ if ( $bpbtb_extra ) {
 		$bpbtb_attrs        = $bpbtb_portable( bpbtb_demo_preview_attributes( $bpbtb_slug ) );
 		$bpbtb_attrs['cId'] = substr( md5( $bpbtb_slug ), 0, 10 );
 
-		$bpbtb_section[] = $bpbtb_heading( $bpbtb_label, 3 );
+		$bpbtb_desc = $bpbtb_describe( $bpbtb_registered[ $bpbtb_slug ] );
+
+		$bpbtb_section[] = $bpbtb_heading( $bpbtb_label, 3, 'bptmb-' . $bpbtb_slug );
+
+		if ( $bpbtb_desc ) {
+			$bpbtb_section[] = $bpbtb_paragraph( '<em>' . esc_html( $bpbtb_desc ) . '</em>' );
+		}
+
 		$bpbtb_section[] = $bpbtb_block( $bpbtb_registered[ $bpbtb_slug ], $bpbtb_attrs );
 
 		++$bpbtb_count;
@@ -258,6 +370,32 @@ if ( $bpbtb_extra ) {
 
 	$bpbtb_parts[] = implode( "\n\n", $bpbtb_section );
 }
+
+/*
+ * The page's own opening, prepended once the count is known.
+ *
+ * Three blocks -- a heading, a sentence and the contents list -- so a site that
+ * wants the demos without the preamble deletes three things rather than picking
+ * them out of one. Everything below the list is the blocks themselves.
+ */
+array_unshift(
+	$bpbtb_parts,
+	implode(
+		"\n\n",
+		[
+			$bpbtb_heading( 'Every block in one page', 2, 'bptmb-intro' ),
+			$bpbtb_paragraph(
+				esc_html(
+					sprintf(
+						'All %d blocks in the plugin, each with sample content, grouped the way the Demos screen groups them. Open Options > Code editor to copy any block\'s markup, or delete the ones you do not want and keep the rest.',
+						$bpbtb_count
+					)
+				)
+			),
+			$bpbtb_list( $bpbtb_toc ),
+		]
+	)
+);
 
 $bpbtb_content = implode( "\n\n", $bpbtb_parts );
 

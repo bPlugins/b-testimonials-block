@@ -1212,6 +1212,20 @@ $brandColor: #146ef5;
 		font-size: 13px;
 		color: var(--btb-body, #334155);
 		box-shadow: 0 2px 10px rgba(0,0,0,0.03);
+
+		// Icon Size reaches this fallback too. 32px matches the artwork's own
+		// attributes, so a block nobody has resized renders as it always did.
+		//
+		// Inside `.btb-trust-item`, not beside it: the icon is a child of the
+		// badge, and a rule one level up reached the built-in artwork but not a
+		// picked icon's wrapper.
+		.badge-icon,
+		> .btb-custom-icon,
+		> .btb-icon-stroke {
+			width: var(--btb-badge-icon, 32px);
+			height: var(--btb-badge-icon, 32px);
+			flex: 0 0 auto;
+		}
 	}
 
 	@media (max-width: $tablet-max) { grid-template-columns: repeat(var(--cols-t, 2), 1fr); }

@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { __, sprintf } from '@wordpress/i18n';
 import { dispatch, useSelect } from '@wordpress/data';
 import { createBlock, getBlockType } from '@wordpress/blocks';
@@ -136,7 +137,22 @@ const BlockSwitcherModal = ({ isOpen, onRequestClose, clientId, currentBlockName
 		activeChildName = currentBlockName.startsWith('bptmb/') ? currentBlockName : `bptmb/${currentBlockName}`;
 	}
 
-	return (
+	/*
+	 * Rendered into the editor's own document rather than where the block sits.
+	 *
+	 * The canvas is an iframe, and nothing inside an iframe can paint over
+	 * anything outside it -- a stacking context ends at the frame, so no z-index
+	 * reaches past it. On a narrow window the editor turns its settings sidebar
+	 * into an overlay across the canvas, and it landed on top of this dialog's
+	 * category chips.
+	 *
+	 * This component runs in the editor's outer React tree already -- the editor
+	 * portals the block's markup into the iframe, not the tree -- so the global
+	 * `document` here is the editor's, and one portal puts the dialog beside the
+	 * sidebar instead of under it. The styles follow: block.json's `editorStyle`
+	 * registers index.css in the admin document as well as in the canvas.
+	 */
+	return createPortal(
 		// Backdrop dismissal is a mouse convenience only; Escape is handled above.
 		<div
 			className="btb-custom-modal-backdrop"
@@ -280,7 +296,8 @@ const BlockSwitcherModal = ({ isOpen, onRequestClose, clientId, currentBlockName
 					})}
 				</div>
 			</div>
-		</div>
+		</div>,
+		document.body
 	);
 };
 

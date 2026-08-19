@@ -763,19 +763,120 @@ svg.btb-inserter-icon[fill="none"] * {
   }
 }
 
+/*
+ * The switcher on a narrow screen.
+ *
+ * Everything above the cards is a fixed-height flex item and only the grid
+ * scrolls, so on a phone the chrome ate the dialog: the five category chips
+ * wrapped onto five lines, the search box took a sixth, and with the header on
+ * top of that the scrollable strip left for forty layouts came to about 90px.
+ *
+ * So the chrome is cut down and the dialog is given the whole screen. A picker
+ * with forty items is the whole task while it is open; a centred card with a
+ * 12vh margin around it is a desktop shape.
+ */
 @media (max-width: 782px) {
-  .btb-custom-modal-header,
+  /*
+   * The dialog's own size and position are deliberately left alone here.
+   *
+   * Making it full-bleed -- padding:0, height:100% -- looked like the obvious
+   * way to give forty cards the whole screen, and it hid the title and the
+   * search box instead. This modal renders inside the editor's canvas iframe,
+   * whose `position: fixed` origin is the top of the window, behind the admin
+   * bar, the editor toolbar and the inspector tabs. A dialog that starts at
+   * that origin starts underneath all three.
+   *
+   * The centred 95vw/88vh box clears them, which is why the header was visible
+   * before. What was actually short of room was not the box but what this
+   * media query fills it with, so that is all that is changed below.
+   */
+  .btb-custom-modal-header {
+    padding: 12px 16px;
+
+    /* The title alone says what this is. The second line explains it, which is
+       worth a row of a 1080px dialog and not a row of a phone. */
+    .btb-modal-desc {
+      display: none;
+    }
+
+    .btb-modal-header-icon {
+      width: 36px;
+      height: 36px;
+    }
+
+    .btb-modal-title {
+      font-size: 16px;
+    }
+  }
+
   .btb-custom-modal-toolbar {
-    padding: 14px 16px;
+    padding: 10px 16px;
+    /* Chips above, search below, instead of both fighting for one row. */
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+    min-width: 0;
+  }
+
+  /*
+   * Smaller chips that wrap, rather than full-size ones on a strip that scrolls
+   * sideways.
+   *
+   * A sideways strip was the first attempt and it hid three of the five: a mouse
+   * wheel does not scroll a row horizontally, and the scrollbar was hidden on
+   * the theory that chips running past the edge are their own affordance. They
+   * are not -- what the reader sees is two categories and no sign of the rest.
+   *
+   * At this size all five fit in two rows, so nothing has to be discovered.
+   */
+  .btb-modal-cats {
+    flex-wrap: wrap;
+    gap: 6px;
+    min-width: 0;
+    max-width: 100%;
+  }
+
+  .btb-cat-chip {
+    flex: 0 0 auto;
+    padding: 6px 10px;
+    font-size: 12px;
+    white-space: nowrap;
+  }
+
+  /* Its `flex: 0 1 300px` is a width in the desktop row; in this column it
+     would be a 300px-tall search box. */
+  .btb-modal-search-box {
+    flex: 0 0 auto;
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+  }
+
+  /*
+   * Stated again, and from further up the tree, to outrank wp-admin.
+   *
+   * This dialog is portalled into the admin document, so forms.css reaches it
+   * now -- and under 782px that sets `padding: 3px 10px; font-size: 16px` on
+   * every text input, which drops the room the search icon sits in. Its
+   * `input[type="text"]` is exactly as specific as the `.btb-modal-search-box
+   * input` these rules live in, so which one won came down to which stylesheet
+   * the browser read last. Naming the toolbar as well settles it.
+   */
+  .btb-custom-modal-toolbar .btb-modal-search-box input {
+    box-sizing: border-box;
+    width: 100%;
+    min-height: 0;
+    padding: 9px 36px 9px 40px;
+    font-size: 14px;
+    line-height: 1.4;
   }
 
   .btb-custom-modal-grid {
     grid-template-columns: 1fr;
     padding: 16px;
-  }
-
-  .btb-modal-search-box {
-    flex: 1 1 100%;
+    /* A flex child that scrolls needs this, or its content floor keeps it from
+       shrinking and the whole dialog scrolls instead of just the cards. */
+    min-height: 0;
   }
 }
 
@@ -1241,8 +1342,12 @@ svg.btb-inserter-icon[fill="none"] * {
   }
 
   .btbPlaceholderModalBtnWrap {
-    text-align: center;
     margin-top: 24px;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
   }
 
   .btbOpenModalBtn,
@@ -1275,6 +1380,32 @@ svg.btb-inserter-icon[fill="none"] * {
 
     .items-list {
       grid-template-columns: 1fr;
+    }
+
+    /*
+     * The two buttons stack and take the full width.
+     *
+     * Side by side they were wider than the block long before this width --
+     * "View All 40+ Layouts & Widgets in Modal Popup" is a sentence, and a
+     * Button will not wrap or shrink it, so the row ran off the canvas rather
+     * than wrapping onto a second line.
+     */
+    .btbPlaceholderModalBtnWrap {
+      flex-direction: column;
+      align-items: stretch;
+    }
+
+    .btbOpenModalBtn,
+    .btbUseClassicBtn {
+      width: 100%;
+      /* A Button is a fixed-height nowrap line by default; both have to give
+         for a label this long to fit a phone. */
+      height: auto !important;
+      min-height: 40px;
+      white-space: normal !important;
+      text-align: center;
+      justify-content: center;
+      line-height: 1.35 !important;
     }
   }
 }

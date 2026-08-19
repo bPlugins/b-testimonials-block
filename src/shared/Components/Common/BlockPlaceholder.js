@@ -86,7 +86,11 @@ const BlockPlaceholder = ({ clientId, currentBlockName, setAttributes }) => {
 				))}
 			</div>
 
-			<div className="btbPlaceholderModalBtnWrap" style={{ display: 'flex', gap: '12px', justifyContent: 'center', alignItems: 'center', flexWrap: 'wrap' }}>
+			{/* The row's layout lives in editor.scss rather than here: as inline
+			    styles nothing could override them, and on a narrow canvas these
+			    two labels are wider than the block, so the row has to become a
+			    column. */}
+			<div className="btbPlaceholderModalBtnWrap">
 				<Button
 					variant="primary"
 					className="btbOpenModalBtn"

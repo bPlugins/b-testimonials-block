@@ -1068,3 +1068,17 @@
 		letter-spacing: 0.4px;
 	}
 }
+
+/*
+ * The dashboard header these two screens print in PHP -- see
+ * BPBTB_Admin_Menu::render_header().
+ *
+ * bpl-tools' compiled stylesheet lays the whole header out already. This is the
+ * one thing it cannot do from here: the square corners the plugin gives every
+ * button come from `.bPlDashboard .bPlButton`, and the React dashboard's root
+ * element carries that class while these screens do not. Restated rather than
+ * added to bpl-tools, which is shared with every other plugin in this install.
+ */
+.bpbtb-admin-page-host .bPlDashboardHeader .bPlButton {
+	border-radius: 0;
+}

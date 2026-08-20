@@ -50,6 +50,10 @@ module.exports = {
 		// `"editorScript": "file:../index.js"` in each block.json, so the two
 		// agree on one entry rather than producing two of the same thing.
 		'blocks/index': './src/blocks/index.js',
+		// And the front-end bundle for the thirty that have no front-end code of
+		// their own -- see src/blocks/view.js. Same naming reason, matching
+		// `"viewScript": "file:../view.js"`.
+		'blocks/view': './src/blocks/view.js',
 	},
 	plugins: [
 		...plugins,

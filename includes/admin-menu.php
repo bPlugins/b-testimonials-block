@@ -116,6 +116,91 @@ class BPBTB_Admin_Menu {
 	}
 
 	/**
+	 * The dashboard's header, for the two screens that are rendered in PHP.
+	 *
+	 * Submissions and NPS Poll are the only pages under Testimonials that are
+	 * not part of the React dashboard, and they were the only ones without its
+	 * header -- so moving between them and Demo & Help felt like leaving the
+	 * plugin and coming back.
+	 *
+	 * Written out here rather than reused, because the original is a React
+	 * component in bpl-tools that these pages have no React to render. The class
+	 * names are its class names, so bpl-tools' own compiled stylesheet lays this
+	 * out -- nothing in bpl-tools is touched, and the two headers cannot drift
+	 * apart in appearance.
+	 *
+	 * The nav points at the dashboard's routes. None of them is ever marked
+	 * active: these two pages are not among them, and lighting one up would say
+	 * the reader is somewhere they are not.
+	 */
+	public static function render_header() {
+		$dashboard = admin_url( 'edit.php?post_type=testimonial&page=bpbtb-dashboard' );
+
+		$nav = [
+			'#/welcome'    => __( 'Welcome', 'b-testimonials-block' ),
+			'#/all-blocks' => __( 'All Blocks', 'b-testimonials-block' ),
+			'#/demos'      => __( 'Demos', 'b-testimonials-block' ),
+			'#/settings'   => __( 'Settings', 'b-testimonials-block' ),
+		];
+		?>
+		<div class="bPlDashboardHeader">
+			<div class="pluginInfo">
+				<img
+					src="https://ps.w.org/b-testimonial/assets/icon-128x128.png"
+					alt="<?php esc_attr_e( 'Testimonials', 'b-testimonials-block' ); ?>"
+				/>
+				<h1><?php esc_html_e( 'Testimonials', 'b-testimonials-block' ); ?></h1>
+				<div class="pluginVersion">v<?php echo esc_html( BPBTB_PLUGIN_VERSION ); ?></div>
+			</div>
+
+			<?php // Toggled by the inline script in admin_enqueue_scripts(). ?>
+			<button
+				class="bplHamburger"
+				type="button"
+				aria-label="<?php esc_attr_e( 'Toggle navigation', 'b-testimonials-block' ); ?>"
+				aria-expanded="false"
+			>
+				<span></span>
+				<span></span>
+				<span></span>
+			</button>
+
+			<nav class="bPlDashboardNav">
+				<?php foreach ( $nav as $route => $label ) : ?>
+					<a class="navLink" href="<?php echo esc_url( $dashboard . $route ); ?>">
+						<?php echo esc_html( $label ); ?>
+					</a>
+				<?php endforeach; ?>
+			</nav>
+
+			<?php
+			/*
+			 * The filled button, which is what bpl-tools' header shows for Our
+			 * Plugins on a premium install; the free one gets a plain text link.
+			 * The button is the better of the two here whatever the licence --
+			 * these screens have no other action in their top-right corner, and
+			 * a text link on its own reads as an afterthought.
+			 *
+			 * `bPlButton variant-primary` is exactly what bpl-tools' Button
+			 * renders for it, so the gradient, the size and the icon rules all
+			 * come from the stylesheet already loaded. The icon is its
+			 * ourPluginsIcon, copied because a JSX constant cannot be read from
+			 * PHP -- and it is a fixed glyph, so there is nothing here to drift.
+			 */
+			?>
+			<div class="navButtons">
+				<a class="bPlButton variant-primary" href="<?php echo esc_url( $dashboard . '#our-plugins' ); ?>">
+					<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640" aria-hidden="true" focusable="false">
+						<path d="M224 32C241.7 32 256 46.3 256 64L256 160L384 160L384 64C384 46.3 398.3 32 416 32C433.7 32 448 46.3 448 64L448 160L512 160C529.7 160 544 174.3 544 192C544 209.7 529.7 224 512 224L512 288C512 383.1 442.8 462.1 352 477.3L352 544C352 561.7 337.7 576 320 576C302.3 576 288 561.7 288 544L288 477.3C197.2 462.1 128 383.1 128 288L128 224C110.3 224 96 209.7 96 192C96 174.3 110.3 160 128 160L192 160L192 64C192 46.3 206.3 32 224 32z" />
+					</svg>
+					<?php esc_html_e( 'Our Plugins', 'b-testimonials-block' ); ?>
+				</a>
+			</div>
+		</div>
+		<?php
+	}
+
+	/**
 	 * Is the screen currently loading one of the styled PHP pages?
 	 *
 	 * Matched on a substring the way the dashboard's own check is: the full hook
@@ -202,11 +287,67 @@ class BPBTB_Admin_Menu {
 				null
 			);
 
+			// The dashboard's compiled stylesheet, for the header these pages
+			// print in PHP -- see render_header(). Every rule in it is scoped to
+			// a .bPl* or .bpbtb* class, so nothing of it reaches the rest of
+			// these screens or the rest of wp-admin.
+			wp_enqueue_style(
+				'bpbtb-admin-dashboard',
+				plugin_dir_url( __DIR__ ) . 'build/admin-dashboard.css',
+				[ 'bpbtb-admin-fonts' ],
+				BPBTB_PLUGIN_VERSION
+			);
+
+			// Lato, which the header's wordmark is set in. The dashboard page
+			// gets it from bpl-tools' own stylesheet; these do not load that.
+			wp_enqueue_style(
+				'bpbtb-admin-wordmark-font',
+				'https://fonts.googleapis.com/css2?family=Lato:wght@400;700;800;900&display=swap',
+				[],
+				null
+			);
+
 			wp_enqueue_style(
 				'bpbtb-admin-pages',
 				plugin_dir_url( __DIR__ ) . 'assets/admin-pages.css',
-				[ 'bpbtb-admin-fonts' ],
+				[ 'bpbtb-admin-fonts', 'bpbtb-admin-dashboard' ],
 				BPBTB_PLUGIN_VERSION
+			);
+
+			// The header's nav collapses behind a hamburger once the header is
+			// narrow, and bpl-tools' stylesheet shows the dropdown on an `open`
+			// class. Its React header keeps that in state; here it is this much
+			// script, which is the whole of the behaviour and not worth a build
+			// step or a file of its own. Hung on a src-less handle rather than on
+			// jQuery's, so it does not depend on what else the screen enqueues.
+			wp_register_script( 'bpbtb-admin-header-nav', false, [], BPBTB_PLUGIN_VERSION, true );
+			wp_enqueue_script( 'bpbtb-admin-header-nav' );
+			wp_add_inline_script(
+				'bpbtb-admin-header-nav',
+				"document.addEventListener( 'click', function ( e ) {
+	var header = document.querySelector( '.bPlDashboardHeader' );
+	if ( ! header || ! e.target || ! e.target.closest ) { return; }
+
+	var btn = header.querySelector( '.bplHamburger' );
+	var nav = header.querySelector( '.bPlDashboardNav' );
+	if ( ! btn || ! nav ) { return; }
+
+	var setOpen = function ( open ) {
+		btn.classList.toggle( 'open', open );
+		nav.classList.toggle( 'open', open );
+		btn.setAttribute( 'aria-expanded', open ? 'true' : 'false' );
+	};
+
+	if ( e.target.closest( '.bPlDashboardHeader .bplHamburger' ) ) {
+		setOpen( ! nav.classList.contains( 'open' ) );
+		return;
+	}
+
+	// Anywhere outside the menu puts it away again.
+	if ( nav.classList.contains( 'open' ) && ! e.target.closest( '.bPlDashboardNav' ) ) {
+		setOpen( false );
+	}
+} );"
 			);
 		}
 	}

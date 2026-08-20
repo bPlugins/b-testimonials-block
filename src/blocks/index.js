@@ -13,6 +13,24 @@
  * front end still loads only what the page actually uses.
  */
 
+/*
+ * bpl-tools' inspector stylesheet.
+ *
+ * It styles the sidebar this plugin's settings live in -- the General/Style
+ * tabs (.bPlTabPanel), the block's info card (.bPlInspectorInfo), the panel
+ * bodies and the popovers. Nothing in this plugin imported it, so none of it
+ * was ever in its own build.
+ *
+ * The sidebar looked right anyway, because these class names are global and
+ * two other bPlugins plugins on the same install ship the same stylesheet in
+ * their editor CSS. Deactivate those and this plugin's inspector loses its
+ * design -- it was borrowing theirs.
+ *
+ * Imported first, so this plugin's own editor.scss still wins where the two
+ * name the same thing.
+ */
+import '../../../bpl-tools/Components/style.scss';
+
 import { getBlockType, unregisterBlockType } from '@wordpress/blocks';
 
 import './testimonials';

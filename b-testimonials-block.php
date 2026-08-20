@@ -1,7 +1,7 @@
 <?php
 /**
  * Plugin Name: Testimonials
- * Description: Boost your website's credibility with b testimonials block, effortlessly showcasing customer ratings and reviews.
+ * Description: Boost your website's credibility with Testimonials, effortlessly showcasing customer ratings and reviews.
  * Version: 1.0.4
  * Author: bPlugins
  * Author URI: http://bplugins.com
@@ -191,6 +191,27 @@ class BPBTB_Testimonials_Block{
 		// register_block_type() did this from block.json's `textdomain` while the
 		// scripts were named there. Nothing else would now.
 		wp_set_script_translations( 'bpbtb-blocks-editor', 'b-testimonials-block', __DIR__ . '/languages' );
+
+		/*
+		 * The stylesheet as well, deliberately alongside block.json's
+		 * `editorStyle`.
+		 *
+		 * The two reach different places and neither covers the other on its own.
+		 * `editorStyle` is how a stylesheet gets into the iframed canvas, and it is
+		 * bulk-enqueued for every registered block by core -- but that bulk enqueue
+		 * is skipped entirely when a site loads block assets separately, which a
+		 * block theme does. This request is where the inspector lives, and the
+		 * inspector is the plugin's whole settings UI, so it is enqueued outright
+		 * rather than left to depend on how the theme is built.
+		 *
+		 * The cost is one more <link> to a file the page already has.
+		 */
+		wp_enqueue_style(
+			'bpbtb-blocks-editor',
+			plugin_dir_url( __FILE__ ) . 'build/blocks/index.css',
+			[],
+			$asset['version']
+		);
 	}
 
 	/**

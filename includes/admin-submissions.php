@@ -226,6 +226,9 @@ function bpbtb_render_admin_submissions_page() {
 
 	<div class="bpbtb-admin-page">
 
+		<?php // The dashboard's header, so these screens read as part of it.
+		BPBTB_Admin_Menu::render_header(); ?>
+
 		<div class="bpbtb-admin-main">
 			<div class="bpbtb-admin-wrap">
 				<?php

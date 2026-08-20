@@ -411,10 +411,10 @@
 		"html": false
 	},
 	"render": "file:./render.php",
-	"viewScript": "file:./view.js",
+	"viewScript": "file:../view.js",
 	"editorStyle": "file:../index.css",
 	"style": [
 		"file:../index.css",
-		"file:./view.css"
+		"file:../view.css"
 	]
 }

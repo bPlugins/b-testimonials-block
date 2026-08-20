@@ -404,11 +404,11 @@
   "editorStyle": "file:../index.css",
   "style": [
     "file:../index.css",
-    "file:./view.css"
+    "file:../view.css"
   ],
   "render": "file:./render.php",
   "viewScript": [
-    "file:./view.js",
+    "file:../view.js",
     "jquery"
   ]
 }

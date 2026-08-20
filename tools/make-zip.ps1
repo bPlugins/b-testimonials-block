@@ -3,7 +3,7 @@
 	Package the plugin for distribution.
 
 .DESCRIPTION
-	Produces b-testimonials-block.zip with every path inside a single
+	Produces testimonials.zip with every path inside a single
 	`b-testimonials-block/` folder.
 
 	That folder is the whole point. WordPress takes the install directory from
@@ -26,12 +26,30 @@
 
 $ErrorActionPreference = 'Stop'
 
-# The name the plugin ships under: the folder inside the archive, and the
-# archive itself. Not the same as the working directory, which is still
-# b-testimonials-block, and not the same as the wordpress.org slug in
-# src/admin/utils/data.js, which is b-testimonial and addresses the listing,
-# the docs and the logo.
-$slug = 'testimonials'
+# The .zip file name. Cosmetic: WordPress only falls back to it when the
+# archive has no folder inside, and this one always has.
+$zipName = 'testimonials'
+
+# The folder inside the archive, which is a different thing entirely and is
+# NOT free to choose.
+#
+# WordPress identifies a plugin by its directory, not by `Plugin Name`. What
+# it stores in active_plugins is the path -- b-testimonials-block/b-testimonials-block.php.
+# So an archive rooted at `testimonials/` is, to WordPress, a plugin it has
+# never seen: it installs to wp-content/plugins/testimonials/ alongside the
+# existing copy and shows two entries on the Plugins screen, with no "Replace
+# current with uploaded" prompt, because there was nothing matching to replace.
+# That is what naming this `testimonials` did.
+#
+# It matches the working directory, the `Text Domain: b-testimonials-block`
+# in the main file, the languages/b-testimonials-block-*.mo names, and every
+# install already out there. Changing it again splits those installs in two,
+# so it stays.
+#
+# (Not the same as the wordpress.org slug in src/admin/utils/data.js, which is
+# b-testimonial and addresses the listing, the docs and the logo. If this ever
+# ships on wordpress.org, that slug and this folder have to be made one name.)
+$folderName = 'b-testimonials-block'
 
 # The main file keeps its own name. It is what `Plugin Name: Testimonials` is
 # declared in, and renaming it buys nothing while changing the path WordPress
@@ -39,7 +57,7 @@ $slug = 'testimonials'
 $mainFile = 'b-testimonials-block.php'
 
 $pluginDir = Split-Path -Parent $PSScriptRoot
-$zipPath   = Join-Path $pluginDir "$slug.zip"
+$zipPath   = Join-Path $pluginDir "$zipName.zip"
 
 # Only what a site needs. Everything else -- src, node_modules, .git, the
 # scratch files, this folder -- stays out.
@@ -88,11 +106,11 @@ if ( $stale.Count -gt 0 ) {
 		"Run 'npm run clean && npm run build' before packaging." )
 }
 
-# Staged into a temp folder named for the slug, so the archive carries that one
-# folder at its root. Compress-Archive has no exclude switch, so selecting what
-# ships means copying it rather than filtering it.
+# Staged into a temp folder named for the install directory, so the archive
+# carries that one folder at its root. Compress-Archive has no exclude switch,
+# so selecting what ships means copying it rather than filtering it.
 $stage = Join-Path ( [System.IO.Path]::GetTempPath() ) ( 'bpbtb-zip-' + [System.Guid]::NewGuid().ToString('N') )
-$root  = Join-Path $stage $slug
+$root  = Join-Path $stage $folderName
 New-Item -ItemType Directory -Path $root -Force | Out-Null
 
 try {
@@ -153,8 +171,10 @@ try {
 		Write-Host ( "entries:       " + $zip.Entries.Count )
 		Write-Host ( "archive roots: " + $roots.Count + " -> " + ( $roots -join ', ' ) )
 		Write-Host ( "backslash entries (must be 0): " + $backslashes )
-		if ( 1 -ne $roots.Count -or 0 -ne $backslashes ) {
-			throw 'Archive is not a single forward-slashed folder; WordPress will not replace an existing install with it.'
+		if ( 1 -ne $roots.Count -or 0 -ne $backslashes -or $folderName -ne $roots[0] ) {
+			throw ( "Archive root must be exactly one folder named '$folderName' with forward slashes; " +
+				"got $($roots.Count) root(s) [$($roots -join ', ')] and $backslashes backslash entry(ies). " +
+				'WordPress will not replace an existing install with it.' )
 		}
 	} finally {
 		$zip.Dispose()

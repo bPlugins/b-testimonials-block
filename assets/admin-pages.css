@@ -65,13 +65,22 @@
 	--bpbtb-warn: #d97706;
 	--bpbtb-danger: #e11d48;
 
-	/* The admin content area pads 20px on the left and 10px at the top; the
-	   dashboard cancels both so its header sits flush against the menu and the
-	   canvas reaches the window edge. Same numbers, so the two line up. */
+	/* The admin content area pads 20px on the left, which the canvas cancels so
+	   it reaches the window edge -- the same -20px the React dashboard uses on
+	   .bPlDashboard, so the two line up.
+
+	   Nothing is cancelled at the top. This carried a `-10px` for a while on the
+	   belief that the content area pads 10px there and the dashboard cancels it
+	   too. Neither is true: #wpbody-content computes to padding-top 0 (the 10px
+	   belongs to wp-admin's .wrap, which these screens do not use), and
+	   .bPlDashboard only pulls sideways. So the -10px was not matching the
+	   dashboard, it was pulling 10px of this header up behind the fixed admin
+	   bar -- a 75px header showing as 65px, and 10px higher than the dashboard's.
+	   Measured at 1600px: header top was 22px here against 32px there. */
 	width: calc(100% + 20px);
 	max-width: calc(100% + 20px);
 	min-height: 100vh;
-	margin: -10px -20px 0;
+	margin: 0 -20px;
 	background: var(--bpbtb-canvas);
 	font-family: "Roboto", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
 	font-size: 14px;
@@ -82,6 +91,23 @@
 .bpbtb-admin-page * {
 	box-sizing: border-box;
 	line-height: 1.5;
+}
+
+/*
+ * bpl-tools lays out the header under `.bPlDashboard *`, which zeroes every
+ * descendant margin before `.pluginInfo h1` puts back its 8px right one. This
+ * page has no .bPlDashboard ancestor, so the h1 keeps the browser default
+ * `margin: .67em 0` instead -- 16.08px top and bottom at its 24px size.
+ *
+ * `.pluginInfo { min-height: 70px }` hides that at normal widths, which is why
+ * both headers measure exactly 75px down to 600px. It shows up once the header
+ * wraps: 163.2px here against 160px on the dashboard at 480px.
+ *
+ * Restated for the h1 alone rather than as a `* { margin: 0 }` reset, which
+ * would flatten the margins this page sets on purpose everywhere else.
+ */
+.bpbtb-admin-page .bPlDashboardHeader h1 {
+	margin: 0 8px 0 0;
 }
 
 .bpbtb-admin-page a {

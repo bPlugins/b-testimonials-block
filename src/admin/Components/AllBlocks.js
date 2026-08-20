@@ -29,7 +29,7 @@ const AllBlocks = ({
   allBlocks = [],
   disabledBlocks = [],
   uninstallNonce = "",
-  isPremium = true,
+  isPremium = false,
 }) => {
   // '' | 'loading' | 'success' | 'error' -- the component turns this into its
   // own toast, so nothing here has to render one.

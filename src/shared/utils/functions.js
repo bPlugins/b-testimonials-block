@@ -93,18 +93,53 @@ export const htmlTagsStrip = (str) => {
     return str.replace(/(<([^>]+)>)/ig, '');
 }
 
-export const getVideoEmbed = ( url ) => {
+export const getVideoEmbed = ( url, options = {} ) => {
 	if ( ! url ) return '';
-	
+
+	// Embed is only ever injected after the poster is clicked (see VideoCard),
+	// so `autoplay` here means "start as soon as the click swaps it in", not
+	// "play on page load" -- that click is the user gesture browsers require
+	// before they'll allow audible autoplay at all.
+	const {
+		autoplay = true,
+		loop = false,
+		muted = false,
+		controls = true,
+	} = options;
+
 	const ytMatch = url.match( /(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=))([\w-]{11})/ );
 	if ( ytMatch && ytMatch[ 1 ] ) {
-		return `<iframe src="https://www.youtube.com/embed/${ ytMatch[ 1 ] }?autoplay=1" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>`;
+		const videoId = ytMatch[ 1 ];
+		const params = new URLSearchParams( {
+			autoplay: autoplay ? '1' : '0',
+			controls: controls ? '1' : '0',
+			mute: muted ? '1' : '0',
+		} );
+		if ( loop ) {
+			// YouTube only loops a single video when `playlist` repeats its own id.
+			params.set( 'loop', '1' );
+			params.set( 'playlist', videoId );
+		}
+		return `<iframe src="https://www.youtube.com/embed/${ videoId }?${ params.toString() }" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>`;
 	}
 
 	const vimeoMatch = url.match( /vimeo\.com\/(?:video\/)?(\d+)/ );
 	if ( vimeoMatch && vimeoMatch[ 1 ] ) {
-		return `<iframe src="https://player.vimeo.com/video/${ vimeoMatch[ 1 ] }?autoplay=1" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen></iframe>`;
+		const params = new URLSearchParams( {
+			autoplay: autoplay ? '1' : '0',
+			controls: controls ? '1' : '0',
+			muted: muted ? '1' : '0',
+			loop: loop ? '1' : '0',
+		} );
+		return `<iframe src="https://player.vimeo.com/video/${ vimeoMatch[ 1 ] }?${ params.toString() }" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen></iframe>`;
 	}
 
-	return `<video src="${ url }" controls autoplay></video>`;
+	const videoAttrs = [
+		controls && 'controls',
+		autoplay && 'autoplay',
+		loop && 'loop',
+		muted && 'muted',
+	].filter( Boolean ).join( ' ' );
+
+	return `<video src="${ url }" ${ videoAttrs }></video>`;
 };

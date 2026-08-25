@@ -4,7 +4,7 @@ const ExpandButton = ({ attributes = {}, expanded = false, onChange }) => {
 
 	return (
 		expandBtn && (
-			<button className="expandBtn" type="button" onClick={onChange}>
+			<button className="expandBtn btb-expand-btn" type="button" onClick={onChange}>
 				{expanded ? collapseText : expandText}
 			</button>
 		)

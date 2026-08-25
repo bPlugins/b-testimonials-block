@@ -12,6 +12,7 @@ import {
 import { getPaletteCSS } from "../../utils/visualControls";
 import { ownBoxForDevice } from "../../utils/responsiveBox";
 import { resolveArrangement } from "../../utils/layoutFeatures";
+import { SHRINK_TO_FIT_LAYOUTS } from "../../utils/layoutControls";
 
 const Style = ({ attributes = {}, clientId }) => {
   const {
@@ -578,9 +579,59 @@ const Style = ({ attributes = {}, clientId }) => {
   //
   // Nothing is emitted while the value is empty, so a block nobody has aligned
   // keeps the block layout it has today.
+  // Gated to the shrink-to-fit layouts, which is where it has always been able
+  // to apply -- the Alignment control was offered on those alone until Block
+  // Width started offering it too, so this rule had never met another layout.
+  //
+  // It must not: making the block box a flex row leaves the grid inside it
+  // sized to its content instead of to the box. Measured on Video Testimonials
+  // at Block Width 600px -- the video went from 600px wide to 93px the moment
+  // Alignment was set to Center or Right, while Left and Default (which emit no
+  // justify-content) stayed at 600px. The margin rule below is what moves a
+  // block that fills its own box, and it needs no flex container.
   const BLOCK_ALIGN_JUSTIFY = { center: "center", right: "flex-end" };
-  const blockAlignCSS = BLOCK_ALIGN_JUSTIFY[blockAlign]
+  const blockAlignCSS =
+    SHRINK_TO_FIT_LAYOUTS.includes(layout) && BLOCK_ALIGN_JUSTIFY[blockAlign]
     ? `${widthEl} {\n\t\t\tdisplay: flex;\n\t\t\tjustify-content: ${BLOCK_ALIGN_JUSTIFY[blockAlign]};\n\t\t}`
+    : "";
+
+  // The other half of Alignment: which side of the column a *narrowed* block
+  // sits on.
+  //
+  // justify-content above moves a widget inside the block box, which is all a
+  // badge needs -- its box is the full column and the badge is narrower than
+  // it. A block given a Block Width is the opposite case: the box itself is the
+  // narrow thing, and the width rule centres it with `margin-left: auto;
+  // margin-right: auto` because centring was the only thing it could do. Those
+  // auto margins are what a left or right alignment has to overrule, and
+  // justify-content cannot -- there is nothing to move inside a box the grid
+  // already fills.
+  //
+  // Emitted after the per-device width rules so a tablet or mobile one cannot
+  // win on source order at equal specificity, and before the base Block Margin
+  // rule so an explicit side still beats an alignment.
+  //
+  // Nothing is written for an empty value, so a block nobody has aligned keeps
+  // the centring it has today.
+  //
+  // !important, because source order stopped being enough to win this once a
+  // "wide"-aligned block is inside core's own constrained-layout CSS: every
+  // block theme built on `theme.json` ships
+  // `.is-layout-constrained > :where(:not(.alignleft):not(.alignright):not(.alignfull))
+  // { margin-left: auto !important; margin-right: auto !important; }`, and
+  // `.alignwide` is not in that exclusion list -- only left/right/full are.
+  // Measured: Left and Right silently did nothing on a wide block on Twenty
+  // Twenty-Five, while Center looked fine only because it happened to agree
+  // with core's own forced centring. `:where()` zeroes the specificity of
+  // core's own selector, so the ID selector these rules already render at
+  // only has to match core's !important with its own to win outright.
+  const BLOCK_ALIGN_MARGIN = {
+    left: "margin-left: 0 !important;\n\t\t\tmargin-right: auto !important;",
+    center: "margin-left: auto !important;\n\t\t\tmargin-right: auto !important;",
+    right: "margin-left: auto !important;\n\t\t\tmargin-right: 0 !important;",
+  };
+  const blockAlignMarginCSS = BLOCK_ALIGN_MARGIN[blockAlign]
+    ? `${widthEl} {\n\t\t\t${BLOCK_ALIGN_MARGIN[blockAlign]}\n\t\t}`
     : "";
 
   // Block Margin's per-device rules cannot ride along in sizeCSS the way Padding
@@ -1635,7 +1686,7 @@ const Style = ({ attributes = {}, clientId }) => {
     }
 		${getTypoCSS(selectorList(DEG_PARTS), degTypo)?.styles || ""}
 		${getTypoCSS(selectorList(TEXT_PARTS), textTypo)?.styles || ""}
-		${getTypoCSS(`${mainEl} .expandBtn`, expandedTypo)?.styles || ""}
+		${getTypoCSS(`${mainEl} .btb-expand-btn`, expandedTypo)?.styles || ""}
 
 		${/* The badge's score, and the star row beside it.
 		     Neither maps onto a shared role: the score is a bold number the
@@ -1814,11 +1865,11 @@ const Style = ({ attributes = {}, clientId }) => {
 			color: ${withRole("--btb-muted", degColor || "#334155")};
 		}
 
-		${expandColor ? `${mainEl} .expandBtn { color: ${expandColor}; }` : ""}
+		${expandColor ? `${mainEl} .btb-expand-btn { color: ${expandColor}; }` : ""}
 
 		${
       expandHoverColor
-        ? `${mainEl} .expandBtn:hover, ${mainEl} .expandBtn:focus-visible { color: ${expandHoverColor}; }`
+        ? `${mainEl} .btb-expand-btn:hover, ${mainEl} .btb-expand-btn:focus-visible { color: ${expandHoverColor}; }`
         : ""
     }
 
@@ -1884,6 +1935,10 @@ const Style = ({ attributes = {}, clientId }) => {
 		${tabletSize ? `${tabBreakpoint} {\n\t\t${tabletSize}\n\t\t}` : ""}
 
 		${mobileSize ? `${mobileBreakpoint} {\n\t\t${mobileSize}\n\t\t}` : ""}
+
+		${/* After the width rules above, whose auto margins this overrules; before
+		     Block Margin below, which overrules it in turn. */ ""}
+		${blockAlignMarginCSS}
 
 		${/* Last, so an explicit side beats the auto centring the per-device Block
 		     Width rules above apply -- including the ones inside the media queries. */ ""}

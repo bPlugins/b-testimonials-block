@@ -106,15 +106,15 @@ const Edit = ( { attributes, setAttributes, clientId } ) => {
 
 			<div { ...useBlockProps( { className: 'bTestimonialStats' } ) } id={ `btbTestimonialsDir-${ clientId }` }>
 				<Style attributes={ attributes } clientId={ clientId } />
-				<div className={ `stats-grid ${ attributes.surfaceColor || attributes.borderColor ? 'has-surface' : '' }` } style={ { ...gridVars( attributes ), '--cols-d': colsForDevice( attributes.columns, previewDevice, 3 ) } }>
+				<div className={ `stats-grid btb-ts-grid ${ attributes.surfaceColor || attributes.borderColor ? 'has-surface' : '' }` } style={ { ...gridVars( attributes ), '--cols-d': colsForDevice( attributes.columns, previewDevice, 3 ) } }>
 					{ items.map( ( item, i ) => (
-						<div className="stat-item" key={ i }>
-							<div className="stat-value" style={ { color: accentColor } }>
-								<span className="stat-prefix">{ item?.prefix }</span>
-								<span className="stat-number">{ Number( item?.number ).toLocaleString() }</span>
-								<span className="stat-suffix">{ item?.suffix }</span>
+						<div className="stat-item btb-ts-item" key={ i }>
+							<div className="stat-value btb-ts-value" style={ { color: accentColor } }>
+								<span className="stat-prefix btb-ts-prefix">{ item?.prefix }</span>
+								<span className="stat-number btb-ts-number">{ Number( item?.number ).toLocaleString() }</span>
+								<span className="stat-suffix btb-ts-suffix">{ item?.suffix }</span>
 							</div>
-							<div className="stat-label">{ item?.label }</div>
+							<div className="stat-label btb-ts-label">{ item?.label }</div>
 						</div>
 					) ) }
 				</div>

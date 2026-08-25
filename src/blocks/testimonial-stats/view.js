@@ -26,7 +26,7 @@ const animateEl = ( el ) => {
 };
 
 const initStats = () => {
-	const numbers = [ ...document.querySelectorAll( '.bTestimonialStats[data-animate="1"] .stat-number' ) ]
+	const numbers = [ ...document.querySelectorAll( '.bTestimonialStats[data-animate="1"] .btb-ts-number' ) ]
 		.filter( ( el ) => ! el.dataset.bound );
 
 	if ( ! numbers.length ) {

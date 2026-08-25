@@ -52,7 +52,28 @@ function bpbtb_register_admin_submissions_menu() {
 add_action( 'admin_menu', 'bpbtb_register_admin_submissions_menu' );
 
 /**
+ * User meta key holding the pending count this user last dismissed the
+ * notice at.
+ */
+if ( ! defined( 'BPBTB_SUBMISSIONS_NOTICE_DISMISSED_META' ) ) {
+	define( 'BPBTB_SUBMISSIONS_NOTICE_DISMISSED_META', 'bpbtb_submissions_notice_dismissed_count' );
+}
+
+/**
  * Display top dashboard notice when there are pending customer submissions.
+ *
+ * `is-dismissible` only ever removed the notice from that one page's DOM --
+ * WordPress's own dismiss button has no server-side memory of its own, so the
+ * next admin page load ran this function again, saw the same pending count,
+ * and printed it right back. Measured: the button promised a dismissal it
+ * never delivered.
+ *
+ * Fixed the way persistent WP admin notices normally are: the pending count
+ * at the moment of dismissal is stored per-user (`bpbtb_ajax_dismiss_
+ * submissions_notice()` below), and the notice stays hidden as long as the
+ * current count has not grown past that. A newly arrived submission -- a
+ * count higher than what was dismissed -- is different information and
+ * surfaces again; the count dropping from someone being reviewed is not.
  */
 if ( ! function_exists( 'bpbtb_pending_submissions_notice' ) ) {
 function bpbtb_pending_submissions_notice() {
@@ -66,32 +87,81 @@ function bpbtb_pending_submissions_notice() {
 	}
 
 	$pending_count = bpbtb_get_pending_submissions_count();
-	if ( $pending_count > 0 ) {
-		$url = admin_url( 'edit.php?post_type=testimonial&page=bpbtb-submissions' );
-		?>
-		<?php // Square and flat: the plugin's own screens are, and wp-admin's notices are too, so the rounded corners this used to carry only ever singled it out. ?>
-		<div class="notice notice-warning is-dismissible" style="border-left-color: #0b81ee; padding: 12px 16px;">
-			<p style="margin: 0; font-size: 14px; display: flex; align-items: center; justify-content: space-between;">
-				<span>
-					<strong style="color: #0f57c4;"><?php esc_html_e( 'B Testimonials Block:', 'b-testimonials-block' ); ?></strong>
-					<?php
-					printf(
-						/* translators: %d: number of pending submissions */
-						esc_html( _n( 'You have %d pending customer submission awaiting review.', 'You have %d pending customer submissions awaiting review.', $pending_count, 'b-testimonials-block' ) ),
-						(int) $pending_count
-					);
-					?>
-				</span>
-				<a href="<?php echo esc_url( $url ); ?>" class="button button-primary" style="background: #0b81ee; border-color: #0b81ee; border-radius: 0; font-weight: 600;">
-					<?php esc_html_e( 'View Submissions', 'b-testimonials-block' ); ?> &rarr;
-				</a>
-			</p>
-		</div>
-		<?php
+	if ( $pending_count <= 0 ) {
+		return;
 	}
+
+	$dismissed_count = (int) get_user_meta( get_current_user_id(), BPBTB_SUBMISSIONS_NOTICE_DISMISSED_META, true );
+	if ( $pending_count <= $dismissed_count ) {
+		return;
+	}
+
+	$url   = admin_url( 'edit.php?post_type=testimonial&page=bpbtb-submissions' );
+	$nonce = wp_create_nonce( 'bpbtb_dismiss_submissions_notice' );
+	?>
+	<?php // Square and flat: the plugin's own screens are, and wp-admin's notices are too, so the rounded corners this used to carry only ever singled it out. ?>
+	<div id="bpbtb-pending-submissions-notice" class="notice notice-warning is-dismissible" data-nonce="<?php echo esc_attr( $nonce ); ?>" data-count="<?php echo esc_attr( $pending_count ); ?>" style="border-left-color: #0b81ee; padding: 12px 16px;">
+		<p style="margin: 0; font-size: 14px; display: flex; align-items: center; justify-content: space-between;">
+			<span>
+				<strong style="color: #0f57c4;"><?php esc_html_e( 'B Testimonials Block:', 'b-testimonials-block' ); ?></strong>
+				<?php
+				printf(
+					/* translators: %d: number of pending submissions */
+					esc_html( _n( 'You have %d pending customer submission awaiting review.', 'You have %d pending customer submissions awaiting review.', $pending_count, 'b-testimonials-block' ) ),
+					(int) $pending_count
+				);
+				?>
+			</span>
+			<a href="<?php echo esc_url( $url ); ?>" class="button button-primary" style="background: #0b81ee; border-color: #0b81ee; border-radius: 0; font-weight: 600;">
+				<?php esc_html_e( 'View Submissions', 'b-testimonials-block' ); ?> &rarr;
+			</a>
+		</p>
+	</div>
+	<script>
+	document.addEventListener( 'click', function ( e ) {
+		var btn = e.target.closest && e.target.closest( '.notice-dismiss' );
+		if ( ! btn ) {
+			return;
+		}
+		var notice = btn.closest( '#bpbtb-pending-submissions-notice' );
+		if ( ! notice ) {
+			return;
+		}
+		var body = new URLSearchParams();
+		body.set( 'action', 'bpbtb_dismiss_submissions_notice' );
+		body.set( 'nonce', notice.getAttribute( 'data-nonce' ) );
+		body.set( 'count', notice.getAttribute( 'data-count' ) );
+		fetch( ajaxurl, { method: 'POST', credentials: 'same-origin', body: body } );
+	} );
+	</script>
+	<?php
 }
 }
 add_action( 'admin_notices', 'bpbtb_pending_submissions_notice' );
+
+/**
+ * Persist the pending-submissions notice dismissal for the current user.
+ */
+if ( ! function_exists( 'bpbtb_ajax_dismiss_submissions_notice' ) ) {
+function bpbtb_ajax_dismiss_submissions_notice() {
+	$nonce = isset( $_POST['nonce'] ) ? sanitize_text_field( wp_unslash( $_POST['nonce'] ) ) : '';
+
+	if ( ! wp_verify_nonce( $nonce, 'bpbtb_dismiss_submissions_notice' ) ) {
+		wp_send_json_error( [ 'message' => __( 'Invalid security token.', 'b-testimonials-block' ) ] );
+	}
+
+	if ( ! current_user_can( 'manage_options' ) ) {
+		wp_send_json_error( [ 'message' => __( 'You do not have permission to perform this action.', 'b-testimonials-block' ) ] );
+	}
+
+	$count = isset( $_POST['count'] ) ? absint( wp_unslash( $_POST['count'] ) ) : 0;
+
+	update_user_meta( get_current_user_id(), BPBTB_SUBMISSIONS_NOTICE_DISMISSED_META, $count );
+
+	wp_send_json_success();
+}
+}
+add_action( 'wp_ajax_bpbtb_dismiss_submissions_notice', 'bpbtb_ajax_dismiss_submissions_notice' );
 
 /**
  * Handle submission action GET requests (Approve, Trash, Delete).

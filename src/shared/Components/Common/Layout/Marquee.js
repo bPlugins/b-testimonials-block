@@ -12,13 +12,20 @@ const Marquee = ({
     pauseOnHover = true,
   } = marquee && "object" === typeof marquee ? marquee : {};
 
+  // `marquee-track`/`-group`/`-item` are plain English terms any other
+  // carousel or logo-ticker plugin is just as likely to have picked -- on a
+  // site running several of those, a same-named foreign rule landing on
+  // `display: flex`/`width: max-content`/`flex: 0 0 auto` here is what turns
+  // the seamless scroll into an overlapping pile. `btb-marquee-*` twins carry
+  // the actual layout now; the bare classes stay for anyone already styling
+  // against them.
   const group = (dupe = false) => (
     <div
-      className={`marquee-group${dupe ? " marquee-group-dupe" : ""}`}
+      className={`marquee-group btb-marquee-group${dupe ? " marquee-group-dupe btb-marquee-group-dupe" : ""}`}
       aria-hidden={dupe ? "true" : undefined}>
       {items.map((item, index) => (
         <div
-          className="marquee-item"
+          className="marquee-item btb-marquee-item"
           style={{ marginRight: columnGap }}
           key={`${dupe ? "dup-" : ""}${index}`}>
           {themeSelect(item, index)}
@@ -32,6 +39,7 @@ const Marquee = ({
   // freezes them exactly where they are.
   const trackClasses = [
     "marquee-track",
+    "btb-marquee-track",
     pauseOnHover ? "pause-on-hover" : "",
     isBackend && pauseInEditor ? "is-paused" : "",
   ]

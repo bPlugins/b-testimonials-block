@@ -1,10 +1,17 @@
 import { useEffect } from "react";
 import { __ } from "@wordpress/i18n";
-import { useBlockProps, InspectorControls } from "@wordpress/block-editor";
 import {
+  useBlockProps,
+  InspectorControls,
+  MediaUpload,
+  MediaUploadCheck,
+} from "@wordpress/block-editor";
+import {
+  Button,
   PanelBody,
   RangeControl,
   TextControl,
+  ToggleControl,
   PanelRow,
   SandBox,
   __experimentalUnitControl as UnitControl,
@@ -55,6 +62,10 @@ const Edit = ({ attributes, setAttributes, clientId }) => {
     nameColor,
     degTypo,
     degColor,
+    videoAutoplay,
+    videoLoop,
+    videoMuted,
+    videoControls,
   } = attributes;
 
   // The device switch below is the editor's own preview device, so picking a
@@ -125,6 +136,35 @@ const Edit = ({ attributes, setAttributes, clientId }) => {
               </PanelBody>
               <PanelBody
                 className="bPlPanelBody"
+                title={__("Playback", "b-testimonials-block")}
+                initialOpen={false}>
+                <ToggleControl
+                  label={__("Autoplay on click", "b-testimonials-block")}
+                  help={__(
+                    "Start the video as soon as the poster is clicked.",
+                    "b-testimonials-block"
+                  )}
+                  checked={videoAutoplay}
+                  onChange={(val) => setAttributes({ videoAutoplay: val })}
+                />
+                <ToggleControl
+                  label={__("Loop", "b-testimonials-block")}
+                  checked={videoLoop}
+                  onChange={(val) => setAttributes({ videoLoop: val })}
+                />
+                <ToggleControl
+                  label={__("Muted", "b-testimonials-block")}
+                  checked={videoMuted}
+                  onChange={(val) => setAttributes({ videoMuted: val })}
+                />
+                <ToggleControl
+                  label={__("Show controls", "b-testimonials-block")}
+                  checked={videoControls}
+                  onChange={(val) => setAttributes({ videoControls: val })}
+                />
+              </PanelBody>
+              <PanelBody
+                className="bPlPanelBody"
                 title={__("Videos", "b-testimonials-block")}
                 initialOpen={false}>
                 {/* One video at a time, chosen from the chips -- the same editor
@@ -144,12 +184,54 @@ const Edit = ({ attributes, setAttributes, clientId }) => {
                   addLabel={__("Add New Video", "b-testimonials-block")}>
                   {(item, index, update) => (
                     <>
-                      <TextControl
-                        label={__("Video URL", "b-testimonials-block")}
-                        placeholder="YouTube / Vimeo / .mp4"
-                        value={item?.videoUrl || ""}
-                        onChange={(val) => update("videoUrl", val)}
-                      />
+                      {/*
+                        A plain TextControl until now, on the reading that the
+                        field is for YouTube and Vimeo links, where the media
+                        library has nothing to offer. It also takes an .mp4,
+                        though, and a self-hosted one lives in the library --
+                        so the only way to use your own file was to open the
+                        library in another tab and copy the URL across.
+
+                        Laid out as InlineDetailMediaUpload does it (its Label +
+                        .bPlInlineMediaUpload row), so this matches the Poster
+                        image field below rather than resembling it. Not that
+                        component itself: it hands back the whole attachment
+                        object, and videoUrl is a plain string that render.php and
+                        every already-saved block read as one. Writing only
+                        media.url keeps that shape, so no deprecation is needed
+                        and existing content is untouched.
+                      */}
+                      <Label className="mb5">
+                        {__("Video URL", "b-testimonials-block")}
+                      </Label>
+                      <PanelRow className="bPlInlineMediaUpload">
+                        <TextControl
+                          placeholder="YouTube / Vimeo / .mp4"
+                          value={item?.videoUrl || ""}
+                          onChange={(val) => update("videoUrl", val)}
+                        />
+
+                        <MediaUploadCheck>
+                          <MediaUpload
+                            allowedTypes={["video"]}
+                            onSelect={({ url }) => update("videoUrl", url)}
+                            render={({ open }) => (
+                              <Button
+                                className="button button-primary"
+                                icon="upload"
+                                onClick={open}
+                                /* Icon-only, so it needs a name of its own --
+                                   the Label above belongs to the text field. */
+                                label={__(
+                                  "Choose a video from the media library",
+                                  "b-testimonials-block"
+                                )}
+                                showTooltip
+                              />
+                            )}
+                          />
+                        </MediaUploadCheck>
+                      </PanelRow>
                       <InlineDetailMediaUpload
                         label={__("Poster image", "b-testimonials-block")}
                         value={item?.poster}
@@ -269,6 +351,10 @@ const Edit = ({ attributes, setAttributes, clientId }) => {
               item={item}
               accentColor={accentColor}
               playIcon={getIcon(attributes, "play")}
+              autoplay={videoAutoplay}
+              loop={videoLoop}
+              muted={videoMuted}
+              controls={videoControls}
               SandBox={SandBox}
             />
           ))}

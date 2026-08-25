@@ -940,7 +940,7 @@ const Layout = ({
           className="bTestimonialStats"
           data-animate={attributes.animate ? "1" : "0"}>
           <div
-            className={`stats-grid ${
+            className={`stats-grid btb-ts-grid ${
               attributes.surfaceColor || attributes.borderColor
                 ? "has-surface"
                 : ""
@@ -953,23 +953,23 @@ const Layout = ({
                 : 0;
 
               return (
-                <div className="stat-item" key={index}>
+                <div className="stat-item btb-ts-item" key={index}>
                   <div
-                    className="stat-value"
+                    className="stat-value btb-ts-value"
                     style={{ color: attributes.accentColor }}>
-                    <span className="stat-prefix">{item?.prefix}</span>
+                    <span className="stat-prefix btb-ts-prefix">{item?.prefix}</span>
                     {/* The literal stays in the markup so the number is still
                         right with JavaScript off; the view script only takes
                         over to count up to it. */}
                     <span
-                      className="stat-number"
+                      className="stat-number btb-ts-number"
                       data-number={item?.number}
                       data-decimals={decimals}>
                       {Number(item?.number || 0).toLocaleString()}
                     </span>
-                    <span className="stat-suffix">{item?.suffix}</span>
+                    <span className="stat-suffix btb-ts-suffix">{item?.suffix}</span>
                   </div>
-                  <div className="stat-label">{item?.label}</div>
+                  <div className="stat-label btb-ts-label">{item?.label}</div>
                 </div>
               );
             })}
@@ -1198,7 +1198,7 @@ const Layout = ({
   if (layout === "audio-testimonials") {
     return (
       <div
-        className={`layoutSection btb-audio-layout ${theme} columns-${previewCols} columns-tablet-${tablet} columns-mobile-${mobile}`}>
+        className={`layoutSection btb-audio-layout ${theme} btb-columns-${previewCols} btb-columns-tablet-${tablet} btb-columns-mobile-${mobile}`}>
         {items.map((item, index) => (
           <div key={index} className="btb-audio-card">
             {/* Was a static play glyph beside ten fixed bars -- no <audio>
@@ -1216,10 +1216,54 @@ const Layout = ({
   }
 
   if (layout === "video-testimonials") {
+    // `grid-template-columns: repeat(N, 1fr)` always fills the grid's own box,
+    // whatever N is -- so fewer videos than columns left the extra tracks
+    // empty rather than absent, and the grid's own width still spanned all N
+    // of them. Block Width narrowed and Alignment shifted that whole box
+    // correctly, but the populated card sat wherever the grid placed it (the
+    // first track, flush left) and never moved with it: measured, blockAlign
+    // "right" on a single video in a 3-column grid put 50px between the box
+    // and the page's right edge, and 437px between the card and that same
+    // edge, so the box had moved but the card had not.
+    //
+    // Capping the effective column count at the item count -- desktop,
+    // tablet and mobile can each run out at a different count -- shrinks the
+    // grid's own box to only the tracks something is actually in, without
+    // touching how wide any one card renders: 2 items in a 3-column desktop
+    // grid still get 1/3 of the full width each, just inside a box that is
+    // now 2/3 as wide instead of 3/3 with an invisible empty third. That
+    // narrower box is then free to carry the block's own alignment, so a
+    // partially-filled grid follows Left/Center/Right the same as the block
+    // around it. A full grid keeps its box at 100% either way, so this is a
+    // no-op whenever there are at least as many videos as columns -- which is
+    // every grid that was already working correctly.
+    const videoColCounts = { d: previewCols || 3, t: tablet || 2, m: mobile || 1 };
+    const videoItemCount = items.length || 1;
+    const videoEffCols = {
+      d: Math.max(1, Math.min(videoItemCount, videoColCounts.d)),
+      t: Math.max(1, Math.min(videoItemCount, videoColCounts.t)),
+      m: Math.max(1, Math.min(videoItemCount, videoColCounts.m)),
+    };
+    // The same three options the block's own alignment offers, so a
+    // partially-filled grid reads as an extension of it rather than a
+    // separate setting -- "Default" falls back to today's flush-left.
+    const VIDEO_GRID_ALIGN_MARGIN = {
+      left: { l: "0", r: "auto" },
+      center: { l: "auto", r: "auto" },
+      right: { l: "auto", r: "0" },
+    };
+    const videoGridAlign =
+      VIDEO_GRID_ALIGN_MARGIN[attributes.blockAlign] || VIDEO_GRID_ALIGN_MARGIN.left;
+
     const videoGridVars = {
-      "--cols-d": previewCols || 3,
-      "--cols-t": tablet || 2,
-      "--cols-m": mobile || 1,
+      "--cols-d": videoEffCols.d,
+      "--cols-t": videoEffCols.t,
+      "--cols-m": videoEffCols.m,
+      "--grid-width-d": `${(videoEffCols.d / videoColCounts.d) * 100}%`,
+      "--grid-width-t": `${(videoEffCols.t / videoColCounts.t) * 100}%`,
+      "--grid-width-m": `${(videoEffCols.m / videoColCounts.m) * 100}%`,
+      "--grid-margin-left": videoGridAlign.l,
+      "--grid-margin-right": videoGridAlign.r,
       "--col-gap": columnGap || "30px",
       "--row-gap": rowGap || "30px",
       "--accent": attributes.accentColor || "#0575e6",
@@ -1234,6 +1278,10 @@ const Layout = ({
               item={item}
               playIcon={getIcon(attributes, "play")}
               accentColor={attributes.accentColor}
+              autoplay={attributes.videoAutoplay}
+              loop={attributes.videoLoop}
+              muted={attributes.videoMuted}
+              controls={attributes.videoControls}
               SandBox={SandBox}
             />
           ))}
@@ -1249,7 +1297,7 @@ const Layout = ({
   if (layout === "case-study-card") {
     return (
       <div
-        className={`btb-case-study-grid columns-${previewCols} columns-tablet-${tablet} columns-mobile-${mobile}`}>
+        className={`btb-case-study-grid btb-columns-${previewCols} btb-columns-tablet-${tablet} btb-columns-mobile-${mobile}`}>
         {items.map((item, index) => {
           const sections = item.sections || [
             {
@@ -1390,7 +1438,7 @@ const Layout = ({
         <div className="btb-hero-card">{themeSelect(heroItem, 0)}</div>
         {followers.length > 0 && (
           <div
-            className={`btb-hero-grid columns-${gridCols(previewCols)} columns-tablet-${gridCols(tablet)} columns-mobile-${gridCols(mobile)}`}>
+            className={`btb-hero-grid btb-columns-${gridCols(previewCols)} btb-columns-tablet-${gridCols(tablet)} btb-columns-mobile-${gridCols(mobile)}`}>
             {followers.map((item, index) => themeSelect(item, index + 1))}
           </div>
         )}
@@ -1402,7 +1450,7 @@ const Layout = ({
     return (
       <div className="btb-popup-modal-wrapper">
         <div
-          className={`layoutSection btb-popup-modal-grid ${theme} columns-${previewCols} columns-tablet-${tablet} columns-mobile-${mobile} ${
+          className={`layoutSection btb-popup-modal-grid ${theme} btb-columns-${previewCols} btb-columns-tablet-${tablet} btb-columns-mobile-${mobile} ${
             isBackend ? "is-editing" : ""
           }`}>
           {items.map((item, index) => (
@@ -1646,9 +1694,9 @@ const Layout = ({
       ? []
       : [`${arrangement}-layout`]),
     theme,
-    `columns-${previewCols}`,
-    `columns-tablet-${tablet}`,
-    `columns-mobile-${mobile}`,
+    `btb-columns-${previewCols}`,
+    `btb-columns-tablet-${tablet}`,
+    `btb-columns-mobile-${mobile}`,
     isBackend ? "is-editing" : "",
   ]
     .filter(Boolean)

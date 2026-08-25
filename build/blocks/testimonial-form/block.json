@@ -67,6 +67,10 @@
         "mobile": ""
       }
     },
+    "blockAlign": {
+      "type": "string",
+      "default": ""
+    },
     "cardHeight": {
       "type": "object",
       "default": {

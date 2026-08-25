@@ -1054,6 +1054,83 @@ function bpbtb_demo_urls() {
  * base plus a pattern in JavaScript could not follow a filter that changes the
  * shape of the URL rather than just its host.
  */
+/**
+ * The hosted showcase site's demo pages, keyed by preview slug.
+ *
+ * bpbtb_demo_url()'s own docblock invites exactly this -- a filter pointing
+ * the plugin at a hosted demo site once one exists. bblockswp.com now has a
+ * live, published page per block, so this is that filter: every entry here
+ * wins over the local `?bpbtb_demo=` preview, on the Demos screen, the All
+ * Blocks screen, the canvas picker and the switcher modal alike, since all
+ * four resolve through bpbtb_demo_url(). A block with no entry -- only future
+ * ones, once every current block is listed -- keeps the local preview it
+ * already falls back to.
+ *
+ * @return array<string, string> preview slug => hosted demo URL.
+ */
+if ( ! function_exists( 'bpbtb_hosted_demo_urls' ) ) {
+function bpbtb_hosted_demo_urls() {
+	return [
+		'b-testimonials'               => 'https://bblockswp.com/demo/testimonials-default/',
+		'testimonials-grid-2'          => 'https://bblockswp.com/demo/testimonials-centered-cards-grid/',
+		'testimonials-grid-3'          => 'https://bblockswp.com/demo/testimonials-gradient-border-grid/',
+		'testimonials-grid-minimal'    => 'https://bblockswp.com/demo/testimonials-minimalist-reviews-grid/',
+		'testimonials-list'            => 'https://bblockswp.com/demo/testimonials-list/',
+		'testimonials-compact'         => 'https://bblockswp.com/demo/testimonials-compact-reviews-list/',
+		'testimonials-avatar-list'     => 'https://bblockswp.com/demo/testimonials-avatar-reviews-list/',
+		'testimonials-masonry'         => 'https://bblockswp.com/demo/testimonials-masonry/',
+		'testimonials-card-stack'      => 'https://bblockswp.com/demo/testimonials-stacked-review-cards/',
+		'testimonials-floating-bubble' => 'https://bblockswp.com/demo/testimonials-floating-avatar-bubbles/',
+		'testimonials-slider'          => 'https://bblockswp.com/demo/testimonials-slider/',
+		'testimonials-carousel-2'      => 'https://bblockswp.com/demo/testimonials-coverflow-carousel/',
+		'testimonials-slider-3d'       => 'https://bblockswp.com/demo/testimonials-3d-flip-perspective-carousel/',
+		'testimonials-marquee'         => 'https://bblockswp.com/demo/testimonials-marquee/',
+		'social-proof-toast'           => 'https://bblockswp.com/demo/testimonials-social-proof-toast/',
+		'testimonials-hero'            => 'https://bblockswp.com/demo/testimonials-hero-testimonial-spotlight/',
+		'testimonials-quote-box'       => 'https://bblockswp.com/demo/testimonials-quote-box-showcase/',
+		'testimonials-speech-bubble'   => 'https://bblockswp.com/demo/testimonials-speech-bubble-cards/',
+		'testimonials-timeline'        => 'https://bblockswp.com/demo/testimonials-customer-journey-timeline/',
+		'case-study-card'              => 'https://bblockswp.com/demo/testimonials-customer-case-study/',
+		'video-testimonials'           => 'https://bblockswp.com/demo/video-testimonials/',
+		'audio-testimonials'           => 'https://bblockswp.com/demo/audio-testimonials/',
+		'before-after'                 => 'https://bblockswp.com/demo/testimonials-before-after/',
+		'rating-summary'               => 'https://bblockswp.com/demo/testimonials-rating-summary/',
+		'star-rating-bars'             => 'https://bblockswp.com/demo/testimonials-star-rating-progress-bars/',
+		'testimonial-stats'            => 'https://bblockswp.com/demo/testimonials-testimonial-stats/',
+		'comparison-testimonial-table' => 'https://bblockswp.com/demo/testimonials-comparison-review-table/',
+		'google-review-badge'          => 'https://bblockswp.com/demo/testimonials-google-reviews-badge/',
+		'facebook-review-badge'        => 'https://bblockswp.com/demo/testimonials-facebook-recommendation-badge/',
+		'g2-review-badge'              => 'https://bblockswp.com/demo/testimonials-g2-review-badge/',
+		'capterra-review-badge'        => 'https://bblockswp.com/demo/testimonials-capterra-score-badge/',
+		'trustpilot-review-badge'      => 'https://bblockswp.com/demo/testimonials-trustpilot-score-badge/',
+		'review-badge-widget'          => 'https://bblockswp.com/demo/testimonials-floating-review-badge/',
+		'verified-buyer-badge'         => 'https://bblockswp.com/demo/testimonials-verified-buyer-trust-seal/',
+		'trust-badges'                 => 'https://bblockswp.com/demo/testimonials-trust-badges/',
+		'client-logos'                 => 'https://bblockswp.com/demo/testimonials-client-logos/',
+		'testimonial-form'             => 'https://bblockswp.com/demo/testimonials-testimonial-form/',
+		'user-feedback-poll'           => 'https://bblockswp.com/demo/testimonials-feedback-nps-poll/',
+		'faq-testimonial-accordion'    => 'https://bblockswp.com/demo/testimonials-faq-review-accordion/',
+		'testimonials-popup-modal'     => 'https://bblockswp.com/demo/testimonials-popup-modal-review-trigger/',
+	];
+}
+}
+
+if ( ! function_exists( 'bpbtb_filter_demo_url' ) ) {
+function bpbtb_filter_demo_url( $url, $slug ) {
+	$hosted = bpbtb_hosted_demo_urls();
+
+	return isset( $hosted[ $slug ] ) ? $hosted[ $slug ] : $url;
+}
+}
+add_filter( 'bpbtb_demo_url', 'bpbtb_filter_demo_url', 10, 2 );
+
+if ( ! function_exists( 'bpbtb_filter_demo_index_url' ) ) {
+function bpbtb_filter_demo_index_url( $url ) {
+	return 'https://bblockswp.com/demo/testimonials-all-demos/';
+}
+}
+add_filter( 'bpbtb_demo_index_url', 'bpbtb_filter_demo_index_url' );
+
 if ( ! function_exists( 'bpbtb_demo_editor_data' ) ) {
 function bpbtb_demo_editor_data() {
 	wp_add_inline_script(

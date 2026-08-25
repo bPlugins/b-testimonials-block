@@ -19,15 +19,55 @@ import { getVideoEmbed } from "../../utils/functions";
  * @param {Object}   props.item        Video item: { videoUrl, poster, name, deg, company }.
  * @param {string}   props.accentColor Colour for the play glyph.
  * @param {Object}   props.playIcon    Icon slot from the Icon panel.
+ * @param {boolean}  props.autoplay    Start the embed as soon as the click swaps it in.
+ * @param {boolean}  props.loop        Repeat the video once it ends.
+ * @param {boolean}  props.muted       Start muted.
+ * @param {boolean}  props.controls    Show the player's native controls.
  * @param {Function} props.SandBox     `@wordpress/components`' SandBox, passed in
  *                                     by the editor only -- see below. The front
  *                                     end must not pull wp-components in, so it
  *                                     is injected the way Layout.js already takes
  *                                     RichText and MediaUpload.
  */
-const VideoCard = ({ item, accentColor, playIcon = {}, SandBox }) => {
+const VideoCard = ({
+  item,
+  accentColor,
+  playIcon = {},
+  autoplay = true,
+  loop = false,
+  muted = false,
+  controls = true,
+  SandBox,
+}) => {
   const [isPlaying, setIsPlaying] = useState(false);
-  const embedHtml = item?.videoUrl ? getVideoEmbed(item.videoUrl) : "";
+  const embedHtml = item?.videoUrl
+    ? getVideoEmbed(item.videoUrl, { autoplay, loop, muted, controls })
+    : "";
+
+  /*
+   * SandBox is only for the iframe embeds. It is here to solve one problem --
+   * a YouTube or Vimeo player in the canvas gets no Referer and answers with
+   * Error 153 (see the note further down) -- and a self-hosted file has no
+   * such problem: getVideoEmbed returns a plain <video> for anything that is
+   * not YouTube or Vimeo, and it is served from this site.
+   *
+   * Sending it through SandBox actively broke it. The sandbox document is a
+   * document of its own, so .video-frame's `video { position: absolute; inset:
+   * 0; width: 100%; height: 100% }` cannot reach inside it, and the only
+   * sizing left is SandBox's own `wp-has-aspect-ratio` rule -- which names
+   * `html`, `body`, `body > div` and `body > div iframe`, and no `video`. The
+   * file rendered at its intrinsic size in the corner of the card while the
+   * published page, which never had SandBox, looked right.
+   */
+  const isIframeEmbed = /^s*<iframe/i.test(embedHtml);
+  const useSandbox = Boolean(SandBox) && isIframeEmbed;
+
+  const fillStyle = {
+    width: "100%",
+    height: "100%",
+    position: "absolute",
+    inset: 0,
+  };
 
   const play = () => {
     if (embedHtml) {
@@ -55,48 +95,54 @@ const VideoCard = ({ item, accentColor, playIcon = {}, SandBox }) => {
           }
         }}>
         {isPlaying ? (
-          <div
-            className="video-embed-container"
-            style={{
-              width: "100%",
-              height: "100%",
-              position: "absolute",
-              inset: 0,
-            }}
-            {...(SandBox ? {} : { dangerouslySetInnerHTML: { __html: embedHtml } })}>
-            {/* In the editor the embed has to go through SandBox.
-                WordPress renders the canvas as an iframe whose document is a
-                `blob:` URL, and Chrome sends no Referer from a blob: document --
-                so a YouTube player dropped straight into the canvas answers with
-                "Error 153: Video player configuration error" and never plays.
-                Measured, not guessed: the same iframe markup requested from the
-                canvas carries no `Referer` header, while core's embed block
-                carries `http://localhost:8881/`.
+          /*
+           * Two separate elements rather than one with a spread, because a React
+           * element may carry `dangerouslySetInnerHTML` or children, never both --
+           * and `{useSandbox && <SandBox/>}` is a child even when it is `false`.
+           * (`{SandBox && ...}` got away with it only because on the front end
+           * SandBox is `undefined`, which React drops, while `false` it counts.
+           * Caught in the editor as "Minified React error #60".)
+           */
+          useSandbox ? (
+            <div className="video-embed-container" style={fillStyle}>
+              {/* In the editor an iframe embed has to go through SandBox.
+                  WordPress renders the canvas as an iframe whose document is a
+                  `blob:` URL, and Chrome sends no Referer from a blob: document --
+                  so a YouTube player dropped straight into the canvas answers with
+                  "Error 153: Video player configuration error" and never plays.
+                  Measured, not guessed: the same iframe markup requested from the
+                  canvas carries no `Referer` header, while core's embed block
+                  carries `http://localhost:8881/`.
 
-                SandBox writes its document from the parent admin frame, which
-                gives that document the admin page's URL instead of the blob one,
-                so the player gets a referrer and loads. The front end has no
-                blob document and no wp-components, and keeps the plain embed. */}
-            {/* `type` becomes the class on the sandbox document's html and body,
-                and SandBox's own stylesheet only stretches the embed to fill
-                under `wp-has-aspect-ratio` -- without it the player renders at
-                its intrinsic size in the corner of the card. Core's embed block
-                passes the same class for the same reason. */}
-            {/* `allowSameOrigin` is what makes the referrer work, and is not
-                optional here: without it SandBox renders the `srcdoc` variant,
-                whose document inherits the canvas's `blob:` URL and so sends no
-                Referer -- the same Error 153 as before. With it, SandBox writes
-                the document from the parent admin frame and it inherits the
-                admin page's URL instead. Core's embed block passes it too. */}
-            {SandBox && (
+                  SandBox writes its document from the parent admin frame, which
+                  gives that document the admin page's URL instead of the blob one,
+                  so the player gets a referrer and loads. The front end has no
+                  blob document and no wp-components, and keeps the plain embed. */}
+              {/* `type` becomes the class on the sandbox document's html and body,
+                  and SandBox's own stylesheet only stretches the embed to fill
+                  under `wp-has-aspect-ratio` -- without it the player renders at
+                  its intrinsic size in the corner of the card. Core's embed block
+                  passes the same class for the same reason. */}
+              {/* `allowSameOrigin` is what makes the referrer work, and is not
+                  optional here: without it SandBox renders the `srcdoc` variant,
+                  whose document inherits the canvas's `blob:` URL and so sends no
+                  Referer -- the same Error 153 as before. With it, SandBox writes
+                  the document from the parent admin frame and it inherits the
+                  admin page's URL instead. Core's embed block passes it too. */}
               <SandBox
                 html={embedHtml}
                 allowSameOrigin
                 type="wp-has-aspect-ratio"
                 title={item?.name ? `${item.name} video` : "Video testimonial"}
               />
-            )}
-          </div>
+            </div>
+          ) : (
+            <div
+              className="video-embed-container"
+              style={fillStyle}
+              dangerouslySetInnerHTML={{ __html: embedHtml }}
+            />
+          )
         ) : (
           <span
             className="video-play"

@@ -101,7 +101,15 @@ $brandColor: #146ef5;
 // enter -- they would render the raw browser button chrome. Declared here so
 // every layout gets the inline-text appearance; the nested copy still wins
 // where it applies.
-.expandBtn {
+//
+// Was a bare `.expandBtn`, unscoped -- the same class of bug the `columns-N`
+// leak was (see below): it styled any element anywhere named `.expandBtn`,
+// and an equally-generic foreign rule of the same name loading after this
+// one would win outright, since a single bare class carries no specificity
+// edge either way. `ExpandButton.js` now renders a `btb-expand-btn` twin
+// alongside the old class for that reason; scoped and prefixed here so
+// neither direction of collision is possible.
+.bTestimonials .btb-expand-btn {
 	background: none;
 	border: 0;
 	padding: 0;
@@ -295,6 +303,17 @@ $brandColor: #146ef5;
 
 		.layoutSection {
 			display: grid;
+			// A card is one flex/grid child holding several stacked pieces
+			// (avatar band, text, footer). A theme or another plugin defining
+			// its own `.columns-3` utility with `column-count: 3` -- a name
+			// generic enough that a collision is only a matter of time --
+			// turns this into a native CSS multi-column box, which fragments
+			// that tall single-piece content across columns by height rather
+			// than by element, scattering one card's avatar/text/footer into
+			// three unrelated boxes. Grid/flex here never wants columns; this
+			// closes that opening regardless of which class the collision
+			// lands on.
+			column-count: initial;
 
 			.single {
 				// Colour on the card itself.
@@ -758,7 +777,14 @@ $brandColor: #146ef5;
 				display: block;
 				overflow: hidden;
 
-				.marquee-track {
+				// Bare `.marquee-track`/`-group`/`-item` used to carry this styling
+				// directly; the same generic names another carousel/ticker plugin
+				// on the page is just as likely to define, and a foreign rule
+				// winning here on `display`/`width`/`flex` is what fragments the
+				// seamless scroll into an overlapping pile. `Marquee.js` now
+				// renders `btb-marquee-*` twins alongside the bare classes, and
+				// they carry the styling here instead.
+				.btb-marquee-track {
 					display: flex;
 					width: max-content;
 					// Duration and direction come from the Marquee panel via inline
@@ -778,11 +804,11 @@ $brandColor: #146ef5;
 					}
 				}
 
-				.marquee-group {
+				.btb-marquee-group {
 					display: flex;
 				}
 
-				.marquee-item {
+				.btb-marquee-item {
 					flex: 0 0 auto;
 					width: 320px;
 				}
@@ -795,7 +821,7 @@ $brandColor: #146ef5;
 					// Only the first group is editable. Without this the seamless
 					// copy renders a second editable field bound to the same
 					// attribute, so a click could land on either one.
-					.marquee-group-dupe {
+					.btb-marquee-group-dupe {
 						pointer-events: none;
 						user-select: none;
 					}
@@ -1062,24 +1088,32 @@ $brandColor: #146ef5;
 *
 *column set
 */
-@for $i from 1 through 12 {
-	.columns-#{$i} {
-		grid-template-columns: repeat(#{$i}, 1fr);
-	}
-}
-
-@media (max-width: $tablet-max) {
+// Was bare `.columns-N`, unscoped and generic enough to collide with any
+// other plugin or theme's own utility of the same name -- which is exactly
+// what fed a foreign `column-count: 3` into a masonry section on a site
+// running several block plugins (see the column-count reset on
+// `.layoutSection` above). Prefixed and nested under `.bTestimonials` so it
+// can neither collide with, nor be collided into by, anyone else's CSS.
+.bTestimonials {
 	@for $i from 1 through 12 {
-		.columns-tablet-#{$i} {
+		.btb-columns-#{$i} {
 			grid-template-columns: repeat(#{$i}, 1fr);
 		}
 	}
-}
 
-@media (max-width: $mobile-max) {
-	@for $i from 1 through 12 {
-		.columns-mobile-#{$i} {
-			grid-template-columns: repeat(#{$i}, 1fr);
+	@media (max-width: $tablet-max) {
+		@for $i from 1 through 12 {
+			.btb-columns-tablet-#{$i} {
+				grid-template-columns: repeat(#{$i}, 1fr);
+			}
+		}
+	}
+
+	@media (max-width: $mobile-max) {
+		@for $i from 1 through 12 {
+			.btb-columns-mobile-#{$i} {
+				grid-template-columns: repeat(#{$i}, 1fr);
+			}
 		}
 	}
 }
@@ -1916,8 +1950,14 @@ $brandColor: #146ef5;
 }
 
 /* --- Compact Layout (Category B — CSS-only variation) --- */
-.btb-testimonials-compact-layout,
-.testimonials-compact-layout {
+// Every other layout here styles only its `btb-`-prefixed identity class --
+// this one alone also matched the bare `testimonials-compact-layout`, which
+// Layout.js's identityClasses puts on the element too but which nothing here
+// needs: the prefixed twin is always present alongside it. Bare and generic
+// enough that another plugin's own "compact layout" class could collide with
+// it (the same opening the `columns-N` bug came through), so dropped rather
+// than carried forward with the rest.
+.btb-testimonials-compact-layout {
 	&.layoutSection {
 		gap: 16px;
 	}

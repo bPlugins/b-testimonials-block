@@ -53,6 +53,10 @@
 				"mobile": ""
 			}
 		},
+		"blockAlign": {
+			"type": "string",
+			"default": ""
+		},
 		"cardHeight": {
 			"type": "object",
 			"default": {
@@ -132,6 +136,22 @@
 		"accentColor": {
 			"type": "string",
 			"default": "#0575e6"
+		},
+		"videoAutoplay": {
+			"type": "boolean",
+			"default": true
+		},
+		"videoLoop": {
+			"type": "boolean",
+			"default": false
+		},
+		"videoMuted": {
+			"type": "boolean",
+			"default": false
+		},
+		"videoControls": {
+			"type": "boolean",
+			"default": true
 		},
 		"layout": {
 			"type": "string",

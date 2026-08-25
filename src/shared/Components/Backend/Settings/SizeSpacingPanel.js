@@ -58,7 +58,16 @@ const SizeSpacingPanel = ({ attributes = {}, setAttributes }) => {
     layout = "default",
   } = attributes;
 
-  const canAlign = SHRINK_TO_FIT_LAYOUTS.includes(layout);
+  // Alignment only has somewhere to move a block that is narrower than its
+  // column, and that happens two ways: a badge widget is narrower by nature
+  // (SHRINK_TO_FIT_LAYOUTS), and any layout is once it has been given a Block
+  // Width. It used to be offered for the first case only, so on every other
+  // layout a narrowed block could be centred and nothing else -- the width
+  // rule's own `margin-left: auto; margin-right: auto` was the only answer
+  // available. Offered in both cases now, and still hidden otherwise rather
+  // than shown as a control that quietly does nothing.
+  const hasWidth = Object.values(blockWidth || {}).some(Boolean);
+  const canAlign = SHRINK_TO_FIT_LAYOUTS.includes(layout) || hasWidth;
 
   const device = useDeviceKey();
 
@@ -115,9 +124,14 @@ const SizeSpacingPanel = ({ attributes = {}, setAttributes }) => {
           )}
         />
 
-        {/* Not per device. A badge is the same width on a phone as on a
+        {/* Not per device. A widget is the same width on a phone as on a
             desktop, so an alignment that changed with the viewport would be a
             setting to keep in step rather than one to use. */}
+        {/* "" is kept as its own option rather than folded into Left, because
+            it does not mean the same thing everywhere: a badge with no
+            alignment lands left, while a block narrowed by Block Width is
+            centred by that rule's auto margins. Making "" mean left would have
+            moved every already-narrowed block on save. */}
         {canAlign && (
           <SelectControl
             className="mt20"
@@ -125,12 +139,13 @@ const SizeSpacingPanel = ({ attributes = {}, setAttributes }) => {
             value={blockAlign}
             onChange={(val) => setAttributes({ blockAlign: val })}
             options={[
-              { label: __("Left", "b-testimonials-block"), value: "" },
+              { label: __("Default", "b-testimonials-block"), value: "" },
+              { label: __("Left", "b-testimonials-block"), value: "left" },
               { label: __("Center", "b-testimonials-block"), value: "center" },
               { label: __("Right", "b-testimonials-block"), value: "right" },
             ]}
             help={__(
-              "Where this badge sits in its column. It is narrower than the column, so left is where it lands on its own.",
+              "Where the block sits in its column. Only does something once the block is narrower than the column -- either a Block Width above, or a badge, which is narrower on its own. Default leaves it where it lands: centred when a Block Width is set, left otherwise.",
               "b-testimonials-block",
             )}
           />

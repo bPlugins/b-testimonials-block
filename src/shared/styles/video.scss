@@ -12,6 +12,12 @@
 		display: grid;
 		gap: var(--row-gap, 30px) var(--col-gap, 30px);
 		grid-template-columns: repeat(var(--cols-d, 3), 1fr);
+		// Full width, and flush left, until fewer videos than columns leaves a
+		// gap for these to close and Layout.js hands the alignment a box worth
+		// moving -- see the comment on videoGridVars there.
+		width: var(--grid-width-d, 100%);
+		margin-left: var(--grid-margin-left, 0);
+		margin-right: var(--grid-margin-right, auto);
 	}
 
 	.video-frame {
@@ -93,12 +99,14 @@
 	@media ( max-width: $tablet-max ) {
 		.videos-grid {
 			grid-template-columns: repeat(var(--cols-t, 2), 1fr);
+			width: var(--grid-width-t, 100%);
 		}
 	}
 
 	@media ( max-width: $mobile-max ) {
 		.videos-grid {
 			grid-template-columns: repeat(var(--cols-m, 1), 1fr);
+			width: var(--grid-width-m, 100%);
 		}
 	}
 }

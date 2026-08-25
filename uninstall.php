@@ -64,6 +64,13 @@ function bpbtb_uninstall_site_data() {
 
 	delete_option( 'bpbtb_nps_poll_votes' );
 	delete_option( 'bpbtb_nps_categories' );
+
+	// The All Blocks screen's on/off list. Left behind until now, so deleting
+	// the plugin with this toggle on still brought the same blocks back
+	// switched off on the next install.
+	delete_option( 'bpbtb_disabled_blocks' );
+
+	// Last, because it is the toggle that authorised everything above.
 	delete_option( 'bpbtb_delete_data_on_uninstall' );
 }
 

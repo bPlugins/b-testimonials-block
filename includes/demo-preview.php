@@ -26,13 +26,6 @@ if ( ! defined( 'BPBTB_DEMO_QUERY_VAR' ) ) {
 }
 
 /**
- * Query var that streams a generated clip for the Audio Testimonials preview.
- */
-if ( ! defined( 'BPBTB_DEMO_AUDIO_QUERY_VAR' ) ) {
-	define( 'BPBTB_DEMO_AUDIO_QUERY_VAR', 'bpbtb_demo_audio' );
-}
-
-/**
  * The blocks that may be previewed: this plugin's own, straight from the
  * registry, so the list cannot drift from what is actually registered.
  *
@@ -547,171 +540,11 @@ function bpbtb_demo_audio_items() {
 
 	foreach ( $items as $index => $item ) {
 		$items[ $index ]['audio'] = [
-			'url' => add_query_arg( BPBTB_DEMO_AUDIO_QUERY_VAR, $index, home_url( '/' ) ),
+			'url' => BPBTB_ASSETS_DIR . 'demo-audio-' . $index . '.wav',
 		];
 	}
 
 	return $items;
-}
-}
-
-/**
- * The clips behind those items: length in seconds, and the notes to sound.
- *
- * Different lengths on purpose -- three identical durations in a row would read
- * as one file repeated rather than three separate voice notes.
- *
- * @return array<int, array{seconds: float, notes: float[]}>
- */
-if ( ! function_exists( 'bpbtb_demo_audio_clips' ) ) {
-function bpbtb_demo_audio_clips() {
-	return [
-		[
-			'seconds' => 6.0,
-			'notes'   => [ 392.00, 523.25, 659.25, 523.25 ],
-		],
-		[
-			'seconds' => 9.0,
-			'notes'   => [ 349.23, 440.00, 587.33, 440.00, 349.23, 587.33 ],
-		],
-		[
-			'seconds' => 7.5,
-			'notes'   => [ 293.66, 440.00, 523.25, 392.00, 293.66 ],
-		],
-	];
-}
-}
-
-/**
- * Build one clip as a complete WAV file, in memory.
- *
- * 8-bit unsigned mono at 8kHz. That is telephone quality and deliberately so:
- * the longest clip lands around 72KB, small enough to serve on every preview
- * load, and the player only needs something with an honest duration to scrub
- * through. Each note gets an attack/release envelope and a quiet second harmonic,
- * so it fades in and out instead of clicking at the segment joins, and the whole
- * thing sits at roughly a fifth of full scale -- a demo should not be the loudest
- * thing on the machine.
- *
- * @param int $index Clip index.
- * @return string Raw WAV bytes.
- */
-if ( ! function_exists( 'bpbtb_demo_audio_wav' ) ) {
-function bpbtb_demo_audio_wav( $index ) {
-	$clips = bpbtb_demo_audio_clips();
-	$clip  = isset( $clips[ $index ] ) ? $clips[ $index ] : $clips[0];
-
-	$rate      = 8000;
-	$amplitude = 0.20;
-	$total     = (int) round( $clip['seconds'] * $rate );
-	$notes     = $clip['notes'];
-	$per_note  = (int) ceil( $total / count( $notes ) );
-
-	$samples = '';
-
-	for ( $i = 0; $i < $total; $i++ ) {
-		$note     = min( count( $notes ) - 1, (int) floor( $i / $per_note ) );
-		$position = ( $i % $per_note ) / $per_note;
-		$freq     = $notes[ $note ];
-
-		// Envelope: 12% fade in, then a long fall to silence by the note's end.
-		$envelope = $position < 0.12 ? ( $position / 0.12 ) : ( 1 - ( ( $position - 0.12 ) / 0.88 ) );
-		$envelope = max( 0, $envelope );
-		$envelope = $envelope * $envelope;
-
-		$phase = 2 * M_PI * $freq * ( $i / $rate );
-		$value = ( sin( $phase ) + 0.3 * sin( 2 * $phase ) ) / 1.3;
-
-		// 8-bit PCM is unsigned, so silence is 128 rather than 0.
-		$sample   = (int) round( 128 + ( 127 * $amplitude * $envelope * $value ) );
-		$samples .= chr( max( 0, min( 255, $sample ) ) );
-	}
-
-	$length = strlen( $samples );
-
-	return 'RIFF' . pack( 'V', 36 + $length ) . 'WAVE'
-		. 'fmt ' . pack( 'V', 16 )
-		. pack( 'v', 1 )      // PCM.
-		. pack( 'v', 1 )      // Mono.
-		. pack( 'V', $rate )
-		. pack( 'V', $rate )  // Byte rate: rate x channels x bytes per sample.
-		. pack( 'v', 1 )      // Block align.
-		. pack( 'v', 8 )      // Bits per sample.
-		. 'data' . pack( 'V', $length )
-		. $samples;
-}
-}
-
-/**
- * Serve a clip and stop, when the query var asks for one.
- *
- * Shares the preview's capability check: the clips are only ever requested by an
- * `<audio>` element inside a preview page, which is already behind that check.
- *
- * @return void
- */
-if ( ! function_exists( 'bpbtb_render_demo_audio' ) ) {
-function bpbtb_render_demo_audio() {
-	// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only, generates no state.
-	if ( ! isset( $_GET[ BPBTB_DEMO_AUDIO_QUERY_VAR ] ) ) {
-		return;
-	}
-
-	if ( ! current_user_can( 'edit_posts' ) ) {
-		wp_die(
-			esc_html__( 'You do not have permission to preview blocks.', 'b-testimonials-block' ),
-			esc_html__( 'Preview unavailable', 'b-testimonials-block' ),
-			[ 'response' => 403 ]
-		);
-	}
-
-	// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only, generates no state.
-	$index = absint( wp_unslash( $_GET[ BPBTB_DEMO_AUDIO_QUERY_VAR ] ) );
-	$wav   = bpbtb_demo_audio_wav( $index );
-	$size  = strlen( $wav );
-
-	$start = 0;
-	$end   = $size - 1;
-
-	// Range support is what makes the waveform scrubbable. Without it, a click
-	// two thirds along the bars asked Chrome to seek into audio it had not
-	// buffered, it could not fetch just that part, and playback landed near the
-	// start instead -- measured at 0.44s for a seek to 7.2s.
-	$range = isset( $_SERVER['HTTP_RANGE'] ) ? sanitize_text_field( wp_unslash( $_SERVER['HTTP_RANGE'] ) ) : '';
-
-	if ( $range && preg_match( '/^bytes=(\d*)-(\d*)$/', $range, $matches ) ) {
-		$req_start = '' === $matches[1] ? null : (int) $matches[1];
-		$req_end   = '' === $matches[2] ? null : (int) $matches[2];
-
-		if ( null === $req_start ) {
-			// `bytes=-500` means the last 500 bytes, not "up to byte 500".
-			$start = null === $req_end ? 0 : max( 0, $size - $req_end );
-		} else {
-			$start = $req_start;
-			$end   = null === $req_end ? $end : min( $end, $req_end );
-		}
-
-		if ( $start > $end || $start >= $size ) {
-			status_header( 416 );
-			header( 'Content-Range: bytes */' . $size );
-			exit;
-		}
-
-		status_header( 206 );
-		header( 'Content-Range: bytes ' . $start . '-' . $end . '/' . $size );
-	} else {
-		status_header( 200 );
-	}
-
-	header( 'Content-Type: audio/wav' );
-	header( 'Accept-Ranges: bytes' );
-	header( 'Content-Length: ' . ( $end - $start + 1 ) );
-	// Private and short: the bytes are deterministic, and re-synthesising them on
-	// every play of every card would be pure waste.
-	header( 'Cache-Control: private, max-age=3600' );
-
-	echo substr( $wav, $start, $end - $start + 1 ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Binary audio, not markup.
-	exit;
 }
 }
 
@@ -806,10 +639,6 @@ function bpbtb_demo_compact_blocks() {
  */
 if ( ! function_exists( 'bpbtb_render_demo_preview' ) ) {
 function bpbtb_render_demo_preview() {
-	// Checked first: the Audio Testimonials cards request their clips from this
-	// same front-page URL, and those requests carry no preview slug.
-	bpbtb_render_demo_audio();
-
 	// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only preview, no state is changed.
 	$slug = isset( $_GET[ BPBTB_DEMO_QUERY_VAR ] ) ? sanitize_key( wp_unslash( $_GET[ BPBTB_DEMO_QUERY_VAR ] ) ) : '';
 

@@ -1,280 +1,222 @@
-# Testimonials — Product Landing Page Content
+# Testimonials — Product Landing Page Copy
 
-Structure mirrors https://bplugins.com/products/video-player-block/
+Ready to paste. Every line below goes on the page.
 
-- Product URL: https://bplugins.com/products/b-testimonials-block/
-- Demo: https://bblockswp.com/demo/testimonials-all-demos/
-- Docs: https://bplugins.com/docs/b-testimonials-block/
+Section order and layout patterns follow
+https://bplugins.com/products/video-player-block/. Nav and footer are site
+chrome and are not repeated here, so the numbering starts at the hero.
 
----
-
-## 1. HERO SECTION
-
-**Title:** Testimonials
-
-**Tagline:**
-Turn happy customers into your best salespeople. Build high-converting review sections right in the Gutenberg editor with 40+ ready-made layouts — grids, sliders, marquees, video reviews, and official-style score badges for Google, Trustpilot, G2, Facebook and Capterra.
-
-**CTA Buttons:**
-- Download Free → https://wordpress.org/plugins/b-testimonials-block/ *(primary)*
-- View Demo → https://bblockswp.com/demo/testimonials-all-demos/ *(secondary)*
-
-**Under-button line:**
-100% free · No account needed · No upsell popups
-
-**Social proof line:**
-Trusted by more than 1,000+ active users across the world
-
-**Hero image:** `.screenshots/testimonials-grid-2.png` (or `testimonials-hero.png`)
+Build notes, source checks, the open questions and the full screenshot
+inventory live in **LANDING-PAGE-NOTES.md** — read that before building.
 
 ---
 
-## 2. WHY CHOOSE TESTIMONIALS?
+## 1. HERO
+
+*Layout: text left, image right.*
+
+**Heading:** Testimonials
+
+**Intro:**
+Showcase customer reviews easily in the Gutenberg editor with a customizable and responsive Testimonials block for WordPress. Beyond plain quote cards, it offers 40+ ready-made layouts, official-style review score badges, and video and audio testimonials, making it the complete social proof toolkit for any site.
+
+**Primary CTA:** Download Free → https://wordpress.org/plugins/b-testimonials-block/
+
+**Secondary CTA:** View Demo → https://bblockswp.com/demo/testimonials-all-demos/
+
+**Under-button line:** 100% free · No account needed · No upsell popups
+
+**Image:** `.screenshots/landing-features/hero-icon.png` — 1200×1200 (2×), square,
+transparent background. Matches the reference page, whose hero is its plugin icon
+artwork at 600×600, not a screenshot.
+
+**Alternative:** `.screenshots/landing-features/hero-testimonials.png` — a composed
+screenshot of real block output, 2400×1560. Use only if the hero slot is wide
+rather than square; otherwise it suits a feature section better.
+
+---
+
+## 2. TRUST BAR
+
+*Layout: one line of copy above a strip of 5 customer logos.*
+
+**Line:** Trusted by 200+ WordPress sites
+
+*(Logo strip unresolved — see the notes file.)*
+
+---
+
+## 3. WHY CHOOSE TESTIMONIALS?
+
+*Layout: two-part — problems, then the solution with its own bullets.*
 
 **Heading:** Why Choose Testimonials?
 
-**Problem statement:**
-Social proof is the cheapest conversion lift you will ever ship — but only if it looks like it belongs on your page. Most testimonials plugins hand you one stiff layout, a colour picker, and a pile of custom CSS to write before it stops looking like a plugin.
+**Intro:**
+Customer reviews should look convincing and belong to your design. Traditional testimonial blocks often lack the layout range, media support, and trust signals needed for modern, conversion-focused websites.
 
-**Problems with traditional testimonial plugins:**
-- One or two layouts, so every site built with them looks identical
-- No video or audio reviews — text quotes only
-- Review score badges have to be hand-built or embedded from a third-party script
-- No way to collect reviews from visitors without adding a second form plugin
-- Testimonials get retyped on every page instead of being reused
-- Mobile columns and gaps need custom CSS to look right
+**The problem with most testimonials plugins**
+- One or two layouts, so every site built with them looks the same
+- Text quotes only — no video, no audio, no review-score badges
+- Reviews get retyped page by page, and mobile columns need custom CSS
 
-**Solution overview:**
-Testimonials makes social proof simple and powerful — 40+ layouts picked visually with zero CSS, official-style rating badges, video and audio reviews with lightbox playback, a front-end collection form with an approval queue, and a Testimonials post type you reuse across the whole site. All of it in the free version.
-
----
-
-## 3. FEATURE SECTIONS (image + text, alternating)
-
-> Ready-to-upload images for this section live in `.screenshots/landing-features/`.
-> The layout collage, all six badges and the form shot were rendered from the
-> plugin's own built `view.js` at 2× — they are real block output, not mockups.
-
-### 3.1 — 40+ Layouts, Picked Visually
-Choose from standard grids, gradient-border grids, responsive sliders, 3D coverflow carousels, masonry columns, avatar lists, card stacks, speech bubbles, customer timelines, case-study cards, quote boxes, compact lists, popup modals, and continuous marquee tickers. Pick a layout from the block placeholder or browse them all in the Testimonial Block Switcher — no CSS, no page builder, no shortcode.
-
-*Images:* `landing-features/feature-1-layouts.png` (collage of 10 layouts + "+32 more" tile)
-*Motion alt:* `landing-features/feature-1-layouts-alt.gif`
-
-### 3.2 — Official-Style Rating & Trust Badges
-Display review score badges styled after Google Business, Trustpilot, G2, Facebook Recommendations and Capterra, plus Verified Buyer seals, trust badges and client logo walls. Drop your score beside a pricing table or a product page and let the number do the selling. You control the score and review count as block attributes — nothing is fetched, nothing phones home.
-
-*Images:* `landing-features/feature-2-badges-google.png` (4.9 · 2,847 Reviews),
-`-trustpilot.png` (4.8 · 1,932), `-g2.png` (4.7 · 864), `-facebook.png` (4.9 · 1,204),
-`-capterra.png` (4.8 · 612), `-verified.png` (100% Verified Reviews)
-
-### 3.3 — Video & Audio Testimonials
-A customer on camera carries weight a paragraph never will. Embed YouTube, Vimeo or self-hosted MP4 reviews with popup lightbox playback, or publish voice-note style audio reviews with waveform styling. Self-hosted video makes no external request at all, and an embed only loads after a visitor clicks play.
-
-*Images:* `landing-features/feature-3-video.png`, `landing-features/feature-3-audio.gif`
-
-### 3.4 — Collect Reviews & Manage Submissions
-Drop the Testimonial Form block on any page and let customers send in their own reviews. Every submission lands as *pending* under **Testimonials → Submissions**, where you approve, reject or delete before anything goes live. Approved reviews save into the Testimonials custom post type and flow straight into any layout on the site.
-
-*Images:* `landing-features/feature-4-form.png` (full form, Submit button intact),
-`landing-features/feature-4-submissions.png`
-
-### 3.5 — Full Design Control on Every Device
-Set columns, column gap and row gap independently for Desktop, Tablet and Mobile. Customise card background, box shadow, padding, border style/width/colour/radius, avatar size and shape, and complete typography and colour for reviewer name, designation, review text and star icons. Add excerpt limits with expandable Read More / Show Less.
-
-*Images:* `landing-features/feature-5-controls-card.png`, `landing-features/feature-5-controls-typography.png`
+**Testimonials makes social proof simple and powerful**
+- **40+ layouts** picked from a visual switcher, with zero CSS to write
+- **Official-style score badges** for Google, Trustpilot, G2, Facebook and Capterra
+- **Video and audio reviews** with lightbox playback, plus a front-end collection form
+- **One Testimonials post type** reused across the whole site, responsive by default
 
 ---
 
-## 4. COMPREHENSIVE FEATURES LIST
+## 4. FEATURE — 40+ Layouts, Picked Visually
 
-- 40+ Modern Block Layouts
-- Google / Trustpilot / G2 / Facebook / Capterra Review Badges
-- Verified Buyer & Trust Badges
-- Video Testimonials with Lightbox
-- Audio Testimonials with Waveform
-- Testimonial Collection Form
-- Submissions Approval Dashboard
-- Testimonials Custom Post Type (CPT)
-- Rating Summary & Star Distribution Bars
-- Testimonial Stats & Satisfaction Counters
-- NPS Poll & User Feedback Poll
-- Comparison Table & FAQ Review Accordion
-- Before & After Showcase
-- Client Logo Grid & Carousel
-- Social Proof Toast Notifications
-- Continuous Marquee Ticker
-- Responsive Device Controls (Desktop / Tablet / Mobile)
-- Full Typography & Colour Controls
-- Card Design Customisation
-- Excerpt & Read More Control
-- Works With Any Theme & Full Site Editing
-- No Tracking, No Telemetry
+*Layout: image right.*
+
+**Heading:** 40+ Layouts, Picked Visually
+
+**Body:**
+Select from grids, sliders, carousels, masonry columns, speech bubbles, timelines, card stacks, or marquee tickers to present your reviews. Every layout is picked visually from the block placeholder or the Testimonial Block Switcher, with no CSS to write.
+
+**CTA:** Get it Free
+
+**Image:** `landing-features/feature-1-layouts.png`
 
 ---
 
-## 5. TESTIMONIALS SECTION
+## 5. FEATURE — Official-Style Rating & Trust Badges
+
+*Layout: image left.*
+
+**Heading:** Official-Style Rating & Trust Badges
+
+**Body:**
+Display official style score badges for Google Business, Trustpilot, G2, Facebook Recommendations, and Capterra, alongside Verified Buyer seals. You set the score and review count yourself as block attributes, so nothing is fetched and nothing phones home.
+
+**CTA:** Get it Free
+
+**Image:** `landing-features/feature-2-badges.png`
+
+---
+
+## 6. FEATURE — Video & Audio Testimonials
+
+*Layout: image right.*
+
+**Heading:** Video & Audio Testimonials
+
+**Body:**
+Share video reviews from YouTube, Vimeo, or your own Media Library with popup lightbox playback, or publish voice note reviews with waveform styling. A self-hosted file makes no external request at all, and an embed loads only after a visitor clicks play.
+
+**CTA:** Get it Free
+
+**Image:** `landing-features/feature-3-video-audio.png`
+
+---
+
+## 7. FEATURE — Collect Reviews & Manage Submissions
+
+*Layout: image left.*
+
+**Heading:** Collect Reviews & Manage Submissions
+
+**Body:**
+Collect reviews straight from your visitors with the Testimonial Form block on any page. Every submission arrives as pending under **Testimonials → Submissions** for you to approve, reject, or delete, then flows into any layout on the site.
+
+**CTA:** Get it Free
+
+**Image:** `landing-features/feature-4-collect.png`
+
+---
+
+## 8. FEATURES OVERVIEW
+
+*Layout: 3-column card grid, 12 cards, each a title plus one line.*
+
+**Heading:** Smarter Testimonials That Look Great and Just Work
+
+| # | Card title | Description |
+|---|---|---|
+| 1 | 40+ Block Layouts | Switch between grids, sliders, marquees, timelines, and speech bubbles for the layout that fits your page. |
+| 2 | Review Score Badges | Display official style Google, Trustpilot, G2, Facebook, and Capterra badges for instant credibility. |
+| 3 | Video Testimonials | Embed YouTube, Vimeo, or self-hosted MP4 reviews with lightbox playback for proof that carries weight. |
+| 4 | Audio Testimonials | Publish voice note reviews with waveform styling for customers who will talk but not appear on camera. |
+| 5 | Testimonial Collection Form | Drop a front-end review form on any page for feedback that arrives without a second plugin. |
+| 6 | Submissions Dashboard | Approve, reject, or delete every submission for full control over what reaches your visitors. |
+| 7 | Testimonials Post Type | Write each review once and reuse it across any layout for a site that never repeats itself. |
+| 8 | Rating Summary & Stats | Show an overall score, star distribution bars, and satisfaction counters for proof at a glance. |
+| 9 | Excerpt & Read More | Trim long reviews to a set length with an expandable Read More button for cards that stay evenly sized. |
+| 10 | Beyond the Written Review | Add trust badges, client logos, NPS polls, and before and after showcases for social proof of every kind. |
+| 11 | Responsive Device Controls | Set columns and gaps independently for desktop, tablet, and mobile for a layout that holds on every screen. |
+| 12 | Privacy Friendly | Runs with no analytics, telemetry, or usage tracking for a site that keeps its visitor data to itself. |
+
+---
+
+## 9. TESTIMONIALS
+
+*Layout: 4-item carousel with customer thumbnails.*
 
 **Heading:** What Our Customers Say to Us
 
-*(4 customer testimonial cards — reuse the site-wide bPlugins testimonial set, same as the Video Player Block page.)*
+*(No reviews of this plugin exist yet — see the notes file before filling this in.)*
 
 ---
 
-## 6. SCREENSHOTS SECTION
+## 10. SCREENSHOTS GALLERY
+
+*Layout: 5-image gallery grid.*
 
 **Heading:** Explore the Layouts, Settings & Preview Screens
 
-All files live in `.screenshots/`. Items marked **GIF** have an animated version —
-use the `.gif` on the landing page and the `.png` as its poster/fallback.
-
-### 6.1 — Testimonial Layouts (tabbed gallery)
-
-| # | Label | File |
+| # | Caption | File |
 |---|---|---|
-| 1 | Default Cards | `b-testimonials.png` |
-| 2 | Testimonials Hero | `testimonials-hero.png` |
-| 3 | Centered Cards Grid | `testimonials-grid-2.png` |
-| 4 | Gradient Border Grid | `testimonials-grid-3.png` |
-| 5 | Minimal Grid | `testimonials-grid-minimal.png` |
-| 6 | Testimonials Masonry | `testimonials-masonry.png` |
-| 7 | Testimonials List | `testimonials-list.png` |
-| 8 | Compact Reviews List | `testimonials-compact.png` |
-| 9 | Avatar List | `testimonials-avatar-list.png` |
-| 10 | Quote Box | `testimonials-quote-box.png` |
-| 11 | Speech Bubble | `testimonials-speech-bubble.png` |
-| 12 | Customer Timeline | `testimonials-timeline.png` |
-| 13 | Case Study Card | `case-study-card.png` |
-| 14 | Popup Modal | `testimonials-popup-modal.png` |
-| 15 | Testimonials Slider — **GIF** | `testimonials-slider.gif` / `.png` |
-| 16 | 3D Slider — **GIF** | `testimonials-slider-3d.gif` / `.png` |
-| 17 | Coverflow Carousel — **GIF** | `testimonials-carousel-2.gif` / `.png` |
-| 18 | Card Stack — **GIF** | `testimonials-card-stack.gif` / `.png` |
-| 19 | Marquee Ticker — **GIF** | `testimonials-marquee.gif` / `.png` |
-| 20 | Floating Avatar Bubble — **GIF** | `testimonials-floating-bubble.gif` / `.png` |
-
-### 6.2 — Rating & Trust Badges
-
-| # | Label | File |
-|---|---|---|
-| 21 | Google Reviews Badge | `google-review-badge.png` |
-| 22 | Trustpilot Badge | `trustpilot-review-badge.png` |
-| 23 | G2 Badge | `g2-review-badge.png` |
-| 24 | Facebook Recommendations Badge | `facebook-review-badge.png` |
-| 25 | Capterra Badge | `capterra-review-badge.png` |
-| 26 | Verified Buyer Seal | `verified-buyer-badge.png` |
-| 27 | Generic Review Badge Widget | `review-badge-widget.png` |
-| 28 | Trust Badges | `trust-badges.png` |
-| 29 | Client Logos | `client-logos.png` |
-
-### 6.3 — Video, Audio & Rich Media
-
-| # | Label | File |
-|---|---|---|
-| 30 | Video Testimonials | `video-testimonials.png` |
-| 31 | Audio Testimonials — **GIF** | `audio-testimonials.gif` / `.png` |
-| 32 | Before & After | `before-after.png` |
-
-### 6.4 — Stats, Scores & Interactive
-
-| # | Label | File |
-|---|---|---|
-| 33 | Rating Summary | `rating-summary.png` |
-| 34 | Star Rating Bars | `star-rating-bars.png` |
-| 35 | Testimonial Stats | `testimonial-stats.png` |
-| 36 | Comparison Table | `comparison-testimonial-table.png` |
-| 37 | FAQ Review Accordion | `faq-testimonial-accordion.png` |
-| 38 | User Feedback Poll | `user-feedback-poll.png` |
-| 39 | Social Proof Toast — **GIF** | `social-proof-toast.gif` / `.png` |
-
-### 6.5 — Collection & Admin
-
-| # | Label | File |
-|---|---|---|
-| 40 | Testimonial Form | `testimonial-form.png` |
-| 41 | Submissions Dashboard | `submissions-dashboard.png` |
-| 42 | NPS Poll Results (admin) | `feedback-nps-poll-admin.png` |
-
-### 6.6 — Editor Controls & Settings Panels
-
-| # | Label | File |
-|---|---|---|
-| 43 | Content & Layout (general) | `controls-general-content-layout.png` |
-| 44 | Grid — General 1 | `controls-grid-general-1.png` |
-| 45 | Grid — General 2 | `controls-grid-general-2.png` |
-| 46 | Grid — Layout (columns & gaps) | `controls-grid-layout.png` |
-| 47 | Grid — Elements toggles | `controls-grid-elements.png` |
-| 48 | Grid — Card style | `controls-grid-card.png` |
-| 49 | Grid — Style 1 | `controls-grid-style-1.png` |
-| 50 | Grid — Style 2 | `controls-grid-style-2.png` |
-| 51 | Grid — Name typography & colour | `controls-grid-name-typography.png` |
-| 52 | Style — Colours & card | `controls-style-colors-card.png` |
-| 53 | Style — Width & typography | `controls-style-width-typography.png` |
-| 54 | Badge — Width & alignment | `controls-badge-width-alignment.png` |
-| 55 | Badge — Logo sizing | `controls-badge-logo.png` |
-| 56 | Video — Videos panel | `controls-video-videos.png` |
-| 57 | Video — Width & height | `controls-video-width-alignment.png` |
-
-> Cropped variants of the control panels are in `.screenshots/tight/`
-> (`grid-card`, `grid-elements`, `grid-layout`, `grid-name`, `badge-logo`,
-> `badge-width`, `video-videos`, `video-width`) — better for narrow columns.
-
-### 6.7 — How To Use (step-by-step strip)
-
-| # | Step | File |
-|---|---|---|
-| 58 | Activate the plugin | `howto-0-plugin-active.png` |
-| 59 | Pages → Add New | `howto-1-pages-screen.png` |
-| 60 | Search "Testimonials" in the inserter | `howto-1-inserter-search.png` |
-| 61 | Pick a layout from the placeholder | `howto-2-layout-picker.png` |
-| 62 | First layout inserted | `howto-2-first-layout.png` |
-| 63 | Browse every layout in the switcher | `howto-3-switcher-modal.png` |
-| 64 | Switching replaces the content | `howto-3b-switching-resets-content.png` |
-| 65 | Edit your reviews, then Publish | `howto-4-editing.png` |
-
-> Annotated versions of all 8 how-to shots (with callout arrows/numbers) are in
-> `.screenshots/marked/` — use those for the tutorial strip.
+| 1 | Centered Cards Grid | `testimonials-grid-2.png` |
+| 2 | Testimonials Slider | `testimonials-slider.png` |
+| 3 | Video Testimonials | `video-testimonials.png` |
+| 4 | Google Reviews Badge | `google-review-badge.png` |
+| 5 | Block Settings Panel | `controls-grid-card.png` |
 
 ---
 
-## 7. FAQ SECTION
+## 11. FAQ
+
+*Layout: accordion.*
 
 **Heading:** Frequently Asked Questions
 
 **Q: Is Testimonials free to use?**
-Yes. Testimonials is a free Gutenberg block plugin with 40+ layouts, trust badges, CPT integration and the admin submissions dashboard included.
+Yes. 40+ layouts, trust badges, the post type and the submissions dashboard are all in the free version. There is no paywalled feature and no Pro upsell.
 
 **Q: Does it work with any WordPress theme?**
-Yes. Testimonials is fully responsive and compatible with all standard WordPress themes and block-based site editors.
+Yes. Testimonials is fully responsive and compatible with all standard themes and block-based site editors.
 
 **Q: Can I collect testimonials from website visitors?**
-Yes. Insert the Testimonial Form block on any page. Submissions are saved as *pending* under **Testimonials → Submissions** for review and approval before publishing.
+Yes. Insert the Testimonial Form block on any page. Submissions save as *pending* under **Testimonials → Submissions** for approval before publishing.
 
 **Q: Can I reuse the same testimonials across multiple pages?**
-Yes. Create them once under **Testimonials → Add New**, then set **Content Source** to *Testimonials CPT* in any block's settings and they appear automatically.
+Yes. Create them once under **Testimonials → Add New**, then set **Content Source** to *Testimonials CPT* in any block's settings.
 
 **Q: Does switching layouts keep my content?**
 No. Picking a different layout replaces the block with that layout's own starting content. Pick the layout first, then add your real reviews.
 
-**Q: Are the Google, Trustpilot, G2, Facebook and Capterra badges pulled live from those platforms?**
-No. Each badge is a static widget — you enter the score and review count yourself as block attributes. Nothing is fetched from those platforms, so keep the number up to date as your real rating changes.
+**Q: Are the Google, Trustpilot, G2, Facebook and Capterra badges pulled live?**
+No. Each badge is a static widget — you enter the score and review count yourself. Nothing is fetched from those platforms, so keep the number up to date as your real rating changes.
 
 **Q: Can I use my own self-hosted video instead of YouTube or Vimeo?**
-Yes. The Video Testimonials block's Video URL field has an upload button — pick any video from your Media Library or paste a direct MP4 URL. A self-hosted video makes no external request at all.
+Yes. The Video Testimonials block's Video URL field has an upload button, or paste a direct MP4 URL. A self-hosted video makes no external request at all.
 
 **Q: Does the plugin track my usage data?**
-No. Testimonials collects no analytics, telemetry or usage data of any kind, and it does not phone home on activation.
+No. Testimonials collects no analytics, telemetry or usage data, and does not phone home on activation.
 
 **Q: Where can I get support?**
 Post on the [WordPress.org support forum](https://wordpress.org/support/plugin/b-testimonials-block/) or visit [bPlugins Support](https://bplugins.com/support/).
 
 ---
 
-## 8. FOOTER CTA
+## 12. FINAL CTA
 
 **Heading:** Start collecting social proof today — free.
 
-**Text:** Every layout, every badge, the video reviews and the collection form. No trial, no locked features, no credit card. Install it and ship your testimonial section this afternoon.
+**Body:** Every layout, every badge, the video reviews and the collection form. No trial, no locked features, no credit card.
 
 **CTA:** Download Free → https://wordpress.org/plugins/b-testimonials-block/
 

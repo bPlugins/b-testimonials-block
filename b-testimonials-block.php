@@ -6,7 +6,7 @@
  * Author: bPlugins
  * Author URI: http://bplugins.com
  * Requires at least: 6.5
- * Requires PHP: 7.2
+ * Requires PHP: 7.4
  * License: GPLv3
  * License URI: https://www.gnu.org/licenses/gpl-3.0.txt
  * Text Domain: b-testimonials-block
@@ -87,20 +87,11 @@ class BPBTB_Testimonials_Block{
         if ( ! defined( 'BPBTB_PLUGIN_VERSION' ) ) {
             define( 'BPBTB_PLUGIN_VERSION', $is_local ? time() : '1.0.4' );
         }
-        if ( ! defined( 'BTB_PLUGIN_VERSION' ) ) {
-            define( 'BTB_PLUGIN_VERSION', BPBTB_PLUGIN_VERSION );
-        }
         if ( ! defined( 'BPBTB_ASSETS_DIR' ) ) {
             define( 'BPBTB_ASSETS_DIR', plugin_dir_url( __FILE__ ) . 'assets/' );
         }
-        if ( ! defined( 'BTB_ASSETS_DIR' ) ) {
-            define( 'BTB_ASSETS_DIR', BPBTB_ASSETS_DIR );
-        }
         if ( ! defined( 'BPBTB_DIR' ) ) {
             define( 'BPBTB_DIR', plugin_dir_url( __FILE__ ) );
-        }
-        if ( ! defined( 'BTB_DIR' ) ) {
-            define( 'BTB_DIR', BPBTB_DIR );
         }
     }
 

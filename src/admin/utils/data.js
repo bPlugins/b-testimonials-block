@@ -442,21 +442,86 @@ const blockDemoUrl = (demoUrls, demoBase, slug) =>
  * @param {string} demoBase Site home URL, passed through from home_url( '/' ).
  * @param {Object} demoUrls Preview slug => URL, resolved in PHP.
  */
+/**
+ * A demo group whose `icon` answers with the icon of the child being read.
+ *
+ * The Demos screen draws one glyph per card, and it takes it from the group
+ * rather than the card: `processCard` sets `categoryIcon: demo.icon` for every
+ * child, and the card renders `categoryIcon`. The child's own `icon` -- the one
+ * `demoInfo` sets below, the one the block shows in the inserter -- is spread
+ * onto the card and then never read. So all seven Grids & Lists cards drew the
+ * same four-square glyph, and the tile said nothing the category chip under it
+ * did not already say.
+ *
+ * The fix belongs in that component (`categoryIcon: cardData.icon || demo.icon`,
+ * one line, and every bPlugins dashboard gets it at once). Until that lands this
+ * does it from our side, without touching bpl-tools.
+ *
+ * `children` is a Proxy: reading an index records which child it handed over,
+ * and `icon` is a getter that answers with that child's icon. The screen reads
+ * them in exactly that order --
+ *
+ *     demo.children.forEach( child => cards.push( processCard( child ) ) )
+ *
+ * -- so `children[i]` is always read immediately before the `demo.icon` that
+ * describes it. The answer is keyed to the child that was handed over, not to a
+ * running count, so a second read of `icon` for the same card repeats that
+ * card's icon instead of shuffling the group out of step. Anything reading
+ * `icon` before touching a child at all gets the group icon, which is what the
+ * screen drew before this existed.
+ *
+ * The group is built here and returned whole rather than spread into a literal
+ * at the call site: spreading an object reads its getters, which would freeze
+ * `icon` at the fallback before the screen ever saw a card.
+ *
+ * @param {string}      title     The category name, printed on the card's chip.
+ * @param {JSX.Element} groupIcon The group's own glyph, and the fallback.
+ * @param {Array}       children  Demo cards, each carrying its own `icon`.
+ * @return {Object} One entry for `demoInfo().demos`.
+ */
+const perCardIcons = (title, groupIcon, children) => {
+  let current = null;
+
+  const group = {
+    title,
+    children: new Proxy(children, {
+      get(target, prop, receiver) {
+        const value = Reflect.get(target, prop, receiver);
+        // Array indices arrive as strings; `length`, `forEach` and the iterator
+        // symbol must not count as handing over a card.
+        if ("string" === typeof prop && String(Number(prop)) === prop) {
+          current = value;
+        }
+        return value;
+      },
+    }),
+  };
+
+  Object.defineProperty(group, "icon", {
+    enumerable: true,
+    get: () => current?.icon || groupIcon,
+  });
+
+  return group;
+};
+
 export const demoInfo = (demoBase = "/", demoUrls = {}) => ({
   allInOneLabel: "Browse All Blocks",
   // The plugin's own block list, rather than an off-site demo index.
   allInOneLink: `${demoBase}wp-admin/edit.php?post_type=testimonial&page=bpbtb-dashboard#/welcome`,
-  demos: demoGroups.map(({ icon, title, blocks }) => ({
-    icon,
-    title,
-    children: blocks.map(([slug, label]) => ({
-      title: label,
-      type: "iframe",
-      url: blockDemoUrl(demoUrls, demoBase, slug),
-      // The block's own icon rather than this group's -- see demoBlockIcon().
-      icon: demoBlockIcon(slug),
-    })),
-  })),
+  demos: demoGroups.map(({ icon, title, blocks }) =>
+    perCardIcons(
+      title,
+      icon,
+      blocks.map(([slug, label]) => ({
+        title: label,
+        type: "iframe",
+        url: blockDemoUrl(demoUrls, demoBase, slug),
+        // The block's own icon rather than this group's -- see demoBlockIcon().
+        icon: demoBlockIcon(slug),
+      })),
+    ),
+  ),
 });
 
 /**

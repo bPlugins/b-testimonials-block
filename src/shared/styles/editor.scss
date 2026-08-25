@@ -1,701 +1,1427 @@
-$primaryColor: #4527a4;
+@use './custom-icon' as *;
+
+// bPlugins brand colour. Applied to icon wrappers only; the icons themselves
+// stay `currentColor` so the hover/active states can still flip them to white.
+$brandColor: #146ef5;
 
 // Custom
 .btbNowEditing {
-	outline: 2px solid $primaryColor;
+  outline: 2px solid $brandColor;
 }
 
 .btbCptNotice {
-	padding: 30px 20px;
-	text-align: center;
-	border: 1px dashed #c3c4c7;
-	border-radius: 4px;
-	color: #757575;
+  padding: 30px 20px;
+  text-align: center;
+  border: 1px dashed #c3c4c7;
+  border-radius: 4px;
+  color: #757575;
 }
 
-
+// Hover-to-upload overlay: a plus button that fades in over an avatar and
+// opens the media library for that card.
+//
+// This used to be scoped to `.layoutSection .authorImg`, so it only reached the
+// layouts that wrap their cards in that element. Hero, timeline and card-stack
+// build their own wrapper, which left their overlay unpositioned -- and once
+// `.img` started clipping its overflow, invisible. Anchoring is per-avatar
+// below; the overlay rule itself is layout-agnostic.
 .bTestimonials {
-	.layoutSection {
-		.authorImg {
-			.img {
-				position: relative;
+  .authorImg .img,
+  .btb-avatar-thumb,
+  .btb-bubble-avatar,
+  .btb-cs-avatar-wrap {
+    position: relative;
+  }
 
-				img {
-					// width: 100%;
-					// height: 100%;
-					// object-fit: cover;
-					// border-radius: 50%;
-				}
-			}
+  .upload {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: 0.3s;
+    // The plus icon is drawn in black, so it needs a light scrim to stay
+    // legible over a dark photo. `inherit` keeps it inside a circular avatar.
+    background: rgba(255, 255, 255, 0.68);
+    border-radius: inherit;
+    cursor: pointer;
 
-			.upload {
-				position: absolute;
-				top: 0;
-				left: 0;
-				width: 100%;
-				height: 100%;
-				display: flex;
-				align-items: center;
-				justify-content: center;
-				opacity: 0;
-				transition: 0.3s;
+    button {
+      padding: 0px;
+    }
 
-				button {
-					padding: 0px;
-				}
+    &:hover {
+      opacity: 1;
+      transition: 0.3s;
+    }
+  }
+}
 
-				&:hover {
-					opacity: 1;
-					transition: 0.3s;
-				}
-			}
+// Collapsed excerpt for the Expand/Less toggle. The text is already cut to
+// `textLength` in JS, exactly as the front end cuts it, so there is nothing to
+// truncate here -- this only advertises that clicking the excerpt expands it
+// back into an editable field.
+.reviewText.btbTextCollapsed {
+	cursor: text;
+}
+
+/*
+ * Vertical rhythm for inspector controls.
+ *
+ * bpl-tools deliberately zeroes WordPress core's 16px control spacing across
+ * the whole block inspector (Components/style.scss), on the assumption that
+ * every control carries an explicit mt/mb utility. Most of this plugin's
+ * controls don't, so they end up flush against each other. Restore a baseline
+ * gap between the direct children of our panels.
+ *
+ * Using margin-top on subsequent siblings (rather than margin-bottom on all)
+ * means the mt* utilities -- which are !important -- cleanly override this
+ * instead of stacking on top of it.
+ */
+.bPlPanelBody {
+	> * + * {
+		margin-top: 16px;
+	}
+
+	// The panel title already carries its own spacing.
+	> .components-panel__body-title + * {
+		margin-top: 0;
+	}
+
+	/*
+	 * Two controls sharing a row need a gap between them.
+	 *
+	 * PanelRow is `justify-content: space-between`, which only reads as spacing
+	 * when the pair does not fill the row. Where it does -- the Image panel's
+	 * Width and Height, measured at 122px and 124px in a 246px column -- the two
+	 * controls ended up touching at exactly 0px, so the fields ran together with
+	 * no seam. A `gap` is a minimum, not a fixed amount, so the label-and-control
+	 * rows that already sit far apart are unaffected.
+	 *
+	 * The media picker is excluded on purpose: its text field and upload button
+	 * are meant to read as one joined input group, which a gap would break.
+	 */
+	.components-panel__row:not(.bPlInlineMediaUpload) {
+		gap: 12px;
+	}
+
+	// Rows inside a repeater need breathing room from their separator too.
+	.btb-badge-row,
+	.btb-logo-row,
+	.btb-video-row,
+	.btb-stat-row {
+		> * + * {
+			margin-top: 16px;
+		}
+
+		hr {
+			margin: 16px 0 0;
 		}
 	}
+}
+
+/*
+ * The card chips.
+ *
+ * Was an inline flex style on the shared panel only. Moved here so the shared
+ * panel and every editor built on ItemCards lay the row out identically -- the
+ * component sets the class and nothing else, and a second copy of these three
+ * declarations in JS is a copy that drifts.
+ */
+.btb-card-selector-list {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 6px;
+}
+/*
+ * The card editors' vertical rhythm.
+ *
+ * Every field in these panels carried its own margin utility -- mt5 here, mt10
+ * there, none on the media picker -- and the result was measurably backwards.
+ * Measured in the Testimonial Cards panel before this rule:
+ *
+ *   Customer Image / Avatar:  label
+ *                            16px   <- label to ITS OWN field
+ *   [ the upload field ]
+ *                            10px   <- field to the NEXT field
+ *   Name
+ *                            10px
+ *   Company / Designation
+ *
+ * A label sat further from the control it introduces than that control sat
+ * from the next one down, so each label read as belonging to the field above
+ * it. The 16px came from .bPlPanelBody's own `> * + *` landing on the picker,
+ * against which the label's 5px bottom margin collapsed and lost.
+ *
+ * So: one step of 16px between fields, and a label bound to its own control at
+ * 6px. Scoped to the item editors -- .editItem is already on the shared card
+ * panel, and the four -row classes above are the bespoke ones -- rather than
+ * applied to every panel in the plugin, so no unrelated control moves.
+ */
+.bPlPanelBody.editItem,
+.bPlPanelBody .btb-section-card {
+	> * + * {
+		margin-top: 16px;
+	}
+
+	// The title button and the card chips keep the spacing they already had.
+	> .components-panel__body-title + *,
+	> .btb-card-selector-list + * {
+		margin-top: 0;
+	}
+
+	/*
+	 * A section label and the control under it are one unit: more air above the
+	 * pair than inside it, which is the whole point of the label. The 5px comes
+	 * from the Label component's own mb5; all this has to do is stop the 16px
+	 * rhythm from being added on top of it.
+	 */
+	> .bPlLabel + * {
+		margin-top: 0;
+	}
+}
+
+/*
+ * Backstop for the inserter's `fill: currentColor` on block icons. The inline
+ * style set in getBlockIcon covers rules that target the <svg>; this covers
+ * rules that reach the child paths directly, which an inline style on the
+ * parent cannot beat.
+ */
+svg.btb-inserter-icon[fill="none"] * {
+	fill: none;
 }
 
 /* ==========================================================================
    BTB Block Switcher Modal, Canvas Placeholder & Sidebar Styles
    ========================================================================== */
 
-/* Custom Ultra-Modern React Modal (WP-Free UI) */
+/*
+ * The block switcher modal.
+ *
+ * Third and last of the plugin's block-choosing surfaces to move into the Demo &
+ * Help dashboard's language, after assets/admin-pages.css (Submissions, Feedback
+ * & NPS Poll) and the canvas placeholder below. It is the one you reach *from*
+ * the placeholder, so the two sat one click apart with 20px radii, a gradient
+ * header tile and red-gradient ribbons on one side and squared, category-tinted
+ * cards on the other.
+ *
+ * Values from bpl-tools/Admin/Demos/style.scss and __variables.scss, same as the
+ * other two: #001737 titles, #1B2E4B body, 1px rgba(27,46,75,.1) borders, the
+ * 0 1px 3px / 0 10px 24px shadow pair, and square corners throughout.
+ *
+ * Kept: the dialog's fade and scale-in, which is motion rather than decoration,
+ * and the search and category filters, which are the toolbar the dashboard's
+ * Demos route has too.
+ */
+
+/* Category accents, shared by the modal's cards, its filter chips and the canvas
+   placeholder's cards below -- the first four of the eight colours the Demos
+   route assigns, in its order. One map, so the same block is the same colour on
+   every surface. */
+.btb-custom-modal-dialog,
+.btb-my-testimonials-feeds {
+  .layouts-item,
+  .btb-cat-chip.is-layouts {
+    --accent: #3b82f6;
+  }
+
+  .social-item,
+  .btb-cat-chip.is-social {
+    --accent: #10b981;
+  }
+
+  .media-item,
+  .btb-cat-chip.is-media {
+    --accent: #8b5cf6;
+  }
+
+  .interactive-item,
+  .btb-cat-chip.is-interactive {
+    --accent: #f59e0b;
+  }
+}
+
 .btb-custom-modal-backdrop {
-	position: fixed;
-	inset: 0;
-	z-index: 999999;
-	background: rgba(15, 23, 42, 0.72);
-	backdrop-filter: blur(8px);
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	padding: 20px;
-	animation: btbFadeIn 0.2s ease-out;
+  position: fixed;
+  inset: 0;
+  z-index: 999999;
+  background: rgba(9, 30, 66, 0.72);
+  backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  animation: btbFadeIn 0.2s ease-out;
 }
 
 @keyframes btbFadeIn {
-	from { opacity: 0; }
-	to { opacity: 1; }
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
 .btb-custom-modal-dialog {
-	background: #ffffff;
-	width: 960px;
-	max-width: 95vw;
-	max-height: 88vh;
-	border-radius: 20px;
-	box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.35);
-	display: flex;
-	flex-direction: column;
-	overflow: hidden;
-	animation: btbScaleUp 0.25s cubic-bezier(0.16, 1, 0.3, 1);
-	border: 1px solid rgba(255, 255, 255, 0.2);
+  --btb-modal-primary: #0b81ee;
+  --btb-modal-title: #001737;
+  --btb-modal-content: #1b2e4b;
+  --btb-modal-line: rgba(27, 46, 75, 0.1);
+
+  background: #ffffff;
+  width: 1080px;
+  max-width: 95vw;
+  max-height: 88vh;
+  border: 1px solid var(--btb-modal-line);
+  border-radius: 0;
+  box-shadow: 0 24px 60px rgba(9, 30, 66, 0.28);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  animation: btbScaleUp 0.25s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 @keyframes btbScaleUp {
-	from { transform: scale(0.95); opacity: 0; }
-	to { transform: scale(1); opacity: 1; }
+  from {
+    transform: scale(0.95);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
 }
 
 .btb-custom-modal-header {
-	padding: 24px 28px 16px 28px;
-	display: flex;
-	align-items: center;
-	justify-content: space-between;
-	background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
-	border-bottom: 1px solid #f1f5f9;
+  padding: 20px 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  background: #ffffff;
+  border-bottom: 1px solid var(--btb-modal-line);
 
-	.btb-modal-title-wrap {
-		display: flex;
-		align-items: center;
-		gap: 14px;
-	}
+  .btb-modal-title-wrap {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
 
-	.btb-modal-header-icon {
-		width: 48px;
-		height: 48px;
-		border-radius: 14px;
-		background: linear-gradient(135deg, $primaryColor, #312e81);
-		color: #ffffff;
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		box-shadow: 0 8px 16px rgba(69, 39, 164, 0.25);
-	}
+  /* Flat tint, not a gradient with a coloured drop shadow: the same tile the
+     dashboard's cards use, at the size the header needs. */
+  .btb-modal-header-icon {
+    width: 44px;
+    height: 44px;
+    flex-shrink: 0;
+    border-radius: 0;
+    background: rgba(11, 129, 238, 0.12);
+    color: var(--btb-modal-primary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
 
-	.btb-modal-title {
-		margin: 0 0 2px 0;
-		font-size: 20px;
-		font-weight: 800;
-		color: #0f172a;
-		letter-spacing: -0.4px;
-	}
+    svg {
+      fill: none;
+      stroke: currentColor;
+    }
+  }
 
-	.btb-modal-desc {
-		margin: 0;
-		font-size: 13px;
-		color: #64748b;
-	}
+  /*
+   * `text-transform` and `font-style` are stated, not inherited.
+   *
+   * This dialog renders inside the editor canvas, where the active theme's editor
+   * styles reach it -- and a theme that uppercases its h3s turns the title into
+   * TESTIMONIAL BLOCK SWITCHER. Plugin chrome should read the same whatever theme
+   * is active, so anything a theme is likely to set on a heading is set here.
+   */
+  .btb-modal-title {
+    margin: 0;
+    font-size: 20px;
+    font-weight: 700;
+    line-height: 1.25;
+    letter-spacing: -0.3px;
+    text-transform: none;
+    font-style: normal;
+    color: var(--btb-modal-title);
+  }
 
-	.btb-modal-close-btn {
-		background: #f1f5f9;
-		border: none;
-		width: 36px;
-		height: 36px;
-		border-radius: 50%;
-		font-size: 22px;
-		line-height: 1;
-		color: #64748b;
-		cursor: pointer;
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		transition: all 0.2s ease;
+  .btb-modal-desc {
+    margin: 2px 0 0;
+    font-size: 13px;
+    line-height: 1.5;
+    text-transform: none;
+    font-style: normal;
+    color: rgba(27, 46, 75, 0.65);
+  }
 
-		&:hover {
-			background: #fee2e2;
-			color: #dc2626;
-			transform: rotate(90deg);
-		}
-	}
+  /* The old button spun 90 degrees into red on hover. The dashboard's own modal
+     close is a quiet square that darkens; a dialog's dismiss control should not
+     be the liveliest thing on screen. */
+  .btb-modal-close-btn {
+    width: 34px;
+    height: 34px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: rgba(27, 46, 75, 0.65);
+    background: rgba(27, 46, 75, 0.06);
+    border: none;
+    border-radius: 0;
+    cursor: pointer;
+    transition: background 0.18s ease, color 0.18s ease;
+
+    &:hover {
+      color: var(--btb-modal-title);
+      background: rgba(27, 46, 75, 0.12);
+    }
+  }
 }
 
 .btb-custom-modal-toolbar {
-	padding: 14px 28px;
-	background: #f8fafc;
-	border-bottom: 1px solid #e2e8f0;
-	display: flex;
-	align-items: center;
-	justify-content: space-between;
-	flex-wrap: wrap;
-	gap: 12px;
+  padding: 14px 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 16px;
+  background: #ffffff;
+  border-bottom: 1px solid var(--btb-modal-line);
 }
 
 .btb-modal-cats {
-	display: flex;
-	gap: 6px;
-	flex-wrap: wrap;
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
 }
 
+/* The dashboard's filter chip: a dot in the category's colour, a label, and the
+   dark-navy active state -- not a rounded pill that turns solid brand blue. */
 .btb-cat-chip {
-	background: #ffffff;
-	border: 1px solid #cbd5e1;
-	border-radius: 20px;
-	padding: 6px 16px;
-	font-size: 12px;
-	font-weight: 600;
-	color: #475569;
-	cursor: pointer;
-	transition: all 0.2s ease;
+  --accent: rgba(27, 46, 75, 0.4);
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 7px 14px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #1b2e4b;
+  background: transparent;
+  border: 1px solid rgba(27, 46, 75, 0.15);
+  border-radius: 0;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s, color 0.15s;
 
-	&:hover {
-		background: #f1f5f9;
-		color: #0f172a;
-		border-color: #94a3b8;
-	}
+  &::before {
+    content: "";
+    width: 8px;
+    height: 8px;
+    flex-shrink: 0;
+    background: var(--accent);
+  }
 
-	&.is-active {
-		background: $primaryColor;
-		border-color: $primaryColor;
-		color: #ffffff;
-		box-shadow: 0 4px 12px rgba(69, 39, 164, 0.3);
-	}
+  &:hover {
+    color: #001737;
+    border-color: rgba(11, 129, 238, 0.4);
+  }
+
+  &.is-active {
+    color: #ffffff;
+    background: #001737;
+    border-color: #001737;
+    box-shadow: none;
+
+    &::before {
+      background: rgba(255, 255, 255, 0.55);
+    }
+  }
 }
 
 .btb-modal-search-box {
-	position: relative;
-	min-width: 240px;
+  position: relative;
+  display: flex;
+  align-items: center;
+  flex: 0 1 300px;
 
-	.search-icon {
-		position: absolute;
-		left: 10px;
-		top: 50%;
-		transform: translateY(-50%);
-		color: #94a3b8;
-		font-size: 16px;
-		width: 16px;
-		height: 16px;
-	}
+  .search-icon {
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 18px;
+    height: 18px;
+    color: rgba(27, 46, 75, 0.5);
+    pointer-events: none;
+  }
 
-	input {
-		width: 100%;
-		border-radius: 10px;
-		border: 1px solid #cbd5e1;
-		padding: 7px 32px 7px 32px;
-		font-size: 13px;
-		outline: none;
-		transition: all 0.2s ease;
-		background: #ffffff;
+  input {
+    width: 100%;
+    padding: 9px 36px 9px 40px;
+    font-size: 14px;
+    color: #001737;
+    background: rgba(27, 46, 75, 0.05);
+    border: 1px solid transparent;
+    border-radius: 0;
+    outline: none;
+    box-shadow: none;
+    transition: background 0.15s, border-color 0.15s, box-shadow 0.15s;
 
-		&:focus {
-			border-color: $primaryColor;
-			box-shadow: 0 0 0 3px rgba(69, 39, 164, 0.15);
-		}
-	}
+    &:focus {
+      background: #ffffff;
+      border-color: rgba(11, 129, 238, 0.45);
+      box-shadow: 0 0 0 3px rgba(11, 129, 238, 0.1);
+    }
 
-	.clear-search-btn {
-		position: absolute;
-		right: 8px;
-		top: 50%;
-		transform: translateY(-50%);
-		background: none;
-		border: none;
-		color: #94a3b8;
-		font-size: 16px;
-		cursor: pointer;
+    &::placeholder {
+      color: rgba(27, 46, 75, 0.45);
+    }
+  }
 
-		&:hover {
-			color: #0f172a;
-		}
-	}
+  .clear-search-btn {
+    position: absolute;
+    right: 8px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 22px;
+    height: 22px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 17px;
+    line-height: 1;
+    color: #1b2e4b;
+    background: rgba(27, 46, 75, 0.12);
+    border: none;
+    border-radius: 0;
+    cursor: pointer;
+
+    &:hover {
+      background: rgba(27, 46, 75, 0.2);
+    }
+  }
 }
 
 .btb-custom-modal-grid {
-	display: grid;
-	grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-	gap: 16px;
-	padding: 24px 28px;
-	flex: 1;
-	overflow-y: auto !important;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 16px;
+  padding: 20px 24px 24px;
+  flex: 1;
+  background: #f6f8fa;
+  /* The grid is a flex child with a definite height, so its auto rows are
+     candidates for stretching. Pin them to their content and let the container
+     scroll instead. */
+  align-content: start;
+  overflow-y: auto !important;
 
-	/* Single Custom Scrollbar */
-	&::-webkit-scrollbar {
-		width: 6px;
-	}
-	&::-webkit-scrollbar-track {
-		background: #f1f5f9;
-	}
-	&::-webkit-scrollbar-thumb {
-		background: #cbd5e1;
-		border-radius: 10px;
+  &::-webkit-scrollbar {
+    width: 8px;
+  }
 
-		&:hover {
-			background: #94a3b8;
-		}
-	}
+  &::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: rgba(27, 46, 75, 0.25);
+
+    &:hover {
+      background: rgba(27, 46, 75, 0.45);
+    }
+  }
 }
 
 .btb-modern-card {
-	background: #ffffff;
-	border: 1.5px solid #e2e8f0;
-	border-radius: 14px;
-	padding: 20px;
-	display: flex;
-	flex-direction: column;
-	justify-content: space-between;
-	cursor: pointer;
-	transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
-	position: relative;
+  --accent: #0b81ee;
+  position: relative;
+  /*
+   * No `overflow: hidden` here, unlike the canvas placeholder's cards.
+   *
+   * This card has nothing positioned outside its box -- its badge sits inline in
+   * the header -- and clipping it had a cost that was not obvious: a grid item
+   * with a non-visible overflow loses its content-based automatic minimum size,
+   * so its row can be sized below its contents. In this grid, which is a flex
+   * child with a definite height, that let all ten rows collapse to an equal
+   * 63px share of the container and every card rendered as a strip with the icon
+   * clipped in half.
+   */
+  display: flex;
+  flex-direction: column;
+  padding: 20px;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
 
-	&:hover {
-		border-color: $primaryColor;
-		transform: translateY(-4px);
-		box-shadow: 0 16px 32px -8px rgba(69, 39, 164, 0.18);
+  /* The category wash at rest, as on the dashboard's demo cards, with a flat
+     fallback first for browsers without color-mix. */
+  background: #ffffff;
+  background:
+    linear-gradient(
+      150deg,
+      color-mix(in srgb, var(--accent) 16%, transparent) 0%,
+      color-mix(in srgb, var(--accent) 5%, transparent) 46%,
+      transparent 78%
+    ),
+    #ffffff;
+  border: 1px solid rgba(27, 46, 75, 0.1);
+  border-color: color-mix(in srgb, var(--accent) 24%, transparent);
+  border-radius: 0;
 
-		.btb-modern-icon {
-			background: $primaryColor;
-			color: #ffffff;
-			transform: scale(1.05);
-		}
-	}
+  &:hover {
+    transform: translateY(-3px);
+    border-color: var(--accent);
+    box-shadow: 0 10px 24px rgba(9, 30, 66, 0.08);
+  }
 
-	&.is-active {
-		border-color: $primaryColor;
-		background: rgba(69, 39, 164, 0.04);
-		box-shadow: 0 0 0 2px $primaryColor;
-
-		.btb-modern-icon {
-			background: $primaryColor;
-			color: #ffffff;
-		}
-	}
+  /* The block already on the canvas. A 2px inset ring in its own accent, rather
+     than a second border colour plus a tinted background, so "this is the one you
+     have" reads at a glance without competing with the hover state. */
+  &.is-active {
+    border-color: var(--accent);
+    box-shadow: inset 0 0 0 2px var(--accent);
+  }
 }
 
 .btb-modern-card-header {
-	display: flex;
-	align-items: center;
-	justify-content: space-between;
-	margin-bottom: 14px;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 12px;
 }
 
 .btb-modern-icon {
-	width: 44px;
-	height: 44px;
-	border-radius: 12px;
-	background: #f1f5f9;
-	color: $primaryColor;
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	transition: all 0.25s ease;
+  width: 44px;
+  height: 44px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 0;
+  /* Mixed against white rather than transparent: the card behind it already
+     carries the same colour. */
+  background: rgba(11, 129, 238, 0.12);
+  background: color-mix(in srgb, var(--accent) 20%, #ffffff);
+  color: var(--accent);
 
-	svg {
-		display: block;
-		flex-shrink: 0;
-	}
-
-
+  svg {
+    display: block;
+    flex-shrink: 0;
+  }
 }
 
+/* A tag in the card's own accent instead of a red-orange gradient pill -- that
+   was the only warm colour in the plugin's admin UI, and it fired on a third of
+   the cards at once. */
 .btb-modern-badge {
-	background: linear-gradient(135deg, #ff416c, #ff4b2b);
-	color: #ffffff;
-	font-size: 10px;
-	font-weight: 700;
-	padding: 3px 8px;
-	border-radius: 12px;
-	text-transform: uppercase;
-	letter-spacing: 0.4px;
+  align-self: flex-start;
+  padding: 3px 8px;
+  font-size: 10px;
+  font-weight: 700;
+  line-height: 1.4;
+  letter-spacing: 0.6px;
+  text-transform: uppercase;
+  color: #ffffff;
+  background: var(--accent);
+  border-radius: 0;
 }
 
 .btb-modern-card-body {
-	flex: 1;
-	margin-bottom: 16px;
+  flex: 1;
+  margin-bottom: 14px;
 }
 
-.btb-modern-card-title {
-	margin: 0 0 6px 0;
-	font-size: 16px;
-	font-weight: 700;
-	color: #0f172a;
-	display: flex;
-	align-items: center;
-	justify-content: space-between;
+/* Prefixed, and stating text-transform/font-style, for the reason given on
+   .btb-modal-title above: an h4 and a p are exactly what a theme's editor styles
+   restyle, and one class alone loses to `.editor-styles-wrapper h4`. */
+.btb-custom-modal-dialog .btb-modern-card-title {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin: 0 0 5px;
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 1.35;
+  text-transform: none;
+  font-style: normal;
+  color: #001737;
 }
 
-.btb-modern-card-desc {
-	margin: 0;
-	font-size: 12px;
-	color: #64748b;
-	line-height: 1.45;
+.btb-active-pill {
+  padding: 2px 7px;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.6px;
+  text-transform: uppercase;
+  white-space: nowrap;
+  color: var(--accent);
+  background: color-mix(in srgb, var(--accent) 20%, #ffffff);
+}
+
+.btb-custom-modal-dialog .btb-modern-card-desc {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.5;
+  text-transform: none;
+  font-style: normal;
+  color: rgba(27, 46, 75, 0.65);
+}
+
+/* The footer became a row once the demo joined the choice, and the demo is a
+   square rather than a second labelled button: "Use This Layout" is the card's
+   action and it has to fit on one line at this card width, which it stopped
+   doing the moment a word sat beside it. The name lives in the title attribute
+   instead -- see DemoLink. */
+.btb-modern-card-footer {
+  display: flex;
+  align-items: stretch;
+  gap: 8px;
+
+  /* Narrower side padding than the button had on its own. The grid's columns
+     bottom out at 240px, which leaves 156px here once the card's padding, the
+     gap and the demo square are taken out -- and "Currently Selected" needs all
+     but a few of them. Buying back 12px keeps the longest label on one line at
+     the narrowest column the grid can produce. */
+  .btb-modern-select-btn {
+    flex: 1 1 auto;
+    width: auto;
+    min-width: 0;
+    padding-right: 10px;
+    padding-left: 10px;
+  }
+}
+
+.btb-modern-demo-btn {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  text-decoration: none;
+  box-shadow: none;
+  /* Quieter than the button beside it: looking is the lighter of the two
+     actions, and two boxes of equal weight said they were the same thing. */
+  color: rgba(27, 46, 75, 0.5);
+  background: #ffffff;
+  border: 1px solid rgba(27, 46, 75, 0.2);
+  transition: color 0.18s ease, border-color 0.18s ease;
+
+  svg {
+    flex: none;
+  }
+
+  &:hover {
+    color: var(--accent);
+    border-color: var(--accent);
+    text-decoration: none;
+  }
+
+  &:focus {
+    box-shadow: none;
+    outline: none;
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 1px;
+  }
 }
 
 .btb-modern-select-btn {
-	width: 100%;
-	border-radius: 10px;
-	padding: 8px 16px;
-	font-size: 13px;
-	font-weight: 600;
-	cursor: pointer;
-	border: 1px solid #cbd5e1;
-	background: #ffffff;
-	color: #334155;
-	transition: all 0.2s ease;
+  width: 100%;
+  padding: 8px 16px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #1b2e4b;
+  background: #ffffff;
+  border: 1px solid rgba(27, 46, 75, 0.2);
+  border-radius: 0;
+  cursor: pointer;
+  transition: background 0.18s ease, color 0.18s ease, border-color 0.18s ease;
 
-	&:hover {
-		background: $primaryColor;
-		color: #ffffff;
-		border-color: $primaryColor;
-	}
+  &:hover {
+    color: #ffffff;
+    background: var(--accent);
+    border-color: var(--accent);
+  }
 
-	&.is-selected {
-		background: rgba(69, 39, 164, 0.12);
-		color: $primaryColor;
-		border-color: rgba(69, 39, 164, 0.3);
+  &.is-selected {
+    color: var(--accent);
+    background: color-mix(in srgb, var(--accent) 14%, #ffffff);
+    border-color: color-mix(in srgb, var(--accent) 40%, #ffffff);
 
-		&:hover {
-			background: $primaryColor;
-			color: #ffffff;
-		}
-	}
+    &:hover {
+      color: #ffffff;
+      background: var(--accent);
+      border-color: var(--accent);
+    }
+  }
+}
+
+/*
+ * The switcher on a narrow screen.
+ *
+ * Everything above the cards is a fixed-height flex item and only the grid
+ * scrolls, so on a phone the chrome ate the dialog: the five category chips
+ * wrapped onto five lines, the search box took a sixth, and with the header on
+ * top of that the scrollable strip left for forty layouts came to about 90px.
+ *
+ * So the chrome is cut down and the dialog is given the whole screen. A picker
+ * with forty items is the whole task while it is open; a centred card with a
+ * 12vh margin around it is a desktop shape.
+ */
+@media (max-width: 782px) {
+  /*
+   * The dialog's own size and position are deliberately left alone here.
+   *
+   * Making it full-bleed -- padding:0, height:100% -- looked like the obvious
+   * way to give forty cards the whole screen, and it hid the title and the
+   * search box instead. This modal renders inside the editor's canvas iframe,
+   * whose `position: fixed` origin is the top of the window, behind the admin
+   * bar, the editor toolbar and the inspector tabs. A dialog that starts at
+   * that origin starts underneath all three.
+   *
+   * The centred 95vw/88vh box clears them, which is why the header was visible
+   * before. What was actually short of room was not the box but what this
+   * media query fills it with, so that is all that is changed below.
+   */
+  .btb-custom-modal-header {
+    padding: 12px 16px;
+
+    /* The title alone says what this is. The second line explains it, which is
+       worth a row of a 1080px dialog and not a row of a phone. */
+    .btb-modal-desc {
+      display: none;
+    }
+
+    .btb-modal-header-icon {
+      width: 36px;
+      height: 36px;
+    }
+
+    .btb-modal-title {
+      font-size: 16px;
+    }
+  }
+
+  .btb-custom-modal-toolbar {
+    padding: 10px 16px;
+    /* Chips above, search below, instead of both fighting for one row. */
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+    min-width: 0;
+  }
+
+  /*
+   * Smaller chips that wrap, rather than full-size ones on a strip that scrolls
+   * sideways.
+   *
+   * A sideways strip was the first attempt and it hid three of the five: a mouse
+   * wheel does not scroll a row horizontally, and the scrollbar was hidden on
+   * the theory that chips running past the edge are their own affordance. They
+   * are not -- what the reader sees is two categories and no sign of the rest.
+   *
+   * At this size all five fit in two rows, so nothing has to be discovered.
+   */
+  .btb-modal-cats {
+    flex-wrap: wrap;
+    gap: 6px;
+    min-width: 0;
+    max-width: 100%;
+  }
+
+  .btb-cat-chip {
+    flex: 0 0 auto;
+    padding: 6px 10px;
+    font-size: 12px;
+    white-space: nowrap;
+  }
+
+  /* Its `flex: 0 1 300px` is a width in the desktop row; in this column it
+     would be a 300px-tall search box. */
+  .btb-modal-search-box {
+    flex: 0 0 auto;
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+  }
+
+  /*
+   * Stated again, and from further up the tree, to outrank wp-admin.
+   *
+   * This dialog is portalled into the admin document, so forms.css reaches it
+   * now -- and under 782px that sets `padding: 3px 10px; font-size: 16px` on
+   * every text input, which drops the room the search icon sits in. Its
+   * `input[type="text"]` is exactly as specific as the `.btb-modal-search-box
+   * input` these rules live in, so which one won came down to which stylesheet
+   * the browser read last. Naming the toolbar as well settles it.
+   */
+  .btb-custom-modal-toolbar .btb-modal-search-box input {
+    box-sizing: border-box;
+    width: 100%;
+    min-height: 0;
+    padding: 9px 36px 9px 40px;
+    font-size: 14px;
+    line-height: 1.4;
+  }
+
+  .btb-custom-modal-grid {
+    grid-template-columns: 1fr;
+    padding: 16px;
+    /* A flex child that scrolls needs this, or its content floor keeps it from
+       shrinking and the whole dialog scrolls instead of just the cards. */
+    min-height: 0;
+  }
 }
 
 .btbSmartCard {
-	display: flex;
-	flex-direction: column;
-	justify-content: space-between;
-	background: #ffffff;
-	border: 1.5px solid #e2e8f0;
-	border-radius: 14px;
-	padding: 18px;
-	cursor: pointer;
-	transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-	position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  background: #ffffff;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 14px;
+  padding: 18px;
+  cursor: pointer;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
 
-	&:hover {
-		border-color: $primaryColor;
-		box-shadow: 0 12px 24px -8px rgba(69, 39, 164, 0.18);
-		transform: translateY(-3px);
+  &:hover {
+    border-color: $brandColor;
+    box-shadow: 0 12px 24px -8px rgba(20, 110, 245, 0.18);
+    transform: translateY(-3px);
 
-		.btbIconBox {
-			background: $primaryColor;
-			color: #ffffff;
-		}
-	}
+    .btbIconBox {
+      background: $brandColor;
+      color: #ffffff;
+    }
+  }
 
-	&.is-active {
-		border-color: $primaryColor;
-		background: #f8f6ff;
-		box-shadow: 0 0 0 1px $primaryColor;
+  &.is-active {
+    border-color: $brandColor;
+    background: #f8f6ff;
+    box-shadow: 0 0 0 1px $brandColor;
 
-		.btbIconBox {
-			background: $primaryColor;
-			color: #ffffff;
-		}
-	}
+    .btbIconBox {
+      background: $brandColor;
+      color: #ffffff;
+    }
+  }
 }
 
 .btbSmartCardHeader {
-	display: flex;
-	align-items: center;
-	justify-content: space-between;
-	margin-bottom: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 14px;
 }
 
 .btbIconBox {
-	width: 44px;
-	height: 44px;
-	border-radius: 10px;
-	background: #f1f5f9;
-	color: $primaryColor;
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	transition: all 0.25s ease;
-
-
+  width: 44px;
+  height: 44px;
+  border-radius: 10px;
+  background: #f1f5f9;
+  color: $brandColor;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.25s ease;
 }
 
 .btbSmartBadge {
-	background: linear-gradient(135deg, #ff416c, #ff4b2b);
-	color: #ffffff;
-	font-size: 10px;
-	font-weight: 700;
-	padding: 3px 8px;
-	border-radius: 12px;
-	text-transform: uppercase;
-	letter-spacing: 0.4px;
+  background: linear-gradient(135deg, #ff416c, #ff4b2b);
+  color: #ffffff;
+  font-size: 10px;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
 }
 
 .btbSmartCardBody {
-	flex-grow: 1;
-	margin-bottom: 16px;
+  flex-grow: 1;
+  margin-bottom: 16px;
 }
 
 .btbSmartCardTitle {
-	margin: 0 0 6px 0;
-	font-size: 15px;
-	font-weight: 700;
-	color: #0f172a;
-	display: flex;
-	align-items: center;
-	gap: 8px;
+  margin: 0 0 6px 0;
+  font-size: 15px;
+  font-weight: 700;
+  color: #0f172a;
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
 .btbActivePill {
-	font-size: 10px;
-	font-weight: 600;
-	background: $primaryColor;
-	color: #ffffff;
-	padding: 2px 7px;
-	border-radius: 10px;
+  font-size: 10px;
+  font-weight: 600;
+  background: $brandColor;
+  color: #ffffff;
+  padding: 2px 7px;
+  border-radius: 10px;
 }
 
 .btbSmartCardDesc {
-	margin: 0;
-	font-size: 12px;
-	color: #64748b;
-	line-height: 1.45;
+  margin: 0;
+  font-size: 12px;
+  color: #64748b;
+  line-height: 1.45;
 }
 
 .btbCardSelectBtn {
-	width: 100%;
-	justify-content: center;
-	border-radius: 8px !important;
-	font-weight: 600 !important;
+  width: 100%;
+  justify-content: center;
+  border-radius: 8px !important;
+  font-weight: 600 !important;
 }
 
 /* Canvas Placeholder */
 .btbCanvasPlaceholder {
-	padding: 40px 20px;
-	display: flex;
-	justify-content: center;
-	align-items: center;
+  padding: 40px 20px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 .btbPlaceholderCard {
-	max-width: 580px;
-	width: 100%;
-	background: #ffffff;
-	border: 2px dashed #cbd5e1;
-	border-radius: 20px;
-	padding: 36px 28px;
-	text-align: center;
-	box-shadow: 0 10px 30px rgba(0, 0, 0, 0.04);
-	transition: all 0.25s ease;
+  max-width: 580px;
+  width: 100%;
+  background: #ffffff;
+  border: 2px dashed #cbd5e1;
+  border-radius: 20px;
+  padding: 36px 28px;
+  text-align: center;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.04);
+  transition: all 0.25s ease;
 
-	&:hover {
-		border-color: $primaryColor;
-		border-style: solid;
-		box-shadow: 0 16px 36px rgba(69, 39, 164, 0.1);
-	}
+  &:hover {
+    border-color: $brandColor;
+    border-style: solid;
+    box-shadow: 0 16px 36px rgba(20, 110, 245, 0.1);
+  }
 }
 
 .btbPlaceholderIconWrap {
-	width: 64px;
-	height: 64px;
-	margin: 0 auto 16px auto;
-	border-radius: 16px;
-	background: #f1f5f9;
-	color: $primaryColor;
-	display: flex;
-	align-items: center;
-	justify-content: center;
+  width: 64px;
+  height: 64px;
+  margin: 0 auto 16px auto;
+  border-radius: 16px;
+  background: #f1f5f9;
+  color: $brandColor;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 
-	.btbPlaceholderMainIcon {
-		font-size: 36px;
-		width: 36px;
-		height: 36px;
-	}
+  .btbPlaceholderMainIcon {
+    font-size: 36px;
+    width: 36px;
+    height: 36px;
+  }
 }
 
 .btbPlaceholderTitle {
-	margin: 0 0 10px 0;
-	font-size: 20px;
-	font-weight: 700;
-	color: #0f172a;
+  margin: 0 0 10px 0;
+  font-size: 20px;
+  font-weight: 700;
+  color: #0f172a;
 }
 
 .btbPlaceholderDesc {
-	margin: 0 0 24px 0;
-	font-size: 14px;
-	color: #64748b;
-	line-height: 1.5;
+  margin: 0 0 24px 0;
+  font-size: 14px;
+  color: #64748b;
+  line-height: 1.5;
 }
 
 .btbChooseBlockBtn {
-	border-radius: 10px !important;
-	padding: 10px 24px !important;
-	font-size: 15px !important;
-	font-weight: 600 !important;
-	display: inline-flex;
-	align-items: center;
-	gap: 8px;
-
-
+  border-radius: 10px !important;
+  padding: 10px 24px !important;
+  font-size: 15px !important;
+  font-weight: 600 !important;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
 }
 
-/* Canvas Placeholder Grid matching my-social-feeds */
+/*
+ * Canvas placeholder: the "Select Your Testimonial Block" picker.
+ *
+ * Rewritten in the language of the plugin's Demo & Help dashboard, which is the
+ * screen users associate with this plugin -- see assets/admin-pages.css for the
+ * same exercise on the Submissions and Feedback & NPS Poll screens, and
+ * bpl-tools/Admin/Demos/style.scss for the original the values come from.
+ *
+ * What changed, and why:
+ *
+ * - Hierarchy. The heading, its description and the twelve card titles were an
+ *   h2 and thirteen h3s, all fighting at 22px/17px. It is now the dashboard's
+ *   eyebrow -> 28px title -> 14px description, with 15px card titles under it, so
+ *   the eye lands on the page's purpose before the grid.
+ * - Category colour. Each card takes its category's accent from the same eight
+ *   colours, in the same order, that the dashboard's Demos route assigns -- so
+ *   the four groups are legible before you read a word, and the two screens tint
+ *   the same block the same way.
+ * - Square corners. The dashboard commented out every border-radius it had; the
+ *   12px cards, 12px tiles and 8px gradient ribbons here were the odd ones out.
+ * - Fixed 3 columns became auto-fill. The editor canvas is narrower than an admin
+ *   page and narrower again in a sidebar-heavy layout, and three hard columns put
+ *   three-word titles on three lines rather than dropping to two columns.
+ *
+ * Left as it was: the dashed border, which is the editor's own convention for a
+ * block that has not been configured yet, and the inline SVG brand marks, which
+ * keep their own colours inside the tinted tile.
+ */
 .btb-my-testimonials-feeds {
-	background-color: rgba(69, 39, 164, 0.05);
-	padding: 30px 24px;
-	border-radius: 12px;
-	border: 1px dashed rgba(69, 39, 164, 0.25);
-	margin: 20px 0;
+  /* Same tokens as the dashboard: #0B81EE primary from src/admin/dashboard.scss,
+     titles and body text from bpl-tools/Admin/__variables.scss. */
+  --btb-pick-primary: #0b81ee;
+  --btb-pick-title: #001737;
+  --btb-pick-content: #1b2e4b;
+  --accent: var(--btb-pick-primary);
 
-	h2 {
-		color: #0f172a;
-		text-align: center;
-		padding-top: 10px;
-		padding-bottom: 6px;
-		margin: 0;
-		font-size: 22px;
-		font-weight: 700;
-	}
+  background: #f6f8fa;
+  border: 1px dashed rgba(27, 46, 75, 0.16);
+  border-radius: 0;
+  padding: 28px 24px;
+  margin: 20px 0;
 
-	h3 {
-		color: #64748b;
-		text-align: center;
-		margin: 0;
-		font-size: 15px;
-		font-weight: 400;
-	}
+  .btbPickerHero {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    max-width: 640px;
+    margin: 0 auto;
+    text-align: center;
 
-	.items-list {
-		display: grid;
-		grid-template-columns: repeat(3, 1fr);
-		column-gap: 16px;
-		row-gap: 16px;
-		padding-top: 24px;
+    .btbPickerEyebrow {
+      padding: 5px 12px;
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      color: var(--btb-pick-primary);
+      background: rgba(11, 129, 238, 0.08);
+    }
 
-		.item {
-			background-color: #ffffff;
-			border: 1.5px solid #e2e8f0;
-			border-radius: 12px;
-			text-align: center;
-			padding: 32px 18px 24px 18px;
-			cursor: pointer;
-			position: relative;
-			transition: all 0.25s ease;
-			transform: translateY(0);
+    /* text-transform and font-style stated for the same reason as the switcher's
+       title: the theme's editor styles reach this heading too. */
+    h2 {
+      margin: 0;
+      padding: 0;
+      font-size: 28px;
+      font-weight: 700;
+      line-height: 1.2;
+      letter-spacing: -0.3px;
+      text-transform: none;
+      font-style: normal;
+      color: var(--btb-pick-title);
+    }
 
-			h3 {
-				font-size: 17px;
-				font-weight: 700;
-				margin: 0 0 6px 0;
-				color: #0f172a;
-				transition: color 0.25s ease;
-			}
+    p {
+      margin: 0;
+      font-size: 14px;
+      font-weight: 400;
+      line-height: 1.55;
+      text-transform: none;
+      font-style: normal;
+      color: var(--btb-pick-content);
+    }
 
-			p {
-				margin: 0;
-				font-size: 13px;
-				color: #64748b;
-				line-height: 1.4;
-			}
+    /* Quiet by design: it sits under the page's own title, and the twelve cards
+       below it are the thing to act on. */
+    .btbPickerDemoAll {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 13px;
+      font-weight: 600;
+      text-decoration: none;
+      box-shadow: none;
+      color: var(--btb-pick-primary);
 
-			.icon {
-				margin: 0 auto 12px auto;
-				width: 44px;
-				height: 44px;
-				border-radius: 12px;
-				background: rgba(69, 39, 164, 0.08);
-				display: flex;
-				align-items: center;
-				justify-content: center;
-				transition: transform 0.25s ease;
+      &:hover {
+        text-decoration: underline;
+      }
 
+      /* Pointer clicks must not leave a ring behind; keyboard focus must. */
+      &:focus {
+        box-shadow: none;
+        outline: none;
+      }
 
-			}
+      &:focus-visible {
+        outline: 2px solid var(--btb-pick-primary);
+        outline-offset: 2px;
+      }
 
-			.btbItemBadge {
-				position: absolute;
-				top: 12px;
-				right: 12px;
-				background: linear-gradient(135deg, #ff416c, #ff4b2b);
-				color: #ffffff;
-				font-size: 9px;
-				font-weight: 700;
-				padding: 2px 7px;
-				border-radius: 8px;
-				text-transform: uppercase;
-			}
+      svg {
+        flex: none;
+      }
+    }
+  }
 
-			&:hover {
-				transform: translateY(-5px);
-				box-shadow: 0 12px 24px rgba(69, 39, 164, 0.15);
-				border-color: $primaryColor;
+  .items-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 16px;
+    padding-top: 24px;
 
-				h3 {
-					color: $primaryColor;
-				}
+    .item {
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      text-align: left;
+      padding: 20px;
+      cursor: pointer;
+      transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+      transform: translateY(0);
 
-				.icon {
-					background: $primaryColor;
-					color: #ffffff;
-				}
-			}
-		}
-	}
+      /* The category wash the dashboard lifts to rest state in
+         src/admin/dashboard.scss, with a flat fallback ahead of it: a browser
+         without color-mix drops the whole declaration and keeps the white card,
+         which is exactly what this had before. */
+      background: #ffffff;
+      background:
+        linear-gradient(
+          150deg,
+          color-mix(in srgb, var(--accent) 16%, transparent) 0%,
+          color-mix(in srgb, var(--accent) 5%, transparent) 46%,
+          transparent 78%
+        ),
+        #ffffff;
+      border: 1px solid rgba(27, 46, 75, 0.1);
+      border-color: color-mix(in srgb, var(--accent) 24%, transparent);
+      border-radius: 0;
 
-	.btbPlaceholderModalBtnWrap {
-		text-align: center;
-		margin-top: 24px;
-	}
+      &::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(135deg, rgba(11, 129, 238, 0.08), transparent 60%);
+        background: linear-gradient(135deg, color-mix(in srgb, var(--accent) 8%, transparent), transparent 60%);
+        opacity: 0;
+        transition: opacity 0.2s ease;
+        pointer-events: none;
+      }
 
-	.btbOpenModalBtn {
-		border-radius: 10px !important;
-		padding: 8px 20px !important;
-		font-weight: 600 !important;
-	}
-}
+      &:hover {
+        transform: translateY(-3px);
+        border-color: var(--accent);
+        box-shadow: 0 10px 24px rgba(9, 30, 66, 0.08);
 
-@media (max-width: 960px) {
-	.btb-my-testimonials-feeds .items-list {
-		grid-template-columns: repeat(2, 1fr);
-	}
+        &::before {
+          opacity: 1;
+        }
+      }
+
+      .icon {
+        /* Mixed against white rather than transparent, like the dashboard's own
+           tiles on a tinted card: at 14% over a card already carrying the same
+           colour there was nothing left to stand out against. */
+        width: 44px;
+        height: 44px;
+        margin: 0;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 0;
+        background: rgba(11, 129, 238, 0.12);
+        background: color-mix(in srgb, var(--accent) 20%, #ffffff);
+        color: var(--accent);
+        transition: none;
+      }
+
+      .btbItemCat {
+        align-self: flex-start;
+        padding: 3px 8px;
+        font-size: 11px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.8px;
+        line-height: 1.4;
+        color: var(--accent);
+        background: rgba(11, 129, 238, 0.12);
+        background: color-mix(in srgb, var(--accent) 20%, #ffffff);
+      }
+
+      h3 {
+        margin: 0;
+        font-size: 15px;
+        font-weight: 600;
+        line-height: 1.35;
+        text-align: left;
+        text-transform: none;
+        font-style: normal;
+        color: var(--btb-pick-title);
+      }
+
+      p {
+        margin: 0;
+        font-size: 13px;
+        line-height: 1.5;
+        text-transform: none;
+        font-style: normal;
+        color: rgba(27, 46, 75, 0.65);
+      }
+
+      /* A tag in the corner rather than a floating pill: flush to the two edges
+         it touches, so it reads as part of the card instead of a sticker on top
+         of it. The red-orange gradient is gone -- it was the only warm colour in
+         the plugin's admin UI, and it fired on a third of the cards. */
+      .btbItemBadge {
+        position: absolute;
+        top: 0;
+        right: 0;
+        padding: 3px 8px;
+        font-size: 10px;
+        font-weight: 700;
+        letter-spacing: 0.6px;
+        text-transform: uppercase;
+        color: #ffffff;
+        background: var(--accent);
+        border-radius: 0;
+      }
+
+      /* Pinned to the foot of the card rather than left after the description,
+         so the twelve links form a line across the grid instead of stepping up
+         and down with each description's length.
+         `align-self` keeps the hit area to the words: the card is one big
+         button, and a full-width link across it would swallow clicks meant for
+         the card. */
+      .btbDemoLink {
+        margin-top: auto;
+        align-self: flex-start;
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        font-size: 12px;
+        font-weight: 600;
+        text-decoration: none;
+        box-shadow: none;
+        color: rgba(27, 46, 75, 0.55);
+        transition: color 0.18s ease;
+
+        svg {
+          flex: none;
+        }
+
+        &:focus {
+          box-shadow: none;
+          outline: none;
+        }
+
+        &:focus-visible {
+          outline: 2px solid var(--accent);
+          outline-offset: 2px;
+        }
+      }
+
+      /* Legible only once the card is the one being considered, so the grid
+         reads as titles and descriptions rather than as twelve links. */
+      &:hover .btbDemoLink,
+      .btbDemoLink:hover,
+      .btbDemoLink:focus-visible {
+        color: var(--accent);
+      }
+
+      .btbDemoLink:hover {
+        text-decoration: underline;
+      }
+    }
+  }
+
+  .btbPlaceholderModalBtnWrap {
+    margin-top: 24px;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+  }
+
+  .btbOpenModalBtn,
+  .btbUseClassicBtn {
+    border-radius: 0 !important;
+    padding: 8px 18px !important;
+    font-size: 13px !important;
+    font-weight: 600 !important;
+  }
+
+  .btbOpenModalBtn {
+    background: var(--btb-pick-primary) !important;
+    border-color: var(--btb-pick-primary) !important;
+
+    &:hover,
+    &:focus {
+      background: #0a6dc9 !important;
+      border-color: #0a6dc9 !important;
+    }
+  }
 }
 
 @media (max-width: 600px) {
-	.btb-my-testimonials-feeds .items-list {
-		grid-template-columns: 1fr;
-	}
+  .btb-my-testimonials-feeds {
+    padding: 20px 14px;
+
+    .btbPickerHero h2 {
+      font-size: 22px;
+    }
+
+    .items-list {
+      grid-template-columns: 1fr;
+    }
+
+    /*
+     * The two buttons stack and take the full width.
+     *
+     * Side by side they were wider than the block long before this width --
+     * "View All 40+ Layouts & Widgets in Modal Popup" is a sentence, and a
+     * Button will not wrap or shrink it, so the row ran off the canvas rather
+     * than wrapping onto a second line.
+     */
+    .btbPlaceholderModalBtnWrap {
+      flex-direction: column;
+      align-items: stretch;
+    }
+
+    .btbOpenModalBtn,
+    .btbUseClassicBtn {
+      width: 100%;
+      /* A Button is a fixed-height nowrap line by default; both have to give
+         for a label this long to fit a phone. */
+      height: auto !important;
+      min-height: 40px;
+      white-space: normal !important;
+      text-align: center;
+      justify-content: center;
+      line-height: 1.35 !important;
+    }
+  }
+}
+
+/*
+ * The switcher modal with nothing to show.
+ *
+ * Reachable without a search term now that the All Blocks screen can switch
+ * every layout off, so the grid needs something to say rather than collapsing
+ * to an empty box.
+ */
+.btb-modal-empty {
+	grid-column: 1 / -1;
+	margin: 0;
+	padding: 40px 20px;
+	text-align: center;
+	font-size: 14px;
+	color: #64748b;
 }

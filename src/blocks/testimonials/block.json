@@ -2,19 +2,117 @@
 	"$schema": "https://schemas.wp.org/trunk/block.json",
 	"apiVersion": 3,
 	"name": "bptmb/b-testimonials",
-	"title": "B Testimonials Block",
-	"description": "Boost your website's credibility with b testimonials block, effortlessly showcasing customer ratings and reviews.",
+	"title": "Testimonials",
+	"description": "Boost your website's credibility with testimonials, effortlessly showcasing customer ratings and reviews.",
 	"category": "bplugins",
 	"keywords": [
 		"testimonials",
 		"block",
-		"rating"
+		"rating",
+		"review",
+		"testimonial"
 	],
 	"textdomain": "b-testimonials-block",
 	"attributes": {
+		"arrangement": {
+			"type": "string"
+		},
+		"expandedTypo": {
+			"type": "object"
+		},
+		"expandColor": {
+			"type": "string"
+		},
+		"expandHoverColor": {
+			"type": "string"
+		},
+		"badgeTitle": {
+			"type": "string",
+			"default": ""
+		},
+		"badgeDesc": {
+			"type": "string",
+			"default": ""
+		},
+		"badgeScore": {
+			"type": "string",
+			"default": ""
+		},
+		"badgeCount": {
+			"type": "string",
+			"default": ""
+		},
+		"minScore": {
+			"type": "number",
+			"default": 0
+		},
+		"maxScore": {
+			"type": "number",
+			"default": 10
+		},
+		"lowLabel": {
+			"type": "string",
+			"default": "Not likely"
+		},
+		"highLabel": {
+			"type": "string",
+			"default": "Very likely"
+		},
+		"star5Count": {
+			"type": "string",
+			"default": ""
+		},
+		"star4Count": {
+			"type": "string",
+			"default": ""
+		},
+		"star3Count": {
+			"type": "string",
+			"default": ""
+		},
+		"star2Count": {
+			"type": "string",
+			"default": ""
+		},
+		"star1Count": {
+			"type": "string",
+			"default": ""
+		},
+		"col1Header": {
+			"type": "string",
+			"default": "Customer"
+		},
+		"col2Header": {
+			"type": "string",
+			"default": "Rating"
+		},
+		"col3Header": {
+			"type": "string",
+			"default": "Review"
+		},
 		"align": {
 			"type": "string",
 			"default": "wide"
+		},
+		"blockWidth": {
+			"type": "object",
+			"default": {
+				"desktop": "",
+				"tablet": "",
+				"mobile": ""
+			}
+		},
+		"blockAlign": {
+			"type": "string",
+			"default": ""
+		},
+		"cardHeight": {
+			"type": "object",
+			"default": {
+				"desktop": "",
+				"tablet": "",
+				"mobile": ""
+			}
 		},
 		"cId": {
 			"type": "string",
@@ -84,6 +182,18 @@
 				"left": "15px"
 			}
 		},
+		"blockMargin": {
+			"type": "object",
+			"default": {}
+		},
+		"cardMargin": {
+			"type": "object",
+			"default": {}
+		},
+		"degDivider": {
+			"type": "object",
+			"default": {}
+		},
 		"border": {
 			"type": "object",
 			"default": {
@@ -97,6 +207,30 @@
 		"shadow": {
 			"type": "object",
 			"default": {}
+		},
+		"cardWash": {
+			"type": "boolean",
+			"default": true
+		},
+		"cardWashStrength": {
+			"type": "number",
+			"default": 100
+		},
+		"cardWashColor": {
+			"type": "string"
+		},
+		"cardHoverBg": {
+			"type": "string"
+		},
+		"cardHoverBorderColor": {
+			"type": "string"
+		},
+		"cardHoverShadow": {
+			"type": "object",
+			"default": {}
+		},
+		"cardHoverLift": {
+			"type": "number"
 		},
 		"image": {
 			"type": "object",
@@ -115,6 +249,17 @@
 				"radius": "50%"
 			}
 		},
+		"avatarRing": {
+			"type": "boolean",
+			"default": true
+		},
+		"avatarRingWidth": {
+			"type": "number",
+			"default": 3
+		},
+		"avatarRingColor": {
+			"type": "string"
+		},
 		"nameTypo": {
 			"type": "object",
 			"default": {
@@ -125,7 +270,7 @@
 				},
 				"fontFamily": "Open Sans",
 				"fontWeight": 700,
-				"lineHeight": "135%"
+				"lineHeight": "140%"
 			}
 		},
 		"nameColor": {
@@ -142,7 +287,7 @@
 				},
 				"fontFamily": "Open Sans",
 				"fontWeight": 400,
-				"lineHeight": "135%"
+				"lineHeight": "150%"
 			}
 		},
 		"degColor": {
@@ -158,7 +303,7 @@
 					"mobile": 14
 				},
 				"fontWeight": 400,
-				"lineHeight": "135%"
+				"lineHeight": "170%"
 			}
 		},
 		"textColor": {
@@ -176,6 +321,14 @@
 		"grid2Bg": {
 			"type": "string",
 			"default": "#f9f8f8"
+		},
+		"headerWash": {
+			"type": "boolean",
+			"default": true
+		},
+		"headerWashStrength": {
+			"type": "number",
+			"default": 100
 		},
 		"grid2Padding": {
 			"type": "object",
@@ -211,6 +364,18 @@
 				"navigation": true
 			}
 		},
+		"marquee": {
+			"type": "object",
+			"default": {
+				"speed": 30,
+				"direction": "left",
+				"pauseOnHover": true
+			}
+		},
+		"pauseInEditor": {
+			"type": "boolean",
+			"default": false
+		},
 		"dataSource": {
 			"type": "string",
 			"default": "manual"
@@ -222,6 +387,9 @@
 				"orderBy": "date",
 				"order": "desc"
 			}
+		},
+		"starSize": {
+			"type": "number"
 		}
 	},
 	"supports": {
@@ -241,17 +409,14 @@
 			}
 		}
 	},
-	"editorScript": [
-		"file:./index.js"
-	],
-	"editorStyle": "file:./index.css",
+	"editorStyle": "file:../index.css",
 	"style": [
-		"file:./index.css",
-		"file:./view.css"
+		"file:../index.css",
+		"file:../view.css"
 	],
 	"render": "file:./render.php",
 	"viewScript": [
-		"file:./view.js",
+		"file:../view.js",
 		"jquery"
 	]
 }

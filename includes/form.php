@@ -51,7 +51,11 @@ if ( ! function_exists( 'bpbtb_handle_form_submit' ) ) {
 function bpbtb_handle_form_submit( $request ) {
 	$params = $request->get_params();
 
-	$name   = isset( $params['name'] ) ? sanitize_text_field( $params['name'] ) : '';
+	// `btb_name` since the field was renamed off WordPress's `name` query var;
+	// `name` stays accepted so a page cached with the older markup still posts.
+	$raw_name = $params['btb_name'] ?? $params['name'] ?? '';
+
+	$name   = sanitize_text_field( $raw_name );
 	$review = isset( $params['review'] ) ? sanitize_textarea_field( $params['review'] ) : '';
 
 	if ( '' === $name || '' === $review ) {

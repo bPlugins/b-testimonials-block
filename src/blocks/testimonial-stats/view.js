@@ -26,10 +26,16 @@ const animateEl = ( el ) => {
 };
 
 const initStats = () => {
-	const numbers = document.querySelectorAll( '.bTestimonialStats[data-animate="1"] .stat-number' );
+	const numbers = [ ...document.querySelectorAll( '.bTestimonialStats[data-animate="1"] .btb-ts-number' ) ]
+		.filter( ( el ) => ! el.dataset.bound );
+
 	if ( ! numbers.length ) {
 		return;
 	}
+
+	numbers.forEach( ( el ) => {
+		el.dataset.bound = '1';
+	} );
 
 	if ( ! ( 'IntersectionObserver' in window ) ) {
 		numbers.forEach( animateEl );
@@ -48,4 +54,18 @@ const initStats = () => {
 	numbers.forEach( ( el ) => io.observe( el ) );
 };
 
-document.addEventListener( 'DOMContentLoaded', initStats );
+// The stats grid is rendered by React (shared/view), and createRoot().render()
+// commits asynchronously, so the numbers are not always in the DOM on
+// DOMContentLoaded. The retries catch that; `dataset.bound` above keeps a number
+// from being observed -- and counted up -- twice.
+const bindStats = () => {
+	initStats();
+	setTimeout( initStats, 100 );
+	setTimeout( initStats, 500 );
+};
+
+if ( 'loading' === document.readyState ) {
+	document.addEventListener( 'DOMContentLoaded', bindStats );
+} else {
+	bindStats();
+}

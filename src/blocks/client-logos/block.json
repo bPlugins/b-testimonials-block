@@ -16,9 +16,56 @@
 	],
 	"textdomain": "b-testimonials-block",
 	"attributes": {
+		"borderWidth": {
+			"type": "number"
+		},
+		"brandColor": {
+			"type": "string"
+		},
+		"surfaceColor": {
+			"type": "string"
+		},
+		"borderColor": {
+			"type": "string"
+		},
+		"titleColor": {
+			"type": "string"
+		},
+		"bodyColor": {
+			"type": "string"
+		},
+		"mutedColor": {
+			"type": "string"
+		},
+		"ratingColor": {
+			"type": "string"
+		},
+		"trackColor": {
+			"type": "string"
+		},
 		"align": {
 			"type": "string",
 			"default": "wide"
+		},
+		"blockWidth": {
+			"type": "object",
+			"default": {
+				"desktop": "",
+				"tablet": "",
+				"mobile": ""
+			}
+		},
+		"blockAlign": {
+			"type": "string",
+			"default": ""
+		},
+		"cardHeight": {
+			"type": "object",
+			"default": {
+				"desktop": "",
+				"tablet": "",
+				"mobile": ""
+			}
 		},
 		"cId": {
 			"type": "string",
@@ -80,6 +127,18 @@
 		"layout": {
 			"type": "string",
 			"default": "client-logos"
+		},
+		"degDivider": {
+			"type": "object",
+			"default": {}
+		},
+		"blockMargin": {
+			"type": "object",
+			"default": {}
+		},
+		"cardMargin": {
+			"type": "object",
+			"default": {}
 		}
 	},
 	"supports": {
@@ -89,12 +148,9 @@
 		],
 		"html": false
 	},
-	"editorScript": [
-		"file:./index.js"
-	],
-	"editorStyle": "file:./index.css",
+	"editorStyle": "file:../index.css",
 	"style": [
-		"file:./index.css",
+		"file:../index.css",
 		"file:./view.css"
 	],
 	"viewScript": [

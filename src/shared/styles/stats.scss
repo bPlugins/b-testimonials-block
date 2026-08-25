@@ -1,36 +1,63 @@
+@use './devices' as *;
 .bTestimonialStats {
-	.stats-grid {
+	// minmax(0, 1fr) rather than a bare 1fr.
+	//
+	// A `1fr` track is really `minmax(auto, 1fr)`, so it refuses to shrink below
+	// its content's min-content width -- and a 44px stat number with a label
+	// under it is wider than a third of a phone. Asking for 3 columns on mobile
+	// pushed this block 130px past a 420px viewport and gave the whole page a
+	// horizontal scrollbar. Measured, and measured again at 0 after the change.
+	//
+	// Selectors here were the bare `.stats-grid`/`.stat-item`/`.stat-value`/
+	// `.stat-label` -- generic enough that a site running another stats/counter
+	// widget under the same names could either bleed our grid onto its markup
+	// or, just as easily, have its own typography rule (very plausibly
+	// `!important`, which counter widgets favour to beat a theme's own text
+	// styles) land on top of ours and hollow out the big accent number, which
+	// is what happened live. `btb-ts-*` twins now carry the styling; the bare
+	// classes stay in the markup only for anyone who may already target them.
+	.btb-ts-grid {
 		display: grid;
 		gap: var(--row-gap, 30px) var(--col-gap, 30px);
-		grid-template-columns: repeat(var(--cols-d, 3), 1fr);
+		grid-template-columns: repeat(var(--cols-d, 3), minmax(0, 1fr));
 	}
 
-	.stat-item {
+	// Card Surface, Border Color and Border Width are offered for this layout but
+	// had nothing to paint here -- they only ever reached the old front-end
+	// markup. Transparent and zero defaults leave a plain grid plain.
+	.btb-ts-item {
 		text-align: center;
+		background: var(--btb-surface, transparent);
+		border: var(--btb-border-width, 0px) solid var(--btb-border, transparent);
 	}
 
-	.stat-value {
+	.btb-ts-grid.has-surface .btb-ts-item {
+		padding: 20px 12px;
+		border-radius: 12px;
+	}
+
+	.btb-ts-value {
 		font-size: 44px;
 		font-weight: 800;
 		line-height: 1.1;
 		color: var(--accent, #0575e6);
 	}
 
-	.stat-label {
+	.btb-ts-label {
 		margin-top: 6px;
 		font-size: 16px;
-		color: #7b7b7b;
+		color: var(--btb-muted, #7b7b7b);
 	}
 
-	@media ( max-width: 768px ) {
-		.stats-grid {
-			grid-template-columns: repeat(var(--cols-t, 3), 1fr);
+	@media ( max-width: $tablet-max ) {
+		.btb-ts-grid {
+			grid-template-columns: repeat(var(--cols-t, 3), minmax(0, 1fr));
 		}
 	}
 
-	@media ( max-width: 576px ) {
-		.stats-grid {
-			grid-template-columns: repeat(var(--cols-m, 1), 1fr);
+	@media ( max-width: $mobile-max ) {
+		.btb-ts-grid {
+			grid-template-columns: repeat(var(--cols-m, 1), minmax(0, 1fr));
 		}
 	}
 }

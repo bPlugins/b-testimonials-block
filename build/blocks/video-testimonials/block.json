@@ -17,9 +17,87 @@
   ],
   "textdomain": "b-testimonials-block",
   "attributes": {
+    "brandColor": {
+      "type": "string"
+    },
+    "surfaceColor": {
+      "type": "string"
+    },
+    "borderColor": {
+      "type": "string"
+    },
+    "titleColor": {
+      "type": "string"
+    },
+    "bodyColor": {
+      "type": "string"
+    },
+    "mutedColor": {
+      "type": "string"
+    },
+    "ratingColor": {
+      "type": "string"
+    },
+    "trackColor": {
+      "type": "string"
+    },
     "align": {
       "type": "string",
       "default": "wide"
+    },
+    "blockWidth": {
+      "type": "object",
+      "default": {
+        "desktop": "",
+        "tablet": "",
+        "mobile": ""
+      }
+    },
+    "blockAlign": {
+      "type": "string",
+      "default": ""
+    },
+    "cardHeight": {
+      "type": "object",
+      "default": {
+        "desktop": "",
+        "tablet": "",
+        "mobile": ""
+      }
+    },
+    "nameTypo": {
+      "type": "object",
+      "default": {
+        "fontSize": {
+          "desktop": 17,
+          "tablet": 17,
+          "mobile": 16
+        },
+        "fontFamily": "Open Sans",
+        "fontWeight": 700,
+        "lineHeight": "140%"
+      }
+    },
+    "nameColor": {
+      "type": "string",
+      "default": "#000"
+    },
+    "degTypo": {
+      "type": "object",
+      "default": {
+        "fontSize": {
+          "desktop": 14,
+          "tablet": 14,
+          "mobile": 13
+        },
+        "fontFamily": "Open Sans",
+        "fontWeight": 400,
+        "lineHeight": "150%"
+      }
+    },
+    "degColor": {
+      "type": "string",
+      "default": "#7B7B7B"
     },
     "cId": {
       "type": "string",
@@ -29,7 +107,7 @@
       "type": "array",
       "default": [
         {
-          "videoUrl": "https://www.youtube.com/watch?v=ysz5S6PUM-U",
+          "videoUrl": "https://www.youtube.com/watch?v=aqz-KE-bpKQ",
           "poster": {
             "url": ""
           },
@@ -59,9 +137,41 @@
       "type": "string",
       "default": "#0575e6"
     },
+    "videoAutoplay": {
+      "type": "boolean",
+      "default": true
+    },
+    "videoLoop": {
+      "type": "boolean",
+      "default": false
+    },
+    "videoMuted": {
+      "type": "boolean",
+      "default": false
+    },
+    "videoControls": {
+      "type": "boolean",
+      "default": true
+    },
     "layout": {
       "type": "string",
       "default": "video-testimonials"
+    },
+    "customIcons": {
+      "type": "object",
+      "default": {}
+    },
+    "degDivider": {
+      "type": "object",
+      "default": {}
+    },
+    "blockMargin": {
+      "type": "object",
+      "default": {}
+    },
+    "cardMargin": {
+      "type": "object",
+      "default": {}
     }
   },
   "supports": {
@@ -71,12 +181,9 @@
     ],
     "html": false
   },
-  "editorScript": [
-    "file:./index.js"
-  ],
-  "editorStyle": "file:./index.css",
+  "editorStyle": "file:../index.css",
   "style": [
-    "file:./index.css",
+    "file:../index.css",
     "file:./view.css"
   ],
   "viewScript": [

@@ -2,12 +2,13 @@
 import Image from '../Image';
 import ReviewText from '../ReviewText';
 import { rightQuote } from '../../../utils/icons';
+import { editorClickable } from '../../../utils/a11y';
 
 const ThemeFour = ({ itemEls = {}, item = {}, index, attributes = {}, activeIndex, setActiveIndex, isBackend }) => {
     const { nameColor, quoteIcon } = attributes || {};
     const { img = {}, reviewText = '' } = item || {};
 
-    return <div key={index} className={`single ${isBackend && index === activeIndex ? "btbNowEditing" : ""}`} onClick={() => isBackend && setActiveIndex(index)}>
+    return <div key={index} className={`single ${isBackend && index === activeIndex ? "btbNowEditing" : ""}`} {...editorClickable(isBackend, () => setActiveIndex(index))}>
 
         <div className="top">
             <Image attributes={attributes} img={img}>{itemEls?.img}</Image>

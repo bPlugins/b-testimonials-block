@@ -13,12 +13,9 @@
     ],
     "html": false
   },
-  "editorScript": [
-    "file:./index.js"
-  ],
-  "editorStyle": "file:./index.css",
+  "editorStyle": "file:../index.css",
   "style": [
-    "file:./index.css",
+    "file:../index.css",
     "file:./view.css"
   ],
   "viewScript": [
@@ -36,9 +33,62 @@
     "image"
   ],
   "attributes": {
+    "brandColor": {
+      "type": "string"
+    },
+    "surfaceColor": {
+      "type": "string"
+    },
+    "borderColor": {
+      "type": "string"
+    },
+    "titleColor": {
+      "type": "string"
+    },
+    "bodyColor": {
+      "type": "string"
+    },
+    "mutedColor": {
+      "type": "string"
+    },
+    "ratingColor": {
+      "type": "string"
+    },
+    "trackColor": {
+      "type": "string"
+    },
+    "labelBgColor": {
+      "type": "string"
+    },
+    "labelTextColor": {
+      "type": "string"
+    },
+    "gripIconColor": {
+      "type": "string"
+    },
     "align": {
       "type": "string",
       "default": "wide"
+    },
+    "blockWidth": {
+      "type": "object",
+      "default": {
+        "desktop": "",
+        "tablet": "",
+        "mobile": ""
+      }
+    },
+    "blockAlign": {
+      "type": "string",
+      "default": ""
+    },
+    "cardHeight": {
+      "type": "object",
+      "default": {
+        "desktop": "",
+        "tablet": "",
+        "mobile": ""
+      }
     },
     "cId": {
       "type": "string",
@@ -75,6 +125,54 @@
     "layout": {
       "type": "string",
       "default": "before-after"
+    },
+    "blockMargin": {
+      "type": "object",
+      "default": {}
+    },
+    "cardMargin": {
+      "type": "object",
+      "default": {}
+    },
+    "degDivider": {
+      "type": "object",
+      "default": {}
+    },
+    "orientation": {
+      "type": "string",
+      "default": "horizontal"
+    },
+    "interaction": {
+      "type": "string",
+      "default": "drag"
+    },
+    "aspectRatio": {
+      "type": "string",
+      "default": "auto"
+    },
+    "mediaRadius": {
+      "type": "string",
+      "default": "8px"
+    },
+    "dividerWidth": {
+      "type": "number",
+      "default": 3
+    },
+    "gripSize": {
+      "type": "number",
+      "default": 38
+    },
+    "showLabels": {
+      "type": "boolean",
+      "default": true
+    },
+    "labelPosition": {
+      "type": "string",
+      "default": "bottom"
+    },
+    "labelFontSize": {
+      "type": "number",
+      "default": 13
     }
   }
 }

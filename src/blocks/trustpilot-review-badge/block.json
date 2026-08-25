@@ -14,9 +14,317 @@
 	],
 	"textdomain": "b-testimonials-block",
 	"attributes": {
+		"borderWidth": {
+			"type": "number"
+		},
+		"brandColor": {
+			"type": "string"
+		},
+		"surfaceColor": {
+			"type": "string"
+		},
+		"borderColor": {
+			"type": "string"
+		},
+		"titleColor": {
+			"type": "string"
+		},
+		"bodyColor": {
+			"type": "string"
+		},
+		"mutedColor": {
+			"type": "string"
+		},
+		"ratingColor": {
+			"type": "string"
+		},
+		"trackColor": {
+			"type": "string"
+		},
+		"minScore": {
+			"type": "number",
+			"default": 0
+		},
+		"maxScore": {
+			"type": "number",
+			"default": 10
+		},
+		"lowLabel": {
+			"type": "string",
+			"default": "Not likely"
+		},
+		"highLabel": {
+			"type": "string",
+			"default": "Very likely"
+		},
+		"star5Count": {
+			"type": "string",
+			"default": ""
+		},
+		"star4Count": {
+			"type": "string",
+			"default": ""
+		},
+		"star3Count": {
+			"type": "string",
+			"default": ""
+		},
+		"star2Count": {
+			"type": "string",
+			"default": ""
+		},
+		"star1Count": {
+			"type": "string",
+			"default": ""
+		},
+		"col1Header": {
+			"type": "string",
+			"default": "Customer"
+		},
+		"col2Header": {
+			"type": "string",
+			"default": "Rating"
+		},
+		"col3Header": {
+			"type": "string",
+			"default": "Review"
+		},
+		"columnGap": {
+			"type": "string",
+			"default": "30px"
+		},
+		"rowGap": {
+			"type": "string",
+			"default": "30px"
+		},
+		"grid2Border": {
+			"type": "object",
+			"default": {
+				"width": "0px",
+				"style": "solid",
+				"color": "#0575e6",
+				"side": "all",
+				"radius": "3px"
+			}
+		},
+		"grid2Bg": {
+			"type": "string",
+			"default": "#f9f8f8"
+		},
+		"headerWash": {
+			"type": "boolean",
+			"default": true
+		},
+		"headerWashStrength": {
+			"type": "number",
+			"default": 100
+		},
+		"grid2Padding": {
+			"type": "object",
+			"default": {
+				"top": "10px",
+				"right": "10px",
+				"bottom": "10px",
+				"left": "10px"
+			}
+		},
+		"dataSource": {
+			"type": "string",
+			"default": "manual"
+		},
+		"query": {
+			"type": "object",
+			"default": {
+				"number": 6,
+				"orderBy": "date",
+				"order": "desc"
+			}
+		},
+		"background": {
+			"type": "string",
+			"default": "#0000"
+		},
+		"padding": {
+			"type": "object",
+			"default": {
+				"top": "10px",
+				"right": "15px",
+				"bottom": "10px",
+				"left": "15px"
+			}
+		},
+		"blockAlign": {
+			"type": "string",
+			"default": ""
+		},
+		"blockMargin": {
+			"type": "object",
+			"default": {}
+		},
+		"cardMargin": {
+			"type": "object",
+			"default": {}
+		},
+		"degDivider": {
+			"type": "object",
+			"default": {}
+		},
+		"border": {
+			"type": "object",
+			"default": {
+				"width": "1px",
+				"style": "solid",
+				"color": "#0575e6",
+				"side": "all",
+				"radius": "3px"
+			}
+		},
+		"shadow": {
+			"type": "object",
+			"default": {}
+		},
+		"cardWash": {
+			"type": "boolean",
+			"default": false
+		},
+		"cardWashStrength": {
+			"type": "number",
+			"default": 100
+		},
+		"cardWashColor": {
+			"type": "string"
+		},
+		"cardHoverBg": {
+			"type": "string"
+		},
+		"cardHoverBorderColor": {
+			"type": "string"
+		},
+		"cardHoverShadow": {
+			"type": "object",
+			"default": {}
+		},
+		"cardHoverLift": {
+			"type": "number"
+		},
+		"imgBorder": {
+			"type": "object",
+			"default": {
+				"width": "1px",
+				"style": "solid",
+				"color": "#0575e6",
+				"side": "all",
+				"radius": "50%"
+			}
+		},
+		"avatarRing": {
+			"type": "boolean",
+			"default": true
+		},
+		"avatarRingWidth": {
+			"type": "number",
+			"default": 3
+		},
+		"avatarRingColor": {
+			"type": "string"
+		},
+		"image": {
+			"type": "object",
+			"default": {
+				"width": 50,
+				"height": 50
+			}
+		},
+		"nameTypo": {
+			"type": "object",
+			"default": {
+				"fontSize": {
+					"desktop": 17,
+					"tablet": 17,
+					"mobile": 16
+				},
+				"fontWeight": 700
+			}
+		},
+		"nameColor": {
+			"type": "string",
+			"default": "#1e293b"
+		},
+		"degTypo": {
+			"type": "object",
+			"default": {
+				"fontSize": {
+					"desktop": 13,
+					"tablet": 13,
+					"mobile": 13
+				}
+			}
+		},
+		"degColor": {
+			"type": "string",
+			"default": "#64748b"
+		},
+		"badgeScoreTypo": {
+			"type": "object",
+			"default": {
+				"fontSize": {
+					"desktop": 18,
+					"tablet": 18,
+					"mobile": 18
+				},
+				"fontWeight": 800
+			}
+		},
+		"badgeLogoSize": {
+			"type": "number"
+		},
+		"badgeStarsSize": {
+			"type": "number",
+			"default": 16
+		},
+		"textTypo": {
+			"type": "object",
+			"default": {
+				"fontSize": {
+					"desktop": 16,
+					"tablet": 16,
+					"mobile": 14
+				},
+				"fontWeight": 400,
+				"lineHeight": "170%"
+			}
+		},
+		"textColor": {
+			"type": "string",
+			"default": "#000"
+		},
+		"starIconColor": {
+			"type": "string",
+			"default": "#FF8C02"
+		},
+		"textLength": {
+			"type": "number",
+			"default": 120
+		},
 		"align": {
 			"type": "string",
 			"default": "wide"
+		},
+		"blockWidth": {
+			"type": "object",
+			"default": {
+				"desktop": "",
+				"tablet": "",
+				"mobile": ""
+			}
+		},
+		"cardHeight": {
+			"type": "object",
+			"default": {
+				"desktop": "",
+				"tablet": "",
+				"mobile": ""
+			}
 		},
 		"cId": {
 			"type": "string",
@@ -75,6 +383,9 @@
 		"badgeCount": {
 			"type": "string",
 			"default": ""
+		},
+		"starSize": {
+			"type": "number"
 		}
 	},
 	"supports": {
@@ -84,12 +395,11 @@
 		],
 		"html": false
 	},
-	"editorScript": "file:./index.js",
-	"editorStyle": "file:./index.css",
 	"render": "file:./render.php",
-	"viewScript": "file:./view.js",
+	"viewScript": "file:../view.js",
+	"editorStyle": "file:../index.css",
 	"style": [
-		"file:./index.css",
-		"file:./view.css"
+		"file:../index.css",
+		"file:../view.css"
 	]
 }

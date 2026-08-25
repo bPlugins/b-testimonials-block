@@ -1,897 +1,1777 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect } from "react";
 import Masonry, { ResponsiveMasonry } from "react-responsive-masonry";
 
-import Default from '../Themes/Default';
-import ThemeOne from '../Themes/ThemeOne';
-import ThemeTwo from '../Themes/ThemeTwo';
-import ThemeThree from '../Themes/ThemeThree';
-import ThemeFour from '../Themes/ThemeFour';
-import ThemeFive from '../Themes/ThemeFive';
-import ThemeSix from '../Themes/ThemeSix';
-import Slider from './Slider';
-import Marquee from './Marquee';
-import BeforeAfterSlider from '../BeforeAfterSlider';
+import Default from "../Themes/Default";
+import ThemeOne from "../Themes/ThemeOne";
+import ThemeTwo from "../Themes/ThemeTwo";
+import ThemeThree from "../Themes/ThemeThree";
+import ThemeFour from "../Themes/ThemeFour";
+import ThemeFive from "../Themes/ThemeFive";
+import ThemeSix from "../Themes/ThemeSix";
+import Slider from "./Slider";
+import Marquee from "./Marquee";
+import BeforeAfterSlider from "../BeforeAfterSlider";
+import TestimonialForm from "../TestimonialForm";
 
-import { getVideoEmbed } from '../../../utils/functions';
+import { clickable, editorClickable } from "../../../utils/a11y";
+import BlockIcon from "../BlockIcon";
+import VideoCard from "../VideoCard";
+import AudioPlayer from "../AudioPlayer";
+import { getIcon } from "../../../utils/blockIcons";
+import { TRUST_BADGE_ART, getTrustBadgeArt } from "../../../utils/trustBadgeArt";
+import { ARRANGEMENTS, resolveArrangement } from "../../../utils/layoutFeatures";
 
-const VideoCard = ({ item, accentColor }) => {
-    const [isPlaying, setIsPlaying] = useState(false);
-    const embedHtml = item?.videoUrl ? getVideoEmbed(item.videoUrl) : '';
+/**
+ * The Feedback & NPS Poll scale, shared by the editor and the front end.
+ *
+ * On a published page the block's view script owns this interaction: it binds a
+ * delegated click, writes `.is-selected` onto the button it was given and posts
+ * the vote to the REST route. That script is registered as `viewScript`, so it
+ * never loads in the editor -- which left every number completely dead there.
+ * Clicking one did nothing, and the selected state could not be seen at all
+ * while styling it.
+ *
+ * So the editor gets local state and the front end deliberately gets none. If
+ * React owned `.is-selected` on the page, its next render would wipe whatever
+ * the view script had just written; and nothing in the editor may post a real
+ * vote, which is why the click here only ever sets state.
+ *
+ * It lives in its own component because Layout returns early for each layout,
+ * and a hook cannot be called inside one of those branches.
+ */
+const FeedbackPoll = ({ attributes = {}, isBackend, bt, bd }) => {
+  const [picked, setPicked] = useState(null);
 
-    return (
-        <div className="video-item">
-            <div
-                className={`video-frame ${isPlaying ? 'is-playing' : ''}`}
-                style={!isPlaying && item?.poster?.url ? { backgroundImage: `url(${item.poster.url})` } : undefined}
-                data-embed={embedHtml}
-                onClick={() => {
-                    if (embedHtml) {
-                        setIsPlaying(true);
-                    }
-                }}
-                tabIndex={0}
-                role="button"
-                onKeyDown={(e) => {
-                    if ((e.key === 'Enter' || e.key === ' ') && embedHtml) {
-                        e.preventDefault();
-                        setIsPlaying(true);
-                    }
-                }}
-            >
-                {isPlaying ? (
-                    <div
-                        className="video-embed-container"
-                        style={{ width: '100%', height: '100%', position: 'absolute', inset: 0 }}
-                        dangerouslySetInnerHTML={{ __html: embedHtml }}
-                    />
-                ) : (
-                    <span className="video-play" style={accentColor ? { color: accentColor } : undefined}>
-                        <svg viewBox="0 0 24 24" width="26" height="26" fill="currentColor">
-                            <path d="M8 5v14l11-7z" />
-                        </svg>
-                    </span>
-                )}
-            </div>
-            <div className="video-meta">
-                {item?.name && <h3 className="name">{item.name}</h3>}
-                {(item?.deg || item?.company) && (
-                    <p className="deg">{[item?.deg, item?.company].filter(Boolean).join(', ')}</p>
-                )}
-            </div>
+  const minVal =
+    attributes.minScore !== undefined ? Number(attributes.minScore) : 0;
+  const maxVal =
+    attributes.maxScore !== undefined ? Number(attributes.maxScore) : 10;
+  const lowLbl =
+    attributes.lowLabel !== undefined ? attributes.lowLabel : "Not likely";
+  const highLbl =
+    attributes.highLabel !== undefined ? attributes.highLabel : "Very likely";
+
+  const pollNumbers = [];
+  for (let i = minVal; i <= maxVal; i++) {
+    pollNumbers.push(i);
+  }
+
+  const previewing = isBackend && picked !== null;
+
+  return (
+    // Endpoint and REST nonce come from render.php; the view script reads them
+    // off this element rather than guessing the REST root.
+    <div
+      className="btb-poll-wrapper"
+      data-endpoint={attributes.pollEndpoint || ""}
+      data-rest-nonce={attributes.pollRestNonce || ""}>
+      <h4 className="btb-poll-title">
+        {bt || "How likely are you to recommend us?"}
+      </h4>
+      <p className="btb-poll-desc">{bd || "Net Promoter Score Survey"}</p>
+      <div className="btb-poll-scale">
+        {lowLbl && <span className="btb-poll-label-low">{lowLbl}</span>}
+        <div className="btb-poll-buttons">
+          {pollNumbers.map((n) => (
+            <button
+              key={n}
+              type="button"
+              className={
+                previewing && picked === n
+                  ? "btb-poll-num-btn is-selected"
+                  : "btb-poll-num-btn"
+              }
+              data-mark={n}
+              onClick={isBackend ? () => setPicked(n) : undefined}>
+              {n}
+            </button>
+          ))}
         </div>
-    );
+        {highLbl && <span className="btb-poll-label-high">{highLbl}</span>}
+      </div>
+      <div
+        className="btb-poll-response-msg"
+        style={{ display: previewing ? "block" : "none" }}>
+        {previewing ? "Preview only — votes are recorded on the published page." : ""}
+      </div>
+    </div>
+  );
 };
 
-const SocialProofToast = ({ items = [], bt, bd, isBackend, activeIndex }) => {
-    const [currentIndex, setCurrentIndex] = useState(0);
+const SocialProofToast = ({
+  items = [],
+  bt,
+  bd,
+  isBackend,
+  activeIndex,
+  toast = {},
+  pauseInEditor = false,
+}) => {
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [isHovered, setIsHovered] = useState(false);
 
-    useEffect(() => {
-        if (isBackend || items.length <= 1) return;
-        const interval = setInterval(() => {
-            setCurrentIndex((prev) => (prev + 1) % items.length);
-        }, 4000);
-        return () => clearInterval(interval);
-    }, [isBackend, items.length]);
+  /*
+   * The rotation runs in the editor too.
+   *
+   * It used to stop dead on `isBackend`, so the one thing this block is -- a
+   * notification that cycles -- could only be seen by previewing the page. The
+   * slider and the marquee both animate in the editor and both offer "Pause
+   * while editing" for when they get in the way; this now follows that
+   * convention rather than being the one animated layout that never moves.
+   */
+  const isPaused = isBackend && pauseInEditor;
 
-    const activeItemIndex = isBackend ? (activeIndex < items.length ? activeIndex : 0) : currentIndex;
-    const currentItem = items[activeItemIndex] || {};
+  /*
+   * Picking a card in the sidebar jumps the preview to it.
+   *
+   * Without this the author would select card 3, watch the rotation carry on
+   * from wherever it was, and be styling something they cannot see. Syncing on
+   * `activeIndex` keeps the selection meaningful while the cycle continues from
+   * that card.
+   */
+  useEffect(() => {
+    if (isBackend && activeIndex < items.length) {
+      setCurrentIndex(activeIndex);
+    }
+  }, [isBackend, activeIndex, items.length]);
 
-    return (
-        <div className="btb-toast-wrapper">
-            <div className="btb-toast-card" key={activeItemIndex}>
-                <div className="btb-toast-avatar">
-                    <img src={currentItem.img?.url || 'https://templates.bplugins.com/wp-content/uploads/2025/02/p-29.png'} alt={currentItem.name || ''} />
-                </div>
-                <div className="btb-toast-body">
-                    <p className="btb-toast-text">{currentItem.reviewText || bt || 'Someone just left a 5-star review!'}</p>
-                    <span className="btb-toast-meta">{currentItem.name || 'John Doe'} — {bd || 'Just now'}</span>
-                </div>
-            </div>
+  // How fast the notifications cycle, and whether hovering holds one still.
+  //
+  // The rotation was a bare 4000 in this effect -- the one setting a "live
+  // social proof notification" is really made of, with nothing in the sidebar to
+  // change it. Stored in seconds, because that is how an author thinks about it.
+  const { speed = 4, pauseOnHover = false } = toast || {};
+  const delay = Math.max(1, Number(speed) || 4) * 1000;
+
+  useEffect(() => {
+    if (isPaused || items.length <= 1) return;
+    // Hovering pauses by tearing the timer down and rebuilding it on leave,
+    // rather than by tracking elapsed time: a notification the reader has
+    // stopped on should stay up as long as they are on it, then start its full
+    // interval again, not finish the remainder of an interval they interrupted.
+    if (pauseOnHover && isHovered) return;
+
+    const interval = setInterval(() => {
+      setCurrentIndex((prev) => (prev + 1) % items.length);
+    }, delay);
+    return () => clearInterval(interval);
+  }, [isPaused, items.length, delay, pauseOnHover, isHovered]);
+
+  // Paused in the editor, the card being edited is the one to show; otherwise
+  // the cycle decides, in the editor as on the page.
+  const activeItemIndex = isPaused
+    ? activeIndex < items.length
+      ? activeIndex
+      : 0
+    : currentIndex < items.length
+      ? currentIndex
+      : 0;
+  const currentItem = items[activeItemIndex] || {};
+
+  return (
+    <div
+      className="btb-toast-wrapper"
+      {...(pauseOnHover
+        ? {
+            onMouseEnter: () => setIsHovered(true),
+            onMouseLeave: () => setIsHovered(false),
+          }
+        : {})}>
+      <div className="btb-toast-card" key={activeItemIndex}>
+        <div className="btb-toast-avatar">
+          <img
+            src={
+              currentItem.img?.url ||
+              "https://templates.bplugins.com/wp-content/uploads/2025/02/p-29.png"
+            }
+            alt={currentItem.name || ""}
+          />
         </div>
-    );
+        <div className="btb-toast-body">
+          <p className="btb-toast-text">
+            {currentItem.reviewText ||
+              bt ||
+              "Someone just left a 5-star review!"}
+          </p>
+          <span className="btb-toast-meta">
+            {currentItem.name || "John Doe"} — {bd || "Just now"}
+          </span>
+        </div>
+      </div>
+    </div>
+  );
 };
 
-const Layout = ({ itemsEls = [], ToolbarButton, MediaUpload, MediaUploadCheck, attributes = {}, setActiveIndex, activeIndex = 0, updateItem, isBackend = false, __, RichText }) => {
-    const { items = [], columnGap = '30px', rowGap = '40px', layout = 'default', theme = 'default', columns = { desktop: 3, tablet: 2, mobile: 1 } } = attributes || {};
-    const { desktop = 3, tablet = 2, mobile = 1 } = (columns && typeof columns === 'object') ? columns : { desktop: 3, tablet: 2, mobile: 1 };
+const Layout = ({
+  itemsEls = [],
+  ToolbarButton,
+  MediaUpload,
+  MediaUploadCheck,
+  attributes = {},
+  setActiveIndex,
+  activeIndex = 0,
+  updateItem,
+  isBackend = false,
+  previewDevice = "Desktop",
+  __,
+  RichText,
+  SandBox,
+}) => {
+  const {
+    items = [],
+    columnGap = "30px",
+    rowGap = "40px",
+    layout = "default",
+    theme = "default",
+    columns = { desktop: 3, tablet: 2, mobile: 1 },
+  } = attributes || {};
+  const {
+    desktop = 3,
+    tablet = 2,
+    mobile = 1,
+  } = columns && typeof columns === "object"
+    ? columns
+    : { desktop: 3, tablet: 2, mobile: 1 };
 
-    const [selectedAvatarIdx, setSelectedAvatarIdx] = useState(0);
-    const [cardStackIdx, setCardStackIdx] = useState(0);
-    const [activeModalItem, setActiveModalItem] = useState(null);
-    const itemProps = { attributes, setActiveIndex, activeIndex, updateItem, isBackend, __, RichText, MediaUpload, MediaUploadCheck, ToolbarButton };
+  // The column count to render at the "base" size.
+  //
+  // On the front end that is always the desktop value, with the media queries
+  // taking over at narrower widths. In the editor it has to follow the device
+  // buttons directly, because those only produce a real viewport when the
+  // canvas is iframed -- and WordPress iframes it only when every registered
+  // block is apiVersion 3. A single v2 block from any other active plugin
+  // disables iframing for the whole editor, and then @media keeps measuring the
+  // browser window, so the tablet and mobile rules never fire no matter which
+  // device is selected. Resolving the count here works either way: when the
+  // canvas *is* iframed the media queries agree with this value.
+  const previewCols =
+    isBackend && "Tablet" === previewDevice
+      ? tablet
+      : isBackend && "Mobile" === previewDevice
+        ? mobile
+        : desktop;
 
-    // Dynamic badge attributes (from block.json / sidebar settings)
-    const bt = attributes.badgeTitle || '';
-    const bd = attributes.badgeDesc || '';
-    const bs = attributes.badgeScore || '';
-    const bc = attributes.badgeCount || '';
+  const arrangement = resolveArrangement(attributes);
 
-    // === Theme selector (shared by all testimonial-items layouts) ===
-    const themeSelect = (item, index) => {
-        const itemProp = { item: item || {}, index, itemEls: itemsEls?.[index] || {}, ...itemProps };
-        switch (theme) {
-            case 'theme_1': return <ThemeOne {...itemProp} />;
-            case 'theme_2': return <ThemeTwo {...itemProp} />;
-            case 'theme_3': return <ThemeThree {...itemProp} />;
-            case 'theme_4': return <ThemeFour {...itemProp} />;
-            case 'theme_5': return <ThemeFive {...itemProp} />;
-            case 'theme_6': return <ThemeSix {...itemProp} />;
-            default: return <Default {...itemProp} />;
-        }
+  const [selectedAvatarIdx, setSelectedAvatarIdx] = useState(0);
+  const [cardStackIdx, setCardStackIdx] = useState(0);
+  const [activeModalItem, setActiveModalItem] = useState(null);
+  const [stackHovered, setStackHovered] = useState(false);
+
+  // The Stacked Review Cards deck advancing on its own.
+  //
+  // It is driven from here rather than from the block's `view.js`, which is where
+  // a DOM-side autoplay would naturally have gone. That script never runs: it
+  // hooks DOMContentLoaded and queries `.btb-card-stack-wrapper`, but
+  // `shared/view.js` mounts React on the same event, so the wrapper does not
+  // exist yet when it looks -- measured, the deck's `is-top` classes and its
+  // next/prev buttons all come from React below, and an autoplay added to that
+  // script sat dead. (Its drag-to-swipe is dead for the same reason; see the
+  // note in that file.)
+  //
+  // Declared at the top level of the component because the card-stack branch is
+  // an early return further down, and a hook cannot live behind one. The guard
+  // is inside the effect instead, so every other layout runs it and exits.
+  const stackAutoPlay = !!attributes?.stackAutoPlay;
+  const stackDelay =
+    Math.max(1, Number(attributes?.stackAutoPlayDelay) || 5) * 1000;
+  const stackCount = items.length;
+
+  useEffect(() => {
+    if ("testimonials-card-stack" !== layout) return;
+    // Not in the editor: the deck should hold still while it is being styled,
+    // the same way the marquee's Pause while editing works.
+    if (isBackend || !stackAutoPlay || stackCount <= 1) return;
+    if (stackHovered) return;
+
+    const timer = setInterval(() => {
+      setCardStackIdx((prev) => (prev + 1) % stackCount);
+    }, stackDelay);
+
+    return () => clearInterval(timer);
+  }, [
+    layout,
+    isBackend,
+    stackAutoPlay,
+    stackDelay,
+    stackCount,
+    stackHovered,
+  ]);
+  const itemProps = {
+    attributes,
+    setActiveIndex,
+    activeIndex,
+    updateItem,
+    isBackend,
+    __,
+    RichText,
+    MediaUpload,
+    MediaUploadCheck,
+    ToolbarButton,
+  };
+
+  // Dynamic badge attributes (from block.json / sidebar settings)
+  const bt = attributes.badgeTitle || "";
+  const bd = attributes.badgeDesc || "";
+  const bs = attributes.badgeScore || "";
+  const bc = attributes.badgeCount || "";
+
+  // === Theme selector (shared by all testimonial-items layouts) ===
+  const themeSelect = (item, index) => {
+    const itemProp = {
+      item: item || {},
+      index,
+      itemEls: itemsEls?.[index] || {},
+      ...itemProps,
+    };
+    switch (theme) {
+      case "theme_1":
+        return <ThemeOne {...itemProp} />;
+      case "theme_2":
+        return <ThemeTwo {...itemProp} />;
+      case "theme_3":
+        return <ThemeThree {...itemProp} />;
+      case "theme_4":
+        return <ThemeFour {...itemProp} />;
+      case "theme_5":
+        return <ThemeFive {...itemProp} />;
+      case "theme_6":
+        return <ThemeSix {...itemProp} />;
+      default:
+        return <Default {...itemProp} />;
+    }
+  };
+
+  // ================================================================
+  //  CATEGORY D: Badge / Score Widgets (fully custom JSX, dynamic)
+  // ================================================================
+
+  // Helper to calculate dynamic rating stats from items array
+  const computedStats = (() => {
+    const total = Array.isArray(items) ? items.length : 0;
+    if (total === 0) {
+      return {
+        total: 0,
+        avg: "5.0",
+        countText: "",
+        counts: { 5: 0, 4: 0, 3: 0, 2: 0, 1: 0 },
+      };
+    }
+    const counts = { 5: 0, 4: 0, 3: 0, 2: 0, 1: 0 };
+    let sum = 0;
+    items.forEach((it) => {
+      const rawVal = Number(it?.rating ?? 5);
+      const r = Math.min(5, Math.max(1, isNaN(rawVal) ? 5 : rawVal));
+      const rounded = Math.round(r);
+      counts[rounded] = (counts[rounded] || 0) + 1;
+      sum += r;
+    });
+    const avg = (sum / total).toFixed(1);
+    return {
+      total,
+      avg,
+      countText: `Based on ${total} reviews`,
+      counts,
+    };
+  })();
+
+  if (layout === "google-review-badge") {
+    const score = bs || (computedStats.total > 0 ? computedStats.avg : "4.9");
+    const count =
+      bc ||
+      (computedStats.total > 0
+        ? `(${computedStats.total}+ Reviews)`
+        : "(128+ Reviews)");
+    return (
+      <div className="btb-badge-card btb-google-badge">
+        <div className="btb-badge-header">
+          <svg
+            className="btb-badge-brand-logo"
+            viewBox="0 0 24 24"
+            width="36"
+            height="36">
+            <path
+              fill="#4285F4"
+              d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
+            />
+            <path
+              fill="#34A853"
+              d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
+            />
+            <path
+              fill="#FBBC05"
+              d="M5.84 14.1c-.22-.66-.35-1.36-.35-2.1s.13-1.44.35-2.1V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.62z"
+            />
+            <path
+              fill="#EA4335"
+              d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"
+            />
+          </svg>
+          <div className="btb-badge-info">
+            <h4 className="btb-badge-title">{bt || "Google Reviews"}</h4>
+            <div className="btb-badge-rating">
+              <span className="score">{score}</span>
+              <span className="stars">★★★★★</span>
+              <span className="count">{count}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (layout === "capterra-review-badge") {
+    const score = bs || (computedStats.total > 0 ? computedStats.avg : "4.8");
+    const count =
+      bc ||
+      (computedStats.total > 0
+        ? `(${computedStats.total} Reviews)`
+        : "Verified Software Reviews");
+    return (
+      <div className="btb-badge-card btb-capterra-badge">
+        <div className="btb-badge-header">
+          <svg
+            className="btb-badge-brand-logo"
+            viewBox="0 0 24 24"
+            width="36"
+            height="36">
+            <path fill="#FF9D28" d="M2 2h9v9H2z" />
+            <path fill="#68C5ED" d="M13 2h9v9h-9z" />
+            <path fill="#044D80" d="M2 13h9v9H2z" />
+            <path fill="#E54747" d="M13 13h9v9h-9z" />
+          </svg>
+          <div className="btb-badge-info">
+            <h4 className="btb-badge-title">{bt || "Capterra Rating"}</h4>
+            <div className="btb-badge-rating">
+              <span className="score">{score}</span>
+              <span className="stars">★★★★★</span>
+              <span className="count">{count}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (layout === "facebook-review-badge") {
+    const score = bs || (computedStats.total > 0 ? computedStats.avg : "5.0");
+    const count =
+      bc ||
+      (computedStats.total > 0
+        ? `Recommended by ${computedStats.total} Customers`
+        : "Recommended by 250+ Customers");
+    return (
+      <div className="btb-badge-card btb-facebook-badge">
+        <div className="btb-badge-header">
+          <svg
+            className="btb-badge-brand-logo"
+            viewBox="0 0 24 24"
+            width="36"
+            height="36">
+            <path
+              fill="#1877F2"
+              d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"
+            />
+          </svg>
+          <div className="btb-badge-info">
+            <h4 className="btb-badge-title">{bt || "Facebook Reviews"}</h4>
+            <div className="btb-badge-rating">
+              <span className="score">{score}</span>
+              <span className="stars">★★★★★</span>
+              <span className="count">{count}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (layout === "trustpilot-review-badge") {
+    const score =
+      bs || (computedStats.total > 0 ? `${computedStats.avg} / 5` : "4.9 / 5");
+    const count =
+      bc ||
+      (computedStats.total > 0
+        ? `TrustScore | ${computedStats.total} Reviews`
+        : "TrustScore | 500+ Reviews");
+    return (
+      <div className="btb-badge-card btb-trustpilot-badge">
+        <div className="btb-badge-header">
+          <svg
+            className="btb-badge-brand-logo"
+            viewBox="0 0 24 24"
+            width="36"
+            height="36">
+            <path
+              fill="#00B67A"
+              d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"
+            />
+          </svg>
+          <div className="btb-badge-info">
+            <h4 className="btb-badge-title">{bt || "Trustpilot Score"}</h4>
+            <div className="btb-badge-rating">
+              <span className="score">{score}</span>
+              <span className="stars">★★★★★</span>
+              <span className="count">{count}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (layout === "g2-review-badge") {
+    const score =
+      bs || (computedStats.total > 0 ? `${computedStats.avg} / 5` : "4.8 / 5");
+    const count = bc || "Leader Category 2026";
+    return (
+      <div className="btb-badge-card btb-g2-badge">
+        <div className="btb-badge-header">
+          <svg
+            className="btb-badge-brand-logo"
+            viewBox="0 0 24 24"
+            width="36"
+            height="36">
+            <circle cx="12" cy="12" r="11" fill="#FF492C" />
+            <text
+              x="12"
+              y="16"
+              textAnchor="middle"
+              fill="#fff"
+              fontSize="12"
+              fontWeight="bold">
+              G2
+            </text>
+          </svg>
+          <div className="btb-badge-info">
+            <h4 className="btb-badge-title">{bt || "G2 High Performer"}</h4>
+            <div className="btb-badge-rating">
+              <span className="score">{score}</span>
+              <span className="stars">★★★★★</span>
+              <span className="count">{count}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (layout === "verified-buyer-badge") {
+    return (
+      <div className="btb-badge-card btb-verified-badge">
+        <div className="btb-badge-header">
+          <BlockIcon
+            icon={getIcon(attributes, "badge")}
+            size={36}
+            className="btb-badge-brand-logo"
+            renderFallback={(color, box) => (
+              <svg
+                className="btb-badge-brand-logo"
+                viewBox="0 0 24 24"
+                width={box}
+                height={box}>
+                <path
+                  fill={color}
+                  d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm-2 16l-4-4 1.41-1.41L10 14.17l6.59-6.59L18 9l-8 8z"
+                />
+              </svg>
+            )}
+          />
+          <div className="btb-badge-info">
+            <h4 className="btb-badge-title">{bt || "100% Verified Reviews"}</h4>
+            <p className="btb-badge-desc">
+              {bd || "All customer testimonials are authenticated & verified."}
+            </p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (layout === "review-badge-widget") {
+    const score = bs || (computedStats.total > 0 ? computedStats.avg : "4.9");
+    const count =
+      bc ||
+      (computedStats.total > 0
+        ? `Based on ${computedStats.total} reviews`
+        : "Based on 320+ reviews");
+    return (
+      <div className="btb-badge-card btb-review-widget">
+        <div className="btb-badge-header">
+          <BlockIcon
+            icon={getIcon(attributes, "badge")}
+            size={36}
+            className="btb-badge-brand-logo"
+            renderFallback={(color, box) => (
+              <svg
+                className="btb-badge-brand-logo"
+                viewBox="0 0 24 24"
+                width={box}
+                height={box}>
+                <path
+                  fill={color}
+                  d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"
+                />
+              </svg>
+            )}
+          />
+          <div className="btb-badge-info">
+            <h4 className="btb-badge-title">{bt || "Customer Reviews"}</h4>
+            <div className="btb-badge-rating">
+              <span className="score">{score}</span>
+              <span className="stars">★★★★★</span>
+              <span className="count">{count}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (layout === "trust-badges") {
+    // Artwork from the shared list, so the editor preview draws the same badge
+    // this does; only the labels below belong to this branch, since they are
+    // read from the generic badge fields and used by the fallback alone.
+    const TRUST_LABELS = [
+      bt || "Secure & Verified",
+      bd || "Money-Back Guarantee",
+      bs || "5-Star Support",
+      bc || "Trusted by 10K+ Users",
+    ];
+    const trustItems = TRUST_BADGE_ART.map((art, index) => ({
+      ...art,
+      label: TRUST_LABELS[index],
+    }));
+
+    // The Columns and Gap controls only reached this block's editor preview --
+    // the front end grid was a fixed repeat(4, 1fr). Same custom properties the
+    // video layout uses, so both honour the inspector.
+    const gridVars = {
+      "--cols-d": previewCols || 3,
+      "--cols-t": tablet || 3,
+      "--cols-m": mobile || 1,
+      "--col-gap": columnGap || "16px",
+      "--row-gap": rowGap || "16px",
     };
 
-    // === Helper: render items grid with a custom wrapper class ===
-    const renderItemsGrid = (extraClass = '') => (
-        <div className={`layoutSection ${layout}-layout btb-${layout}-layout ${theme} ${extraClass} columns-${desktop} columns-tablet-${tablet} columns-mobile-${mobile} ${isBackend ? 'is-editing' : ''}`}>
-            {items.map((item, index) => themeSelect(item, index))}
-        </div>
+    // The block's editor is a repeater of badges -- icon image, title, subtitle
+    // -- and none of it reached the page: this branch rendered four fixed
+    // badges built out of the generic badge fields, so adding or editing a badge
+    // moved the editor preview only. Where the repeater has content it now
+    // drives the page, with the Icons panel supplying the artwork for any badge
+    // whose image is empty.
+    // Icon size reaches a picked icon through BlockIcon's `size` prop rather
+    // than CSS -- BlockIcon writes width and height inline, which no selector
+    // outranks. `lockSize` on both calls below is what makes this the one that
+    // lands: the slot's own size normally wins, and this block's Icons panel
+    // offers none, so an old saved value would override a control it can no
+    // longer be cleared from.
+    const iconBox = attributes.badgeIconSize || 32;
+    const iconTop = "top" === attributes.badgeIconPosition;
+
+    const badgeItems = Array.isArray(attributes.items) ? attributes.items : [];
+    const hasRepeater = badgeItems.some(
+      (it) => it && (it.img?.url || it.title || it.subtitle),
     );
 
-    // ================================================================
-    //  CATEGORY D: Badge / Score Widgets (fully custom JSX, dynamic)
-    // ================================================================
+    if (hasRepeater) {
+      return (
+        <div className="bTrustBadges">
+          <div className="badges-grid" style={gridVars}>
+            {badgeItems.map((item, index) => {
+              // Four drawings, no limit on badges: a fifth repeats the
+              // first, which is what the helper does.
+              const slot = getTrustBadgeArt(index);
 
-    // Helper to calculate dynamic rating stats from items array
-    const computedStats = (() => {
-        const total = Array.isArray(items) ? items.length : 0;
-        if (total === 0) {
-            return {
-                total: 0,
-                avg: '5.0',
-                countText: '',
-                counts: { 5: 0, 4: 0, 3: 0, 2: 0, 1: 0 }
-            };
-        }
-        const counts = { 5: 0, 4: 0, 3: 0, 2: 0, 1: 0 };
-        let sum = 0;
-        items.forEach(it => {
-            const rawVal = Number(it?.rating ?? 5);
-            const r = Math.min(5, Math.max(1, isNaN(rawVal) ? 5 : rawVal));
-            const rounded = Math.round(r);
-            counts[rounded] = (counts[rounded] || 0) + 1;
-            sum += r;
-        });
-        const avg = (sum / total).toFixed(1);
-        return {
-            total,
-            avg,
-            countText: `Based on ${total} reviews`,
-            counts
-        };
-    })();
-
-    if (layout === 'google-review-badge') {
-        const score = bs || (computedStats.total > 0 ? computedStats.avg : '4.9');
-        const count = bc || (computedStats.total > 0 ? `(${computedStats.total}+ Reviews)` : '(128+ Reviews)');
-        return (
-            <div className="btb-badge-card btb-google-badge">
-                <div className="btb-badge-header">
-                    <svg className="btb-badge-brand-logo" viewBox="0 0 24 24" width="36" height="36"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" /><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" /><path fill="#FBBC05" d="M5.84 14.1c-.22-.66-.35-1.36-.35-2.1s.13-1.44.35-2.1V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.62z" /><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z" /></svg>
-                    <div className="btb-badge-info">
-                        <h4 className="btb-badge-title">{bt || 'Google Reviews'}</h4>
-                        <div className="btb-badge-rating">
-                            <span className="score">{score}</span>
-                            <span className="stars">★★★★★</span>
-                            <span className="count">{count}</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        );
-    }
-
-    if (layout === 'capterra-review-badge') {
-        const score = bs || (computedStats.total > 0 ? computedStats.avg : '4.8');
-        const count = bc || (computedStats.total > 0 ? `(${computedStats.total} Reviews)` : 'Verified Software Reviews');
-        return (
-            <div className="btb-badge-card btb-capterra-badge">
-                <div className="btb-badge-header">
-                    <svg className="btb-badge-brand-logo" viewBox="0 0 24 24" width="36" height="36"><path fill="#FF9D28" d="M2 2h9v9H2z" /><path fill="#68C5ED" d="M13 2h9v9h-9z" /><path fill="#044D80" d="M2 13h9v9H2z" /><path fill="#E54747" d="M13 13h9v9h-9z" /></svg>
-                    <div className="btb-badge-info">
-                        <h4 className="btb-badge-title">{bt || 'Capterra Rating'}</h4>
-                        <div className="btb-badge-rating">
-                            <span className="score">{score}</span>
-                            <span className="stars">★★★★★</span>
-                            <span className="count">{count}</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        );
-    }
-
-    if (layout === 'facebook-review-badge') {
-        const score = bs || (computedStats.total > 0 ? computedStats.avg : '5.0');
-        const count = bc || (computedStats.total > 0 ? `Recommended by ${computedStats.total} Customers` : 'Recommended by 250+ Customers');
-        return (
-            <div className="btb-badge-card btb-facebook-badge">
-                <div className="btb-badge-header">
-                    <svg className="btb-badge-brand-logo" viewBox="0 0 24 24" width="36" height="36"><path fill="#1877F2" d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" /></svg>
-                    <div className="btb-badge-info">
-                        <h4 className="btb-badge-title">{bt || 'Facebook Reviews'}</h4>
-                        <div className="btb-badge-rating">
-                            <span className="score">{score}</span>
-                            <span className="stars">★★★★★</span>
-                            <span className="count">{count}</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        );
-    }
-
-    if (layout === 'trustpilot-review-badge') {
-        const score = bs || (computedStats.total > 0 ? `${computedStats.avg} / 5` : '4.9 / 5');
-        const count = bc || (computedStats.total > 0 ? `TrustScore | ${computedStats.total} Reviews` : 'TrustScore | 500+ Reviews');
-        return (
-            <div className="btb-badge-card btb-trustpilot-badge">
-                <div className="btb-badge-header">
-                    <svg className="btb-badge-brand-logo" viewBox="0 0 24 24" width="36" height="36"><path fill="#00B67A" d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" /></svg>
-                    <div className="btb-badge-info">
-                        <h4 className="btb-badge-title">{bt || 'Trustpilot Score'}</h4>
-                        <div className="btb-badge-rating">
-                            <span className="score">{score}</span>
-                            <span className="stars">★★★★★</span>
-                            <span className="count">{count}</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        );
-    }
-
-    if (layout === 'g2-review-badge') {
-        const score = bs || (computedStats.total > 0 ? `${computedStats.avg} / 5` : '4.8 / 5');
-        const count = bc || 'Leader Category 2026';
-        return (
-            <div className="btb-badge-card btb-g2-badge">
-                <div className="btb-badge-header">
-                    <svg className="btb-badge-brand-logo" viewBox="0 0 24 24" width="36" height="36"><circle cx="12" cy="12" r="11" fill="#FF492C" /><text x="12" y="16" textAnchor="middle" fill="#fff" fontSize="12" fontWeight="bold">G2</text></svg>
-                    <div className="btb-badge-info">
-                        <h4 className="btb-badge-title">{bt || 'G2 High Performer'}</h4>
-                        <div className="btb-badge-rating">
-                            <span className="score">{score}</span>
-                            <span className="stars">★★★★★</span>
-                            <span className="count">{count}</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        );
-    }
-
-    if (layout === 'verified-buyer-badge') {
-        return (
-            <div className="btb-badge-card btb-verified-badge">
-                <div className="btb-badge-header">
-                    <svg className="btb-badge-brand-logo" viewBox="0 0 24 24" width="36" height="36"><path fill="#4527a4" d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm-2 16l-4-4 1.41-1.41L10 14.17l6.59-6.59L18 9l-8 8z" /></svg>
-                    <div className="btb-badge-info">
-                        <h4 className="btb-badge-title">{bt || '100% Verified Reviews'}</h4>
-                        <p className="btb-badge-desc">{bd || 'All customer testimonials are authenticated & verified.'}</p>
-                    </div>
-                </div>
-            </div>
-        );
-    }
-
-    if (layout === 'review-badge-widget') {
-        const score = bs || (computedStats.total > 0 ? computedStats.avg : '4.9');
-        const count = bc || (computedStats.total > 0 ? `Based on ${computedStats.total} reviews` : 'Based on 320+ reviews');
-        return (
-            <div className="btb-badge-card btb-review-widget">
-                <div className="btb-badge-header">
-                    <svg className="btb-badge-brand-logo" viewBox="0 0 24 24" width="36" height="36"><path fill="#4527a4" d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" /></svg>
-                    <div className="btb-badge-info">
-                        <h4 className="btb-badge-title">{bt || 'Customer Reviews'}</h4>
-                        <div className="btb-badge-rating">
-                            <span className="score">{score}</span>
-                            <span className="stars">★★★★★</span>
-                            <span className="count">{count}</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        );
-    }
-
-    if (layout === 'trust-badges') {
-        return (
-            <div className="btb-trust-badges-grid">
-                <div className="btb-trust-item">
-                    <svg viewBox="0 0 24 24" width="32" height="32"><path fill="#4527a4" d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4z" /></svg>
-                    <span>{bt || 'Secure & Verified'}</span>
-                </div>
-                <div className="btb-trust-item">
-                    <svg viewBox="0 0 24 24" width="32" height="32"><path fill="#34A853" d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z" /></svg>
-                    <span>{bd || 'Money-Back Guarantee'}</span>
-                </div>
-                <div className="btb-trust-item">
-                    <svg viewBox="0 0 24 24" width="32" height="32"><path fill="#FF9D28" d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" /></svg>
-                    <span>{bs || '5-Star Support'}</span>
-                </div>
-                <div className="btb-trust-item">
-                    <svg viewBox="0 0 24 24" width="32" height="32"><path fill="#1877F2" d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" /></svg>
-                    <span>{bc || 'Trusted by 10K+ Users'}</span>
-                </div>
-            </div>
-        );
-    }
-
-    // ================================================================
-    //  CATEGORY E: Interactive / Data Widgets (fully custom JSX)
-    // ================================================================
-
-    if (layout === 'testimonial-form') {
-        return (
-            <div className="btb-form-wrapper">
-                <h3 className="btb-form-title">{bt || 'Leave a Customer Review'}</h3>
-                <div className="btb-form-grid">
-                    <input type="text" className="btb-input" placeholder="Your Name" readOnly />
-                    <input type="text" className="btb-input" placeholder="Your Company / Designation" readOnly />
-                    <div className="btb-form-rating-selector"><span>Rating: </span><span className="stars">★★★★★</span></div>
-                    <textarea className="btb-textarea" placeholder="Write your testimonial review here..." readOnly></textarea>
-                    <button type="button" className="btb-submit-btn">{bc || 'Submit Testimonial'}</button>
-                </div>
-            </div>
-        );
-    }
-
-    if (layout === 'user-feedback-poll') {
-        const minVal = attributes.minScore !== undefined ? Number(attributes.minScore) : 0;
-        const maxVal = attributes.maxScore !== undefined ? Number(attributes.maxScore) : 10;
-        const lowLbl = attributes.lowLabel !== undefined ? attributes.lowLabel : 'Not likely';
-        const highLbl = attributes.highLabel !== undefined ? attributes.highLabel : 'Very likely';
-
-        const pollNumbers = [];
-        for (let i = minVal; i <= maxVal; i++) {
-            pollNumbers.push(i);
-        }
-
-        return (
-            <div className="btb-poll-wrapper">
-                <h4 className="btb-poll-title">{bt || 'How likely are you to recommend us?'}</h4>
-                <p className="btb-poll-desc">{bd || 'Net Promoter Score Survey'}</p>
-                <div className="btb-poll-scale">
-                    {lowLbl && <span className="btb-poll-label-low">{lowLbl}</span>}
-                    <div className="btb-poll-buttons">
-                        {pollNumbers.map(n => (
-                            <button key={n} type="button" className="btb-poll-num-btn" data-mark={n}>{n}</button>
-                        ))}
-                    </div>
-                    {highLbl && <span className="btb-poll-label-high">{highLbl}</span>}
-                </div>
-                <div className="btb-poll-response-msg" style={{ display: 'none' }}></div>
-            </div>
-        );
-    }
-
-    if (layout === 'rating-summary') {
-        const displayScore = bs || (computedStats.total > 0 ? computedStats.avg : '4.8');
-        const displayCountText = bc || (computedStats.total > 0 ? `Based on ${computedStats.total} reviews` : 'Based on 256 reviews');
-
-        const defaultPcts = { 5: 78, 4: 15, 3: 4, 2: 2, 1: 1 };
-
-        const rows = [5, 4, 3, 2, 1].map(s => {
-            const count = computedStats.counts[s];
-            const pct = computedStats.total > 0
-                ? Math.round((count / computedStats.total) * 100)
-                : (attributes[`star${s}Pct`] ?? defaultPcts[s]);
-            return { star: s, pct, count };
-        });
-
-        return (
-            <div className="btb-rating-summary">
-                <div className="btb-rs-left">
-                    <span className="btb-rs-big-number">{displayScore}</span>
-                    <div className="btb-rs-stars">★★★★★</div>
-                    <span className="btb-rs-count">{displayCountText}</span>
-                </div>
-                <div className="btb-rs-bars">
-                    {rows.map(r => (
-                        <div key={r.star} className="btb-rs-bar-row">
-                            <span className="btb-rs-bar-label">{r.star} ★</span>
-                            <div className="btb-rs-bar-track"><div className="btb-rs-bar-fill" style={{ width: `${r.pct}%` }}></div></div>
-                            <span className="btb-rs-bar-pct">{r.pct}%</span>
-                        </div>
-                    ))}
-                </div>
-            </div>
-        );
-    }
-
-    if (layout === 'star-rating-bars') {
-        const defaultCounts = { 5: 184, 4: 46, 3: 15, 2: 7, 1: 3 };
-
-        const rows = [5, 4, 3, 2, 1].map(s => {
-            const overrideVal = attributes[`star${s}Count`];
-            let count;
-            if (overrideVal !== undefined && overrideVal !== '') {
-                count = Number(overrideVal) || 0;
-            } else if (computedStats.total > 0 && computedStats.counts[s] > 0) {
-                count = computedStats.counts[s];
-            } else {
-                count = defaultCounts[s];
-            }
-            return { star: s, count };
-        });
-
-        const totalCountSum = rows.reduce((sum, r) => sum + (Number(r.count) || 0), 0);
-
-        const rowsWithPct = rows.map(r => {
-            const rawPct = totalCountSum > 0 ? Math.round((r.count / totalCountSum) * 100) : 0;
-            const pct = isNaN(rawPct) ? 0 : rawPct;
-            return { ...r, pct };
-        });
-
-        return (
-            <div className="btb-star-rating-bars">
-                <h4 className="btb-srb-title">{bt || 'Rating Breakdown'}</h4>
-                {rowsWithPct.map(r => (
-                    <div key={r.star} className="btb-srb-row">
-                        <span className="btb-srb-label">{r.star} {r.star === 1 ? 'Star' : 'Stars'}</span>
-                        <div className="btb-srb-track"><div className="btb-srb-fill" style={{ width: `${r.pct}%` }}></div></div>
-                        <span className="btb-srb-count">{r.count} ({r.pct}%)</span>
-                    </div>
-                ))}
-            </div>
-        );
-    }
-
-    if (layout === 'testimonial-stats') {
-        const fiveStarCount = computedStats.counts[5];
-        const calcAvg = computedStats.total > 0 ? computedStats.avg : '4.9';
-        const calc5Star = computedStats.total > 0 ? `${fiveStarCount}` : '500+';
-
-        const stat1Num = bs || (computedStats.total > 0 ? `${computedStats.total}+` : '10K+');
-        const stat1Label = bt || 'Happy Customers';
-        const stat2Num = bc || '98%';
-        const stat2Label = bd || 'Satisfaction Rate';
-        const stat3Num = attributes.stat3Number || calcAvg;
-        const stat3Label = attributes.stat3Label || 'Average Rating';
-        const stat4Num = attributes.stat4Number || calc5Star;
-        const stat4Label = attributes.stat4Label || '5-Star Reviews';
-
-        return (
-            <div className="btb-stats-grid">
-                <div className="btb-stat-card">
-                    <span className="btb-stat-number">{stat1Num}</span>
-                    <span className="btb-stat-label">{stat1Label}</span>
-                </div>
-                <div className="btb-stat-card">
-                    <span className="btb-stat-number">{stat2Num}</span>
-                    <span className="btb-stat-label">{stat2Label}</span>
-                </div>
-                <div className="btb-stat-card">
-                    <span className="btb-stat-number">{stat3Num}</span>
-                    <span className="btb-stat-label">{stat3Label}</span>
-                </div>
-                <div className="btb-stat-card">
-                    <span className="btb-stat-number">{stat4Num}</span>
-                    <span className="btb-stat-label">{stat4Label}</span>
-                </div>
-            </div>
-        );
-    }
-
-    if (layout === 'social-proof-toast') {
-        return <SocialProofToast items={items} bt={bt} bd={bd} isBackend={isBackend} activeIndex={activeIndex} />;
-    }
-
-    if (layout === 'comparison-testimonial-table') {
-        const title = bt || attributes.badgeTitle || 'Customer Comparison';
-        const col1 = attributes.col1Header || 'Customer';
-        const col2 = attributes.col2Header || 'Rating';
-        const col3 = attributes.col3Header || 'Review';
-
-        return (
-            <div className="btb-comparison-table">
-                <h4 className="btb-ct-title">{title}</h4>
-                <table className="btb-ct-table">
-                    <thead>
-                        <tr>
-                            <th>{col1}</th>
-                            <th>{col2}</th>
-                            <th>{col3}</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {items.map((item, i) => (
-                            <tr key={i}>
-                                <td className="btb-ct-name">{item.name || ''}</td>
-                                <td className="btb-ct-rating">{'★'.repeat(item.rating || 5)}</td>
-                                <td className="btb-ct-text">{item.reviewText || ''}</td>
-                            </tr>
-                        ))}
-                    </tbody>
-                </table>
-            </div>
-        );
-    }
-
-    if (layout === 'faq-testimonial-accordion') {
-        return (
-            <div className="btb-faq-accordion">
-                <h4 className="btb-faq-title">{bt || 'Frequently Asked Questions'}</h4>
-                {items.map((item, i) => (
-                    <details key={i} className="btb-faq-item">
-                        <summary className="btb-faq-question">{item.name || `Question ${i + 1}`}</summary>
-                        <div className="btb-faq-answer">
-                            <p>{item.reviewText}</p>
-                            <span className="btb-faq-author">— {item.deg || 'Customer'}</span>
-                        </div>
-                    </details>
-                ))}
-            </div>
-        );
-    }
-
-    // ================================================================
-    //  CATEGORY C: Custom testimonial layouts (unique JSX + items)
-    // ================================================================
-
-    if (layout === 'testimonials-avatar-list') {
-        const activeIdx = isBackend && typeof activeIndex === 'number' ? activeIndex : selectedAvatarIdx;
-        const currentActiveIdx = activeIdx < items.length ? activeIdx : 0;
-        const activeItem = items[currentActiveIdx] || items[0] || {};
-
-        const handleAvatarClick = (idx) => {
-            setSelectedAvatarIdx(idx);
-            if (typeof setActiveIndex === 'function') {
-                setActiveIndex(idx);
-            }
-        };
-
-        return (
-            <div className="btb-avatar-list-wrapper">
-                <div className="btb-avatar-row">
-                    {items.map((it, idx) => (
-                        <div key={idx} onClick={() => handleAvatarClick(idx)}
-                            className={`btb-avatar-thumb ${currentActiveIdx === idx ? 'active' : ''}`}>
-                            <img src={it.img?.url || 'https://templates.bplugins.com/wp-content/uploads/2025/02/p-29.png'} alt={it.name || ''} />
-                        </div>
-                    ))}
-                </div>
-                <div className="btb-avatar-detail">
-                    {isBackend && RichText ? (
-                        <>
-                            <RichText
-                                tagName="p"
-                                className="btb-avatar-review"
-                                value={activeItem.reviewText || ''}
-                                onChange={(val) => updateItem('reviewText', val)}
-                                placeholder={__('Enter review text', 'b-testimonials-block')}
-                                inlineToolbar
-                            />
-                            <RichText
-                                tagName="h4"
-                                className="btb-avatar-name"
-                                value={activeItem.name || ''}
-                                onChange={(val) => updateItem('name', val)}
-                                placeholder={__('Enter name', 'b-testimonials-block')}
-                                inlineToolbar
-                            />
-                            <RichText
-                                tagName="span"
-                                className="btb-avatar-deg"
-                                value={activeItem.deg || ''}
-                                onChange={(val) => updateItem('deg', val)}
-                                placeholder={__('Enter designation', 'b-testimonials-block')}
-                                inlineToolbar
-                            />
-                        </>
-                    ) : (
-                        <>
-                            <p className="btb-avatar-review">&quot;{activeItem.reviewText || ''}&quot;</p>
-                            <h4 className="btb-avatar-name">{activeItem.name || ''}</h4>
-                            <span className="btb-avatar-deg">{activeItem.deg || ''}</span>
-                        </>
+              return (
+                <div
+                  className={`badge-item${iconTop ? " is-icon-top" : ""}`}
+                  key={index}>
+                  {item?.img?.url ? (
+                    <img
+                      className="badge-icon"
+                      src={item.img.url}
+                      alt={item.img.alt || ""}
+                    />
+                  ) : (
+                    /* `trust${index}` rather than the art's own slot: the
+                       drawings repeat past the fourth badge but the icon slots
+                       do not -- the Icon panel names one per badge. */
+                    <BlockIcon
+                      icon={getIcon(attributes, `trust${index}`)}
+                      size={iconBox}
+                      lockSize
+                      defaultColor={slot.color}
+                      renderFallback={(color) => (
+                        <svg className="badge-icon" viewBox="0 0 24 24" width={iconBox} height={iconBox}>
+                          <path fill={color} d={slot.d} />
+                        </svg>
+                      )}
+                    />
+                  )}
+                  <div className="badge-text">
+                    {item?.title && <h4 className="badge-title">{item.title}</h4>}
+                    {item?.subtitle && (
+                      <p className="badge-subtitle">{item.subtitle}</p>
                     )}
+                  </div>
                 </div>
-            </div>
-        );
+              );
+            })}
+          </div>
+        </div>
+      );
     }
-
-    if (layout === 'testimonials-timeline') {
-        return (
-            <div className="btb-timeline-layout">
-                {items.map((item, index) => (
-                    <div key={index} className="btb-timeline-item">
-                        <div className="btb-timeline-dot"></div>
-                        <div className="btb-timeline-card">
-                            {themeSelect(item, index)}
-                        </div>
-                    </div>
-                ))}
-            </div>
-        );
-    }
-
-    if (layout === 'audio-testimonials') {
-        return (
-            <div className={`layoutSection btb-audio-layout ${theme} columns-${desktop} columns-tablet-${tablet} columns-mobile-${mobile}`}>
-                {items.map((item, index) => (
-                    <div key={index} className="btb-audio-card">
-                        <div className="btb-audio-player">
-                            <svg viewBox="0 0 24 24" width="40" height="40"><circle cx="12" cy="12" r="11" fill="#4527a4" opacity="0.1" /><path fill="#4527a4" d="M10 8.64L15.27 12 10 15.36V8.64M8 5v14l11-7L8 5z" /></svg>
-                            <div className="btb-audio-wave">
-                                {[35, 55, 25, 65, 45, 70, 30, 60, 40, 50].map((h, i) => <div key={i} className="btb-wave-bar" style={{ height: `${h}%` }}></div>)}
-                            </div>
-                        </div>
-                        {themeSelect(item, index)}
-                    </div>
-                ))}
-            </div>
-        );
-    }
-
-    if (layout === 'video-testimonials') {
-        const videoGridVars = {
-            '--cols-d': desktop || 3,
-            '--cols-t': tablet || 2,
-            '--cols-m': mobile || 1,
-            '--col-gap': columnGap || '30px',
-            '--row-gap': rowGap || '30px',
-            '--accent': attributes.accentColor || '#0575e6',
-        };
-
-        return (
-            <div className="bVideoTestimonials">
-                <div className="videos-grid" style={videoGridVars}>
-                    {items.map((item, index) => (
-                        <VideoCard key={index} item={item} accentColor={attributes.accentColor} />
-                    ))}
-                </div>
-            </div>
-        );
-    }
-
-    if (layout === 'before-after') {
-        return <BeforeAfterSlider attributes={attributes} />;
-    }
-
-
-    if (layout === 'case-study-card') {
-        return (
-            <div className={`btb-case-study-grid columns-${desktop} columns-tablet-${tablet} columns-mobile-${mobile}`}>
-                {items.map((item, index) => {
-                    const sections = item.sections || [
-                        {
-                            title: item.challengeTitle ?? item.challengeLabel ?? 'Challenge',
-                            content: item.challenge ?? 'The customer needed a reliable solution to improve their workflow.'
-                        },
-                        {
-                            title: item.solutionTitle ?? item.solutionLabel ?? 'Solution',
-                            content: item.solution ?? item.reviewText ?? 'It is a long-established fact that a reader will be distracted by the readable content of a page when looking at its layout'
-                        },
-                        {
-                            title: item.resultTitle ?? item.resultLabel ?? 'Result',
-                            content: item.result ?? '95% improvement in efficiency and customer satisfaction.'
-                        }
-                    ];
-
-                    return (
-                        <div key={index} className="btb-case-study">
-                            <div className="btb-cs-header">
-                                <img src={item.img?.url || 'https://templates.bplugins.com/wp-content/uploads/2025/02/p-29.png'} alt={item.name} className="btb-cs-avatar" />
-                                <div>
-                                    <h4 className="btb-cs-name">{item.name || 'John Doe'}</h4>
-                                    <span className="btb-cs-deg">{item.deg || 'Developer'}</span>
-                                </div>
-                            </div>
-                            <div className="btb-cs-body">
-                                {sections.map((sec, secIdx) => (
-                                    <div key={secIdx} className="btb-cs-section">
-                                        {sec.title && <span className="btb-cs-label">{sec.title}</span>}
-                                        {sec.content && <p>{sec.content}</p>}
-                                    </div>
-                                ))}
-                            </div>
-                        </div>
-                    );
-                })}
-            </div>
-        );
-    }
-
-    if (layout === 'client-logos') {
-        const logoItems = items.length > 0 ? items : (attributes.logos || []);
-        return (
-            <div className={`btb-client-logos columns-${desktop} columns-tablet-${tablet} columns-mobile-${mobile}`}>
-                {logoItems.map((item, index) => {
-                    const imgEl = <img src={item.img?.url || 'https://templates.bplugins.com/wp-content/uploads/2025/02/p-29.png'} alt={item.name || item.img?.alt || ''} />;
-                    return (
-                        <div key={index} className="btb-logo-item">
-                            {item.link ? <a href={item.link} target="_blank" rel="noopener noreferrer">{imgEl}</a> : imgEl}
-                        </div>
-                    );
-                })}
-            </div>
-        );
-    }
-
-    // ================================================================
-    //  CATEGORY B: Testimonial layouts with custom CSS wrappers
-    //  (use themeSelect but wrapped in unique layout classes)
-    // ================================================================
-
-    if (layout === 'testimonials-hero') {
-        const heroItem = items[0] || {};
-        return (
-            <div className="btb-hero-layout">
-                <div className="btb-hero-card">
-                    {themeSelect(heroItem, 0)}
-                </div>
-                {items.length > 1 && (
-                    <div className={`btb-hero-grid columns-${desktop} columns-tablet-${tablet} columns-mobile-${mobile}`}>
-                        {items.slice(1).map((item, index) => themeSelect(item, index + 1))}
-                    </div>
-                )}
-            </div>
-        );
-    }
-
-    if (layout === 'testimonials-popup-modal') {
-        return (
-            <div className="btb-popup-modal-wrapper">
-                <div className={`layoutSection btb-popup-modal-grid ${theme} columns-${desktop} columns-tablet-${tablet} columns-mobile-${mobile} ${isBackend ? 'is-editing' : ''}`}>
-                    {items.map((item, index) => (
-                        <div key={index} className="btb-popup-modal-card-trigger" onClick={() => setActiveModalItem(item)} style={{ cursor: 'pointer' }}>
-                            {themeSelect(item, index)}
-                        </div>
-                    ))}
-                </div>
-
-                {activeModalItem && (
-                    <div className="btb-modal-overlay" onClick={() => setActiveModalItem(null)} style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(4px)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 999999, padding: '20px' }}>
-                        <div className="btb-modal-content-box" onClick={e => e.stopPropagation()} style={{ background: '#fff', borderRadius: '16px', maxWidth: '540px', width: '100%', padding: '28px', position: 'relative', boxShadow: '0 20px 40px rgba(0,0,0,0.2)', animation: 'btbToastSlide 0.3s ease' }}>
-                            <button type="button" onClick={() => setActiveModalItem(null)} style={{ position: 'absolute', top: '16px', right: '16px', background: 'none', border: 'none', fontSize: '24px', cursor: 'pointer', color: '#64748b', lineHeight: 1 }}>×</button>
-                            <div style={{ display: 'flex', gap: '16px', alignItems: 'center', marginBottom: '18px' }}>
-                                <img src={activeModalItem.img?.url || 'https://templates.bplugins.com/wp-content/uploads/2025/02/p-29.png'} alt={activeModalItem.name || ''} style={{ width: '60px', height: '60px', borderRadius: '50%', objectFit: 'cover' }} />
-                                <div>
-                                    <h3 style={{ margin: 0, fontSize: '18px', fontWeight: 700, color: '#0f172a' }}>{activeModalItem.name || 'John Doe'}</h3>
-                                    <span style={{ fontSize: '13px', color: '#64748b' }}>{activeModalItem.deg || ''}</span>
-                                    <div style={{ color: '#f59e0b', fontSize: '16px', marginTop: '4px' }}>{'★'.repeat(activeModalItem.rating || 5)}</div>
-                                </div>
-                            </div>
-                            <p style={{ margin: 0, fontSize: '15px', color: '#334155', lineHeight: '1.6', fontStyle: 'italic' }}>&quot;{activeModalItem.reviewText || ''}&quot;</p>
-                        </div>
-                    </div>
-                )}
-            </div>
-        );
-    }
-
-    if (layout === 'testimonials-floating-bubble') {
-        return (
-            <div className="btb-floating-bubble-layout">
-                {items.map((item, index) => (
-                    <div key={index} className="btb-bubble-item" style={{ animationDelay: `${index * 0.3}s` }}>
-                        <div className="btb-bubble-avatar">
-                            <img src={item.img?.url || 'https://templates.bplugins.com/wp-content/uploads/2025/02/p-29.png'} alt={item.name} />
-                        </div>
-                        <div className="btb-bubble-content">
-                            <p>{item.reviewText || ''}</p>
-                            <span className="btb-bubble-name">{item.name}</span>
-                        </div>
-                    </div>
-                ))}
-            </div>
-        );
-    }
-
-    if (layout === 'testimonials-card-stack') {
-        const totalItems = items.length;
-        const currentIdx = typeof setActiveIndex === 'function' ? (activeIndex || 0) : cardStackIdx;
-        const activeIdx = totalItems > 0 ? (currentIdx % totalItems + totalItems) % totalItems : 0;
-
-        const updateStackActive = (newIdx) => {
-            setCardStackIdx(newIdx);
-            if (typeof setActiveIndex === 'function') {
-                setActiveIndex(newIdx);
-            }
-        };
-
-        const nextCard = (e) => {
-            if (e) e.preventDefault();
-            if (totalItems > 1) {
-                updateStackActive((activeIdx + 1) % totalItems);
-            }
-        };
-
-        const prevCard = (e) => {
-            if (e) e.preventDefault();
-            if (totalItems > 1) {
-                updateStackActive((activeIdx - 1 + totalItems) % totalItems);
-            }
-        };
-
-        return (
-            <div className={`btb-card-stack-wrapper ${isBackend ? 'is-editing' : ''}`}>
-                <div className="btb-card-stack-layout" data-active-index={activeIdx} data-total-items={totalItems}>
-                    {items.map((item, index) => {
-                        const pos = totalItems > 0 ? (index - activeIdx + totalItems) % totalItems : 0;
-                        const isTop = pos === 0;
-                        const isVisibleBehind = pos > 0 && pos <= 2;
-
-                        return (
-                            <div
-                                key={index}
-                                className={`btb-stacked-card ${isTop ? 'is-top' : ''} ${isVisibleBehind ? `is-behind-${pos}` : 'is-hidden'}`}
-                                data-index={index}
-                                data-stack-pos={pos}
-                                style={{
-                                    zIndex: isTop ? 10 : 10 - pos,
-                                }}
-                                onClick={() => {
-                                    if (isBackend) {
-                                        updateStackActive(index);
-                                    }
-                                }}
-                            >
-                                {themeSelect(item, index)}
-                            </div>
-                        );
-                    })}
-                </div>
-
-                {totalItems > 1 && (
-                    <div className="btb-stack-controls">
-                        <button type="button" className="btb-stack-btn btb-stack-prev" onClick={prevCard} aria-label="Previous card">
-                            ‹
-                        </button>
-                        <div className="btb-stack-dots">
-                            {items.map((_, idx) => (
-                                <button
-                                    key={idx}
-                                    type="button"
-                                    className={`btb-stack-dot ${idx === activeIdx ? 'is-active' : ''}`}
-                                    onClick={(e) => {
-                                        e.preventDefault();
-                                        updateStackActive(idx);
-                                    }}
-                                    aria-label={`Go to card ${idx + 1}`}
-                                />
-                            ))}
-                        </div>
-                        <button type="button" className="btb-stack-btn btb-stack-next" onClick={nextCard} aria-label="Next card">
-                            ›
-                        </button>
-                    </div>
-                )}
-            </div>
-        );
-    }
-
-    // ================================================================
-    //  CATEGORY A: Standard layouts (existing switch logic, fixed)
-    // ================================================================
 
     return (
-        <div className={`layoutSection ${layout}-layout btb-${layout}-layout ${theme} columns-${desktop} columns-tablet-${tablet} columns-mobile-${mobile} ${isBackend ? 'is-editing' : ''}`}>
-            {(() => {
-                switch (layout) {
-                    case 'masonry':
-                        return (
-                            <ResponsiveMasonry columnsCountBreakPoints={{ 0: mobile, 576: tablet, 768: desktop }}>
-                                <Masonry columnsCount={3} gutter={`${rowGap} ${columnGap}`}>
-                                    {items.map((item, index) => themeSelect(item, index))}
-                                </Masonry>
-                            </ResponsiveMasonry>
-                        );
-                    case 'slider':
-                    case 'slider-3d':
-                    case 'coverflow':
-                        return <Slider attributes={attributes} itemsEls={itemsEls} itemProps={itemProps} />;
-                    case 'marquee':
-                        return <Marquee items={items} themeSelect={themeSelect} columnGap={columnGap} isBackend={isBackend} />;
-                    // All other testimonial-items layouts: quote-box, speech-bubble, compact, list, etc.
-                    // The unique visual is produced by the CSS class on the wrapper div
-                    default:
-                        return items.map((item, index) => themeSelect(item, index));
-                }
-            })()}
-        </div>
+      <div className="btb-trust-badges-grid" style={gridVars}>
+        {trustItems.map((it) => (
+          <div className="btb-trust-item" key={it.slot}>
+            {/* The four-badge fallback, shown until a badge is added. It kept
+                its own hardcoded 32px, so Icon Size moved the repeater's icons
+                and did nothing at all here. */}
+            <BlockIcon
+              icon={getIcon(attributes, it.slot)}
+              size={iconBox}
+              lockSize
+              defaultColor={it.color}
+              renderFallback={(color) => (
+                <svg className="badge-icon" viewBox="0 0 24 24" width={iconBox} height={iconBox}>
+                  <path fill={color} d={it.d} />
+                </svg>
+              )}
+            />
+            <span>{it.label}</span>
+          </div>
+        ))}
+      </div>
     );
+  }
+
+  // ================================================================
+  //  CATEGORY E: Interactive / Data Widgets (fully custom JSX)
+  // ================================================================
+
+  if (layout === "testimonial-form") {
+    return <TestimonialForm attributes={attributes} isBackend={isBackend} />;
+  }
+
+  if (layout === "user-feedback-poll") {
+    return (
+      <FeedbackPoll
+        attributes={attributes}
+        isBackend={isBackend}
+        bt={bt}
+        bd={bd}
+      />
+    );
+  }
+
+  if (layout === "rating-summary") {
+    // The Rating panel's own fields -- Rating, Out of, Show review count and
+    // Count text -- reached the editor preview only: the score fell back to a
+    // hard-coded 4.8 and the count line to "Based on 256 reviews", and there was
+    // no way at all to turn the count off. Only Star color made it through,
+    // through its palette alias.
+    const {
+      rating,
+      outOf = 5,
+      count,
+      countText = "",
+      showCount = true,
+      stacked = false,
+    } = attributes;
+
+    // Which of the two wins is decided by the data source, not by whether any
+    // testimonials happen to exist. `items` ships with three demo reviews, so
+    // "calculate when there are items" meant the Rating panel could never win --
+    // the block would have kept ignoring it. Choosing the testimonials source is
+    // the request to be calculated; anything else means the panel's own figures.
+    const useComputed = "cpt" === attributes.dataSource && computedStats.total > 0;
+
+    const manualScore =
+      undefined === rating || null === rating || "" === rating
+        ? ""
+        : `${rating}`;
+
+    const displayScore =
+      bs || (useComputed ? computedStats.avg : manualScore || "4.8");
+
+    const manualCountText = countText
+      ? countText.replace("{count}", Number(count || 0).toLocaleString())
+      : "";
+
+    const displayCountText =
+      bc ||
+      (useComputed
+        ? `Based on ${computedStats.total} reviews`
+        : manualCountText || "Based on 256 reviews");
+
+    // Out of is not always 5, so the star row is drawn rather than a literal
+    // run of five glyphs, with the filled overlay clipped to the score.
+    const starCount = Math.max(1, Math.min(10, Number(outOf) || 5));
+    const scoreNum = parseFloat(displayScore) || 0;
+    const fillPct = Math.max(
+      0,
+      Math.min(100, (scoreNum / starCount) * 100),
+    );
+    const starRow = "★".repeat(starCount);
+
+    const defaultPcts = { 5: 78, 4: 15, 3: 4, 2: 2, 1: 1 };
+
+    // Same precedence as the score above, so the bars cannot disagree with it.
+    const rows = [5, 4, 3, 2, 1].map((s) => {
+      const starTotal = computedStats.counts[s];
+      const pct = useComputed
+        ? Math.round((starTotal / computedStats.total) * 100)
+        : attributes[`star${s}Pct`] ?? defaultPcts[s];
+      return { star: s, pct, count: starTotal };
+    });
+
+    return (
+      <div className={`btb-rating-summary ${stacked ? "is-stacked" : ""}`}>
+        <div className="btb-rs-left">
+          <span className="btb-rs-big-number">{displayScore}</span>
+          <div className="btb-rs-stars">
+            <span className="btb-rs-stars-base">{starRow}</span>
+            <span
+              className="btb-rs-stars-fill"
+              style={{ width: `${fillPct}%` }}>
+              {starRow}
+            </span>
+          </div>
+          {showCount && (
+            <span className="btb-rs-count">{displayCountText}</span>
+          )}
+        </div>
+        <div className="btb-rs-bars">
+          {rows.map((r) => (
+            <div key={r.star} className="btb-rs-bar-row">
+              <span className="btb-rs-bar-label">{r.star} ★</span>
+              <div className="btb-rs-bar-track">
+                <div
+                  className="btb-rs-bar-fill"
+                  style={{ width: `${r.pct}%` }}></div>
+              </div>
+              <span className="btb-rs-bar-pct">{r.pct}%</span>
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  }
+
+  if (layout === "star-rating-bars") {
+    const defaultCounts = { 5: 184, 4: 46, 3: 15, 2: 7, 1: 3 };
+
+    const rows = [5, 4, 3, 2, 1].map((s) => {
+      const overrideVal = attributes[`star${s}Count`];
+      let count;
+      if (overrideVal !== undefined && overrideVal !== "") {
+        count = Number(overrideVal) || 0;
+      } else if (computedStats.total > 0 && computedStats.counts[s] > 0) {
+        count = computedStats.counts[s];
+      } else {
+        count = defaultCounts[s];
+      }
+      return { star: s, count };
+    });
+
+    const totalCountSum = rows.reduce(
+      (sum, r) => sum + (Number(r.count) || 0),
+      0,
+    );
+
+    const rowsWithPct = rows.map((r) => {
+      const rawPct =
+        totalCountSum > 0 ? Math.round((r.count / totalCountSum) * 100) : 0;
+      const pct = isNaN(rawPct) ? 0 : rawPct;
+      return { ...r, pct };
+    });
+
+    return (
+      <div className="btb-star-rating-bars">
+        <h4 className="btb-srb-title">{bt || "Rating Breakdown"}</h4>
+        {rowsWithPct.map((r) => (
+          <div key={r.star} className="btb-srb-row">
+            <span className="btb-srb-label">
+              {r.star} {r.star === 1 ? "Star" : "Stars"}
+            </span>
+            <div className="btb-srb-track">
+              <div
+                className="btb-srb-fill"
+                style={{ width: `${r.pct}%` }}></div>
+            </div>
+            <span className="btb-srb-count">
+              {r.count} ({r.pct}%)
+            </span>
+          </div>
+        ))}
+      </div>
+    );
+  }
+
+  if (layout === "testimonial-stats") {
+    const gridVars = {
+      "--cols-d": previewCols || 3,
+      "--cols-t": tablet || 3,
+      "--cols-m": mobile || 1,
+      "--col-gap": columnGap || "16px",
+      "--row-gap": rowGap || "16px",
+      "--accent": attributes.accentColor,
+    };
+
+    // The block's editor is a repeater -- number, prefix, suffix, label per
+    // stat -- and its view script animates `.stat-number[data-number]` inside
+    // `.bTestimonialStats[data-animate="1"]`. Neither reached the page: this
+    // branch used to render four fixed cards out of the generic badge fields,
+    // so adding, removing or editing a stat changed only the editor, and Animate
+    // count never ran. Rendering the repeater fixes all of it at once.
+    const statItems = Array.isArray(attributes.items) ? attributes.items : [];
+    const hasRepeater = statItems.some(
+      (it) =>
+        it &&
+        (it.number !== undefined || it.label !== undefined || it.suffix || it.prefix),
+    );
+
+    if (hasRepeater) {
+      return (
+        <div
+          className="bTestimonialStats"
+          data-animate={attributes.animate ? "1" : "0"}>
+          <div
+            className={`stats-grid btb-ts-grid ${
+              attributes.surfaceColor || attributes.borderColor
+                ? "has-surface"
+                : ""
+            }`}
+            style={gridVars}>
+            {statItems.map((item, index) => {
+              const raw = String(item?.number ?? "");
+              const decimals = raw.includes(".")
+                ? raw.split(".")[1].length
+                : 0;
+
+              return (
+                <div className="stat-item btb-ts-item" key={index}>
+                  <div
+                    className="stat-value btb-ts-value"
+                    style={{ color: attributes.accentColor }}>
+                    <span className="stat-prefix btb-ts-prefix">{item?.prefix}</span>
+                    {/* The literal stays in the markup so the number is still
+                        right with JavaScript off; the view script only takes
+                        over to count up to it. */}
+                    <span
+                      className="stat-number btb-ts-number"
+                      data-number={item?.number}
+                      data-decimals={decimals}>
+                      {Number(item?.number || 0).toLocaleString()}
+                    </span>
+                    <span className="stat-suffix btb-ts-suffix">{item?.suffix}</span>
+                  </div>
+                  <div className="stat-label btb-ts-label">{item?.label}</div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      );
+    }
+
+    // Fallback for blocks saved before the repeater existed, which described
+    // their stats through the generic badge fields.
+    const fiveStarCount = computedStats.counts[5];
+    const calcAvg = computedStats.total > 0 ? computedStats.avg : "4.9";
+    const calc5Star = computedStats.total > 0 ? `${fiveStarCount}` : "500+";
+
+    const legacyStats = [
+      [
+        bs || (computedStats.total > 0 ? `${computedStats.total}+` : "10K+"),
+        bt || "Happy Customers",
+      ],
+      [bc || "98%", bd || "Satisfaction Rate"],
+      [attributes.stat3Number || calcAvg, attributes.stat3Label || "Average Rating"],
+      [
+        attributes.stat4Number || calc5Star,
+        attributes.stat4Label || "5-Star Reviews",
+      ],
+    ];
+
+    return (
+      <div className="btb-stats-grid" style={gridVars}>
+        {legacyStats.map(([num, label], index) => (
+          <div className="btb-stat-card" key={index}>
+            <span className="btb-stat-number">{num}</span>
+            <span className="btb-stat-label">{label}</span>
+          </div>
+        ))}
+      </div>
+    );
+  }
+
+  if (layout === "social-proof-toast") {
+    return (
+      <SocialProofToast
+        items={items}
+        bt={bt}
+        bd={bd}
+        isBackend={isBackend}
+        activeIndex={activeIndex}
+        toast={attributes?.toast}
+        pauseInEditor={attributes?.pauseInEditor}
+      />
+    );
+  }
+
+  if (layout === "comparison-testimonial-table") {
+    const title = bt || attributes.badgeTitle || "Customer Comparison";
+    const col1 = attributes.col1Header || "Customer";
+    const col2 = attributes.col2Header || "Rating";
+    const col3 = attributes.col3Header || "Review";
+
+    return (
+      <div className="btb-comparison-table">
+        <h4 className="btb-ct-title">{title}</h4>
+        <table className="btb-ct-table">
+          <thead>
+            <tr>
+              <th>{col1}</th>
+              <th>{col2}</th>
+              <th>{col3}</th>
+            </tr>
+          </thead>
+          <tbody>
+            {items.map((item, i) => (
+              <tr key={i}>
+                <td className="btb-ct-name">{item.name || ""}</td>
+                <td className="btb-ct-rating">
+                  {"★".repeat(item.rating || 5)}
+                </td>
+                {/* Routed through itemsEls so the excerpt length and the
+                    Expand/Less button apply here too, and so the cell is
+                    editable in place. */}
+                <td className="btb-ct-text">{itemsEls?.[i]?.reviewText}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    );
+  }
+
+  if (layout === "faq-testimonial-accordion") {
+    // The two settings every accordion has, and this one had neither: rows could
+    // all be open at once and none opened on load.
+    //
+    // "One at a time" is the native `name` attribute on `<details>`, not a click
+    // handler -- browsers make a named group exclusive themselves, so it keeps
+    // working with JavaScript off and needs no state here. The name is scoped to
+    // the block's own clientId, or two accordions on one page would close each
+    // other's rows.
+    const { faqExclusive = false, faqFirstOpen = false } = attributes || {};
+    const groupName = faqExclusive
+      ? `btb-faq-${attributes?.cId || "group"}`
+      : undefined;
+
+    return (
+      <div className="btb-faq-accordion">
+        <h4 className="btb-faq-title">{bt || "Frequently Asked Questions"}</h4>
+        {items.map((item, i) => (
+          <details
+            key={i}
+            className="btb-faq-item"
+            name={groupName}
+            // `defaultOpen` is not a thing on <details>; `open` is, and React
+            // treats it as a controlled-ish prop. Only the first row takes it,
+            // and only as the initial state -- the reader can still close it.
+            open={faqFirstOpen && 0 === i ? true : undefined}>
+            <summary className="btb-faq-question">
+              {item.name || `Question ${i + 1}`}
+            </summary>
+            <div className="btb-faq-answer">
+              {itemsEls?.[i]?.reviewText}
+              <span className="btb-faq-author">— {item.deg || "Customer"}</span>
+            </div>
+          </details>
+        ))}
+      </div>
+    );
+  }
+
+  // ================================================================
+  //  CATEGORY C: Custom testimonial layouts (unique JSX + items)
+  // ================================================================
+
+  if (layout === "testimonials-avatar-list") {
+    const activeIdx =
+      isBackend && typeof activeIndex === "number"
+        ? activeIndex
+        : selectedAvatarIdx;
+    const currentActiveIdx = activeIdx < items.length ? activeIdx : 0;
+    const activeItem = items[currentActiveIdx] || items[0] || {};
+
+    const handleAvatarClick = (idx) => {
+      setSelectedAvatarIdx(idx);
+      if (typeof setActiveIndex === "function") {
+        setActiveIndex(idx);
+      }
+    };
+
+    return (
+      <div className="btb-avatar-list-wrapper">
+        <div className="btb-avatar-row">
+          {items.map((it, idx) => (
+            <div
+              key={idx}
+              {...clickable(() => handleAvatarClick(idx), it.name || "")}
+              className={`btb-avatar-thumb ${
+                currentActiveIdx === idx ? "active" : ""
+              }`}>
+              <img
+                src={
+                  it.img?.url ||
+                  "https://templates.bplugins.com/wp-content/uploads/2025/02/p-29.png"
+                }
+                alt={it.name || ""}
+              />
+              {/* Same hover-to-upload overlay the themed cards get. This
+                  layout draws its own avatar markup, so it has to opt in. */}
+              {itemsEls?.[idx]?.img}
+            </div>
+          ))}
+        </div>
+        <div className="btb-avatar-detail">
+          {isBackend && RichText ? (
+            <>
+              <RichText
+                tagName="p"
+                className="btb-avatar-review"
+                value={activeItem.reviewText || ""}
+                onChange={(val) => updateItem("reviewText", val)}
+                placeholder={__("Enter review text", "b-testimonials-block")}
+                inlineToolbar
+              />
+              <RichText
+                tagName="h4"
+                className="btb-avatar-name"
+                value={activeItem.name || ""}
+                onChange={(val) => updateItem("name", val)}
+                placeholder={__("Enter name", "b-testimonials-block")}
+                inlineToolbar
+              />
+              <RichText
+                tagName="span"
+                className="btb-avatar-deg"
+                value={activeItem.deg || ""}
+                onChange={(val) => updateItem("deg", val)}
+                placeholder={__("Enter designation", "b-testimonials-block")}
+                inlineToolbar
+              />
+            </>
+          ) : (
+            <>
+              <p className="btb-avatar-review">
+                &quot;{activeItem.reviewText || ""}&quot;
+              </p>
+              <h4 className="btb-avatar-name">{activeItem.name || ""}</h4>
+              <span className="btb-avatar-deg">{activeItem.deg || ""}</span>
+            </>
+          )}
+        </div>
+      </div>
+    );
+  }
+
+  if (layout === "testimonials-timeline") {
+    return (
+      <div className="btb-timeline-layout">
+        {items.map((item, index) => (
+          <div key={index} className="btb-timeline-item">
+            <div className="btb-timeline-dot"></div>
+            <div className="btb-timeline-card">{themeSelect(item, index)}</div>
+          </div>
+        ))}
+      </div>
+    );
+  }
+
+  if (layout === "audio-testimonials") {
+    return (
+      <div
+        className={`layoutSection btb-audio-layout ${theme} btb-columns-${previewCols} btb-columns-tablet-${tablet} btb-columns-mobile-${mobile}`}>
+        {items.map((item, index) => (
+          <div key={index} className="btb-audio-card">
+            {/* Was a static play glyph beside ten fixed bars -- no <audio>
+                element existed, so the card only looked like a player. */}
+            <AudioPlayer
+              src={item?.audio?.url || ""}
+              playIcon={getIcon(attributes, "play")}
+              isBackend={isBackend}
+            />
+            {themeSelect(item, index)}
+          </div>
+        ))}
+      </div>
+    );
+  }
+
+  if (layout === "video-testimonials") {
+    // `grid-template-columns: repeat(N, 1fr)` always fills the grid's own box,
+    // whatever N is -- so fewer videos than columns left the extra tracks
+    // empty rather than absent, and the grid's own width still spanned all N
+    // of them. Block Width narrowed and Alignment shifted that whole box
+    // correctly, but the populated card sat wherever the grid placed it (the
+    // first track, flush left) and never moved with it: measured, blockAlign
+    // "right" on a single video in a 3-column grid put 50px between the box
+    // and the page's right edge, and 437px between the card and that same
+    // edge, so the box had moved but the card had not.
+    //
+    // Capping the effective column count at the item count -- desktop,
+    // tablet and mobile can each run out at a different count -- shrinks the
+    // grid's own box to only the tracks something is actually in, without
+    // touching how wide any one card renders: 2 items in a 3-column desktop
+    // grid still get 1/3 of the full width each, just inside a box that is
+    // now 2/3 as wide instead of 3/3 with an invisible empty third. That
+    // narrower box is then free to carry the block's own alignment, so a
+    // partially-filled grid follows Left/Center/Right the same as the block
+    // around it. A full grid keeps its box at 100% either way, so this is a
+    // no-op whenever there are at least as many videos as columns -- which is
+    // every grid that was already working correctly.
+    const videoColCounts = { d: previewCols || 3, t: tablet || 2, m: mobile || 1 };
+    const videoItemCount = items.length || 1;
+    const videoEffCols = {
+      d: Math.max(1, Math.min(videoItemCount, videoColCounts.d)),
+      t: Math.max(1, Math.min(videoItemCount, videoColCounts.t)),
+      m: Math.max(1, Math.min(videoItemCount, videoColCounts.m)),
+    };
+    // The same three options the block's own alignment offers, so a
+    // partially-filled grid reads as an extension of it rather than a
+    // separate setting -- "Default" falls back to today's flush-left.
+    const VIDEO_GRID_ALIGN_MARGIN = {
+      left: { l: "0", r: "auto" },
+      center: { l: "auto", r: "auto" },
+      right: { l: "auto", r: "0" },
+    };
+    const videoGridAlign =
+      VIDEO_GRID_ALIGN_MARGIN[attributes.blockAlign] || VIDEO_GRID_ALIGN_MARGIN.left;
+
+    const videoGridVars = {
+      "--cols-d": videoEffCols.d,
+      "--cols-t": videoEffCols.t,
+      "--cols-m": videoEffCols.m,
+      "--grid-width-d": `${(videoEffCols.d / videoColCounts.d) * 100}%`,
+      "--grid-width-t": `${(videoEffCols.t / videoColCounts.t) * 100}%`,
+      "--grid-width-m": `${(videoEffCols.m / videoColCounts.m) * 100}%`,
+      "--grid-margin-left": videoGridAlign.l,
+      "--grid-margin-right": videoGridAlign.r,
+      "--col-gap": columnGap || "30px",
+      "--row-gap": rowGap || "30px",
+      "--accent": attributes.accentColor || "#0575e6",
+    };
+
+    return (
+      <div className="bVideoTestimonials">
+        <div className="videos-grid" style={videoGridVars}>
+          {items.map((item, index) => (
+            <VideoCard
+              key={index}
+              item={item}
+              playIcon={getIcon(attributes, "play")}
+              accentColor={attributes.accentColor}
+              autoplay={attributes.videoAutoplay}
+              loop={attributes.videoLoop}
+              muted={attributes.videoMuted}
+              controls={attributes.videoControls}
+              SandBox={SandBox}
+            />
+          ))}
+        </div>
+      </div>
+    );
+  }
+
+  if (layout === "before-after") {
+    return <BeforeAfterSlider attributes={attributes} />;
+  }
+
+  if (layout === "case-study-card") {
+    return (
+      <div
+        className={`btb-case-study-grid btb-columns-${previewCols} btb-columns-tablet-${tablet} btb-columns-mobile-${mobile}`}>
+        {items.map((item, index) => {
+          const sections = item.sections || [
+            {
+              title: item.challengeTitle ?? item.challengeLabel ?? "Challenge",
+              content:
+                item.challenge ??
+                "The customer needed a reliable solution to improve their workflow.",
+            },
+            {
+              title: item.solutionTitle ?? item.solutionLabel ?? "Solution",
+              content:
+                item.solution ??
+                item.reviewText ??
+                "It is a long-established fact that a reader will be distracted by the readable content of a page when looking at its layout",
+            },
+            {
+              title: item.resultTitle ?? item.resultLabel ?? "Result",
+              content:
+                item.result ??
+                "95% improvement in efficiency and customer satisfaction.",
+            },
+          ];
+
+          return (
+            <div key={index} className="btb-case-study">
+              <div className="btb-cs-header">
+                {/* Wrapper is rendered on both sides so the editor and the
+                    front end keep identical markup; it only carries the
+                    positioning the upload overlay needs. */}
+                <div className="btb-cs-avatar-wrap">
+                  <img
+                    src={
+                      item.img?.url ||
+                      "https://templates.bplugins.com/wp-content/uploads/2025/02/p-29.png"
+                    }
+                    alt={item.name}
+                    className="btb-cs-avatar"
+                  />
+                  {itemsEls?.[index]?.img}
+                </div>
+                <div>
+                  <h4 className="btb-cs-name">{item.name || "John Doe"}</h4>
+                  <span className="btb-cs-deg">{item.deg || "Developer"}</span>
+                </div>
+              </div>
+              <div className="btb-cs-body">
+                {sections.map((sec, secIdx) => (
+                  <div key={secIdx} className="btb-cs-section">
+                    {sec.title && (
+                      <span className="btb-cs-label">{sec.title}</span>
+                    )}
+                    {sec.content && <p>{sec.content}</p>}
+                  </div>
+                ))}
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    );
+  }
+
+  if (layout === "client-logos") {
+    const logoItems = items.length > 0 ? items : attributes.logos || [];
+
+    // Same markup and custom properties as the block's own editor.
+    //
+    // This used to render a `.btb-client-logos` grid of its own with the gap
+    // and the logo height written into the stylesheet as literals, so four of
+    // the block's controls -- Column Gap, Row Gap, Logo height and Grayscale --
+    // moved the editor preview and nothing else. Matching the editor markup is
+    // what makes them reach the page, and it is the markup logos.scss styles.
+    return (
+      <div className="bClientLogos">
+        <div
+          className={`logos-grid ${attributes.grayscale ? "is-grayscale" : ""} ${
+            attributes.trackColor || attributes.borderColor ? "has-surface" : ""
+          }`}
+          style={{
+            "--cols-d": previewCols || 4,
+            "--cols-t": tablet || 3,
+            "--cols-m": mobile || 2,
+            "--col-gap": columnGap || "30px",
+            "--row-gap": rowGap || "30px",
+            "--logo-h": `${attributes.logoHeight || 60}px`,
+          }}>
+          {logoItems.map((item, index) => {
+            const imgEl = (
+              <img
+                src={
+                  item.img?.url ||
+                  "https://templates.bplugins.com/wp-content/uploads/2025/02/p-29.png"
+                }
+                alt={item.name || item.img?.alt || ""}
+              />
+            );
+            return (
+              <div key={index} className="logo-item">
+                {item.link ? (
+                  <a href={item.link} target="_blank" rel="noopener noreferrer">
+                    {imgEl}
+                  </a>
+                ) : (
+                  imgEl
+                )}
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    );
+  }
+
+  // ================================================================
+  //  CATEGORY B: Testimonial layouts with custom CSS wrappers
+  //  (use themeSelect but wrapped in unique layout classes)
+  // ================================================================
+
+  if (layout === "testimonials-hero") {
+    const heroItem = items[0] || {};
+
+    // The spotlight takes the first testimonial, so the grid only ever holds
+    // the ones after it -- which is why Columns looks broken here. A hero block
+    // ships with a single testimonial and renders no grid at all, so the control
+    // has nothing to act on until a second card is added; and with more columns
+    // than follower cards the few that exist were squeezed into a fraction of
+    // the row with the remaining tracks left empty. Measured at 4 columns and
+    // one follower: a 310px card in a 1280px row.
+    //
+    // Clamping to the number of cards actually in the grid keeps the control
+    // honest at every count -- it can still reduce the columns, it just cannot
+    // ask for more tracks than there are cards to fill them.
+    const followers = items.slice(1);
+    const gridCols = (value) => Math.max(1, Math.min(Number(value) || 1, followers.length));
+
+    return (
+      <div className="btb-hero-layout">
+        <div className="btb-hero-card">{themeSelect(heroItem, 0)}</div>
+        {followers.length > 0 && (
+          <div
+            className={`btb-hero-grid btb-columns-${gridCols(previewCols)} btb-columns-tablet-${gridCols(tablet)} btb-columns-mobile-${gridCols(mobile)}`}>
+            {followers.map((item, index) => themeSelect(item, index + 1))}
+          </div>
+        )}
+      </div>
+    );
+  }
+
+  if (layout === "testimonials-popup-modal") {
+    return (
+      <div className="btb-popup-modal-wrapper">
+        <div
+          className={`layoutSection btb-popup-modal-grid ${theme} btb-columns-${previewCols} btb-columns-tablet-${tablet} btb-columns-mobile-${mobile} ${
+            isBackend ? "is-editing" : ""
+          }`}>
+          {items.map((item, index) => (
+            <div
+              key={index}
+              className="btb-popup-modal-card-trigger"
+              {...clickable(() => setActiveModalItem(item), item?.name || "")}
+              style={{ cursor: "pointer" }}>
+              {themeSelect(item, index)}
+            </div>
+          ))}
+        </div>
+
+        {/* The popup used to be built entirely out of inline styles -- overlay
+            colour, panel background, width, padding, radius, the close button
+            and every one of the five text parts. Inline styles outrank even the
+            ID-scoped rules Style.js emits, so the whole Style tab missed the one
+            thing this block exists to show: the panel stayed #fff however the
+            palette was set, which on a dark palette opened a white popup out of
+            a dark card.
+
+            Everything below is class-driven now. The stylesheet carries the
+            same values it had inline, so an untouched block is unchanged, and
+            the parts are named in Style.js's selector lists so the Card, Image,
+            Name, Designation and Review Text panels all reach inside. */}
+        {activeModalItem && (
+          <div
+            className="btb-modal-overlay"
+            role="presentation"
+            onClick={(e) =>
+              e.target === e.currentTarget && setActiveModalItem(null)
+            }>
+            <div
+              className="btb-modal-content-box"
+              role="dialog"
+              aria-modal="true"
+              aria-label={activeModalItem?.name || "Testimonial"}>
+              <button
+                type="button"
+                className="btb-modal-close"
+                onClick={() => setActiveModalItem(null)}>
+                ×
+              </button>
+              <div className="btb-modal-head">
+                <img
+                  className="btb-modal-avatar"
+                  src={
+                    activeModalItem.img?.url ||
+                    "https://templates.bplugins.com/wp-content/uploads/2025/02/p-29.png"
+                  }
+                  alt={activeModalItem.name || ""}
+                />
+                <div className="btb-modal-meta">
+                  <h3 className="btb-modal-name">
+                    {activeModalItem.name || "John Doe"}
+                  </h3>
+                  <span className="btb-modal-deg">
+                    {activeModalItem.deg || ""}
+                  </span>
+                  <div className="btb-modal-rating">
+                    {"★".repeat(activeModalItem.rating || 5)}
+                  </div>
+                </div>
+              </div>
+              <p className="btb-modal-review">
+                &quot;{activeModalItem.reviewText || ""}&quot;
+              </p>
+            </div>
+          </div>
+        )}
+      </div>
+    );
+  }
+
+  if (layout === "testimonials-floating-bubble") {
+    return (
+      <div className="btb-floating-bubble-layout">
+        {items.map((item, index) => (
+          <div
+            key={index}
+            className="btb-bubble-item"
+            style={{ animationDelay: `${index * 0.3}s` }}>
+            <div className="btb-bubble-avatar">
+              <img
+                src={
+                  item.img?.url ||
+                  "https://templates.bplugins.com/wp-content/uploads/2025/02/p-29.png"
+                }
+                alt={item.name}
+              />
+              {itemsEls?.[index]?.img}
+            </div>
+            <div className="btb-bubble-content">
+              {itemsEls?.[index]?.reviewText}
+              <span className="btb-bubble-name">{item.name}</span>
+            </div>
+          </div>
+        ))}
+      </div>
+    );
+  }
+
+  if (layout === "testimonials-card-stack") {
+    const totalItems = items.length;
+    const currentIdx =
+      typeof setActiveIndex === "function" ? activeIndex || 0 : cardStackIdx;
+    const activeIdx =
+      totalItems > 0
+        ? ((currentIdx % totalItems) + totalItems) % totalItems
+        : 0;
+
+    const updateStackActive = (newIdx) => {
+      setCardStackIdx(newIdx);
+      if (typeof setActiveIndex === "function") {
+        setActiveIndex(newIdx);
+      }
+    };
+
+    const nextCard = (e) => {
+      if (e) e.preventDefault();
+      if (totalItems > 1) {
+        updateStackActive((activeIdx + 1) % totalItems);
+      }
+    };
+
+    const prevCard = (e) => {
+      if (e) e.preventDefault();
+      if (totalItems > 1) {
+        updateStackActive((activeIdx - 1 + totalItems) % totalItems);
+      }
+    };
+
+    return (
+      <div
+        className={`btb-card-stack-wrapper ${isBackend ? "is-editing" : ""}`}
+        {...(stackAutoPlay && !isBackend
+          ? {
+              onMouseEnter: () => setStackHovered(true),
+              onMouseLeave: () => setStackHovered(false),
+            }
+          : {})}>
+        <div
+          className="btb-card-stack-layout"
+          data-active-index={activeIdx}
+          data-total-items={totalItems}>
+          {items.map((item, index) => {
+            const pos =
+              totalItems > 0
+                ? (index - activeIdx + totalItems) % totalItems
+                : 0;
+            const isTop = pos === 0;
+
+            // One state class, not two. This was `${isTop ? 'is-top' : ''}`
+            // followed by a separate `is-behind-N` / `is-hidden` ternary, so the
+            // top card came out as `is-top is-hidden`: both classes carry the
+            // same specificity and `.is-hidden` is declared last, so it won with
+            // `opacity: 0`. Every stack rendered its front card invisible, and a
+            // stack of one -- which is the default -- showed nothing at all. The
+            // front-end view script assigns these exclusively already, but it
+            // returns early on a single card, so it never repaired that case.
+            const stateClass = isTop
+              ? "is-top"
+              : pos <= 2
+                ? `is-behind-${pos}`
+                : "is-hidden";
+
+            return (
+              <div
+                key={index}
+                className={`btb-stacked-card ${stateClass}`}
+                data-index={index}
+                data-stack-pos={pos}
+                style={{
+                  zIndex: isTop ? 10 : 10 - pos,
+                }}
+                {...editorClickable(isBackend, () => updateStackActive(index))}>
+                {themeSelect(item, index)}
+              </div>
+            );
+          })}
+        </div>
+
+        {totalItems > 1 && (
+          <div className="btb-stack-controls">
+            <button
+              type="button"
+              className="btb-stack-btn btb-stack-prev"
+              onClick={prevCard}
+              aria-label="Previous card">
+              ‹
+            </button>
+            <div className="btb-stack-dots">
+              {items.map((_, idx) => (
+                <button
+                  key={idx}
+                  type="button"
+                  className={`btb-stack-dot ${
+                    idx === activeIdx ? "is-active" : ""
+                  }`}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    updateStackActive(idx);
+                  }}
+                  aria-label={`Go to card ${idx + 1}`}
+                />
+              ))}
+            </div>
+            <button
+              type="button"
+              className="btb-stack-btn btb-stack-next"
+              onClick={nextCard}
+              aria-label="Next card">
+              ›
+            </button>
+          </div>
+        )}
+      </div>
+    );
+  }
+
+  // ================================================================
+  //  CATEGORY A: Standard layouts (existing switch logic, fixed)
+  // ================================================================
+
+  // The block keeps its own identity classes; the arrangement adds its own on
+  // top. The one exception is a layout that only ever named an arrangement
+  // (default/slider/masonry/list/marquee) -- once an explicit arrangement is
+  // chosen, keeping the old class would let two arrangements style the same
+  // element, e.g. marquee's overflow rules wrapping a Swiper.
+  const identityClasses =
+    ARRANGEMENTS.includes(layout) && arrangement !== layout
+      ? []
+      : [`${layout}-layout`, `btb-${layout}-layout`];
+
+  const sectionClasses = [
+    "layoutSection",
+    ...identityClasses,
+    // Deduped: for a block whose layout already names its arrangement, the two
+    // produce the same class.
+    ...(identityClasses.includes(`${arrangement}-layout`)
+      ? []
+      : [`${arrangement}-layout`]),
+    theme,
+    `btb-columns-${previewCols}`,
+    `btb-columns-tablet-${tablet}`,
+    `btb-columns-mobile-${mobile}`,
+    isBackend ? "is-editing" : "",
+  ]
+    .filter(Boolean)
+    .join(" ");
+
+  return (
+    <div className={sectionClasses}>
+      {(() => {
+        switch (arrangement) {
+          case "masonry": {
+            const masonryItems = items.map((item, index) =>
+              themeSelect(item, index),
+            );
+
+            // In the editor the count comes from the device buttons: this
+            // measures the window, so inside a non-iframed canvas it would
+            // report the desktop width whichever device is selected.
+            if (isBackend) {
+              return (
+                <Masonry
+                  columnsCount={previewCols}
+                  gutter={`${rowGap} ${columnGap}`}>
+                  {masonryItems}
+                </Masonry>
+              );
+            }
+
+            // Breakpoints are min-width here, so they are the CSS max-widths in
+            // _devices.scss plus one, keeping this in step with the stylesheets.
+            return (
+              <ResponsiveMasonry
+                columnsCountBreakPoints={{
+                  0: mobile,
+                  641: tablet,
+                  1025: desktop,
+                }}>
+                <Masonry columnsCount={desktop} gutter={`${rowGap} ${columnGap}`}>
+                  {masonryItems}
+                </Masonry>
+              </ResponsiveMasonry>
+            );
+          }
+          case "slider":
+          case "slider-3d":
+          case "coverflow":
+            return (
+              <Slider
+                attributes={attributes}
+                itemsEls={itemsEls}
+                itemProps={itemProps}
+                isBackend={isBackend}
+                previewCols={previewCols}
+                previewDevice={previewDevice}
+                arrangement={arrangement}
+              />
+            );
+          case "marquee":
+            return (
+              <Marquee
+                items={items}
+                themeSelect={themeSelect}
+                columnGap={columnGap}
+                marquee={attributes?.marquee}
+                isBackend={isBackend}
+                pauseInEditor={attributes?.pauseInEditor}
+              />
+            );
+          // All other testimonial-items layouts: quote-box, speech-bubble, compact, list, etc.
+          // The unique visual is produced by the CSS class on the wrapper div
+          default:
+            return items.map((item, index) => themeSelect(item, index));
+        }
+      })()}
+    </div>
+  );
 };
 
 export default Layout;

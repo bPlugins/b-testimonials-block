@@ -16,9 +16,68 @@
   ],
   "textdomain": "b-testimonials-block",
   "attributes": {
+    "borderWidth": {
+      "type": "number"
+    },
+    "brandColor": {
+      "type": "string"
+    },
+    "surfaceColor": {
+      "type": "string"
+    },
+    "borderColor": {
+      "type": "string"
+    },
+    "titleColor": {
+      "type": "string"
+    },
+    "bodyColor": {
+      "type": "string"
+    },
+    "mutedColor": {
+      "type": "string"
+    },
+    "ratingColor": {
+      "type": "string"
+    },
+    "trackColor": {
+      "type": "string"
+    },
+    "successColor": {
+      "type": "string"
+    },
+    "successBg": {
+      "type": "string"
+    },
+    "errorColor": {
+      "type": "string"
+    },
+    "errorBg": {
+      "type": "string"
+    },
     "align": {
       "type": "string",
       "default": "wide"
+    },
+    "blockWidth": {
+      "type": "object",
+      "default": {
+        "desktop": "",
+        "tablet": "",
+        "mobile": ""
+      }
+    },
+    "blockAlign": {
+      "type": "string",
+      "default": ""
+    },
+    "cardHeight": {
+      "type": "object",
+      "default": {
+        "desktop": "",
+        "tablet": "",
+        "mobile": ""
+      }
     },
     "cId": {
       "type": "string",
@@ -46,13 +105,112 @@
         "image": false
       }
     },
+    "fieldLabels": {
+      "type": "object",
+      "default": {}
+    },
+    "fieldPlaceholders": {
+      "type": "object",
+      "default": {}
+    },
     "accentColor": {
       "type": "string",
       "default": "#0575e6"
     },
+    "labelColor": {
+      "type": "string"
+    },
+    "labelTypo": {
+      "type": "object",
+      "default": {}
+    },
+    "inputColor": {
+      "type": "string"
+    },
+    "inputTypo": {
+      "type": "object",
+      "default": {}
+    },
+    "placeholderColor": {
+      "type": "string"
+    },
+    "inputFocusColor": {
+      "type": "string"
+    },
+    "inputRadius": {
+      "type": "string"
+    },
+    "inputPadding": {
+      "type": "object",
+      "default": {}
+    },
+    "textareaHeight": {
+      "type": "string"
+    },
     "layout": {
       "type": "string",
       "default": "testimonial-form"
+    },
+    "degDivider": {
+      "type": "object",
+      "default": {}
+    },
+    "blockMargin": {
+      "type": "object",
+      "default": {}
+    },
+    "cardMargin": {
+      "type": "object",
+      "default": {}
+    },
+    "btnBg": {
+      "type": "string",
+      "default": ""
+    },
+    "btnHoverBg": {
+      "type": "string",
+      "default": ""
+    },
+    "btnColor": {
+      "type": "string",
+      "default": "#ffffff"
+    },
+    "btnHoverColor": {
+      "type": "string",
+      "default": ""
+    },
+    "btnTypo": {
+      "type": "object",
+      "default": {
+        "fontSize": {
+          "desktop": 15,
+          "tablet": 15,
+          "mobile": 15
+        },
+        "fontWeight": 600,
+        "lineHeight": "150%"
+      }
+    },
+    "btnPadding": {
+      "type": "object",
+      "default": {
+        "top": "11px",
+        "right": "24px",
+        "bottom": "11px",
+        "left": "24px"
+      }
+    },
+    "btnRadius": {
+      "type": "string",
+      "default": "6px"
+    },
+    "btnWidth": {
+      "type": "string",
+      "default": "auto"
+    },
+    "btnAlign": {
+      "type": "string",
+      "default": "start"
     }
   },
   "supports": {
@@ -62,12 +220,9 @@
     ],
     "html": false
   },
-  "editorScript": [
-    "file:./index.js"
-  ],
-  "editorStyle": "file:./index.css",
+  "editorStyle": "file:../index.css",
   "style": [
-    "file:./index.css",
+    "file:../index.css",
     "file:./view.css"
   ],
   "render": "file:./render.php",

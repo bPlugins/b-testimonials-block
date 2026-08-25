@@ -13,12 +13,9 @@
 		],
 		"html": false
 	},
-	"editorScript": [
-		"file:./index.js"
-	],
-	"editorStyle": "file:./index.css",
+	"editorStyle": "file:../index.css",
 	"style": [
-		"file:./index.css",
+		"file:../index.css",
 		"file:./view.css"
 	],
 	"viewScript": [
@@ -35,9 +32,56 @@
 		"aggregate"
 	],
 	"attributes": {
+		"borderWidth": {
+			"type": "number"
+		},
+		"brandColor": {
+			"type": "string"
+		},
+		"surfaceColor": {
+			"type": "string"
+		},
+		"borderColor": {
+			"type": "string"
+		},
+		"titleColor": {
+			"type": "string"
+		},
+		"bodyColor": {
+			"type": "string"
+		},
+		"mutedColor": {
+			"type": "string"
+		},
+		"ratingColor": {
+			"type": "string"
+		},
+		"trackColor": {
+			"type": "string"
+		},
 		"align": {
 			"type": "string",
 			"default": "wide"
+		},
+		"blockWidth": {
+			"type": "object",
+			"default": {
+				"desktop": "",
+				"tablet": "",
+				"mobile": ""
+			}
+		},
+		"blockAlign": {
+			"type": "string",
+			"default": ""
+		},
+		"cardHeight": {
+			"type": "object",
+			"default": {
+				"desktop": "",
+				"tablet": "",
+				"mobile": ""
+			}
 		},
 		"cId": {
 			"type": "string",
@@ -99,6 +143,21 @@
 			"type": "string",
 			"default": ""
 		},
+		"star5Pct": {
+			"type": "number"
+		},
+		"star4Pct": {
+			"type": "number"
+		},
+		"star3Pct": {
+			"type": "number"
+		},
+		"star2Pct": {
+			"type": "number"
+		},
+		"star1Pct": {
+			"type": "number"
+		},
 		"rating": {
 			"type": "number",
 			"default": 4.8
@@ -126,6 +185,18 @@
 		"stacked": {
 			"type": "boolean",
 			"default": false
+		},
+		"degDivider": {
+			"type": "object",
+			"default": {}
+		},
+		"blockMargin": {
+			"type": "object",
+			"default": {}
+		},
+		"cardMargin": {
+			"type": "object",
+			"default": {}
 		}
 	}
 }

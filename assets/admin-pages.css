@@ -1,0 +1,1110 @@
+/**
+ * Shared styles for the plugin's two PHP admin screens: Submissions and
+ * Feedback & NPS Poll.
+ *
+ * Both screens used to carry their own ~500-line <style> block, and between them
+ * they had three different visual languages: a blue gradient banner with 12px
+ * radii on Submissions, a second one with different radii on the Poll, and the
+ * React Demo & Help dashboard -- the screen users actually associate with this
+ * plugin -- looking like neither. This file is that dashboard's language written
+ * once for both screens, so all three read as one product.
+ *
+ * The values are not invented here. They are lifted from the dashboard's own
+ * stylesheets so the two match rather than merely resemble each other:
+ *
+ *   bpl-tools/Admin/style.scss          - shell: #f6f8fa canvas, Roboto, the
+ *                                        `calc(100% + 20px)` / `-20px` bleed
+ *   bpl-tools/Admin/Demos/style.scss    - hero, toolbar, chips, cards, empty
+ *   bpl-tools/Admin/__variables.scss    - #001737 titles, #1B2E4B body text
+ *   src/admin/dashboard.scss            - the #0B81EE primary this plugin sets
+ *
+ * Square corners throughout are deliberate, not an omission: the dashboard
+ * commented out every `border-radius` in those files and forces
+ * `.bPlButton { border-radius: 0 }`, so rounding anything here would single these
+ * screens out again.
+ *
+ * The hierarchy each screen follows, top to bottom -- the Demos page's own
+ * order, which is the point of the exercise:
+ *
+ *   hero     -> eyebrow, h1, one line of description; what this screen is
+ *   stats    -> the numbers, as their own row rather than inside the banner
+ *   toolbar  -> filters on the left, actions on the right
+ *   count    -> what the filters currently add up to
+ *   cards    -> the content itself
+ *
+ * There is deliberately no header bar, though the dashboard has one and these
+ * screens carried a copy of it for a while. Everything it showed was already on
+ * the page: its nav duplicated the sidebar submenu, which lists all three of this
+ * plugin's screens and highlights the current one, and the wordmark repeated what
+ * that highlighted item says. The dashboard's own header earns its place because
+ * its Welcome / Demos / Settings routes are hash routes with no sidebar entries;
+ * here it was ~120px of chrome doing nothing. The canvas, type scale, cards,
+ * chips and tables are what carry the family resemblance.
+ */
+
+/* -------------------------------------------------------------------------
+ * Shell
+ * ---------------------------------------------------------------------- */
+
+.bpbtb-admin-page {
+	/* Named here rather than in :root so nothing leaks into the rest of
+	   wp-admin, which these screens share with every other plugin. */
+	--bpbtb-primary: #0b81ee;
+	--bpbtb-primary-rgb: 11, 129, 238;
+	--bpbtb-title: #001737;
+	--bpbtb-content: #1b2e4b;
+	--bpbtb-content-rgb: 27, 46, 75;
+	--bpbtb-canvas: #f6f8fa;
+	--bpbtb-surface: #ffffff;
+	--bpbtb-line: rgba(27, 46, 75, 0.1);
+	--bpbtb-line-soft: rgba(27, 46, 75, 0.06);
+	--bpbtb-muted: rgba(27, 46, 75, 0.65);
+	--bpbtb-shadow: 0 1px 3px rgba(9, 30, 66, 0.04);
+	--bpbtb-shadow-lift: 0 10px 24px rgba(9, 30, 66, 0.08);
+	--bpbtb-ok: #10b981;
+	--bpbtb-warn: #d97706;
+	--bpbtb-danger: #e11d48;
+
+	/* The admin content area pads 20px on the left, which the canvas cancels so
+	   it reaches the window edge -- the same -20px the React dashboard uses on
+	   .bPlDashboard, so the two line up.
+
+	   Nothing is cancelled at the top. This carried a `-10px` for a while on the
+	   belief that the content area pads 10px there and the dashboard cancels it
+	   too. Neither is true: #wpbody-content computes to padding-top 0 (the 10px
+	   belongs to wp-admin's .wrap, which these screens do not use), and
+	   .bPlDashboard only pulls sideways. So the -10px was not matching the
+	   dashboard, it was pulling 10px of this header up behind the fixed admin
+	   bar -- a 75px header showing as 65px, and 10px higher than the dashboard's.
+	   Measured at 1600px: header top was 22px here against 32px there. */
+	width: calc(100% + 20px);
+	max-width: calc(100% + 20px);
+	min-height: 100vh;
+	margin: 0 -20px;
+	background: var(--bpbtb-canvas);
+	font-family: "Roboto", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+	font-size: 14px;
+	color: var(--bpbtb-content);
+	box-sizing: border-box;
+}
+
+.bpbtb-admin-page * {
+	box-sizing: border-box;
+	line-height: 1.5;
+}
+
+/*
+ * bpl-tools lays out the header under `.bPlDashboard *`, which zeroes every
+ * descendant margin before `.pluginInfo h1` puts back its 8px right one. This
+ * page has no .bPlDashboard ancestor, so the h1 keeps the browser default
+ * `margin: .67em 0` instead -- 16.08px top and bottom at its 24px size.
+ *
+ * `.pluginInfo { min-height: 70px }` hides that at normal widths, which is why
+ * both headers measure exactly 75px down to 600px. It shows up once the header
+ * wraps: 163.2px here against 160px on the dashboard at 480px.
+ *
+ * Restated for the h1 alone rather than as a `* { margin: 0 }` reset, which
+ * would flatten the margins this page sets on purpose everywhere else.
+ */
+.bpbtb-admin-page .bPlDashboardHeader h1 {
+	margin: 0 8px 0 0;
+}
+
+.bpbtb-admin-page a {
+	text-decoration: none;
+}
+
+.bpbtb-admin-page a:focus {
+	box-shadow: none;
+	outline: 2px solid rgba(var(--bpbtb-primary-rgb), 0.4);
+	outline-offset: 1px;
+}
+
+/*
+ * Notices land in #wpbody-content above the page, outside the canvas.
+ *
+ * The React dashboard hides all of them (`.notice { display: none !important }`
+ * in bpl-tools' stylesheet) so nothing breaks the top of its layout. That is too
+ * blunt to copy wholesale: this plugin's own "you have N pending submissions"
+ * nudge is a `notice-warning`, and a real failure from any plugin is worth more
+ * than a tidy first 40 pixels. So only the chatty kinds go -- the success and
+ * info banners other plugins print on every screen they can reach -- and
+ * warnings and errors stay, restyled to sit on the canvas rather than above it.
+ *
+ * The plugin's own confirmations are not affected either way: each page prints
+ * them inside .bpbtb-admin-wrap, where the rule below styles them.
+ */
+.bpbtb-admin-page-host #wpbody-content > .notice-success,
+.bpbtb-admin-page-host #wpbody-content > .notice-info,
+.bpbtb-admin-page-host #wpbody-content > .updated,
+.bpbtb-admin-page-host #wpbody-content > h1.screen-reader-text {
+	display: none;
+}
+
+.bpbtb-admin-page-host #wpbody-content > .notice-warning,
+.bpbtb-admin-page-host #wpbody-content > .notice-error,
+.bpbtb-admin-page-host #wpbody-content > .error {
+	max-width: 1240px;
+	/* 10px at the bottom, not 0: the canvas below pulls itself up by that much
+	   to sit flush under wp-admin's chrome, and would otherwise clip this. */
+	margin: 24px auto 10px;
+	padding: 12px 16px;
+	font-family: "Roboto", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+	background: #ffffff;
+	border-radius: 0;
+	box-shadow: 0 1px 3px rgba(9, 30, 66, 0.04);
+}
+
+/* The canvas runs to the bottom of the window, so wp-admin's 65px of padding
+   under it would show as a strip of admin grey above the footer. */
+.bpbtb-admin-page-host #wpbody-content {
+	padding-bottom: 0;
+}
+
+/* -------------------------------------------------------------------------
+ * Page body
+ * ---------------------------------------------------------------------- */
+
+/* More air at the top than the dashboard's 28px: that page has a header bar
+   between its content and wp-admin's chrome, and this one does not, so this
+   padding is the whole separation. */
+.bpbtb-admin-main {
+	padding: 40px 24px 48px;
+}
+
+.bpbtb-admin-wrap {
+	display: flex;
+	flex-direction: column;
+	gap: 24px;
+	width: 100%;
+	max-width: 1240px;
+	margin: 0 auto;
+}
+
+/* The Submissions screen wraps its toolbar, count and table in one <form> for
+   the bulk action, which would otherwise collapse those three against each other
+   while everything outside the form kept its 24px rhythm. */
+.bpbtb-admin-wrap > form {
+	display: flex;
+	flex-direction: column;
+	gap: 24px;
+}
+
+/* -------------------------------------------------------------------------
+ * Hero
+ * ---------------------------------------------------------------------- */
+
+.bpbtb-hero {
+	display: flex;
+	flex-direction: column;
+	gap: 10px;
+	max-width: 640px;
+	margin: 0 auto;
+	text-align: center;
+}
+
+.bpbtb-hero .bpbtb-eyebrow {
+	align-self: center;
+	padding: 5px 12px;
+	font-size: 12px;
+	font-weight: 700;
+	text-transform: uppercase;
+	letter-spacing: 1.5px;
+	color: var(--bpbtb-primary);
+	background: rgba(var(--bpbtb-primary-rgb), 0.08);
+}
+
+.bpbtb-hero h1 {
+	margin: 0;
+	padding: 0;
+	font-size: 28px;
+	font-weight: 700;
+	line-height: 1.2;
+	letter-spacing: -0.3px;
+	color: var(--bpbtb-title);
+}
+
+.bpbtb-hero p {
+	margin: 0;
+	font-size: 14px;
+	line-height: 1.55;
+	color: var(--bpbtb-content);
+}
+
+/* -------------------------------------------------------------------------
+ * Stats
+ *
+ * The numbers used to sit inside the blue banner as translucent boxes, which
+ * made them decoration attached to the title. They are the screen's primary
+ * data, so they get the card treatment and a row of their own directly under
+ * the hero -- the same weight the Demos grid gives its cards.
+ * ---------------------------------------------------------------------- */
+
+.bpbtb-stats-row {
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+	gap: 16px;
+}
+
+.bpbtb-stat-box {
+	display: flex;
+	flex-direction: column;
+	gap: 4px;
+	padding: 18px 20px;
+	background: var(--bpbtb-surface);
+	border: 1px solid var(--bpbtb-line);
+	box-shadow: var(--bpbtb-shadow);
+	transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.bpbtb-stat-box:hover {
+	border-color: rgba(var(--bpbtb-primary-rgb), 0.45);
+	box-shadow: var(--bpbtb-shadow-lift);
+}
+
+.bpbtb-stat-num {
+	font-size: 26px;
+	font-weight: 700;
+	line-height: 1.15;
+	letter-spacing: -0.5px;
+	color: var(--bpbtb-title);
+	/* Digits in a row of counters should not shift width as they change. */
+	font-variant-numeric: tabular-nums;
+}
+
+.bpbtb-stat-label {
+	font-size: 11px;
+	font-weight: 700;
+	text-transform: uppercase;
+	letter-spacing: 0.8px;
+	color: var(--bpbtb-muted);
+}
+
+/* -------------------------------------------------------------------------
+ * Toolbar: filters left, actions right
+ * ---------------------------------------------------------------------- */
+
+.bpbtb-nav-toolbar {
+	display: flex;
+	align-items: center;
+	flex-wrap: wrap;
+	gap: 16px;
+	padding: 14px 16px;
+	background: var(--bpbtb-surface);
+	border: 1px solid var(--bpbtb-line);
+	box-shadow: var(--bpbtb-shadow);
+}
+
+.bpbtb-tabs {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 6px;
+}
+
+/* The dashboard's filter chip: a dot, a label, and the dark-navy active state.
+   The dot carries the status colour, which is what the old tabs used a blue
+   fill for -- so the colour survives without a second filled shape. */
+.bpbtb-tab-link {
+	--accent: rgba(27, 46, 75, 0.4);
+	display: inline-flex;
+	align-items: center;
+	gap: 7px;
+	padding: 7px 14px;
+	font-size: 13px;
+	font-weight: 600;
+	color: var(--bpbtb-content);
+	background: transparent;
+	border: 1px solid rgba(var(--bpbtb-content-rgb), 0.15);
+	transition: background 0.15s, border-color 0.15s, color 0.15s;
+}
+
+.bpbtb-tab-link::before {
+	content: "";
+	width: 8px;
+	height: 8px;
+	flex-shrink: 0;
+	background: var(--accent);
+}
+
+.bpbtb-tab-link:hover {
+	color: var(--bpbtb-title);
+	border-color: rgba(var(--bpbtb-primary-rgb), 0.4);
+}
+
+.bpbtb-tab-link.is-active {
+	color: #ffffff;
+	background: var(--bpbtb-title);
+	border-color: var(--bpbtb-title);
+}
+
+.bpbtb-tab-link.is-active::before {
+	background: rgba(255, 255, 255, 0.55);
+}
+
+.bpbtb-tab-count {
+	font-size: 12px;
+	font-weight: 700;
+	font-variant-numeric: tabular-nums;
+	color: inherit;
+	opacity: 0.7;
+}
+
+.bpbtb-toolbar-actions,
+.bpbtb-bulk-wrap {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	margin-left: auto;
+}
+
+.bpbtb-toolbar-note {
+	font-size: 13px;
+	color: var(--bpbtb-muted);
+}
+
+.bpbtb-toolbar-note strong {
+	font-weight: 700;
+	color: var(--bpbtb-title);
+}
+
+/* -------------------------------------------------------------------------
+ * Form controls
+ *
+ * wp-admin's own inputs are 8px-radius, 13px, and a different grey; left alone
+ * they would be the only rounded things on the screen.
+ * ---------------------------------------------------------------------- */
+
+.bpbtb-admin-page select,
+.bpbtb-admin-page input[type="text"],
+.bpbtb-admin-page input[type="number"],
+.bpbtb-admin-page input[type="search"] {
+	min-height: 36px;
+	padding: 7px 12px;
+	font-size: 14px;
+	font-family: inherit;
+	color: var(--bpbtb-title);
+	background: rgba(var(--bpbtb-content-rgb), 0.05);
+	border: 1px solid transparent;
+	border-radius: 0;
+	box-shadow: none;
+	transition: background 0.15s, border-color 0.15s, box-shadow 0.15s;
+}
+
+.bpbtb-admin-page select:focus,
+.bpbtb-admin-page input[type="text"]:focus,
+.bpbtb-admin-page input[type="number"]:focus,
+.bpbtb-admin-page input[type="search"]:focus {
+	outline: none;
+	background: var(--bpbtb-surface);
+	border-color: rgba(var(--bpbtb-primary-rgb), 0.45);
+	box-shadow: 0 0 0 3px rgba(var(--bpbtb-primary-rgb), 0.1);
+}
+
+.bpbtb-admin-page input[type="color"] {
+	width: 100%;
+	height: 36px;
+	padding: 3px;
+	background: rgba(var(--bpbtb-content-rgb), 0.05);
+	border: 1px solid transparent;
+	border-radius: 0;
+	cursor: pointer;
+}
+
+/* One button, three intents -- matching the dashboard, where every button is
+   square and the primary one is the flat brand blue. */
+.bpbtb-admin-page .bpbtb-btn {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	gap: 6px;
+	min-height: 36px;
+	padding: 7px 16px;
+	font-family: inherit;
+	font-size: 13px;
+	font-weight: 600;
+	line-height: 1.4;
+	color: #ffffff;
+	background: var(--bpbtb-primary);
+	border: 1px solid var(--bpbtb-primary);
+	border-radius: 0;
+	box-shadow: none;
+	text-shadow: none;
+	cursor: pointer;
+	transition: background 0.15s, border-color 0.15s, color 0.15s;
+}
+
+.bpbtb-admin-page .bpbtb-btn:hover,
+.bpbtb-admin-page .bpbtb-btn:focus {
+	color: #ffffff;
+	background: #0a6dc9;
+	border-color: #0a6dc9;
+}
+
+.bpbtb-admin-page .bpbtb-btn.is-ghost {
+	color: var(--bpbtb-content);
+	background: transparent;
+	border-color: rgba(var(--bpbtb-content-rgb), 0.2);
+}
+
+.bpbtb-admin-page .bpbtb-btn.is-ghost:hover,
+.bpbtb-admin-page .bpbtb-btn.is-ghost:focus {
+	color: var(--bpbtb-title);
+	background: rgba(var(--bpbtb-content-rgb), 0.04);
+	border-color: rgba(var(--bpbtb-primary-rgb), 0.45);
+}
+
+.bpbtb-admin-page .bpbtb-btn.is-danger {
+	color: var(--bpbtb-danger);
+	background: transparent;
+	border-color: rgba(225, 29, 72, 0.35);
+}
+
+.bpbtb-admin-page .bpbtb-btn.is-danger:hover,
+.bpbtb-admin-page .bpbtb-btn.is-danger:focus {
+	color: #ffffff;
+	background: var(--bpbtb-danger);
+	border-color: var(--bpbtb-danger);
+}
+
+/* -------------------------------------------------------------------------
+ * Count line
+ * ---------------------------------------------------------------------- */
+
+.bpbtb-count {
+	margin: -8px 0 0;
+	font-size: 13px;
+	color: rgba(var(--bpbtb-content-rgb), 0.8);
+}
+
+.bpbtb-count strong {
+	font-weight: 700;
+	color: var(--bpbtb-title);
+}
+
+/* -------------------------------------------------------------------------
+ * Cards and sections
+ * ---------------------------------------------------------------------- */
+
+.bpbtb-card,
+.bpbtb-modern-table-card,
+.bpbtb-nps-table-card {
+	background: var(--bpbtb-surface);
+	border: 1px solid var(--bpbtb-line);
+	box-shadow: var(--bpbtb-shadow);
+}
+
+.bpbtb-card {
+	padding: 24px;
+}
+
+.bpbtb-section-head {
+	display: flex;
+	flex-direction: column;
+	gap: 4px;
+	margin-bottom: 20px;
+}
+
+.bpbtb-section-head h3 {
+	margin: 0;
+	padding: 0;
+	font-size: 18px;
+	font-weight: 700;
+	line-height: 1.3;
+	letter-spacing: -0.2px;
+	color: var(--bpbtb-title);
+}
+
+.bpbtb-section-head p {
+	margin: 0;
+	font-size: 13px;
+	line-height: 1.55;
+	color: var(--bpbtb-muted);
+}
+
+/* A table fills its card edge to edge, so the padding lives on the cells. */
+.bpbtb-modern-table-card,
+.bpbtb-nps-table-card {
+	overflow-x: auto;
+}
+
+.bpbtb-nps-table-card .bpbtb-section-head {
+	margin: 0;
+	padding: 20px 20px 16px;
+	border-bottom: 1px solid var(--bpbtb-line);
+}
+
+/* -------------------------------------------------------------------------
+ * Tables
+ * ---------------------------------------------------------------------- */
+
+.bpbtb-modern-table {
+	width: 100%;
+	min-width: 760px;
+	border-collapse: collapse;
+	background: transparent;
+}
+
+.bpbtb-modern-table thead th {
+	padding: 13px 14px;
+	font-size: 11px;
+	font-weight: 700;
+	text-align: left;
+	text-transform: uppercase;
+	letter-spacing: 0.8px;
+	color: var(--bpbtb-muted);
+	background: rgba(var(--bpbtb-content-rgb), 0.03);
+	border-bottom: 1px solid var(--bpbtb-line);
+}
+
+.bpbtb-modern-table tbody td {
+	padding: 14px;
+	font-size: 14px;
+	color: var(--bpbtb-content);
+	border-bottom: 1px solid var(--bpbtb-line-soft);
+	vertical-align: middle;
+}
+
+.bpbtb-modern-table tbody tr:last-child td {
+	border-bottom: none;
+}
+
+.bpbtb-modern-table tbody tr:hover {
+	background: rgba(var(--bpbtb-content-rgb), 0.02);
+}
+
+.bpbtb-cell-title {
+	font-size: 14px;
+	font-weight: 700;
+	color: var(--bpbtb-title);
+}
+
+.bpbtb-cell-title a {
+	color: inherit;
+}
+
+.bpbtb-cell-title a:hover {
+	color: var(--bpbtb-primary);
+}
+
+.bpbtb-cell-sub {
+	font-size: 12px;
+	color: var(--bpbtb-muted);
+}
+
+.bpbtb-cell-meta {
+	font-size: 12px;
+	color: var(--bpbtb-muted);
+	font-variant-numeric: tabular-nums;
+}
+
+.bpbtb-cell-body {
+	max-height: 76px;
+	overflow: hidden;
+	font-size: 13px;
+	line-height: 1.5;
+	color: var(--bpbtb-content);
+}
+
+.bpbtb-cell-strong {
+	font-weight: 600;
+	color: var(--bpbtb-content);
+}
+
+.bpbtb-cell-actions {
+	text-align: right;
+	white-space: nowrap;
+}
+
+.bpbtb-avatar-box,
+.bpbtb-avatar-placeholder {
+	width: 40px;
+	height: 40px;
+	object-fit: cover;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	border: 1px solid var(--bpbtb-line);
+}
+
+.bpbtb-avatar-placeholder {
+	font-size: 15px;
+	font-weight: 700;
+	color: var(--bpbtb-primary);
+	background: rgba(var(--bpbtb-primary-rgb), 0.1);
+	border-color: transparent;
+}
+
+.bpbtb-stars-wrap {
+	font-size: 14px;
+	letter-spacing: 1px;
+	color: #f59e0b;
+	white-space: nowrap;
+}
+
+/* -------------------------------------------------------------------------
+ * Badges: the Demos card's category chip, recoloured per status
+ * ---------------------------------------------------------------------- */
+
+.bpbtb-badge {
+	display: inline-block;
+	padding: 3px 8px;
+	font-size: 11px;
+	font-weight: 700;
+	text-transform: uppercase;
+	letter-spacing: 0.8px;
+	white-space: nowrap;
+}
+
+.bpbtb-badge-pending {
+	color: var(--bpbtb-warn);
+	background: rgba(217, 119, 6, 0.12);
+}
+
+.bpbtb-badge-approved {
+	color: #047857;
+	background: rgba(16, 185, 129, 0.14);
+}
+
+/* Row actions read as links, not as three competing buttons. */
+.bpbtb-row-action {
+	display: inline-block;
+	margin-left: 12px;
+	font-size: 13px;
+	font-weight: 600;
+	color: var(--bpbtb-content);
+	transition: color 0.15s ease;
+}
+
+.bpbtb-row-action:first-child {
+	margin-left: 0;
+}
+
+.bpbtb-row-action.is-approve:hover {
+	color: #047857;
+}
+
+.bpbtb-row-action.is-reject:hover,
+.bpbtb-row-action.is-delete {
+	color: var(--bpbtb-danger);
+}
+
+.bpbtb-row-action.is-delete:hover {
+	color: #a3103a;
+}
+
+/* -------------------------------------------------------------------------
+ * Empty state -- the Demos page's `.empty`
+ * ---------------------------------------------------------------------- */
+
+.bpbtb-empty {
+	padding: 60px 24px;
+	text-align: center;
+}
+
+.bpbtb-empty .dashicons {
+	width: 34px;
+	height: 34px;
+	font-size: 34px;
+	color: rgba(var(--bpbtb-content-rgb), 0.25);
+}
+
+.bpbtb-empty h3 {
+	margin: 10px 0 4px;
+	font-size: 16px;
+	font-weight: 700;
+	color: var(--bpbtb-title);
+}
+
+.bpbtb-empty p {
+	margin: 0;
+	font-size: 13px;
+	color: var(--bpbtb-muted);
+}
+
+/* -------------------------------------------------------------------------
+ * Notices
+ *
+ * Kept as core's `.notice.is-dismissible` markup so the dismiss button core's
+ * JS attaches still works; only the chrome changes.
+ * ---------------------------------------------------------------------- */
+
+.bpbtb-admin-wrap .notice {
+	margin: 0;
+	padding: 12px 16px;
+	background: var(--bpbtb-surface);
+	border: 1px solid var(--bpbtb-line);
+	border-left: 3px solid var(--bpbtb-ok);
+	border-radius: 0;
+	box-shadow: var(--bpbtb-shadow);
+}
+
+.bpbtb-admin-wrap .notice p {
+	margin: 0;
+	padding: 0;
+	font-size: 14px;
+	color: var(--bpbtb-content);
+}
+
+/* -------------------------------------------------------------------------
+ * Poll: marks breakdown
+ * ---------------------------------------------------------------------- */
+
+.bpbtb-marks-list {
+	display: flex;
+	flex-direction: column;
+	gap: 8px;
+}
+
+.bpbtb-mark-row {
+	display: grid;
+	grid-template-columns: 34px 1fr 150px;
+	align-items: center;
+	gap: 14px;
+}
+
+.bpbtb-mark-pill {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	width: 34px;
+	height: 28px;
+	font-size: 13px;
+	font-weight: 700;
+	font-variant-numeric: tabular-nums;
+	color: var(--bpbtb-title);
+	background: rgba(var(--bpbtb-content-rgb), 0.06);
+}
+
+/* One colour per NPS band, set inline from the saved category colours so the
+   bars, the pills and the log all agree. */
+.bpbtb-mark-pill.has-votes {
+	color: #ffffff;
+}
+
+.bpbtb-mark-track {
+	position: relative;
+	height: 10px;
+	background: rgba(var(--bpbtb-content-rgb), 0.07);
+	overflow: hidden;
+}
+
+.bpbtb-mark-fill {
+	height: 100%;
+	min-width: 0;
+	background: var(--bpbtb-primary);
+	transition: width 0.3s ease;
+}
+
+.bpbtb-mark-count {
+	font-size: 13px;
+	text-align: right;
+	color: var(--bpbtb-muted);
+	font-variant-numeric: tabular-nums;
+}
+
+.bpbtb-mark-count strong {
+	font-weight: 700;
+	color: var(--bpbtb-title);
+}
+
+/* -------------------------------------------------------------------------
+ * Poll: category settings
+ * ---------------------------------------------------------------------- */
+
+.bpbtb-cat-grid {
+	display: flex;
+	flex-direction: column;
+	gap: 12px;
+}
+
+/* The label field is capped rather than given the free space: at `1fr` it grew to
+   ~700px on a wide screen for a one-word band name, and pushed the colour and
+   threshold controls it belongs with to the far edge of the row. */
+.bpbtb-cat-row {
+	display: grid;
+	grid-template-columns: 3px minmax(180px, 320px) 110px 130px minmax(120px, 1fr);
+	align-items: end;
+	gap: 14px;
+	padding: 14px 16px;
+	background: rgba(var(--bpbtb-content-rgb), 0.02);
+	border: 1px solid var(--bpbtb-line);
+}
+
+/* The band's colour as a 3px rule down the left edge of its row: it names the
+   row without spending a swatch on it, the way the dashboard's cards carry
+   their category accent. */
+.bpbtb-cat-swatch {
+	align-self: stretch;
+	width: 3px;
+}
+
+.bpbtb-cat-cell {
+	display: flex;
+	flex-direction: column;
+	gap: 5px;
+}
+
+.bpbtb-cat-cell > span {
+	font-size: 11px;
+	font-weight: 700;
+	text-transform: uppercase;
+	letter-spacing: 0.8px;
+	color: var(--bpbtb-muted);
+}
+
+.bpbtb-cat-range {
+	padding-bottom: 8px;
+	font-size: 13px;
+	color: var(--bpbtb-muted);
+}
+
+.bpbtb-cat-actions {
+	display: flex;
+	align-items: center;
+	flex-wrap: wrap;
+	gap: 10px;
+	margin: 20px 0 0;
+}
+
+.bpbtb-cat-note {
+	font-size: 12px;
+	font-style: normal;
+	line-height: 1.5;
+	color: var(--bpbtb-muted);
+}
+
+/* Only the note that trails the Save/Reset buttons takes the leftover width.
+   Left unscoped, the identical note inside the Detractor row's "Starts at mark"
+   cell read its `260px` basis down the column axis and gave that row a 260px-tall
+   empty cell. */
+.bpbtb-cat-actions .bpbtb-cat-note {
+	flex: 1 1 260px;
+}
+
+/* -------------------------------------------------------------------------
+ * Poll: log table specifics
+ * ---------------------------------------------------------------------- */
+
+.bpbtb-log-mark {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	width: 30px;
+	height: 30px;
+	font-size: 13px;
+	font-weight: 700;
+	color: #ffffff;
+	background: var(--bpbtb-primary);
+}
+
+.bpbtb-log-cat {
+	font-size: 13px;
+	font-weight: 700;
+}
+
+.bpbtb-modern-table a {
+	color: var(--bpbtb-primary);
+}
+
+.bpbtb-modern-table a:hover {
+	color: #0a6dc9;
+	text-decoration: underline;
+}
+
+/* -------------------------------------------------------------------------
+ * Responsive
+ * ---------------------------------------------------------------------- */
+
+@media screen and (max-width: 960px) {
+	.bpbtb-cat-row {
+		grid-template-columns: 3px 1fr 1fr;
+		align-items: start;
+	}
+
+	.bpbtb-cat-range {
+		grid-column: 2 / -1;
+		padding-bottom: 0;
+	}
+}
+
+@media screen and (max-width: 782px) {
+	.bpbtb-admin-page {
+		/* wp-admin drops its 20px side padding below this width, so the bleed
+		   would pull the canvas off-screen. */
+		width: 100%;
+		max-width: 100%;
+		margin: 0;
+	}
+
+	.bpbtb-admin-main {
+		padding: 16px 12px 32px;
+	}
+
+	.bpbtb-hero h1 {
+		font-size: 22px;
+	}
+
+	.bpbtb-nav-toolbar {
+		align-items: stretch;
+	}
+
+	.bpbtb-tab-link {
+		flex: 1 0 auto;
+		justify-content: center;
+	}
+
+	.bpbtb-bulk-wrap,
+	.bpbtb-toolbar-actions {
+		width: 100%;
+		margin-left: 0;
+	}
+
+	.bpbtb-bulk-wrap select {
+		flex: 1;
+		min-width: 0;
+	}
+
+	.bpbtb-card {
+		padding: 18px 16px;
+	}
+
+	.bpbtb-mark-row {
+		grid-template-columns: 34px 1fr;
+		gap: 10px;
+	}
+
+	.bpbtb-mark-count {
+		grid-column: 2;
+		text-align: left;
+	}
+
+	.bpbtb-cat-row {
+		grid-template-columns: 3px 1fr;
+	}
+
+	.bpbtb-cat-range {
+		grid-column: 2;
+	}
+
+	/*
+	 * Eight columns cannot be read side by side on a phone, so each row becomes
+	 * a card and every cell names itself from its `data-label`. This is what
+	 * core does for `.wp-list-table`, which this table is not, so it is spelled
+	 * out here.
+	 */
+	.bpbtb-modern-table,
+	.bpbtb-modern-table tbody,
+	.bpbtb-modern-table tr,
+	.bpbtb-modern-table td {
+		display: block;
+		width: auto;
+	}
+
+	.bpbtb-modern-table {
+		min-width: 0;
+	}
+
+	.bpbtb-modern-table thead {
+		display: none;
+	}
+
+	/* `overflow` contains the floated checkbox and avatar below. */
+	.bpbtb-modern-table tr {
+		overflow: hidden;
+		padding: 10px 4px 16px;
+		border-bottom: 1px solid var(--bpbtb-line);
+	}
+
+	.bpbtb-modern-table tr:last-child {
+		border-bottom: none;
+	}
+
+	.bpbtb-modern-table td {
+		padding: 6px 16px;
+		border-bottom: none;
+		text-align: left !important;
+	}
+
+	/* Everything with a heading starts a fresh line under the floated checkbox
+	   and avatar rather than wrapping around them. */
+	.bpbtb-modern-table td[data-label] {
+		clear: both;
+	}
+
+	.bpbtb-modern-table td[data-label]::before {
+		content: attr(data-label);
+		display: block;
+		margin-bottom: 3px;
+		font-size: 11px;
+		font-weight: 700;
+		text-transform: uppercase;
+		letter-spacing: 0.5px;
+		color: var(--bpbtb-muted);
+	}
+
+	/* Cells the row has no data for carry no label, so they are not worth a
+	   blank line of their own. */
+	.bpbtb-modern-table td:not([data-label]):not([colspan]):not(.bpbtb-cell-check):not(.bpbtb-cell-photo):not(.bpbtb-cell-name) {
+		display: none;
+	}
+
+	/* Checkbox and avatar read as part of the name, not as two more labelled
+	   rows above it. */
+	.bpbtb-modern-table td.bpbtb-cell-check,
+	.bpbtb-modern-table td.bpbtb-cell-photo {
+		float: left;
+		width: auto;
+		padding: 6px 10px 6px 16px;
+	}
+
+	.bpbtb-modern-table td.bpbtb-cell-check {
+		padding-top: 22px;
+	}
+
+	.bpbtb-modern-table td.bpbtb-cell-name {
+		overflow: hidden;
+		padding-top: 14px;
+	}
+
+	.bpbtb-cell-actions {
+		text-align: left !important;
+	}
+
+	.bpbtb-row-action {
+		margin: 2px 12px 2px 0;
+	}
+}
+
+@media screen and (max-width: 600px) {
+	.bpbtb-stats-row {
+		grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+		gap: 10px;
+	}
+
+	.bpbtb-stat-box {
+		padding: 14px;
+	}
+
+	.bpbtb-stat-num {
+		font-size: 21px;
+	}
+
+	.bpbtb-stat-label {
+		font-size: 10px;
+		letter-spacing: 0.4px;
+	}
+}
+
+/*
+ * The dashboard header these two screens print in PHP -- see
+ * BPBTB_Admin_Menu::render_header().
+ *
+ * bpl-tools' compiled stylesheet lays the whole header out already. This is the
+ * one thing it cannot do from here: the square corners the plugin gives every
+ * button come from `.bPlDashboard .bPlButton`, and the React dashboard's root
+ * element carries that class while these screens do not. Restated rather than
+ * added to bpl-tools, which is shared with every other plugin in this install.
+ */
+.bpbtb-admin-page-host .bPlDashboardHeader .bPlButton {
+	border-radius: 0;
+}

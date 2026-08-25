@@ -1,10 +1,28 @@
+/*
+ * One control per line.
+ *
+ * This row used to lay its three controls out side by side, which the sidebar
+ * has nowhere near the width for: measured in the editor, the media picker took
+ * 168px and the Remove button 44px of a 246px column, leaving the "Link
+ * (optional)" field 18px wide -- narrower than a single character, so the field
+ * existed but could not be read or used.
+ *
+ * Stacking matches what the trust-badges, video-testimonials and stats
+ * repeaters already do, so all four now read the same way.
+ */
 .btb-logo-row {
 	display: flex;
-	align-items: center;
-	gap: 8px;
+	flex-direction: column;
+	align-items: stretch;
 	margin-bottom: 12px;
 	padding-bottom: 12px;
 	border-bottom: 1px solid #f0f0f0;
+
+	// Remove belongs at the end of its own line rather than competing with the
+	// fields for the row's width.
+	> .components-button.is-destructive {
+		align-self: flex-end;
+	}
 
 	.btb-logo-pick {
 		height: auto;
@@ -17,7 +35,4 @@
 		}
 	}
 
-	> .components-base-control {
-		flex: 1;
-	}
 }

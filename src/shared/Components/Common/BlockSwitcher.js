@@ -3,10 +3,10 @@ import { __ } from '@wordpress/i18n';
 import { PanelBody, Button } from '@wordpress/components';
 import { dispatch, useSelect } from '@wordpress/data';
 import { createBlock } from '@wordpress/blocks';
-import { getLayoutSvgIcon } from '../../utils/icons';
+import { getLayoutSvgIcon, BRAND_COLOR } from '../../utils/icons';
 import BlockSwitcherModal from './BlockSwitcherModal';
 
-const BlockSwitcher = ({ clientId, currentBlockName, attributes = {}, setAttributes }) => {
+const BlockSwitcher = ({ clientId, currentBlockName, attributes = {} }) => {
 	const [isModalOpen, setIsModalOpen] = useState(false);
 
 	const { currentBlock, parentBlock, innerBlocks } = useSelect(
@@ -46,7 +46,6 @@ const BlockSwitcher = ({ clientId, currentBlockName, attributes = {}, setAttribu
 				});
 
 				// Remove any child blocks inside main parent
-				const pBlock = dispatch('core/block-editor').getBlock ? null : null; // safe check
 				const targetChildren = currentBlock?.name === 'bptmb/b-testimonials'
 					? innerBlocks
 					: (parentBlock?.innerBlocks || []);
@@ -120,7 +119,7 @@ const BlockSwitcher = ({ clientId, currentBlockName, attributes = {}, setAttribu
 			>
 				<div className="btbSidebarSwitcherCard">
 					<div className="btbSidebarIconWrap">
-						{getLayoutSvgIcon('layout', 24)}
+						{getLayoutSvgIcon('layout', 24, BRAND_COLOR)}
 					</div>
 					<div className="btbSidebarTextWrap">
 						<h4 className="btbSidebarTitle">{__('Change Block Layout', 'b-testimonials-block')}</h4>

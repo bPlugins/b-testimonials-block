@@ -1,0 +1,12 @@
+// Breakpoints for the inspector's device toggle.
+//
+// These MUST match bpl-tools' `tabBreakpoint` / `mobileBreakpoint`
+// (bpl-tools/utils/data.js), which is what BDevice and getTypoCSS use. The
+// column rules had drifted to 768px/576px while typography stayed at
+// 1024px/640px, so the same Tablet toggle resized text but not columns.
+//
+// The tablet value also has to clear the editor's own Tablet preview, which
+// WordPress renders at 781px (782 - 1, see getCanvasWidth in block-editor.js).
+// At 768px the tablet rules could never match there at all.
+$tablet-max: 1024px;
+$mobile-max: 640px;

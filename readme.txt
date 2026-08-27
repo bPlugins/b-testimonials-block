@@ -19,7 +19,7 @@ Testimonials is a flexible testimonial plugin for WordPress that helps you showc
 
 Choose from 40+ testimonial and review layouts, customize the design to match your website, and manage your testimonials from one place with the built-in Testimonials Custom Post Type.
 
- [Support](https://bplugins.com/support/) | [Demo](https://bblockswp.com/demo/testimonials-all-demos/)
+[Support](https://bplugins.com/support/) | [Demo](https://bblockswp.com/demo/testimonials-all-demos/)
 
 === Key Features – Free Version ===
 - **40+ Testimonial Layouts**: Create testimonial grids, sliders, carousels, masonry layouts, card stacks, speech bubbles, timelines, marquees, quote boxes, and more.
@@ -82,16 +82,6 @@ You can also manage testimonials centrally with the Testimonials Custom Post Typ
 === Enjoying Testimonials? ===
 
 If the plugin saved you an afternoon, a [review on WordPress.org](https://wordpress.org/support/plugin/b-testimonials-block/reviews/#new-post) helps the next person find it. It takes a minute, and for a small team it makes a real difference.
-
-== External services ==
-
-This plugin's admin screens load two webfonts, Roboto and Lato, from Google Fonts, and the plugin icon shown in its admin header from WordPress.org's own asset host. Both are requested inside wp-admin only, on this plugin's own pages. Neither is used on your public site.
-
-* **Google Fonts** (`fonts.googleapis.com`, `fonts.gstatic.com`) — serves the Roboto and Lato webfonts used by the plugin dashboard, Submissions and Poll screens. The request sends what any web request sends: your IP address, browser and operating system. Nothing about your site, your content or your visitors is sent. [Terms](https://policies.google.com/terms) | [Privacy Policy](https://policies.google.com/privacy)
-* **WordPress.org plugin API** (`api.wordpress.org`) — the **Our Plugins** tab of the plugin dashboard asks WordPress.org for the list of plugins published by bPlugins, so it can show their icons, versions and ratings. The request names bPlugins as the author and sends nothing about your site. [Privacy Policy](https://wordpress.org/about/privacy/)
-* **WordPress.org plugin assets** (`ps.w.org`) — serves this plugin's own icon image, shown beside the plugin name in its admin header. [Privacy Policy](https://wordpress.org/about/privacy/)
-
-On your public site, the **Video Testimonials** block embeds YouTube or Vimeo only if you enter a YouTube or Vimeo URL yourself, and only after a visitor clicks play. A self-hosted MP4 makes no external request at all. [YouTube Privacy Policy](https://policies.google.com/privacy) | [Vimeo Privacy Policy](https://vimeo.com/privacy)
 
 == Installation ==
 
@@ -198,6 +188,48 @@ You can ask questions through the WordPress.org support forum or visit bPlugins 
 50. Capterra Score Badge — official-style Capterra score badge.
 51. Verified Buyer Trust Seal — a verified-purchase trust seal badge.
 52. Popup Modal Review Trigger — a review shown inside a popup modal.
+
+== External services ==
+
+This plugin's admin screens load two webfonts, Roboto and Lato, from Google Fonts, and the plugin icon shown in its admin header from WordPress.org's own asset host. Both are requested inside wp-admin only, on this plugin's own pages. Neither is used on your public site.
+
+* **Google Fonts** (`fonts.googleapis.com`, `fonts.gstatic.com`) — serves the Roboto and Lato webfonts used by the plugin dashboard, Submissions and Poll screens. The request sends what any web request sends: your IP address, browser and operating system. Nothing about your site, your content or your visitors is sent. [Terms](https://policies.google.com/terms) | [Privacy Policy](https://policies.google.com/privacy)
+* **WordPress.org plugin API** (`api.wordpress.org`) — the **Our Plugins** tab of the plugin dashboard asks WordPress.org for the list of plugins published by bPlugins, so it can show their icons, versions and ratings. The request names bPlugins as the author and sends nothing about your site. [Privacy Policy](https://wordpress.org/about/privacy/)
+* **WordPress.org plugin assets** (`ps.w.org`) — serves this plugin's own icon image, shown beside the plugin name in its admin header. [Privacy Policy](https://wordpress.org/about/privacy/)
+* **Live demo previews** (`bblockswp.com`) — the **Demo & Help** page's Live Demo cards load each layout's preview inside an iframe from bPlugins' own demo hosting, only when you open that page and click a demo. No data about your site is sent. [Privacy Policy](https://bplugins.com/privacy-policy/)
+
+On your public site, the **Video Testimonials** block embeds YouTube or Vimeo only if you enter a YouTube or Vimeo URL yourself, and only after a visitor clicks play. A self-hosted MP4 makes no external request at all. [YouTube Privacy Policy](https://policies.google.com/privacy) | [Vimeo Privacy Policy](https://vimeo.com/privacy)
+
+== Source Code ==
+
+The non-minified source code for this plugin is available on our public repository:
+[GitHub Repository](https://github.com/bPlugins/b-testimonials-block)
+
+== Third-Party Libraries ==
+
+This plugin uses the following third-party libraries:
+
+* [Swiper](https://github.com/nolimits4web/Swiper) - MIT License (powers the Testimonials Slider, Coverflow Carousel and 3D Flip Perspective Carousel layouts).
+* [react-responsive-masonry](https://github.com/cedricdelpoux/react-responsive-masonry) - MIT License (powers the Testimonials Masonry layout).
+* [immer](https://github.com/immerjs/immer) - MIT License (used internally by the block editor sidebar and admin dashboard to update settings state).
+* [react-router-dom](https://github.com/remix-run/react-router) - MIT License (routes the plugin's admin dashboard screens: Demo & Help, Submissions, Feedback & NPS Poll).
+
+= bpl-tools =
+* Source / GitHub: https://github.com/bPlugins/bpl-tools
+* License: GPL-2.0-or-later – https://www.gnu.org/licenses/gpl-2.0.html
+* Purpose: Shared utility library providing this plugin's admin dashboard components (Demo & Help, Submissions, Feedback & NPS Poll, Our Plugins) and common Gutenberg editor controls.
+* External Services: see the == External services == section above for exactly which requests this plugin makes through it.
+
+== Build Process ==
+
+This plugin uses a build process to generate the production assets (JS/CSS) located in the `build/` directory. The human-readable source code is available in the `src/` directory.
+
+To build the plugin from source:
+1. Clone the repository: https://github.com/bPlugins/b-testimonials-block
+2. Install dependencies: `npm install`
+3. Run the build command: `npm run build`
+
+Build Tools Used: @wordpress/scripts (Webpack, Babel, PostCSS).
 
 == Changelog ==
 

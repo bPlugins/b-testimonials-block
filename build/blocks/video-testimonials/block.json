@@ -172,6 +172,22 @@
     "cardMargin": {
       "type": "object",
       "default": {}
+    },
+    "showFilter": {
+      "type": "boolean",
+      "default": false
+    },
+    "showSearch": {
+      "type": "boolean",
+      "default": false
+    },
+    "filterAllLabel": {
+      "type": "string",
+      "default": ""
+    },
+    "searchPlaceholder": {
+      "type": "string",
+      "default": ""
     }
   },
   "supports": {
@@ -180,6 +196,16 @@
       "full"
     ],
     "html": false
+  },
+  "example": {
+    "attributes": {
+      "columns": {
+        "desktop": 1,
+        "tablet": 1,
+        "mobile": 1
+      }
+    },
+    "viewportWidth": 640
   },
   "editorStyle": "file:../index.css",
   "style": [

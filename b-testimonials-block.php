@@ -1,8 +1,8 @@
 <?php
 /**
- * Plugin Name: Testimonials
- * Description: Boost your website's credibility with Testimonials, effortlessly showcasing customer ratings and reviews.
- * Version: 1.0.4
+ * Plugin Name: Testimonials Block
+ * Description: Boost your website's credibility with Testimonials Block, effortlessly showcasing customer ratings and reviews.
+ * Version: 1.0.5
  * Author: bPlugins
  * Author URI: http://bplugins.com
  * Requires at least: 6.5
@@ -85,7 +85,7 @@ class BPBTB_Testimonials_Block{
 
         // Constant
         if ( ! defined( 'BPBTB_PLUGIN_VERSION' ) ) {
-            define( 'BPBTB_PLUGIN_VERSION', $is_local ? time() : '1.0.4' );
+            define( 'BPBTB_PLUGIN_VERSION', $is_local ? time() : '1.0.5' );
         }
         if ( ! defined( 'BPBTB_ASSETS_DIR' ) ) {
             define( 'BPBTB_ASSETS_DIR', plugin_dir_url( __FILE__ ) . 'assets/' );
@@ -96,11 +96,24 @@ class BPBTB_Testimonials_Block{
     }
 
     private function load_classes() {
+        require_once __DIR__ . '/includes/samples.php';
         require_once __DIR__ . '/includes/cpt.php';
+        require_once __DIR__ . '/includes/display-cpt.php';
+        require_once __DIR__ . '/includes/schema.php';
+        require_once __DIR__ . '/includes/patterns.php';
+        require_once __DIR__ . '/includes/form-security.php';
         require_once __DIR__ . '/includes/form.php';
         require_once __DIR__ . '/includes/admin-submissions.php';
         require_once __DIR__ . '/includes/admin-nps-poll.php';
         require_once __DIR__ . '/includes/admin-menu.php';
+        require_once __DIR__ . '/includes/admin-review-request.php';
+        require_once __DIR__ . '/includes/import-sources.php';
+        require_once __DIR__ . '/includes/admin-import-export.php';
+        require_once __DIR__ . '/includes/review-sources.php';
+        require_once __DIR__ . '/includes/admin-review-sources.php';
+        require_once __DIR__ . '/includes/admin-source-health.php';
+        require_once __DIR__ . '/includes/admin-facebook-connect.php';
+        require_once __DIR__ . '/includes/review-import.php';
         require_once __DIR__ . '/includes/demo-preview.php';
     }
 

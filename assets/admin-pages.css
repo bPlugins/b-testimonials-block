@@ -144,6 +144,11 @@
 .bpbtb-admin-page-host #wpbody-content > .notice-warning,
 .bpbtb-admin-page-host #wpbody-content > .notice-error,
 .bpbtb-admin-page-host #wpbody-content > .error {
+	/* These sit in #wpbody-content, which is outside the .bpbtb-admin-page
+	   wrapper -- so the `.bpbtb-admin-page *` border-box reset never reached
+	   them and the 32px of side padding fell outside the width, overflowing the
+	   column on any window narrower than 1272px. */
+	box-sizing: border-box;
 	max-width: 1240px;
 	/* 10px at the bottom, not 0: the canvas below pulls itself up by that much
 	   to sit flush under wp-admin's chrome, and would otherwise clip this. */
@@ -377,7 +382,9 @@
 .bpbtb-admin-page select,
 .bpbtb-admin-page input[type="text"],
 .bpbtb-admin-page input[type="number"],
-.bpbtb-admin-page input[type="search"] {
+.bpbtb-admin-page input[type="search"],
+.bpbtb-admin-page input[type="password"],
+.bpbtb-admin-page input[type="url"] {
 	min-height: 36px;
 	padding: 7px 12px;
 	font-size: 14px;
@@ -393,7 +400,9 @@
 .bpbtb-admin-page select:focus,
 .bpbtb-admin-page input[type="text"]:focus,
 .bpbtb-admin-page input[type="number"]:focus,
-.bpbtb-admin-page input[type="search"]:focus {
+.bpbtb-admin-page input[type="search"]:focus,
+.bpbtb-admin-page input[type="password"]:focus,
+.bpbtb-admin-page input[type="url"]:focus {
 	outline: none;
 	background: var(--bpbtb-surface);
 	border-color: rgba(var(--bpbtb-primary-rgb), 0.45);
@@ -1107,4 +1116,359 @@
  */
 .bpbtb-admin-page-host .bPlDashboardHeader .bPlButton {
 	border-radius: 0;
+}
+
+/* -------------------------------------------------------------------------
+ * Review Sources
+ *
+ * One card per platform. The card carries its own connected state rather than
+ * collecting them into a status table at the top: the thing a reader wants next
+ * to "Connected" is the fields that made it so, and next to a failure is the
+ * field to correct.
+ * ---------------------------------------------------------------------- */
+
+.bpbtb-source-card {
+	border-left: 3px solid var(--bpbtb-line);
+}
+
+.bpbtb-source-card.is-connected {
+	border-left-color: var(--bpbtb-ok);
+}
+
+.bpbtb-source-pill {
+	display: inline-block;
+	margin-left: 10px;
+	padding: 3px 9px;
+	font-size: 11px;
+	font-weight: 700;
+	text-transform: uppercase;
+	letter-spacing: 0.6px;
+	vertical-align: middle;
+	color: var(--bpbtb-muted);
+	background: rgba(var(--bpbtb-content-rgb), 0.06);
+}
+
+.bpbtb-source-pill.is-on {
+	color: #ffffff;
+	background: var(--bpbtb-ok);
+}
+
+/* Two credential fields side by side on a desktop, stacked below. The 260px
+   floor is what a pasted Place ID or a G2 URL needs before it starts scrolling
+   inside its own box. */
+.bpbtb-source-fields {
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+	gap: 18px;
+	margin-top: 4px;
+}
+
+.bpbtb-source-field {
+	display: flex;
+	flex-direction: column;
+	gap: 5px;
+}
+
+.bpbtb-source-field-narrow {
+	max-width: 220px;
+}
+
+.bpbtb-source-label {
+	font-size: 11px;
+	font-weight: 700;
+	text-transform: uppercase;
+	letter-spacing: 0.8px;
+	color: var(--bpbtb-muted);
+}
+
+.bpbtb-source-clear {
+	display: flex;
+	align-items: center;
+	gap: 6px;
+	font-size: 12px;
+	color: var(--bpbtb-muted);
+}
+
+.bpbtb-source-state {
+	margin-top: 16px;
+	padding: 14px 16px;
+	background: rgba(var(--bpbtb-content-rgb), 0.02);
+	border: 1px solid var(--bpbtb-line);
+}
+
+.bpbtb-source-state:empty {
+	display: none;
+}
+
+.bpbtb-source-figures {
+	display: flex;
+	align-items: baseline;
+	flex-wrap: wrap;
+	gap: 10px;
+	margin-bottom: 6px;
+	font-size: 14px;
+	color: var(--bpbtb-content);
+}
+
+.bpbtb-source-figures strong {
+	font-size: 26px;
+	font-weight: 800;
+	line-height: 1;
+	color: var(--bpbtb-title);
+}
+
+.bpbtb-source-stars {
+	font-size: 16px;
+	letter-spacing: 2px;
+	color: #f59e0b;
+}
+
+.bpbtb-source-error,
+.bpbtb-source-ok {
+	margin: 8px 0 0;
+	font-size: 13px;
+	line-height: 1.5;
+}
+
+.bpbtb-source-error {
+	color: var(--bpbtb-danger);
+}
+
+.bpbtb-source-ok {
+	color: var(--bpbtb-ok);
+}
+
+.bpbtb-sources-form .bpbtb-card + .bpbtb-card {
+	margin-top: 20px;
+}
+
+/* A platform whose API is set up but could not be read. Amber, not green and
+   not red: the badge has a figure and nothing on the page is broken, but
+   nothing was fetched either, so neither of the other two colours is honest. */
+.bpbtb-source-card.is-fallback {
+	border-left-color: var(--bpbtb-warn);
+}
+
+.bpbtb-source-pill.is-warn {
+	color: #ffffff;
+	background: var(--bpbtb-warn);
+}
+
+/* The full reason behind a fallback. Deliberately only here and not in the
+   block inspector, which is a 280px column. */
+.bpbtb-source-detail {
+	margin: 6px 0 0;
+	padding-left: 10px;
+	font-size: 12px;
+	line-height: 1.55;
+	color: var(--bpbtb-muted);
+	border-left: 2px solid var(--bpbtb-line);
+}
+
+/* -------------------------------------------------------------------------
+ * Categories
+ *
+ * The only screen under Testimonials that this plugin does not render: it is
+ * core's edit-tags.php, so there is no .bpbtb-admin-page wrapper to hang the
+ * canvas on and no chance to move core's markup inside one. The header is
+ * printed into `in_admin_header` (see BPBTB_Admin_Menu::render_taxonomy_header)
+ * and everything below is core's term form and list table.
+ *
+ * So the canvas is painted on #wpbody-content instead, and core's two columns
+ * are given the card treatment rather than replaced. Every rule here is behind
+ * .bpbtb-taxonomy-page: the four own pages must not pick any of it up, and
+ * neither must any other taxonomy's Categories screen.
+ * ---------------------------------------------------------------------- */
+
+/* The custom properties live on .bpbtb-admin-page, which this screen has no
+   wrapper for -- so they are restated on the body instead. Same values; a
+   screen without the wrapper still needs them for the rules below. */
+.bpbtb-taxonomy-page {
+	--bpbtb-primary: #0b81ee;
+	--bpbtb-primary-rgb: 11, 129, 238;
+	--bpbtb-title: #001737;
+	--bpbtb-content: #1b2e4b;
+	--bpbtb-content-rgb: 27, 46, 75;
+	--bpbtb-canvas: #f6f8fa;
+	--bpbtb-surface: #ffffff;
+	--bpbtb-line: rgba(27, 46, 75, 0.1);
+	--bpbtb-line-soft: rgba(27, 46, 75, 0.06);
+	--bpbtb-muted: rgba(27, 46, 75, 0.65);
+	--bpbtb-shadow: 0 1px 3px rgba(9, 30, 66, 0.04);
+	--bpbtb-shadow-lift: 0 10px 24px rgba(9, 30, 66, 0.08);
+}
+
+/*
+ * The canvas, on #wpbody-content rather than a wrapper of this plugin's.
+ *
+ * The bleed is left only. `margin: 0 -20px` -- what .bpbtb-admin-page uses --
+ * cannot be reused here: that rule pairs the negative margins with an explicit
+ * `width: calc(100% + 20px)`, and on a width:auto block like #wpbody-content
+ * the two negative margins instead widen the box by 40px past its container,
+ * which put a horizontal scrollbar across the whole screen.
+ *
+ * With `width: auto`, margin-left + width + margin-right fills the containing
+ * block, so a negative left margin alone grows the box leftward and leaves the
+ * right edge where it was -- no overflow. It reaches into #wpcontent's 20px
+ * gutter, which is empty, and padding-left puts that 20px back so the content
+ * area ends up exactly where it started: .wrap still centres as it did.
+ *
+ * Painting #wpcontent instead would also have avoided the scrollbar, but that
+ * element holds #wpfooter too, so the canvas colour would run behind the footer
+ * -- which it does on none of the other four pages.
+ */
+.bpbtb-taxonomy-page #wpbody-content {
+	min-height: 100vh;
+	/* Core floats this element at `width: 100%`, so a bare `margin-left: -20px`
+	   moves the right edge in by 20px too and leaves a strip of admin grey down
+	   that side. The extra 20px of width puts the right edge back on the
+	   column's own right edge -- left edge in the gutter, right edge where core
+	   had it, which is the span `.bpbtb-admin-page` covers on the other pages. */
+	width: calc(100% + 20px);
+	max-width: calc(100% + 20px);
+	margin-left: -20px;
+	padding-left: 20px;
+	background: var(--bpbtb-canvas);
+	font-family: "Roboto", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+	color: var(--bpbtb-content);
+	box-sizing: border-box;
+}
+
+/*
+ * The header sits in #wpcontent, above #wpbody, so it is outside the canvas
+ * painted above -- it brings its own background from bpl-tools' stylesheet.
+ *
+ * It also arrives with no box-sizing, and that is what put the horizontal
+ * scrollbar on this screen. `.bPlDashboardHeader` is `width: 100%` with
+ * `padding: 0 33px`, and it is only ever border-box by inheritance from a
+ * wrapper: `.bPlDashboard *` on the React dashboard, `.bpbtb-admin-page *` on
+ * the four own pages. This screen has neither, so as content-box the header
+ * measured 100% + 66px and pushed the document 66px wider than the window.
+ *
+ * Scoped to the header's own subtree rather than the whole screen: everything
+ * below it is core's markup, sized by core's stylesheets against the box model
+ * core expects.
+ */
+.bpbtb-taxonomy-page .bPlDashboardHeader,
+.bpbtb-taxonomy-page .bPlDashboardHeader * {
+	box-sizing: border-box;
+	line-height: 1.5;
+}
+
+/* The h1 margin the wrapper would have given it -- see the note on
+   `.bpbtb-admin-page .bPlDashboardHeader h1` for why it is restated. */
+.bpbtb-taxonomy-page .bPlDashboardHeader h1 {
+	margin: 0 8px 0 0;
+}
+
+/* Core's .wrap carries wp-admin's own 10px/2px offsets, which read as the page
+   hanging off-centre once it is on a canvas the full width of the column. */
+.bpbtb-taxonomy-page .wrap {
+	max-width: 1240px;
+	margin: 0 auto;
+	padding: 40px 0 48px;
+}
+
+.bpbtb-taxonomy-page .wrap > h1 {
+	margin: 0 0 4px;
+	padding: 0;
+	font-size: 24px;
+	font-weight: 600;
+	color: var(--bpbtb-title);
+}
+
+/*
+ * Core's term messages must survive.
+ *
+ * .bpbtb-admin-page-host hides the success and info banners core and other
+ * plugins print above the canvas -- on the four own pages that is right,
+ * because each of those prints its own confirmations inside its wrapper. This
+ * screen has no wrapper of its own and no confirmations of its own: "Category
+ * added", "Category deleted" and the rest are exactly these banners, and
+ * hiding them would leave every term action with no feedback at all. So they
+ * come back here, styled to sit on the canvas like the warnings already do.
+ */
+.bpbtb-taxonomy-page #wpbody-content > .notice-success,
+.bpbtb-taxonomy-page #wpbody-content > .notice-info,
+.bpbtb-taxonomy-page #wpbody-content > .updated {
+	display: block;
+	/* Explicit, because there is no box-sizing reset on this screen: the four
+	   own pages get one from `.bpbtb-admin-page *`, and this one has no such
+	   wrapper. Left as content-box, the 32px of side padding would sit outside
+	   the width and overflow the column on any window narrower than 1272px --
+	   the scrollbar back again, just at a different width. */
+	box-sizing: border-box;
+	max-width: 1240px;
+	margin: 24px auto 0;
+	padding: 12px 16px;
+	font-family: "Roboto", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+	background: var(--bpbtb-surface);
+	border-radius: 0;
+	box-shadow: var(--bpbtb-shadow);
+}
+
+/* A notice above the page means the padding below it is doing the separating,
+   so the page's own top padding would double it. */
+.bpbtb-taxonomy-page #wpbody-content > .notice + .wrap,
+.bpbtb-taxonomy-page #wpbody-content > .updated + .wrap {
+	padding-top: 24px;
+}
+
+/* The add-term form and the list table, as the cards the other pages use. */
+.bpbtb-taxonomy-page .form-wrap,
+.bpbtb-taxonomy-page #col-right .col-wrap {
+	padding: 24px;
+	background: var(--bpbtb-surface);
+	border: 1px solid var(--bpbtb-line-soft);
+	box-shadow: var(--bpbtb-shadow);
+}
+
+.bpbtb-taxonomy-page .form-wrap > h2 {
+	margin: 0 0 16px;
+	font-size: 16px;
+	font-weight: 600;
+	color: var(--bpbtb-title);
+}
+
+/* The list table paints its own rows; inside a card its border would double
+   the card's. */
+.bpbtb-taxonomy-page #col-right .wp-list-table {
+	border: 0;
+	box-shadow: none;
+}
+
+/* Core lays the two columns out at 50/50 below 1200px and 45/55 above. The
+   form has one field per row and the table has five columns, so the table is
+   given the room instead. */
+@media screen and (min-width: 981px) {
+	.bpbtb-taxonomy-page #col-left {
+		width: 36%;
+	}
+
+	.bpbtb-taxonomy-page #col-right {
+		width: 64%;
+	}
+}
+
+@media screen and (max-width: 782px) {
+	/* wp-admin narrows its gutter to 10px below this width, so a -20px bleed
+	   would overshoot it and put the scrollbar back. The other pages drop the
+	   bleed entirely here rather than matching the smaller number; same thing
+	   is done for the same reason. */
+	.bpbtb-taxonomy-page #wpbody-content {
+		width: 100%;
+		max-width: 100%;
+		margin-left: 0;
+		padding-left: 0;
+	}
+
+	.bpbtb-taxonomy-page .wrap {
+		padding: 16px 12px 32px;
+	}
+
+	.bpbtb-taxonomy-page #wpbody-content > .notice-success,
+	.bpbtb-taxonomy-page #wpbody-content > .notice-info,
+	.bpbtb-taxonomy-page #wpbody-content > .updated {
+		margin: 12px;
+	}
 }

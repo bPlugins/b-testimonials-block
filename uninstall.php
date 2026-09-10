@@ -17,9 +17,6 @@ if ( ! defined( 'WP_UNINSTALL_PLUGIN' ) ) {
  * Remove every trace of the plugin from one site.
  */
 function bpbtb_uninstall_site_data() {
-	// The testimonials themselves, whatever state they are in -- pending
-	// submissions and trashed ones included, which a default WP_Query would
-	// skip.
 	$testimonials = get_posts(
 		[
 			'post_type'        => 'testimonial',
@@ -30,8 +27,6 @@ function bpbtb_uninstall_site_data() {
 		]
 	);
 
-	// 'any' excludes trashed posts, so those are collected separately rather
-	// than left behind as orphans.
 	$trashed = get_posts(
 		[
 			'post_type'        => 'testimonial',
@@ -43,8 +38,6 @@ function bpbtb_uninstall_site_data() {
 	);
 
 	foreach ( array_unique( array_merge( $testimonials, $trashed ) ) as $post_id ) {
-		// Photos submitted through the frontend form are attachments parented
-		// to the testimonial; deleting the post alone would orphan the files.
 		$attachments = get_posts(
 			[
 				'post_type'   => 'attachment',
@@ -62,16 +55,56 @@ function bpbtb_uninstall_site_data() {
 		wp_delete_post( $post_id, true );
 	}
 
+	$displays = get_posts(
+		[
+			'post_type'        => 'testimonials-block',
+			'post_status'      => 'any',
+			'numberposts'      => -1,
+			'fields'           => 'ids',
+			'suppress_filters' => false,
+		]
+	);
+	$displays_trashed = get_posts(
+		[
+			'post_type'        => 'testimonials-block',
+			'post_status'      => 'trash',
+			'numberposts'      => -1,
+			'fields'           => 'ids',
+			'suppress_filters' => false,
+		]
+	);
+
+	foreach ( array_unique( array_merge( $displays, $displays_trashed ) ) as $post_id ) {
+		wp_delete_post( $post_id, true );
+	}
+
 	delete_option( 'bpbtb_nps_poll_votes' );
 	delete_option( 'bpbtb_nps_categories' );
-
-	// The All Blocks screen's on/off list. Left behind until now, so deleting
-	// the plugin with this toggle on still brought the same blocks back
-	// switched off on the next install.
 	delete_option( 'bpbtb_disabled_blocks' );
-
-	// Last, because it is the toggle that authorised everything above.
+	delete_option( 'bpbtb_first_seen' );
+	delete_option( 'bpbtb_review_state' );
+	delete_transient( 'bpbtb_usage_signal' );
+	delete_metadata( 'user', 0, 'bpbtb_dismissed_source_errors', '', true );
 	delete_option( 'bpbtb_delete_data_on_uninstall' );
+}
+
+
+function bpbtb_uninstall_credentials() {
+	delete_option( 'bpbtb_review_sources' );
+	delete_option( 'bpbtb_review_sources_cache' );
+	wp_clear_scheduled_hook( 'bpbtb_refresh_review_sources' );
+
+	foreach ( [ 'google', 'facebook', 'trustpilot', 'g2', 'capterra' ] as $bpbtb_platform ) {
+		delete_transient( 'bpbtb_review_lock_' . $bpbtb_platform );
+	}
+
+	delete_option( 'bpbtb_review_import_errors' );
+	delete_option( 'bpbtb_google_endpoint' );
+	delete_option( 'bpbtb_google_endpoint_state' );
+
+	foreach ( [ 'google', 'facebook' ] as $bpbtb_platform ) {
+		delete_transient( 'bpbtb_imported_reviews_' . $bpbtb_platform );
+	}
 }
 
 if ( is_multisite() ) {
@@ -80,14 +113,17 @@ if ( is_multisite() ) {
 	foreach ( $bpbtb_sites as $bpbtb_site_id ) {
 		switch_to_blog( $bpbtb_site_id );
 
-		// Checked per site: the toggle is a per-site option, so one site opting
-		// in must not wipe another that did not.
 		if ( get_option( 'bpbtb_delete_data_on_uninstall', false ) ) {
 			bpbtb_uninstall_site_data();
 		}
 
+		bpbtb_uninstall_credentials();
 		restore_current_blog();
 	}
-} elseif ( get_option( 'bpbtb_delete_data_on_uninstall', false ) ) {
-	bpbtb_uninstall_site_data();
+} else {
+	if ( get_option( 'bpbtb_delete_data_on_uninstall', false ) ) {
+		bpbtb_uninstall_site_data();
+	}
+
+	bpbtb_uninstall_credentials();
 }

@@ -1,5 +1,4 @@
 import { useState } from "react";
-
 import BlockIcon from "./BlockIcon";
 import { getVideoEmbed } from "../../utils/functions";
 
@@ -29,6 +28,7 @@ import { getVideoEmbed } from "../../utils/functions";
  *                                     is injected the way Layout.js already takes
  *                                     RichText and MediaUpload.
  */
+
 const VideoCard = ({
   item,
   accentColor,

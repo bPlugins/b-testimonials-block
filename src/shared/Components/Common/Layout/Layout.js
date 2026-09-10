@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import Masonry, { ResponsiveMasonry } from "react-responsive-masonry";
 
 import Default from "../Themes/Default";
@@ -13,6 +13,8 @@ import Marquee from "./Marquee";
 import BeforeAfterSlider from "../BeforeAfterSlider";
 import TestimonialForm from "../TestimonialForm";
 
+import { __, sprintf } from "@wordpress/i18n";
+
 import { clickable, editorClickable } from "../../../utils/a11y";
 import BlockIcon from "../BlockIcon";
 import VideoCard from "../VideoCard";
@@ -20,6 +22,7 @@ import AudioPlayer from "../AudioPlayer";
 import { getIcon } from "../../../utils/blockIcons";
 import { TRUST_BADGE_ART, getTrustBadgeArt } from "../../../utils/trustBadgeArt";
 import { ARRANGEMENTS, resolveArrangement } from "../../../utils/layoutFeatures";
+import { isReviewBadge, resolveBadge } from "../../../utils/reviewSources";
 
 /**
  * The Feedback & NPS Poll scale, shared by the editor and the front end.
@@ -71,7 +74,13 @@ const FeedbackPoll = ({ attributes = {}, isBackend, bt, bd }) => {
       <p className="btb-poll-desc">{bd || "Net Promoter Score Survey"}</p>
       <div className="btb-poll-scale">
         {lowLbl && <span className="btb-poll-label-low">{lowLbl}</span>}
-        <div className="btb-poll-buttons">
+        {/* A bare "7" tells a screen reader nothing about what it is out of,
+            and the selected button was distinguished only by colour. The row is
+            grouped so the question is read before the options. */}
+        <div
+          className="btb-poll-buttons"
+          role="group"
+          aria-label={bt || __("How likely are you to recommend us?", "b-testimonials-block")}>
           {pollNumbers.map((n) => (
             <button
               key={n}
@@ -82,6 +91,13 @@ const FeedbackPoll = ({ attributes = {}, isBackend, bt, bd }) => {
                   : "btb-poll-num-btn"
               }
               data-mark={n}
+              aria-pressed={previewing && picked === n ? "true" : "false"}
+              aria-label={sprintf(
+                /* translators: 1: chosen score, 2: highest score on the scale */
+                __("Score %1$s of %2$s", "b-testimonials-block"),
+                String(n),
+                String(pollNumbers[pollNumbers.length - 1])
+              )}
               onClick={isBackend ? () => setPicked(n) : undefined}>
               {n}
             </button>
@@ -169,8 +185,15 @@ const SocialProofToast = ({
   const currentItem = items[activeItemIndex] || {};
 
   return (
+    /* The card swaps itself out on a timer. Without a live region a screen
+       reader never learns that anything arrived; with "polite" it is read out
+       between sentences instead of interrupting, and aria-atomic makes it read
+       the whole card rather than the one word that changed. */
     <div
       className="btb-toast-wrapper"
+      role="status"
+      aria-live="polite"
+      aria-atomic="true"
       {...(pauseOnHover
         ? {
             onMouseEnter: () => setIsHovered(true),
@@ -257,6 +280,81 @@ const Layout = ({
   const [cardStackIdx, setCardStackIdx] = useState(0);
   const [activeModalItem, setActiveModalItem] = useState(null);
   const [stackHovered, setStackHovered] = useState(false);
+
+  // Keyboard handling for the Popup Modal layout.
+  //
+  // Opening the modal used to leave the keyboard behind it: focus stayed on the
+  // page underneath, Escape did nothing, and Tab walked through the article
+  // rather than the dialog -- so a reader who opened one had no way out short of
+  // reloading. Three things fix that, and all three are required: move focus in,
+  // keep it in, put it back.
+  //
+  // Declared at the top level, like the deck autoplay above, because the popup
+  // branch is behind an early return and a hook cannot be.
+  const modalRef = useRef(null);
+  const modalOpenerRef = useRef(null);
+
+  useEffect(() => {
+    if (!activeModalItem) {
+      return undefined;
+    }
+
+    // Whatever had focus when the modal opened, so it can be given back.
+    modalOpenerRef.current =
+      typeof document !== "undefined" ? document.activeElement : null;
+
+    const dialog = modalRef.current;
+
+    if (dialog) {
+      dialog.focus();
+    }
+
+    const onKeyDown = (e) => {
+      if ("Escape" === e.key) {
+        e.stopPropagation();
+        setActiveModalItem(null);
+        return;
+      }
+
+      if ("Tab" !== e.key || !dialog) {
+        return;
+      }
+
+      const focusable = dialog.querySelectorAll(
+        'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'
+      );
+
+      if (!focusable.length) {
+        // Nothing to move between; keep focus on the dialog itself rather
+        // than letting Tab escape to the page behind.
+        e.preventDefault();
+        return;
+      }
+
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+
+      if (e.shiftKey && document.activeElement === first) {
+        e.preventDefault();
+        last.focus();
+      } else if (!e.shiftKey && document.activeElement === last) {
+        e.preventDefault();
+        first.focus();
+      }
+    };
+
+    document.addEventListener("keydown", onKeyDown);
+
+    return () => {
+      document.removeEventListener("keydown", onKeyDown);
+
+      // Back where they came from, so the page does not silently jump to the
+      // top when the dialog goes away.
+      if (modalOpenerRef.current && modalOpenerRef.current.focus) {
+        modalOpenerRef.current.focus();
+      }
+    };
+  }, [activeModalItem]);
 
   // The Stacked Review Cards deck advancing on its own.
   //
@@ -375,13 +473,48 @@ const Layout = ({
     };
   })();
 
+  /*
+   * The six badges' title, score and count, resolved once.
+   *
+   * Each branch below used to work these out for itself, and all six did it the
+   * same way with different literals -- so the rule "prefer what the platform
+   * publishes over what somebody typed over the local average" had to be written
+   * six times to hold. It is written once, in resolveBadge(); see
+   * src/shared/utils/reviewSources.js for the precedence and why the live values
+   * arrive as unregistered attributes.
+   */
+  const badge = isReviewBadge(layout)
+    ? resolveBadge(layout, attributes, computedStats)
+    : null;
+
+  /**
+   * The badge heading, linked to the platform profile when there is one.
+   *
+   * Only on a published page and only for a live score: the URL is the
+   * platform's own profile, so the link is what turns "4.9 on Google" into
+   * something a visitor can go and check. In the editor it stays a plain
+   * heading -- a target="_blank" inside the canvas is a trap for someone trying
+   * to select the block.
+   */
+  const badgeTitleEl = () => {
+    const heading = <h4 className="btb-badge-title">{badge.title}</h4>;
+
+    if (isBackend || !badge.url || attributes.showLiveLink === false) {
+      return heading;
+    }
+
+    return (
+      <a
+        className="btb-badge-title-link"
+        href={badge.url}
+        target="_blank"
+        rel="noopener noreferrer">
+        {heading}
+      </a>
+    );
+  };
+
   if (layout === "google-review-badge") {
-    const score = bs || (computedStats.total > 0 ? computedStats.avg : "4.9");
-    const count =
-      bc ||
-      (computedStats.total > 0
-        ? `(${computedStats.total}+ Reviews)`
-        : "(128+ Reviews)");
     return (
       <div className="btb-badge-card btb-google-badge">
         <div className="btb-badge-header">
@@ -408,11 +541,11 @@ const Layout = ({
             />
           </svg>
           <div className="btb-badge-info">
-            <h4 className="btb-badge-title">{bt || "Google Reviews"}</h4>
+            {badgeTitleEl()}
             <div className="btb-badge-rating">
-              <span className="score">{score}</span>
+              <span className="score">{badge.score}</span>
               <span className="stars">★★★★★</span>
-              <span className="count">{count}</span>
+              {!!badge.count && <span className="count">{badge.count}</span>}
             </div>
           </div>
         </div>
@@ -421,12 +554,6 @@ const Layout = ({
   }
 
   if (layout === "capterra-review-badge") {
-    const score = bs || (computedStats.total > 0 ? computedStats.avg : "4.8");
-    const count =
-      bc ||
-      (computedStats.total > 0
-        ? `(${computedStats.total} Reviews)`
-        : "Verified Software Reviews");
     return (
       <div className="btb-badge-card btb-capterra-badge">
         <div className="btb-badge-header">
@@ -441,11 +568,11 @@ const Layout = ({
             <path fill="#E54747" d="M13 13h9v9h-9z" />
           </svg>
           <div className="btb-badge-info">
-            <h4 className="btb-badge-title">{bt || "Capterra Rating"}</h4>
+            {badgeTitleEl()}
             <div className="btb-badge-rating">
-              <span className="score">{score}</span>
+              <span className="score">{badge.score}</span>
               <span className="stars">★★★★★</span>
-              <span className="count">{count}</span>
+              {!!badge.count && <span className="count">{badge.count}</span>}
             </div>
           </div>
         </div>
@@ -454,12 +581,6 @@ const Layout = ({
   }
 
   if (layout === "facebook-review-badge") {
-    const score = bs || (computedStats.total > 0 ? computedStats.avg : "5.0");
-    const count =
-      bc ||
-      (computedStats.total > 0
-        ? `Recommended by ${computedStats.total} Customers`
-        : "Recommended by 250+ Customers");
     return (
       <div className="btb-badge-card btb-facebook-badge">
         <div className="btb-badge-header">
@@ -474,11 +595,11 @@ const Layout = ({
             />
           </svg>
           <div className="btb-badge-info">
-            <h4 className="btb-badge-title">{bt || "Facebook Reviews"}</h4>
+            {badgeTitleEl()}
             <div className="btb-badge-rating">
-              <span className="score">{score}</span>
+              <span className="score">{badge.score}</span>
               <span className="stars">★★★★★</span>
-              <span className="count">{count}</span>
+              {!!badge.count && <span className="count">{badge.count}</span>}
             </div>
           </div>
         </div>
@@ -487,13 +608,6 @@ const Layout = ({
   }
 
   if (layout === "trustpilot-review-badge") {
-    const score =
-      bs || (computedStats.total > 0 ? `${computedStats.avg} / 5` : "4.9 / 5");
-    const count =
-      bc ||
-      (computedStats.total > 0
-        ? `TrustScore | ${computedStats.total} Reviews`
-        : "TrustScore | 500+ Reviews");
     return (
       <div className="btb-badge-card btb-trustpilot-badge">
         <div className="btb-badge-header">
@@ -508,11 +622,11 @@ const Layout = ({
             />
           </svg>
           <div className="btb-badge-info">
-            <h4 className="btb-badge-title">{bt || "Trustpilot Score"}</h4>
+            {badgeTitleEl()}
             <div className="btb-badge-rating">
-              <span className="score">{score}</span>
+              <span className="score">{badge.score}</span>
               <span className="stars">★★★★★</span>
-              <span className="count">{count}</span>
+              {!!badge.count && <span className="count">{badge.count}</span>}
             </div>
           </div>
         </div>
@@ -521,9 +635,6 @@ const Layout = ({
   }
 
   if (layout === "g2-review-badge") {
-    const score =
-      bs || (computedStats.total > 0 ? `${computedStats.avg} / 5` : "4.8 / 5");
-    const count = bc || "Leader Category 2026";
     return (
       <div className="btb-badge-card btb-g2-badge">
         <div className="btb-badge-header">
@@ -544,11 +655,11 @@ const Layout = ({
             </text>
           </svg>
           <div className="btb-badge-info">
-            <h4 className="btb-badge-title">{bt || "G2 High Performer"}</h4>
+            {badgeTitleEl()}
             <div className="btb-badge-rating">
-              <span className="score">{score}</span>
+              <span className="score">{badge.score}</span>
               <span className="stars">★★★★★</span>
-              <span className="count">{count}</span>
+              {!!badge.count && <span className="count">{badge.count}</span>}
             </div>
           </div>
         </div>
@@ -589,12 +700,6 @@ const Layout = ({
   }
 
   if (layout === "review-badge-widget") {
-    const score = bs || (computedStats.total > 0 ? computedStats.avg : "4.9");
-    const count =
-      bc ||
-      (computedStats.total > 0
-        ? `Based on ${computedStats.total} reviews`
-        : "Based on 320+ reviews");
     return (
       <div className="btb-badge-card btb-review-widget">
         <div className="btb-badge-header">
@@ -616,11 +721,11 @@ const Layout = ({
             )}
           />
           <div className="btb-badge-info">
-            <h4 className="btb-badge-title">{bt || "Customer Reviews"}</h4>
+            {badgeTitleEl()}
             <div className="btb-badge-rating">
-              <span className="score">{score}</span>
+              <span className="score">{badge.score}</span>
               <span className="stars">★★★★★</span>
-              <span className="count">{count}</span>
+              {!!badge.count && <span className="count">{badge.count}</span>}
             </div>
           </div>
         </div>
@@ -897,7 +1002,9 @@ const Layout = ({
             <span className="btb-srb-label">
               {r.star} {r.star === 1 ? "Star" : "Stars"}
             </span>
-            <div className="btb-srb-track">
+            {/* Decoration: the count and percentage sit next to it in text,
+                so announcing the bar as well would say everything twice. */}
+            <div className="btb-srb-track" aria-hidden="true">
               <div
                 className="btb-srb-fill"
                 style={{ width: `${r.pct}%` }}></div>
@@ -1124,6 +1231,7 @@ const Layout = ({
             <div
               key={idx}
               {...clickable(() => handleAvatarClick(idx), it.name || "")}
+              aria-pressed={currentActiveIdx === idx ? "true" : "false"}
               className={`btb-avatar-thumb ${
                 currentActiveIdx === idx ? "active" : ""
               }`}>
@@ -1485,14 +1593,21 @@ const Layout = ({
             }>
             <div
               className="btb-modal-content-box"
+              ref={modalRef}
+              // -1 so it can be focused programmatically on open without
+              // joining the page's tab order.
+              tabIndex={-1}
               role="dialog"
               aria-modal="true"
-              aria-label={activeModalItem?.name || "Testimonial"}>
+              aria-label={activeModalItem?.name || __("Testimonial", "b-testimonials-block")}>
               <button
                 type="button"
                 className="btb-modal-close"
+                aria-label={__("Close", "b-testimonials-block")}
                 onClick={() => setActiveModalItem(null)}>
-                ×
+                {/* The glyph is the icon; the name comes from aria-label,
+                    because "×" is read as "times" or skipped entirely. */}
+                <span aria-hidden="true">×</span>
               </button>
               <div className="btb-modal-head">
                 <img
@@ -1510,8 +1625,19 @@ const Layout = ({
                   <span className="btb-modal-deg">
                     {activeModalItem.deg || ""}
                   </span>
-                  <div className="btb-modal-rating">
-                    {"★".repeat(activeModalItem.rating || 5)}
+                  {/* A run of star glyphs is read one "black star" at a time.
+                      One label, and the glyphs themselves are decoration. */}
+                  <div
+                    className="btb-modal-rating"
+                    role="img"
+                    aria-label={sprintf(
+                      /* translators: %s: rating out of five */
+                      __("Rated %s out of 5", "b-testimonials-block"),
+                      String(activeModalItem.rating || 5)
+                    )}>
+                    <span aria-hidden="true">
+                      {"★".repeat(activeModalItem.rating || 5)}
+                    </span>
                   </div>
                 </div>
               </div>
@@ -1639,7 +1765,7 @@ const Layout = ({
               type="button"
               className="btb-stack-btn btb-stack-prev"
               onClick={prevCard}
-              aria-label="Previous card">
+              aria-label={__("Previous card", "b-testimonials-block")}>
               ‹
             </button>
             <div className="btb-stack-dots">
@@ -1654,7 +1780,13 @@ const Layout = ({
                     e.preventDefault();
                     updateStackActive(idx);
                   }}
-                  aria-label={`Go to card ${idx + 1}`}
+                  aria-current={idx === activeIdx ? "true" : undefined}
+                  aria-label={sprintf(
+                    /* translators: 1: card number, 2: total cards */
+                    __("Go to card %1$s of %2$s", "b-testimonials-block"),
+                    String(idx + 1),
+                    String(items.length)
+                  )}
                 />
               ))}
             </div>
@@ -1662,7 +1794,7 @@ const Layout = ({
               type="button"
               className="btb-stack-btn btb-stack-next"
               onClick={nextCard}
-              aria-label="Next card">
+              aria-label={__("Next card", "b-testimonials-block")}>
               ›
             </button>
           </div>

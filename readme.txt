@@ -1,25 +1,25 @@
-=== Testimonials – Customer Reviews, Ratings, Badges & Video Testimonials ===
-Contributors: bplugins, abuhayat, btechnologies, himur98
+=== Testimonials Block – Customer Reviews, Ratings, Badges & Video Testimonials ===
+Contributors: bplugins, abuhayat, himur98
 Donate link: https://www.buymeacoffee.com/abuhayat
 Tags: testimonials, reviews, rating, social proof, video testimonials
 Requires at least: 6.5
 Tested up to: 7.1
-Stable tag: 1.0.4
+Stable tag: 1.0.5
 Requires PHP: 7.4
 License: GPLv3 or later
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
-Testimonials makes it easy to display customer testimonials and reviews in a professional, responsive layout using the WordPress block editor.
+Testimonials Block makes it easy to display customer testimonials and reviews in a professional, responsive layout using the WordPress block editor.
 
 == Description ==
 
 Build beautiful customer testimonials, reviews, ratings, and social proof sections with 40+ modern layouts directly in the WordPress Gutenberg block editor. No coding required.
 
-Testimonials is a flexible testimonial plugin for WordPress that helps you showcase customer reviews and build trust with your visitors. Create testimonial grids, sliders, carousels, masonry layouts, review cards, video testimonials, audio testimonials, rating summaries, social proof badges, and more.
+Testimonials Block is a flexible testimonial plugin for WordPress that helps you showcase customer reviews and build trust with your visitors. Create testimonial grids, sliders, carousels, masonry layouts, review cards, video testimonials, audio testimonials, rating summaries, social proof badges, and more.
 
 Choose from 40+ testimonial and review layouts, customize the design to match your website, and manage your testimonials from one place with the built-in Testimonials Custom Post Type.
 
-[Support](https://bplugins.com/support/) | [Demo](https://bblockswp.com/demo/testimonials-all-demos/)
+[Testimonials](https://bplugins.com/products/b-testimonials-block/) | [Support](https://bplugins.com/support/) | [Demo](https://bblockswp.com/demo/testimonials-all-demos/)
 
 === Key Features – Free Version ===
 - **40+ Testimonial Layouts**: Create testimonial grids, sliders, carousels, masonry layouts, card stacks, speech bubbles, timelines, marquees, quote boxes, and more.
@@ -41,6 +41,20 @@ Choose from 40+ testimonial and review layouts, customize the design to match yo
 - **Read More Controls**: Limit long reviews with customizable excerpts and expandable Read More / Show Less buttons.
 
 - **Social Proof & Feedback**: Add rating summaries, NPS polls, customer case studies, review accordions, comparison tables, and other trust-building elements.
+
+- **SEO Rich Results**: Automatic Schema.org Review and AggregateRating JSON-LD markup, so Google can show star ratings for your pages. No add-on, no configuration.
+
+- **Ready-made Patterns**: Seven full sections — Wall of Love, SaaS hero, e-commerce social proof, agency results, review trust bar, scrolling marquee and a review collection page — insert complete and ready to rewrite.
+
+- **One-Click Migration**: Bring your testimonials across from Strong Testimonials, Real Testimonials, Site Reviews or WooCommerce product reviews. Nothing in the other plugin is changed or removed. CSV import and export too.
+
+- **Import Google & Facebook Reviews**: Pull your real Google reviews and Facebook recommendations in as testimonials and show them in any of the 40+ layouts. Uses the same credentials the rating badges already use.
+
+- **Category Filter & Search**: Let visitors filter testimonials by category or search them by keyword, without reloading the page.
+
+- **Accessible**: Star ratings, filters, toggles and dialogs are keyboard-operable and announced correctly by screen readers.
+
+- **Spam-Protected Form**: The submission form is guarded by a honeypot, a timing check, a link cap, a per-visitor rate limit and a duplicate check — no CAPTCHA for your customers to fight.
 
 === How to Use Testimonials – Quick Start Guide ===
 
@@ -87,7 +101,7 @@ If the plugin saved you an afternoon, a [review on WordPress.org](https://wordpr
 
 = From WordPress Admin: =
 1. Navigate to **Plugins → Add New**.
-2. Search for **B Testimonials Block**.
+2. Search for **Testimonials Block**.
 3. Click **Install Now** and then **Activate**.
 
 = Manual Zip Upload: =
@@ -98,13 +112,25 @@ If the plugin saved you an afternoon, a [review on WordPress.org](https://wordpr
 
 == Frequently Asked Questions ==
 
-= Is Testimonials free to use? =
+= Can I move my testimonials over from another plugin? =
 
-Yes. Testimonials is a free WordPress testimonial plugin with 40+ layouts and blocks for displaying customer testimonials, reviews, ratings, and social proof.
+Yes. Go to **Testimonials &rsaquo; Import / Export**. Strong Testimonials, Real Testimonials, Site Reviews and WooCommerce product reviews are detected automatically, including when the other plugin is deactivated. Nothing in the other plugin is changed or deleted, so you can try it and change your mind.
+
+= Will importing twice give me duplicates? =
+
+No. Each imported testimonial remembers where it came from, and rows already imported are skipped. Run it again whenever you like to pick up anything new.
+
+= Do the testimonials show up in Google as star ratings? =
+
+The plugin outputs Schema.org Review and AggregateRating JSON-LD automatically, which is what Google reads for rich results. Whether it chooses to show stars is always Google's decision. If another plugin on your site already outputs review markup, turn this one off with `add_filter( 'bpbtb_schema_enabled', '__return_false' );`.
+
+= Is Testimonials Block free to use? =
+
+Yes. Testimonials Block is a free WordPress testimonial plugin with 40+ layouts and blocks for displaying customer testimonials, reviews, ratings, and social proof.
 
 = Can I add testimonials with Gutenberg? =
 
-Yes. Testimonials is built for the WordPress Gutenberg block editor. You can add testimonial layouts directly to posts and pages without writing code.
+Yes. Testimonials Block is built for the WordPress Gutenberg block editor. You can add testimonial layouts directly to posts and pages without writing code.
 
 = Can I create a testimonial slider? =
 
@@ -126,7 +152,7 @@ Yes. You can showcase video testimonials using YouTube, Vimeo, or MP4 videos.
 
 Yes. The plugin includes rating summaries and social proof badge blocks for platforms such as Google, Trustpilot, G2, Facebook, and Capterra.
 
-= Does Testimonials work with WordPress themes? =
+= Does Testimonials Block work with WordPress themes? =
 
 Yes. The plugin is designed to work with standard WordPress themes and block-based site editors.
 
@@ -193,6 +219,7 @@ You can ask questions through the WordPress.org support forum or visit bPlugins 
 
 This plugin's admin screens load two webfonts, Roboto and Lato, from Google Fonts, and the plugin icon shown in its admin header from WordPress.org's own asset host. Both are requested inside wp-admin only, on this plugin's own pages. Neither is used on your public site.
 
+* **bPlugins authorisation service** (`api.bplugins.com`) — contacted **only** when you press "Connect with Facebook" on the Review Sources screen, and never otherwise. It performs the Facebook login on your behalf and returns your Page access token to your server. What is sent is a random single-use key generated by your site; what comes back is stored in your own database. No request is made unless you press the button, and removing the connection stops it entirely. [Privacy Policy](https://bplugins.com/privacy-policy/)
 * **Google Fonts** (`fonts.googleapis.com`, `fonts.gstatic.com`) — serves the Roboto and Lato webfonts used by the plugin dashboard, Submissions and Poll screens. The request sends what any web request sends: your IP address, browser and operating system. Nothing about your site, your content or your visitors is sent. [Terms](https://policies.google.com/terms) | [Privacy Policy](https://policies.google.com/privacy)
 * **WordPress.org plugin API** (`api.wordpress.org`) — the **Our Plugins** tab of the plugin dashboard asks WordPress.org for the list of plugins published by bPlugins, so it can show their icons, versions and ratings. The request names bPlugins as the author and sends nothing about your site. [Privacy Policy](https://wordpress.org/about/privacy/)
 * **WordPress.org plugin assets** (`ps.w.org`) — serves this plugin's own icon image, shown beside the plugin name in its admin header. [Privacy Policy](https://wordpress.org/about/privacy/)
@@ -231,7 +258,132 @@ To build the plugin from source:
 
 Build Tools Used: @wordpress/scripts (Webpack, Babel, PostCSS).
 
+== Developers ==
+
+Every testimonial block on a page contributes to one consolidated Schema.org JSON-LD document, printed once in the footer. Placeholder testimonials that have never been edited are excluded, and a testimonial shown twice on the same page is only counted once.
+
+Turn the markup off entirely — for example when an SEO plugin already outputs review markup:
+
+`add_filter( 'bpbtb_schema_enabled', '__return_false' );`
+
+Name the thing being reviewed (defaults to the site name):
+
+`add_filter( 'bpbtb_schema_item_name', function () { return 'My Product'; } );`
+
+Change the schema.org type wrapping the reviews (defaults to `Product`):
+
+`add_filter( 'bpbtb_schema_item_type', function () { return 'Service'; } );`
+
+Cap how many reviews go into the document (defaults to 50):
+
+`add_filter( 'bpbtb_schema_max_reviews', function () { return 20; } );`
+
+Reshape the finished document:
+
+`add_filter( 'bpbtb_schema_data', function ( $data, $reviews ) { return $data; }, 10, 2 );`
+
+Exclude further blocks from contributing reviews:
+
+`add_filter( 'bpbtb_schema_excluded_blocks', function ( $blocks ) { $blocks[] = 'bptmb/testimonials-hero'; return $blocks; } );`
+
 == Changelog ==
+
+= 1.0.5 - 10 September 2026 =
+**New**
+* **Schema.org structured data.** Every testimonial block now feeds Review and AggregateRating JSON-LD, which is what Google reads to show star ratings in search results. It is on by default and needs no setup.
+* One consolidated document per page rather than one per block, so a page carrying a grid and a slider no longer publishes two competing aggregate ratings — which search engines treat as a markup error rather than as two ratings.
+* Testimonials read from the Testimonials post type are included, exactly as displayed.
+* A testimonial shown by more than one block on the same page is counted once, so repeating a wall of love below the fold does not inflate the review count.
+* Blocks whose content is not a review of your own — the Google, Trustpilot, G2, Capterra, Facebook and verified-buyer badges, client logos, trust badges, stat counters, rating bars and the poll — are excluded.
+* A block still showing the shipped demo testimonial contributes nothing, so an unfinished page never publishes "John Doe" as a real customer.
+* A Rating Summary block carrying a real average and review count declares the page's aggregate rating outright, in preference to averaging whichever testimonials happen to be on screen.
+* Six filters for developers — see the Developers section.
+
+**Performance**
+* **The editor bundle is 81% smaller — 3.89 MB down to 723 KB.** The icon picker's three icon sets (Font Awesome, Bootstrap and Lucid) come to 3.35 MB of JSON, and they were compiled into the bundle every one of the forty blocks shares. Opening the editor downloaded and parsed all of it before a single block was on the canvas, whether or not anyone went near an icon. They are now fetched on demand, when the Icon panel is actually opened.
+* No change to what the picker does or how icons are stored — the same three sets, still saved as inline SVG.
+
+**Block patterns**
+* **Seven ready-made sections**, under "Testimonials & Social Proof" in the inserter: Wall of Love, SaaS Hero with Rating, E-commerce Social Proof, Agency Results & Testimonials, Review Platform Trust Bar, Scrolling Testimonial Marquee and Ask for a Review.
+* Each arrives as a finished section — heading, layout, spacing and sample testimonials — rather than as a single default block to build out by hand.
+* The sample testimonials a pattern brings with it are excluded from the structured data above, so a page inserted and not yet rewritten never publishes an invented customer to Google. They start counting the moment you write your own words over them.
+
+**Every block previews itself in the inserter**
+* **Thirty-five of the forty blocks had no preview.** They appeared in the inserter as a name and an icon, which is no way to choose between forty layouts. Hovering a block now shows the layout itself, rendered at a width that suits it.
+* Previews carry **three testimonials rather than one**, so a grid reads as a grid, a marquee has something to scroll and a timeline has a sequence. The five blocks that did already preview showed a single card; they show three now as well.
+* **The review badges previewed empty.** Their score, review count and description are blank until you fill them in, so Google, Trustpilot, G2, Capterra, Facebook, verified-buyer and the badge widget all previewed as an outline with nothing in it. They now preview with a figure.
+* A badge whose rating source is set to Live previews from a typed figure instead, so opening the inserter never depends on a connected account or an outbound request.
+* **The Before / After block previewed as a blank box** — both of its images default to an empty URL. It now previews a comparison you can actually drag.
+* The star-rating bars previewed at zero on every row, because the per-star counts start empty. They now preview a real distribution.
+* Preview avatars and images are **drawn inline rather than fetched**, so the inserter never waits on a network request and never shows a broken image.
+
+**Google & Facebook review import**
+* **Your actual Google reviews and Facebook recommendations, imported as testimonials.** The rating badges could already show a live score — "4.8, 312 reviews" — but there was no way to read those reviews. Now there is, and they land in the Testimonials post type so every layout can show them.
+* No second set of credentials: it reads whatever was entered on the Review Sources screen for the badges.
+* **You choose which Google endpoint to read.** Google has two, and they are not interchangeable. The legacy Place Details endpoint still works for Cloud projects that already had it switched on, but Google froze it on 1 March 2025 and it cannot be enabled on any project created since — so a key made today only gets Places API (New). The import screen offers Automatic (try the old one, fall back to the new one), or either on its own, and tells you in plain words which one actually answered and what the other one said.
+* Switching between them re-imports nothing. Both paths produce the same reviews with the same de-duplication keys, so a site that imported under one endpoint and later moves to the other gets no duplicates.
+
+**A broken review platform now says so**
+* **A rating badge that cannot reach its platform no longer fails silently.** The badges are built to degrade rather than break — an unreachable platform falls back to the last figure it had, then to the average of your own testimonials, then to placeholder numbers. Good for a visitor; useless for you, because a dead API key looks exactly like a working one from the front of the site.
+* An expired Facebook Page token is the case this was built for. The badge carried on showing the Facebook logo, five stars and "Recommended by 1 Customer" — where the 1 was the block's own placeholder item. Nothing was broken and nothing said anything was wrong.
+* There is now an admin notice on the plugin's own screens, the Dashboard and the Plugins list, naming the platform and quoting the reason the platform itself gave. Dismissing it is per-error: fix one platform and break another, or have the same platform fail for a new reason, and it comes back.
+* And a **Site Health** test, for the screens the notice stays off. Marked "recommended" rather than "critical" — your pages render fine, it is only the accuracy of a number that is affected.
+* The wording distinguishes the three cases honestly, because they are not equally bad: showing the platform's own figure from yesterday, showing the rating you typed in as a fallback, and showing a figure worked out from your own site under someone else's logo.
+* Neither the notice nor the test ever makes an API call. They read the cached result and nothing else — an admin notice that fetched from Google and Facebook would put two outbound requests on every wp-admin page load.
+
+**Connect Facebook in one click**
+* **A Connect with Facebook button on the Review Sources screen.** No Page access token to find, no Graph API Explorer, no Facebook app to register. Log in, choose your Page, done.
+* This is the other half of the problem above. Graph API Explorer hands out a **short-lived** token by default, and a long-lived Page token takes three steps nobody should have to know about — a user token with the right permissions, exchanged for a long-lived one, then traded at /me/accounts for the Page's own. A Page token obtained properly does not expire; a pasted one usually dies within hours.
+* A connection that has stopped working offers **Reconnect** rather than only Disconnect, so fixing an expired token is one click and not two.
+* **Your access token never passes through your browser.** The exchange happens entirely in PHP and the page is told the Page name and nothing else.
+* Each login attempt uses a single-use key issued by your own site, tied to the administrator who pressed the button and valid for fifteen minutes. A request carrying anything else is refused before any outbound call is made.
+* The plugin ships no Facebook app id and no app secret. The login is handled by the authorisation service bPlugins already runs, at api.bplugins.com — the same one Business Reviews uses. See the Privacy section below.
+* Pasting a token by hand still works exactly as before, for anyone who prefers it.
+* Google keeps the review in the language the customer wrote it in, rather than the machine translation, when both are returned.
+* Facebook recommendations without any written text are skipped — a bare thumbs-up is not a testimonial. Negative recommendations are imported along with the positive ones; quietly keeping only the good ones is how review markup gets penalised.
+* Re-importing picks up only what is new, the same as every other source. A "Refresh" button re-reads from the platform rather than the hourly cache.
+* **Google returns at most five reviews per listing.** That is a Google limit, not a plugin one — Place Details has no pagination and no API key raises it. The screen says so rather than pretending otherwise.
+
+**Import & export**
+* **Testimonials &rsaquo; Import / Export.** One-click migration from **Strong Testimonials**, **Real Testimonials**, **Site Reviews** and **WooCommerce product reviews** — names, job titles, companies, ratings, photos and dates.
+* Nothing in the other plugin is changed, removed or deactivated. The import reads; it does not take. If you do not like the result you simply carry on as you were.
+* Sources are detected even when the other plugin has been **deactivated**, which is the state most sites are in by the time they come looking for this.
+* The screen says how many testimonials each source holds and how many have already come across, so you know whether the button will do anything before you press it.
+* Running an import again picks up only what has been added since — nothing is duplicated. The button relabels itself to "Check for new" once a source is fully imported.
+* Photos are pointed at rather than re-uploaded, so migrating does not leave two copies of every avatar in the media library.
+* **CSV import** matches columns by name: Name, Author, Client or Reviewer all work, as do Review, Text, Testimonial or Feedback, and Rating, Stars or Score. A file with no recognisable name or review column is refused with an explanation rather than half-imported.
+* **CSV export** of every testimonial, with a byte-order mark so Excel opens non-Latin names correctly instead of as mojibake.
+
+**Filtering & search**
+* **Testimonial categories.** The Testimonials post type now has its own Categories taxonomy, with a column on the admin list.
+* **Category filter bar** — a row of buttons above a grid, slider, masonry, list, marquee or timeline that filters the testimonials in place, with no page reload and no request. Switch it on under **Filter & Search** in the block settings.
+* **Keyword search** across the name, role, company and review text of the testimonials on the block. HTML in the review body is not searchable, so searching "div" no longer matches everything.
+* A block can also be pinned to a single category, in which case the others are never sent to the browser at all.
+* Both are off by default, so no existing block changes appearance.
+* The filter is a view control, not a content change: structured data still describes every testimonial on the page, not just the ones currently on screen.
+
+**Accessibility**
+* **Star ratings are now announced.** The star row was decorative SVG with no text, so a screen reader passed over the most important thing on a testimonial in silence. It is now a single labelled image — "Rated 4.5 out of 5".
+* **The Read more / Less toggle** reports whether it is open (`aria-expanded`); it previously announced only a label that changed under the reader.
+* **The popup modal is keyboard-operable.** Opening one used to leave the keyboard behind it — Escape did nothing, Tab walked the page underneath, and there was no way out without a mouse. Focus now moves into the dialog, stays inside it, returns where it came from on close, and Escape closes it.
+* **The modal's close button has a name.** It was the character "×", which is read as "times" or skipped.
+* **Testimonial form labels are tied to their fields.** Each label was a sibling of its input with no `for`, so clicking a label did nothing and every field was announced as unlabelled.
+* The NPS poll's score buttons say what they are out of and which is chosen; the card-stack dots say which card is current; the avatar list reports the selected face; the social-proof toast announces itself politely as it rotates rather than appearing in silence.
+
+**Security & privacy**
+* **The public submission endpoint is no longer unguarded.** It had only a nonce in front of it — which any visitor can read off the page — so a script could post unlimited testimonials; six in a row were accepted in under a second when this was measured. It is now behind a honeypot, a signed timing check, a link cap, a per-visitor hourly rate limit and a duplicate check. No CAPTCHA: it is the one measure that costs an honest submitter more than a bot.
+* **Field lengths are capped.** `post_content` was unbounded, so a single request could write a review of any size. Caps are filterable through `bpbtb_form_field_limits`, and cut on character boundaries so Bangla, Arabic and emoji are not broken in half.
+* **Photo uploads are gated on the form that was actually rendered.** The photo field is off by default, but an upload was accepted regardless — meaning any site running the form accepted unauthenticated files into its media library. Uploads now require a form that offered the field, are capped at 2 MB, and are checked to be real images before anything is written to disk.
+* **The NPS poll route required no nonce and had no rate limit.** Its vote log is capped at 5,000 entries, which made it worse rather than safer: a flood could push out every genuine vote. It now needs a nonce, is rate-limited, and its log is no longer autoloaded on every page request.
+* **The poll no longer records visitors' IP addresses.** One was stored in plain text with every vote and never read by anything — personal data collected for no purpose. Repeat voting is handled by a counter keyed on a salted hash that is never written down.
+* Structured data output escapes slashes, so a review containing `</script>` cannot break out of the JSON-LD tag.
+
+**Fixed**
+* **Half-star ratings could not be saved.** The rating meta was registered as an integer with `absint()` as its sanitiser, so every fractional rating was silently rounded down on save — 4.5 became 4 — even though the meta box offers 0.1 steps. Ratings are now stored as numbers and clamped to the 0–5 scale, on every path that writes one.
+
+**Housekeeping**
+* A one-time notice now asks how the plugin is doing. It waits a week, appears only once a testimonial or a block has actually been saved, shows only on this plugin's own screens and the plugins list, and offers a route to support for anyone who needs help rather than a review. "No thanks" is permanent.
+* Uninstalling with "delete all data" enabled now removes that notice's stored state along with everything else.
 
 = 1.0.4 – Controls, Editor Parity & Alignment =
 **New controls**

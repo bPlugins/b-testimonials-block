@@ -17,6 +17,114 @@ $brandColor: #146ef5;
   color: #757575;
 }
 
+// The shortcode-copy bar shown above the block on the "Testimonials Block"
+// CPT screen -- see includes/display-cpt.php and Backend/FrontShortCode.js.
+.btbShortcodeBar {
+  display: flex;
+  align-items: center;
+  background: #f8f9fb;
+  border-radius: 12px;
+  padding: 12px 20px;
+  gap: 15px;
+  margin: 0 0 15px;
+  border: 1px solid #f1f5f9;
+
+  .btbShortcodeInputGroup {
+    display: flex;
+    align-items: center;
+    background: #fff;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    padding: 4px 4px 4px 16px;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+    transition: all 0.2s ease;
+
+    &:hover {
+      border-color: #cbd5e1;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    }
+
+    input {
+      border: none;
+      outline: none;
+      font-size: 14px;
+      font-weight: 500;
+      color: #334155;
+      background: transparent;
+      width: 180px;
+      padding: 0;
+      cursor: default;
+    }
+
+    .btbShortcodeCopy {
+      background: rgba($brandColor, 0.08);
+      color: $brandColor;
+      border: none;
+      border-radius: 8px;
+      padding: 8px;
+      cursor: pointer;
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s ease;
+
+      &:hover {
+        background: rgba($brandColor, 0.16);
+      }
+
+      &:active {
+        transform: scale(0.95);
+      }
+
+      .btbShortcodeTooltip {
+        visibility: hidden;
+        width: 140px;
+        background-color: #1e293b;
+        color: #fff;
+        text-align: center;
+        border-radius: 6px;
+        padding: 6px 0;
+        position: absolute;
+        z-index: 10;
+        bottom: 140%;
+        left: 50%;
+        margin-left: -70px;
+        opacity: 0;
+        transition: opacity 0.2s ease, transform 0.2s ease;
+        font-size: 12px;
+        font-weight: 400;
+        transform: translateY(5px);
+        pointer-events: none;
+
+        &::after {
+          content: "";
+          position: absolute;
+          top: 100%;
+          left: 50%;
+          margin-left: -5px;
+          border-width: 5px;
+          border-style: solid;
+          border-color: #1e293b transparent transparent transparent;
+        }
+      }
+
+      &:hover .btbShortcodeTooltip {
+        visibility: visible;
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+  }
+
+  .btbShortcodeLabel {
+    font-size: 14px;
+    color: #64748b;
+    font-weight: 400;
+    line-height: 1.5;
+  }
+}
+
 // Hover-to-upload overlay: a plus button that fades in over an avatar and
 // opens the media library for that card.
 //
@@ -1424,4 +1532,60 @@ svg.btb-inserter-icon[fill="none"] * {
 	text-align: center;
 	font-size: 14px;
 	color: #64748b;
+}
+
+/*
+ * Rating Source status, in the badge blocks' inspector.
+ *
+ * A read-only report on what the connected platform last returned, so the
+ * author can tell "the badge is showing 4.9 because Google says 4.9" from "the
+ * badge is showing 4.9 because nothing is connected and that is the demo
+ * figure". The two used to be indistinguishable.
+ */
+.btbLiveStatus {
+	padding: 10px 12px;
+	background: rgba(15, 23, 42, 0.03);
+	border-left: 2px solid #10b981;
+}
+
+.btbLiveFigures {
+	display: flex;
+	align-items: baseline;
+	gap: 8px;
+	margin: 0 0 4px;
+	font-size: 12px;
+	color: #475569;
+
+	strong {
+		font-size: 22px;
+		font-weight: 800;
+		line-height: 1;
+		color: #0f172a;
+	}
+}
+
+.btbLiveNote {
+	display: flex;
+	align-items: center;
+	gap: 6px;
+	flex-wrap: wrap;
+	margin: 0;
+	font-size: 12px;
+	line-height: 1.5;
+	color: #64748b;
+
+	/* Nothing is broken -- the badge just has no live source yet -- so this is
+	   amber rather than red, and it says what to do about it. */
+	&.is-warn {
+		color: #b45309;
+	}
+
+	&.is-error {
+		margin-top: 6px;
+		color: #dc2626;
+	}
+}
+
+.btbLiveStatus .components-button {
+	margin-top: 8px;
 }

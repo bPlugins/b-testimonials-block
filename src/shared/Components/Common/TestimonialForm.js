@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, cloneElement } from 'react';
 import { __ } from '@wordpress/i18n';
 
 /**
@@ -27,6 +27,7 @@ const TestimonialForm = ( { attributes = {}, isBackend = false } ) => {
 	const [ previewNote, setPreviewNote ] = useState( '' );
 
 	const {
+		cId = '',
 		formTitle = '',
 		buttonText = '',
 		successMessage = '',
@@ -44,12 +45,27 @@ const TestimonialForm = ( { attributes = {}, isBackend = false } ) => {
 	const title = formTitle || badgeTitle || __( 'Leave a Customer Review', 'b-testimonials-block' );
 	const button = buttonText || badgeCount || __( 'Submit Testimonial', 'b-testimonials-block' );
 
-	const field = ( label, input ) => (
-		<div className="btb-tform-field">
-			<label>{ label }</label>
-			{ input }
-		</div>
-	);
+	/*
+	 * The label was a sibling of the input with no `htmlFor`, which makes it
+	 * decoration: clicking it did nothing, and a screen reader announced the
+	 * input as unlabelled -- so the form was a column of anonymous boxes.
+	 *
+	 * The id is derived from the input's own `name` rather than passed in at
+	 * each call, so every field is covered without touching the twenty call
+	 * sites, and scoped to the block's cId so two forms on one page do not
+	 * both claim id="btb-tform-name".
+	 */
+	const field = ( label, input ) => {
+		const name = input?.props?.name || '';
+		const id = name ? `btb-tform-${ cId || 'x' }-${ name }` : '';
+
+		return (
+			<div className="btb-tform-field">
+				<label { ...( id ? { htmlFor: id } : {} ) }>{ label }</label>
+				{ id ? cloneElement( input, { id } ) : input }
+			</div>
+		);
+	};
 
 	// Every visible label and placeholder was a hardcoded `__()` string, so the
 	// form could only ever ask for "Name", "Email", "Designation" -- there was no
@@ -100,6 +116,35 @@ const TestimonialForm = ( { attributes = {}, isBackend = false } ) => {
 
 				{/* Carried in the markup rather than appended in JS, so the field
 				    set is complete whichever way the form is posted. */}
+				{ /*
+				     The signed mint-time, and the honeypot.
+
+				     The trap is hidden with CSS and taken out of the tab order
+				     and the accessibility tree: a form-filler reads the markup
+				     and fills it, a person never reaches it, and a screen
+				     reader is never asked about a field that must stay empty.
+				     autoComplete="off" stops a browser helpfully filling it in
+				     for someone and getting them rejected.
+				  */ }
+				{ ! isBackend && attributes.formToken && (
+					<input type="hidden" name="bpbtb_token" value={ attributes.formToken } />
+				) }
+				{ ! isBackend && attributes.formTrap && (
+					<div className="btb-tform-trap" aria-hidden="true">
+						<label htmlFor={ `${ attributes.formTrap }-${ cId || 'x' }` }>
+							{ __( 'Leave this field empty', 'b-testimonials-block' ) }
+						</label>
+						<input
+							type="text"
+							id={ `${ attributes.formTrap }-${ cId || 'x' }` }
+							name={ attributes.formTrap }
+							tabIndex={ -1 }
+							autoComplete="off"
+							defaultValue=""
+						/>
+					</div>
+				) }
+
 				{ ! isBackend && attributes.formNonce && (
 					<input type="hidden" name="nonce" value={ attributes.formNonce } />
 				) }

@@ -191,7 +191,7 @@ import welcomeBanner from "../assets/welcomeBanner";
 import { CHILD_BLOCKS_LIST } from "../../shared/utils/childBlocks";
 import { blockIcon, getLayoutSvgIcon } from "../../shared/utils/icons";
 
-const slug = "b-testimonial";
+const slug = "b-testimonials-block";
 
 /**
  * The icon for one demo card, by preview slug.
@@ -261,8 +261,11 @@ export const dashboardInfo = (info) => {
     // even though the page is deliberately absent from the nav.
     displayOurPlugins: true,
     media: {
-      logo: `https://ps.w.org/b-testimonial/assets/icon-128x128.png`,
-      banner: `https://ps.w.org/b-testimonial/assets/banner-772x250.png`,
+      // No `?rev=` pin: the pinned revision kept serving the icon as it was at
+      // that upload, so replacing the artwork on wp.org never reached the
+      // dashboard. Unpinned, the listing's current icon is always what shows.
+      logo: `https://ps.w.org/${slug}/assets/icon.svg`,
+      banner: `https://ps.w.org/${slug}/assets/banner-1544x500.png`,
       // The Welcome hero's artwork. Vector and bundled -- see the module
       // for why it is a string rather than an imported .svg.
       thumbnail: welcomeBanner,
@@ -602,8 +605,8 @@ export const welcomeInfo = (adminUrl) => ({
         steps: [
           {
             num: 1,
-            title: "Open Testimonials CPT",
-            body: "Go to <strong>Testimonials &rsaquo; All Testimonials</strong> in your WordPress admin and click <strong>Add New</strong>.",
+            title: "Create & Publish a Testimonial",
+            body: "Go to <strong>Testimonials &rsaquo; All Testimonials</strong>, click <strong>Add New</strong>, fill in the review details, and publish.",
             link: {
               url: `${adminUrl}edit.php?post_type=testimonial`,
               label: "All Testimonials",
@@ -611,18 +614,22 @@ export const welcomeInfo = (adminUrl) => ({
           },
           {
             num: 2,
-            title: "Add Testimonial Details",
-            body: "Fill in the <strong>Name</strong> (title), <strong>Review Text</strong> (content), <strong>Rating</strong>, <strong>Designation</strong>, and <strong>Company</strong> fields. Set a featured image for the avatar photo.",
+            title: "Copy the Classic Shortcode",
+            body: "In the <strong>All Testimonials</strong> list, click the shortcode in the <strong>Classic Shortcode</strong> column to copy it (e.g. <code>[testimonial id=123]</code>) — it renders that single review.",
           },
           {
             num: 3,
-            title: "Add the Gutenberg Block",
-            body: "Open any page in the block editor. Insert the <strong>B Testimonials</strong> block, pick your layout, and set the data source to <strong>Testimonials CPT</strong>.",
+            title: "Or Copy a Block Shortcode",
+            body: "Go to <strong>Testimonials &rsaquo; Shortcode</strong>, pick a layout (grid, slider, video, and more), publish it, then copy the <strong>Block Shortcode</strong> shown above the block (e.g. <code>[testimonials_block id=456]</code>) — it renders that whole saved layout.",
+            link: {
+              url: `${adminUrl}edit.php?post_type=testimonials-block`,
+              label: "Testimonials Shortcode",
+            },
           },
           {
             num: 4,
-            title: "Publish & Preview",
-            body: "Click <strong>Publish</strong>. Your testimonials from the CPT will be rendered automatically using the chosen layout.",
+            title: "Paste It Anywhere",
+            body: "Drop either shortcode into any post, page, widget, or page-builder row. Edit the source once and every copy updates.",
           },
         ],
       },
@@ -681,6 +688,20 @@ export const welcomeInfo = (adminUrl) => ({
     ],
   },
   changelogs: [
+    {
+      version: "1.0.5 - 10 September 2026",
+      type: "new",
+      list: [
+        "<strong>New</strong> Schema.org structured data. Every testimonial block now feeds Review and AggregateRating JSON-LD, which is what Google reads to show star ratings in search results. It is on by default and needs no setup.",
+        "<strong>New</strong> One consolidated document per page rather than one per block, so a page carrying a grid and a slider no longer publishes two competing aggregate ratings — which search engines treat as a markup error rather than as two ratings.",
+        "<strong>New</strong> A Rating Summary block carrying a real average and review count declares the page's aggregate rating outright, in preference to averaging whichever testimonials happen to be on screen.",
+        "<strong>New</strong> Six filters for developers — see the Developers section.",
+        "<strong>Performance</strong> The editor bundle is 81% smaller — 3.89 MB down to 723 KB. The icon picker's three icon sets (Font Awesome, Bootstrap and Lucid) come to 3.35 MB of JSON, and they were compiled into the bundle every one of the forty blocks shares. Opening the editor downloaded and parsed all of it before a single block was on the canvas, whether or not anyone went near an icon. They are now fetched on demand, when the Icon panel is actually opened.",
+        "<strong>Performance</strong> No change to what the picker does or how icons are stored — the same three sets, still saved as inline SVG.",
+        "<strong>Block patterns</strong> Seven ready-made sections, under \"Testimonials & Social Proof\" in the inserter: Wall of Love, SaaS Hero with Rating, E-commerce Social Proof, Agency Results & Testimonials, Review Platform Trust Bar, Scrolling Testimonial Marquee and Ask for a Review.",
+        "<strong>Block patterns</strong> Each arrives as a finished section — heading, layout, spacing and sample testimonials — rather than as a single default block to build out by hand.",
+      ],
+    },
     {
       version: "1.0.4 - 19 August 2026",
       type: "new",

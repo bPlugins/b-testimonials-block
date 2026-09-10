@@ -148,6 +148,16 @@
 		],
 		"html": false
 	},
+	"example": {
+		"attributes": {
+			"columns": {
+				"desktop": 4,
+				"tablet": 2,
+				"mobile": 1
+			}
+		},
+		"viewportWidth": 900
+	},
 	"editorStyle": "file:../index.css",
 	"style": [
 		"file:../index.css",

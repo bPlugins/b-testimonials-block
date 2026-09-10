@@ -1,422 +1,452 @@
 {
-	"$schema": "https://schemas.wp.org/trunk/block.json",
-	"apiVersion": 3,
-	"name": "bptmb/b-testimonials",
-	"title": "Testimonials",
-	"description": "Boost your website's credibility with testimonials, effortlessly showcasing customer ratings and reviews.",
-	"category": "bplugins",
-	"keywords": [
-		"testimonials",
-		"block",
-		"rating",
-		"review",
-		"testimonial"
-	],
-	"textdomain": "b-testimonials-block",
-	"attributes": {
-		"arrangement": {
-			"type": "string"
-		},
-		"expandedTypo": {
-			"type": "object"
-		},
-		"expandColor": {
-			"type": "string"
-		},
-		"expandHoverColor": {
-			"type": "string"
-		},
-		"badgeTitle": {
-			"type": "string",
-			"default": ""
-		},
-		"badgeDesc": {
-			"type": "string",
-			"default": ""
-		},
-		"badgeScore": {
-			"type": "string",
-			"default": ""
-		},
-		"badgeCount": {
-			"type": "string",
-			"default": ""
-		},
-		"minScore": {
-			"type": "number",
-			"default": 0
-		},
-		"maxScore": {
-			"type": "number",
-			"default": 10
-		},
-		"lowLabel": {
-			"type": "string",
-			"default": "Not likely"
-		},
-		"highLabel": {
-			"type": "string",
-			"default": "Very likely"
-		},
-		"star5Count": {
-			"type": "string",
-			"default": ""
-		},
-		"star4Count": {
-			"type": "string",
-			"default": ""
-		},
-		"star3Count": {
-			"type": "string",
-			"default": ""
-		},
-		"star2Count": {
-			"type": "string",
-			"default": ""
-		},
-		"star1Count": {
-			"type": "string",
-			"default": ""
-		},
-		"col1Header": {
-			"type": "string",
-			"default": "Customer"
-		},
-		"col2Header": {
-			"type": "string",
-			"default": "Rating"
-		},
-		"col3Header": {
-			"type": "string",
-			"default": "Review"
-		},
-		"align": {
-			"type": "string",
-			"default": "wide"
-		},
-		"blockWidth": {
-			"type": "object",
-			"default": {
-				"desktop": "",
-				"tablet": "",
-				"mobile": ""
-			}
-		},
-		"blockAlign": {
-			"type": "string",
-			"default": ""
-		},
-		"cardHeight": {
-			"type": "object",
-			"default": {
-				"desktop": "",
-				"tablet": "",
-				"mobile": ""
-			}
-		},
-		"cId": {
-			"type": "string",
-			"default": ""
-		},
-		"layout": {
-			"type": "string",
-			"default": "default"
-		},
-		"theme": {
-			"type": "string",
-			"default": "default"
-		},
-		"columns": {
-			"type": "object",
-			"default": {
-				"desktop": 3,
-				"tablet": 2,
-				"mobile": 1
-			}
-		},
-		"columnGap": {
-			"type": "string",
-			"default": "30px"
-		},
-		"rowGap": {
-			"type": "string",
-			"default": "40px"
-		},
-		"items": {
-			"type": "array",
-			"default": [
-				{
-					"img": {
-						"url": "https://templates.bplugins.com/wp-content/uploads/2025/02/p-29.png"
-					},
-					"name": "John Doe",
-					"deg": "Developer",
-					"reviewText": "It is a long-established fact that a reader will be distracted by the readable content of a page when looking at its layout",
-					"rating": 4
-				}
-			]
-		},
-		"elements": {
-			"type": "object",
-			"default": {
-				"img": true,
-				"name": true,
-				"deg": true,
-				"reviewText": true,
-				"icon": true,
-				"expandBtn": true,
-				"expandText": "Expand",
-				"collapseText": "Less"
-			}
-		},
-		"background": {
-			"type": "string",
-			"default": "#0000"
-		},
-		"padding": {
-			"type": "object",
-			"default": {
-				"top": "10px",
-				"right": "15px",
-				"bottom": "10px",
-				"left": "15px"
-			}
-		},
-		"blockMargin": {
-			"type": "object",
-			"default": {}
-		},
-		"cardMargin": {
-			"type": "object",
-			"default": {}
-		},
-		"degDivider": {
-			"type": "object",
-			"default": {}
-		},
-		"border": {
-			"type": "object",
-			"default": {
-				"width": "1px",
-				"style": "solid",
-				"color": "#0575e6",
-				"side": "all",
-				"radius": "3px"
-			}
-		},
-		"shadow": {
-			"type": "object",
-			"default": {}
-		},
-		"cardWash": {
-			"type": "boolean",
-			"default": true
-		},
-		"cardWashStrength": {
-			"type": "number",
-			"default": 100
-		},
-		"cardWashColor": {
-			"type": "string"
-		},
-		"cardHoverBg": {
-			"type": "string"
-		},
-		"cardHoverBorderColor": {
-			"type": "string"
-		},
-		"cardHoverShadow": {
-			"type": "object",
-			"default": {}
-		},
-		"cardHoverLift": {
-			"type": "number"
-		},
-		"image": {
-			"type": "object",
-			"default": {
-				"width": 50,
-				"height": 50
-			}
-		},
-		"imgBorder": {
-			"type": "object",
-			"default": {
-				"width": "1px",
-				"style": "solid",
-				"color": "#0575e6",
-				"side": "all",
-				"radius": "50%"
-			}
-		},
-		"avatarRing": {
-			"type": "boolean",
-			"default": true
-		},
-		"avatarRingWidth": {
-			"type": "number",
-			"default": 3
-		},
-		"avatarRingColor": {
-			"type": "string"
-		},
-		"nameTypo": {
-			"type": "object",
-			"default": {
-				"fontSize": {
-					"desktop": 16,
-					"tablet": 16,
-					"mobile": 14
-				},
-				"fontFamily": "Open Sans",
-				"fontWeight": 700,
-				"lineHeight": "140%"
-			}
-		},
-		"nameColor": {
-			"type": "string",
-			"default": "#000"
-		},
-		"degTypo": {
-			"type": "object",
-			"default": {
-				"fontSize": {
-					"desktop": 14,
-					"tablet": 14,
-					"mobile": 14
-				},
-				"fontFamily": "Open Sans",
-				"fontWeight": 400,
-				"lineHeight": "150%"
-			}
-		},
-		"degColor": {
-			"type": "string",
-			"default": "#7B7B7B"
-		},
-		"textTypo": {
-			"type": "object",
-			"default": {
-				"fontSize": {
-					"desktop": 16,
-					"tablet": 16,
-					"mobile": 14
-				},
-				"fontWeight": 400,
-				"lineHeight": "170%"
-			}
-		},
-		"textColor": {
-			"type": "string",
-			"default": "#000"
-		},
-		"starIconColor": {
-			"type": "string",
-			"default": "#FF8C02"
-		},
-		"textLength": {
-			"type": "number",
-			"default": 120
-		},
-		"grid2Bg": {
-			"type": "string",
-			"default": "#f9f8f8"
-		},
-		"headerWash": {
-			"type": "boolean",
-			"default": true
-		},
-		"headerWashStrength": {
-			"type": "number",
-			"default": 100
-		},
-		"grid2Padding": {
-			"type": "object",
-			"default": {
-				"top": "10px",
-				"right": "10px",
-				"bottom": "10px",
-				"left": "10px"
-			}
-		},
-		"grid2Border": {
-			"type": "object",
-			"default": {
-				"width": "0px",
-				"style": "solid",
-				"color": "#0575e6",
-				"side": "all",
-				"radius": "3px"
-			}
-		},
-		"quoteIcon": {
-			"type": "object",
-			"default": {
-				"size": 23
-			}
-		},
-		"slider": {
-			"type": "object",
-			"default": {
-				"height": 500,
-				"autoPlay": true,
-				"mouseWheel": true,
-				"navigation": true
-			}
-		},
-		"marquee": {
-			"type": "object",
-			"default": {
-				"speed": 30,
-				"direction": "left",
-				"pauseOnHover": true
-			}
-		},
-		"pauseInEditor": {
-			"type": "boolean",
-			"default": false
-		},
-		"dataSource": {
-			"type": "string",
-			"default": "manual"
-		},
-		"query": {
-			"type": "object",
-			"default": {
-				"number": 6,
-				"orderBy": "date",
-				"order": "desc"
-			}
-		},
-		"starSize": {
-			"type": "number"
-		}
-	},
-	"supports": {
-		"align": [
-			"wide",
-			"full"
-		],
-		"html": false
-	},
-	"example": {
-		"attributes": {
-			"preview": true,
-			"columns": {
-				"desktop": 1,
-				"tablet": 1,
-				"mobile": 1
-			}
-		}
-	},
-	"editorStyle": "file:../index.css",
-	"style": [
-		"file:../index.css",
-		"file:../view.css"
-	],
-	"render": "file:./render.php",
-	"viewScript": [
-		"file:../view.js",
-		"jquery"
-	]
+  "$schema": "https://schemas.wp.org/trunk/block.json",
+  "apiVersion": 3,
+  "name": "bptmb/b-testimonials",
+  "title": "Testimonials",
+  "description": "Boost your website's credibility with testimonials, effortlessly showcasing customer ratings and reviews.",
+  "category": "bplugins",
+  "keywords": ["testimonials", "block", "rating", "review", "testimonial"],
+  "textdomain": "b-testimonials-block",
+  "attributes": {
+    "arrangement": {
+      "type": "string"
+    },
+    "expandedTypo": {
+      "type": "object"
+    },
+    "expandColor": {
+      "type": "string"
+    },
+    "expandHoverColor": {
+      "type": "string"
+    },
+    "badgeTitle": {
+      "type": "string",
+      "default": ""
+    },
+    "badgeDesc": {
+      "type": "string",
+      "default": ""
+    },
+    "badgeScore": {
+      "type": "string",
+      "default": ""
+    },
+    "badgeCount": {
+      "type": "string",
+      "default": ""
+    },
+    "minScore": {
+      "type": "number",
+      "default": 0
+    },
+    "maxScore": {
+      "type": "number",
+      "default": 10
+    },
+    "lowLabel": {
+      "type": "string",
+      "default": "Not likely"
+    },
+    "highLabel": {
+      "type": "string",
+      "default": "Very likely"
+    },
+    "star5Count": {
+      "type": "string",
+      "default": ""
+    },
+    "star4Count": {
+      "type": "string",
+      "default": ""
+    },
+    "star3Count": {
+      "type": "string",
+      "default": ""
+    },
+    "star2Count": {
+      "type": "string",
+      "default": ""
+    },
+    "star1Count": {
+      "type": "string",
+      "default": ""
+    },
+    "col1Header": {
+      "type": "string",
+      "default": "Customer"
+    },
+    "col2Header": {
+      "type": "string",
+      "default": "Rating"
+    },
+    "col3Header": {
+      "type": "string",
+      "default": "Review"
+    },
+    "align": {
+      "type": "string",
+      "default": "wide"
+    },
+    "blockWidth": {
+      "type": "object",
+      "default": {
+        "desktop": "",
+        "tablet": "",
+        "mobile": ""
+      }
+    },
+    "blockAlign": {
+      "type": "string",
+      "default": ""
+    },
+    "cardHeight": {
+      "type": "object",
+      "default": {
+        "desktop": "",
+        "tablet": "",
+        "mobile": ""
+      }
+    },
+    "cId": {
+      "type": "string",
+      "default": ""
+    },
+    "layout": {
+      "type": "string",
+      "default": "default"
+    },
+    "theme": {
+      "type": "string",
+      "default": "default"
+    },
+    "columns": {
+      "type": "object",
+      "default": {
+        "desktop": 3,
+        "tablet": 2,
+        "mobile": 1
+      }
+    },
+    "columnGap": {
+      "type": "string",
+      "default": "30px"
+    },
+    "rowGap": {
+      "type": "string",
+      "default": "40px"
+    },
+    "items": {
+      "type": "array",
+      "default": [
+        {
+          "img": {
+            "url": "https://templates.bplugins.com/wp-content/uploads/2025/02/p-29.png"
+          },
+          "name": "John Doe",
+          "deg": "Developer",
+          "reviewText": "It is a long-established fact that a reader will be distracted by the readable content of a page when looking at its layout",
+          "rating": 4
+        }
+      ]
+    },
+    "elements": {
+      "type": "object",
+      "default": {
+        "img": true,
+        "name": true,
+        "deg": true,
+        "reviewText": true,
+        "icon": true,
+        "expandBtn": true,
+        "expandText": "Expand",
+        "collapseText": "Less"
+      }
+    },
+    "background": {
+      "type": "string",
+      "default": "#0000"
+    },
+    "padding": {
+      "type": "object",
+      "default": {
+        "top": "10px",
+        "right": "15px",
+        "bottom": "10px",
+        "left": "15px"
+      }
+    },
+    "blockMargin": {
+      "type": "object",
+      "default": {}
+    },
+    "cardMargin": {
+      "type": "object",
+      "default": {}
+    },
+    "degDivider": {
+      "type": "object",
+      "default": {}
+    },
+    "border": {
+      "type": "object",
+      "default": {
+        "width": "1px",
+        "style": "solid",
+        "color": "#0575e6",
+        "side": "all",
+        "radius": "3px"
+      }
+    },
+    "shadow": {
+      "type": "object",
+      "default": {}
+    },
+    "cardWash": {
+      "type": "boolean",
+      "default": true
+    },
+    "cardWashStrength": {
+      "type": "number",
+      "default": 100
+    },
+    "cardWashColor": {
+      "type": "string"
+    },
+    "cardHoverBg": {
+      "type": "string"
+    },
+    "cardHoverBorderColor": {
+      "type": "string"
+    },
+    "cardHoverShadow": {
+      "type": "object",
+      "default": {}
+    },
+    "cardHoverLift": {
+      "type": "number"
+    },
+    "image": {
+      "type": "object",
+      "default": {
+        "width": 50,
+        "height": 50
+      }
+    },
+    "imgBorder": {
+      "type": "object",
+      "default": {
+        "width": "1px",
+        "style": "solid",
+        "color": "#0575e6",
+        "side": "all",
+        "radius": "50%"
+      }
+    },
+    "avatarRing": {
+      "type": "boolean",
+      "default": true
+    },
+    "avatarRingWidth": {
+      "type": "number",
+      "default": 3
+    },
+    "avatarRingColor": {
+      "type": "string"
+    },
+    "nameTypo": {
+      "type": "object",
+      "default": {
+        "fontSize": {
+          "desktop": 16,
+          "tablet": 16,
+          "mobile": 14
+        },
+        "fontFamily": "Open Sans",
+        "fontWeight": 700,
+        "lineHeight": "140%"
+      }
+    },
+    "nameColor": {
+      "type": "string",
+      "default": "#000"
+    },
+    "degTypo": {
+      "type": "object",
+      "default": {
+        "fontSize": {
+          "desktop": 14,
+          "tablet": 14,
+          "mobile": 14
+        },
+        "fontFamily": "Open Sans",
+        "fontWeight": 400,
+        "lineHeight": "150%"
+      }
+    },
+    "degColor": {
+      "type": "string",
+      "default": "#7B7B7B"
+    },
+    "textTypo": {
+      "type": "object",
+      "default": {
+        "fontSize": {
+          "desktop": 16,
+          "tablet": 16,
+          "mobile": 14
+        },
+        "fontWeight": 400,
+        "lineHeight": "170%"
+      }
+    },
+    "textColor": {
+      "type": "string",
+      "default": "#000"
+    },
+    "starIconColor": {
+      "type": "string",
+      "default": "#FF8C02"
+    },
+    "textLength": {
+      "type": "number",
+      "default": 120
+    },
+    "grid2Bg": {
+      "type": "string",
+      "default": "#f9f8f8"
+    },
+    "headerWash": {
+      "type": "boolean",
+      "default": true
+    },
+    "headerWashStrength": {
+      "type": "number",
+      "default": 100
+    },
+    "grid2Padding": {
+      "type": "object",
+      "default": {
+        "top": "10px",
+        "right": "10px",
+        "bottom": "10px",
+        "left": "10px"
+      }
+    },
+    "grid2Border": {
+      "type": "object",
+      "default": {
+        "width": "0px",
+        "style": "solid",
+        "color": "#0575e6",
+        "side": "all",
+        "radius": "3px"
+      }
+    },
+    "quoteIcon": {
+      "type": "object",
+      "default": {
+        "size": 23
+      }
+    },
+    "slider": {
+      "type": "object",
+      "default": {
+        "height": 500,
+        "autoPlay": true,
+        "mouseWheel": true,
+        "navigation": true
+      }
+    },
+    "marquee": {
+      "type": "object",
+      "default": {
+        "speed": 30,
+        "direction": "left",
+        "pauseOnHover": true
+      }
+    },
+    "pauseInEditor": {
+      "type": "boolean",
+      "default": false
+    },
+    "dataSource": {
+      "type": "string",
+      "default": "manual"
+    },
+    "query": {
+      "type": "object",
+      "default": {
+        "number": 6,
+        "orderBy": "date",
+        "order": "desc"
+      }
+    },
+    "starSize": {
+      "type": "number"
+    },
+    "showFilter": {
+      "type": "boolean",
+      "default": false
+    },
+    "showSearch": {
+      "type": "boolean",
+      "default": false
+    },
+    "filterAllLabel": {
+      "type": "string",
+      "default": ""
+    },
+    "searchPlaceholder": {
+      "type": "string",
+      "default": ""
+    }
+  },
+  "supports": {
+    "align": ["wide", "full"],
+    "html": false
+  },
+  "example": {
+    "attributes": {
+      "items": [
+        {
+          "img": {
+            "url": "data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='96' height='96'%3E%3Crect width='96' height='96' rx='48' fill='%230f766e'/%3E%3Ctext x='48' y='61' font-family='Helvetica,Arial,sans-serif' font-size='34' font-weight='700' fill='%23ffffff' text-anchor='middle'%3ESJ%3C/text%3E%3C/svg%3E"
+          },
+          "name": "Sarah Jenkins",
+          "deg": "Marketing Director",
+          "reviewText": "Setup took about ten minutes and the layout matched our brand straight away.",
+          "rating": 5
+        },
+        {
+          "img": {
+            "url": "data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='96' height='96'%3E%3Crect width='96' height='96' rx='48' fill='%239a3412'/%3E%3Ctext x='48' y='61' font-family='Helvetica,Arial,sans-serif' font-size='34' font-weight='700' fill='%23ffffff' text-anchor='middle'%3EMC%3C/text%3E%3C/svg%3E"
+          },
+          "name": "Michael Chang",
+          "deg": "Founder",
+          "reviewText": "Support replied within the hour and actually solved the problem.",
+          "rating": 5
+        },
+        {
+          "img": {
+            "url": "data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='96' height='96'%3E%3Crect width='96' height='96' rx='48' fill='%23334155'/%3E%3Ctext x='48' y='61' font-family='Helvetica,Arial,sans-serif' font-size='34' font-weight='700' fill='%23ffffff' text-anchor='middle'%3EEW%3C/text%3E%3C/svg%3E"
+          },
+          "name": "Emily Watson",
+          "deg": "Head of Operations",
+          "reviewText": "We replaced three plugins with this one, and the pages load faster too.",
+          "rating": 4
+        }
+      ],
+      "columns": {
+        "desktop": 3,
+        "tablet": 2,
+        "mobile": 1
+      }
+    },
+    "viewportWidth": 1000
+  },
+  "editorStyle": "file:../index.css",
+  "style": ["file:../index.css", "file:../view.css"],
+  "render": "file:./render.php",
+  "viewScript": ["file:../view.js", "jquery"]
 }

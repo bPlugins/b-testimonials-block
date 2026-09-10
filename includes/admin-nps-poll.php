@@ -215,6 +215,47 @@ function bpbtb_handle_nps_poll_submit( $request ) {
 		);
 	}
 
+	/*
+	 * This route is public, like the submission form's, and had no nonce and no
+	 * throttle at all -- so anything on the internet could POST votes into it.
+	 *
+	 * The stored list is capped at 5000, which sounds like protection and is the
+	 * opposite: without a limit in front of it, a script could push 5000 votes
+	 * through and evict every genuine one. Losing real data is worse than the
+	 * table growing.
+	 *
+	 * The block's view script already sends X-WP-Nonce, so nothing on the
+	 * browser side changes.
+	 */
+	$nonce        = isset( $params['nonce'] ) ? sanitize_text_field( wp_unslash( $params['nonce'] ) ) : '';
+	$header_nonce = isset( $_SERVER['HTTP_X_WP_NONCE'] ) ? sanitize_text_field( wp_unslash( $_SERVER['HTTP_X_WP_NONCE'] ) ) : '';
+
+	$valid_nonce = wp_verify_nonce( $nonce, 'wp_rest' )
+		|| ( '' !== $header_nonce && wp_verify_nonce( $header_nonce, 'wp_rest' ) );
+
+	if ( ! $valid_nonce ) {
+		return new WP_REST_Response(
+			[
+				'success' => false,
+				'code'    => 'rest_cookie_invalid_nonce',
+				'message' => __( 'This page has been open too long. Please reload and vote again.', 'b-testimonials-block' ),
+			],
+			403
+		);
+	}
+
+	// A poll asks one question, so one person has one answer to give. Ten an
+	// hour is generous for a shared address behind a single NAT.
+	if ( class_exists( 'BPBTB_Form_Security' ) && ! BPBTB_Form_Security::throttle( 'nps', 10 ) ) {
+		return new WP_REST_Response(
+			[
+				'success' => false,
+				'message' => __( 'You have already voted several times. Please try again later.', 'b-testimonials-block' ),
+			],
+			429
+		);
+	}
+
 	$mark      = min( 10, max( 0, (int) $params['mark'] ) );
 	$page_url  = isset( $params['page_url'] ) ? esc_url_raw( $params['page_url'] ) : '';
 	$page_title = isset( $params['page_title'] ) ? sanitize_text_field( $params['page_title'] ) : '';
@@ -227,11 +268,20 @@ function bpbtb_handle_nps_poll_submit( $request ) {
 		'page_url'   => $page_url,
 		'page_title' => $page_title,
 		'date'       => current_time( 'mysql' ),
-		'user_ip'    => isset( $_SERVER['REMOTE_ADDR'] ) ? sanitize_text_field( wp_unslash( $_SERVER['REMOTE_ADDR'] ) ) : '',
+		/*
+		 * No IP address. One was stored here in plain text on every vote and
+		 * then never read -- not by the dashboard, not by the export, not by
+		 * anything. Personal data collected for no purpose is the kind a site
+		 * owner has to declare and cannot justify, so it is simply not taken.
+		 * Repeat voting is handled by the throttle above, which keys on a
+		 * salted hash it never writes down.
+		 */
 	];
 
 	array_unshift( $votes, $new_vote );
-	update_option( 'bpbtb_nps_poll_votes', array_slice( $votes, 0, 5000 ) );
+	// Explicitly not autoloaded: this grows to thousands of rows, and an
+	// autoloaded option is read on every single request to the site.
+	update_option( 'bpbtb_nps_poll_votes', array_slice( $votes, 0, 5000 ), false );
 
 	return new WP_REST_Response(
 		[

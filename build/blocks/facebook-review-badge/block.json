@@ -383,6 +383,18 @@
       "type": "string",
       "default": ""
     },
+    "ratingSource": {
+      "type": "string",
+      "default": "live"
+    },
+    "ratingPlatform": {
+      "type": "string",
+      "default": ""
+    },
+    "showLiveLink": {
+      "type": "boolean",
+      "default": true
+    },
     "badgeScore": {
       "type": "string",
       "default": ""
@@ -401,6 +413,50 @@
       "full"
     ],
     "html": false
+  },
+  "example": {
+    "attributes": {
+      "items": [
+        {
+          "img": {
+            "url": "data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='96' height='96'%3E%3Crect width='96' height='96' rx='48' fill='%230f766e'/%3E%3Ctext x='48' y='61' font-family='Helvetica,Arial,sans-serif' font-size='34' font-weight='700' fill='%23ffffff' text-anchor='middle'%3ESJ%3C/text%3E%3C/svg%3E"
+          },
+          "name": "Sarah Jenkins",
+          "deg": "Marketing Director",
+          "reviewText": "Setup took about ten minutes and the layout matched our brand straight away.",
+          "rating": 5
+        },
+        {
+          "img": {
+            "url": "data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='96' height='96'%3E%3Crect width='96' height='96' rx='48' fill='%239a3412'/%3E%3Ctext x='48' y='61' font-family='Helvetica,Arial,sans-serif' font-size='34' font-weight='700' fill='%23ffffff' text-anchor='middle'%3EMC%3C/text%3E%3C/svg%3E"
+          },
+          "name": "Michael Chang",
+          "deg": "Founder",
+          "reviewText": "Support replied within the hour and actually solved the problem.",
+          "rating": 5
+        },
+        {
+          "img": {
+            "url": "data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='96' height='96'%3E%3Crect width='96' height='96' rx='48' fill='%23334155'/%3E%3Ctext x='48' y='61' font-family='Helvetica,Arial,sans-serif' font-size='34' font-weight='700' fill='%23ffffff' text-anchor='middle'%3EEW%3C/text%3E%3C/svg%3E"
+          },
+          "name": "Emily Watson",
+          "deg": "Head of Operations",
+          "reviewText": "We replaced three plugins with this one, and the pages load faster too.",
+          "rating": 4
+        }
+      ],
+      "columns": {
+        "desktop": 1,
+        "tablet": 1,
+        "mobile": 1
+      },
+      "badgeDesc": "Rated by real customers",
+      "badgeScore": "4.8",
+      "badgeCount": "236",
+      "ratingSource": "manual",
+      "badgeTitle": "Facebook Reviews"
+    },
+    "viewportWidth": 460
   },
   "render": "file:./render.php",
   "viewScript": "file:../view.js",

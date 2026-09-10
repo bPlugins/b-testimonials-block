@@ -396,6 +396,16 @@
 		],
 		"html": false
 	},
+	"example": {
+		"attributes": {
+			"columns": {
+				"desktop": 1,
+				"tablet": 1,
+				"mobile": 1
+			}
+		},
+		"viewportWidth": 900
+	},
 	"render": "file:./render.php",
 	"viewScript": "file:../view.js",
 	"editorStyle": "file:../index.css",

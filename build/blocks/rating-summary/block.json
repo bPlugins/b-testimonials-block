@@ -13,6 +13,13 @@
     ],
     "html": false
   },
+  "example": {
+    "attributes": {
+      "badgeScore": "4.8",
+      "badgeCount": "236"
+    },
+    "viewportWidth": 520
+  },
   "editorStyle": "file:../index.css",
   "style": [
     "file:../index.css",

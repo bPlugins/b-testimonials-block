@@ -24,6 +24,18 @@ if ( function_exists( 'bpbtb_form_nonce_action' ) ) {
 	$attributes['formRestNonce'] = wp_create_nonce( 'wp_rest' );
 }
 
+/*
+ * The signed token the spam guards read: when this form was drawn, and whether
+ * it offers a photo field. Minted here, per request, for the same reason the
+ * nonce is -- a mint-time baked into post content would be the time the page
+ * was saved, and would make the "too fast" check meaningless.
+ */
+if ( class_exists( 'BPBTB_Form_Security' ) ) {
+	$btb_fields              = isset( $attributes['fields'] ) && is_array( $attributes['fields'] ) ? $attributes['fields'] : [];
+	$attributes['formToken'] = BPBTB_Form_Security::mint_token( ! empty( $btb_fields['image'] ) );
+	$attributes['formTrap']  = BPBTB_Form_Security::HONEYPOT;
+}
+
 $btb_align     = $attributes['align'] ?? 'wide';
 $btb_c_id      = $attributes['cId'] ?? '';
 $btb_extra_cls = $attributes['className'] ?? '';

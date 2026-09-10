@@ -83,15 +83,52 @@ class BPBTB_Admin_Menu {
 	 * their stylesheet is registered here alongside it rather than in each page's
 	 * own file, where it would have to be duplicated.
 	 */
-	const PAGE_SCREENS = [ 'bpbtb-submissions', 'bpbtb-nps-poll' ];
+	const PAGE_SCREENS = [ 'bpbtb-submissions', 'bpbtb-nps-poll', 'bpbtb-review-sources', 'bpbtb-import-export' ];
+
+	/**
+	 * The taxonomy behind the Categories screen, which also carries the canvas.
+	 *
+	 * Registered in includes/cpt.php; named here because the Categories screen
+	 * is core's and can only be told apart by its taxonomy.
+	 */
+	const TAXONOMY = 'testimonial_category';
 
 	public function __construct() {
 		add_action( 'admin_enqueue_scripts', [ $this, 'admin_enqueue_scripts' ] );
 		add_action( 'admin_menu', [ $this, 'admin_menu' ] );
 		add_filter( 'admin_body_class', [ $this, 'admin_body_class' ] );
+		add_action( 'in_admin_header', [ $this, 'render_taxonomy_header' ] );
 		add_action( 'wp_ajax_bpbtbSaveUninstallOption', [ $this, 'save_uninstall_option' ] );
 		add_action( 'wp_ajax_bpbtbSaveDisabledBlocks', [ $this, 'save_disabled_blocks' ] );
 		add_action( 'enqueue_block_editor_assets', [ $this, 'editor_disabled_blocks' ] );
+		add_action( 'admin_head', [ $this, 'highlight_demo_help_menu' ] );
+	}
+
+	/**
+	 * Color the "Demo & Help" submenu link so it stands out in the sidebar,
+	 * the same treatment other bPlugins products give their own onboarding
+	 * page -- see the "Help & Demos" entry under 3D Viewer.
+	 *
+	 * One inline `<style>` tag rather than a whole enqueued stylesheet: it is
+	 * three lines of CSS needed on every admin screen (the sidebar persists
+	 * across all of them), which is not worth a file and a version-busted
+	 * `wp_enqueue_style()` call.
+	 */
+	public function highlight_demo_help_menu() {
+		?>
+		<style>
+			#adminmenu a[href*="page=bpbtb-dashboard"],
+			#adminmenu a[href*="page=bpbtb-dashboard"] *,
+			#adminmenu a[href*="page=bpbtb-dashboard"]:hover,
+			#adminmenu a[href*="page=bpbtb-dashboard"]:hover *,
+			#adminmenu a[href*="page=bpbtb-dashboard"]:focus,
+			#adminmenu a[href*="page=bpbtb-dashboard"]:focus *,
+			#adminmenu li.current a[href*="page=bpbtb-dashboard"],
+			#adminmenu li.current a[href*="page=bpbtb-dashboard"] * {
+				color: #f18500 !important;
+			}
+		</style>
+		<?php
 	}
 
 	/**
@@ -145,8 +182,26 @@ class BPBTB_Admin_Menu {
 		?>
 		<div class="bPlDashboardHeader">
 			<div class="pluginInfo">
+				<?php
+				/*
+				 * The same icon the React dashboard shows, so these pages and
+				 * Demo & Help carry one mark rather than two.
+				 *
+				 * It used to point at `b-testimonial` -- a different, dropped
+				 * plugin -- so these three pages were showing another product's
+				 * icon while the dashboard showed this one's. The slug is
+				 * `b-testimonials-block`, and the file is the SVG the dashboard
+				 * uses rather than the 128px PNG, so it stays sharp at the
+				 * header's size.
+				 *
+				 * Deliberately unpinned (no `?rev=`): a pinned revision keeps
+				 * serving the artwork as it was at that upload, so replacing the
+				 * icon on wp.org would never reach here. Kept in step with
+				 * `media.logo` in src/admin/utils/data.js, which PHP cannot read.
+				 */
+				?>
 				<img
-					src="https://ps.w.org/b-testimonial/assets/icon-128x128.png"
+					src="https://ps.w.org/b-testimonials-block/assets/icon.svg"
 					alt="<?php esc_attr_e( 'Testimonials', 'b-testimonials-block' ); ?>"
 				/>
 				<h1><?php esc_html_e( 'Testimonials', 'b-testimonials-block' ); ?></h1>
@@ -221,6 +276,42 @@ class BPBTB_Admin_Menu {
 	}
 
 	/**
+	 * Is this the Categories screen?
+	 *
+	 * Categories is core's `edit-tags.php`, not a page this plugin renders, so
+	 * it cannot be matched the way the four own pages are: `is_styled_page()` is
+	 * handed the hook suffix on the enqueue side, and for every taxonomy that is
+	 * the same `edit-tags.php` -- matching on it would style another post type's
+	 * categories too. The taxonomy on the screen object is the only thing that
+	 * identifies this one.
+	 *
+	 * @return bool
+	 */
+	private function is_styled_taxonomy_screen() {
+		$screen = function_exists( 'get_current_screen' ) ? get_current_screen() : null;
+
+		return $screen
+			&& 'edit-tags' === $screen->base
+			&& self::TAXONOMY === $screen->taxonomy;
+	}
+
+	/**
+	 * The dashboard header, on the Categories screen.
+	 *
+	 * The four own pages call render_header() from their own markup. This screen
+	 * is core's, so the header is printed into `in_admin_header` instead -- the
+	 * last hook before core opens `#wpbody-content`, which puts it in the same
+	 * place relative to the canvas as it sits on the other pages.
+	 */
+	public function render_taxonomy_header() {
+		if ( ! $this->is_styled_taxonomy_screen() ) {
+			return;
+		}
+
+		self::render_header();
+	}
+
+	/**
 	 * Marks the two PHP pages on <body>.
 	 *
 	 * The stylesheet needs a handle outside its own wrapper to hide the notices
@@ -236,6 +327,16 @@ class BPBTB_Admin_Menu {
 
 		if ( $screen && $this->is_styled_page( $screen->id ) ) {
 			$classes .= ' bpbtb-admin-page-host';
+		}
+
+		/*
+		 * Categories gets the canvas as well, plus a class of its own: the
+		 * markup under it is core's list table and term form rather than this
+		 * plugin's cards, so the stylesheet has a separate block for it -- and
+		 * the rules there must not reach the four own pages.
+		 */
+		if ( $this->is_styled_taxonomy_screen() ) {
+			$classes .= ' bpbtb-admin-page-host bpbtb-taxonomy-page';
 		}
 
 		return $classes;
@@ -275,7 +376,7 @@ class BPBTB_Admin_Menu {
 			wp_set_script_translations( 'bpbtb-admin-dashboard', 'b-testimonials-block', plugin_dir_path( __DIR__ ) . 'languages' );
 		}
 
-		if ( $this->is_styled_page( $hook ) ) {
+		if ( $this->is_styled_page( $hook ) || $this->is_styled_taxonomy_screen() ) {
 			// Roboto, the family bpl-tools' dashboard stylesheet sets on everything.
 			// Not Lato: that is only used for the dashboard header's wordmark, and
 			// these screens have no header. Enqueued rather than @imported so it

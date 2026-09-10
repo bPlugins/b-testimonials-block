@@ -1,8 +1,9 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 
 import Style from "./Style";
 import Layout from "./Layout/Layout";
 import ExpandButton from "./ExpandButton";
+import TestimonialFilter from "./TestimonialFilter";
 
 /**
  * Read-only rendering of a testimonials block, shared by the front end
@@ -62,8 +63,80 @@ const TestimonialsView = ({
   // textLength needs a default here: without one, slice(0, undefined) returns
   // the whole string and `contentLength > undefined` is false, so the text
   // never truncates and the toggle never appears.
-  const { items = [], elements = {}, textLength = 120 } = attributes;
+  const {
+    items: allItems = [],
+    elements = {},
+    textLength = 120,
+    showFilter = false,
+    showSearch = false,
+    filterAllLabel = "",
+    searchPlaceholder = "",
+  } = attributes;
   const { expandBtn } = elements || {};
+
+  const [activeCat, setActiveCat] = useState("");
+  const [search, setSearch] = useState("");
+
+  // Every category present among these testimonials, in the order they first
+  // appear, deduplicated by slug. Derived from the items rather than fetched:
+  // the block already holds everything it displays, and a category with nothing
+  // in it would be a tab that filters to an empty grid.
+  const categories = useMemo(() => {
+    const seen = new Map();
+
+    allItems.forEach((item) => {
+      (item?.categories || []).forEach((cat) => {
+        if (cat?.slug && !seen.has(cat.slug)) {
+          seen.set(cat.slug, { slug: cat.slug, name: cat.name || cat.slug });
+        }
+      });
+    });
+
+    return Array.from(seen.values());
+  }, [allItems]);
+
+  const items = useMemo(() => {
+    if (!showFilter && !showSearch) {
+      return allItems;
+    }
+
+    const needle = search.trim().toLowerCase();
+
+    return allItems.filter((item) => {
+      if (showFilter && activeCat) {
+        const inCat = (item?.categories || []).some(
+          (cat) => cat?.slug === activeCat
+        );
+
+        if (!inCat) {
+          return false;
+        }
+      }
+
+      if (showSearch && needle) {
+        // Name, role, company and the review itself -- someone searching
+        // "acme" means the company as readily as the review body.
+        const haystack = [
+          item?.name,
+          item?.deg,
+          item?.company,
+          item?.reviewText,
+        ]
+          .filter(Boolean)
+          .join(" ")
+          // Review text is stored as HTML; tags must not be searchable or
+          // "div" would match everything.
+          .replace(/<[^>]*>/g, " ")
+          .toLowerCase();
+
+        if (!haystack.includes(needle)) {
+          return false;
+        }
+      }
+
+      return true;
+    });
+  }, [allItems, activeCat, search, showFilter, showSearch]);
 
   const itemsEls = items.map((item) => {
     const { name, deg, reviewText } = item;
@@ -93,8 +166,26 @@ const TestimonialsView = ({
       <Style attributes={attributes} clientId={cId} />
 
       <div className="btbTestimonialsDir">
+        <TestimonialFilter
+          categories={categories}
+          active={activeCat}
+          search={search}
+          onCategory={setActiveCat}
+          onSearch={setSearch}
+          showFilter={showFilter}
+          showSearch={showSearch}
+          allLabel={filterAllLabel}
+          searchPlaceholder={searchPlaceholder}
+          resultCount={items.length}
+          inputId={`btb-filter-search-${cId || "x"}`}
+        />
+
+        {/* Layout reads `attributes.items` and indexes `itemsEls` by the same
+            position, so the filtered list has to reach it through the
+            attributes as well -- passing only itemsEls would draw the filtered
+            text into the unfiltered cards. */}
         <Layout
-          attributes={attributes}
+          attributes={{ ...attributes, items }}
           itemsEls={itemsEls}
           isBackend={isBackend}
           previewDevice={previewDevice}

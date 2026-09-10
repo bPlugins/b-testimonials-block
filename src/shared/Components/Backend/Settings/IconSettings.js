@@ -1,13 +1,32 @@
 import { __, sprintf } from "@wordpress/i18n";
-import { useState } from "react";
+import { lazy, Suspense, useState } from "react";
 import {
   Button,
   Dashicon,
   PanelBody,
+  PanelRow,
   RangeControl,
+  Spinner,
 } from "@wordpress/components";
 
-import IconLibrary from "../../../../../../bpl-tools/Components/IconLibrary/IconLibrary";
+/*
+ * Loaded on demand rather than imported outright.
+ *
+ * IconLibrary pulls in three icon sets as JSON -- Font Awesome, Bootstrap and
+ * Lucid -- which come to 3.35 MB between them. Imported normally that lands in
+ * the editor bundle every one of the forty blocks shares, so opening the editor
+ * downloaded and parsed all of it before a single block was on the canvas,
+ * whether or not anyone went near an icon.
+ *
+ * The panel below only renders its children once it is opened, so as a lazy
+ * import the icon sets arrive exactly when someone opens Icon and picks one.
+ */
+const IconLibrary = lazy(() =>
+  import(
+    /* webpackChunkName: "bpl-icon-library" */
+    "../../../../../../bpl-tools/Components/IconLibrary/IconLibrary"
+  )
+);
 import { ColorControl } from "../../../../../../bpl-tools/Components/ColorControl/ColorControl";
 import { ICON_LAYOUTS, resolveIconSlots } from "../../../utils/blockIcons";
 import { BRAND_COLOR } from "../../../utils/icons";
@@ -99,13 +118,20 @@ const IconSettings = ({
     <>
       {slot?.note && <p className="description">{slot.note}</p>}
 
-      <IconLibrary
-        label={
-          config.add ? __("Icon", "b-testimonials-block") : slot?.label || ""
-        }
-        value={icon.svg || ""}
-        onChange={(svg) => setIcon(slot.key, { svg })}
-      />
+      <Suspense
+        fallback={
+          <PanelRow>
+            <Spinner />
+          </PanelRow>
+        }>
+        <IconLibrary
+          label={
+            config.add ? __("Icon", "b-testimonials-block") : slot?.label || ""
+          }
+          value={icon.svg || ""}
+          onChange={(svg) => setIcon(slot.key, { svg })}
+        />
+      </Suspense>
 
       <ColorControl
         label={__("Icon Color", "b-testimonials-block")}

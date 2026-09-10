@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useMemo, useState, useEffect } from "react";
 import { __ } from "@wordpress/i18n";
 import {
   RichText,
@@ -30,12 +30,15 @@ import { ALLOWED_CHILD_BLOCKS } from "../Common/BlockSwitcherModal";
 import "../../styles/frontend.scss";
 import "../../styles/editor.scss";
 import Settings from "./Settings/Settings";
+import FrontShortCode from "./FrontShortCode";
 import Style from "../Common/Style";
 import Layout from "../Common/Layout/Layout";
 import TestimonialsView from "../Common/TestimonialsView";
 import { upload } from "../../utils/icons";
 import { clickable } from "../../utils/a11y";
 import usePreviewDevice from "../../utils/usePreviewDevice";
+import useReviewSource, { withLiveReview } from "../../utils/useReviewSource";
+import { getBadgePlatform } from "../../utils/reviewSources";
 
 const mapCptPost = (post) => ({
   img: { url: post?._embedded?.["wp:featuredmedia"]?.[0]?.source_url || "" },
@@ -97,6 +100,20 @@ const Edit = (props) => {
     [clientId],
   );
 
+  // Only true on the "Testimonials Block" CPT screen (Testimonials -> Shortcode;
+  // see includes/display-cpt.php), where this block is the whole post and a
+  // shortcode can target it by post ID. Inserted into a regular page/post,
+  // currentPostType is that page's own type.
+  const currentPostType = useSelect(
+    (select) => select("core/editor").getCurrentPostType(),
+    [],
+  );
+  const currentPostId = useSelect(
+    (select) => select("core/editor").getCurrentPostId(),
+    [],
+  );
+  const isDisplayCpt = "testimonials-block" === currentPostType;
+
   useEffect(() => {
     clientId && setAttributes({ cId: clientId.substring(0, 10) });
   }, [clientId, setAttributes]); // Set & Update clientId to cId
@@ -104,6 +121,29 @@ const Edit = (props) => {
   useEffect(() => tabController(), [isSelected]);
 
   const previewDevice = usePreviewDevice();
+
+  /*
+   * A review badge's live figures, for the canvas.
+   *
+   * The published page gets these from render.php, which resolves them on every
+   * request. The editor has no render.php, so it reads the same server-side
+   * cache over REST -- the point being that the number in the canvas is the
+   * number the page will show, not a second guess at it.
+   *
+   * Merged into a copy of the attributes and deliberately never saved: these
+   * blocks serialise their attributes into post content, so a stored score
+   * would freeze one afternoon's rating into the page and sit there going
+   * stale. See withLiveReview() for the full reasoning.
+   */
+  const badgePlatform = getBadgePlatform(attributes.layout, attributes);
+  const liveReview = useReviewSource(
+    badgePlatform,
+    !!badgePlatform && "manual" !== (attributes.ratingSource || "live"),
+  );
+  const previewAttributes = useMemo(
+    () => withLiveReview(attributes, liveReview.data),
+    [attributes, liveReview.data],
+  );
   const [activeIndex, setActiveIndex] = useState(0);
 
   // Fetch testimonials from the CPT for the editor preview when that source is active.
@@ -184,6 +224,9 @@ const Edit = (props) => {
         // all of it, so only the switcher, which retargets the child, is shown.
         return (
           <div {...blockProps}>
+            {isDisplayCpt && (
+              <FrontShortCode shortCode={`[testimonials_block id=${currentPostId}]`} />
+            )}
             <InspectorControls>
               <BlockSwitcher
                 clientId={clientId}
@@ -204,6 +247,13 @@ const Edit = (props) => {
       if (isClassicExplicitOff || isFreshNewBlock) {
         return (
           <div {...blockProps}>
+            {/* No FrontShortCode here, deliberately: nothing has been chosen
+                yet, so `[testimonials_block id=…]` would not render anything
+                either -- showing it at this point just invites someone to
+                copy a shortcode that does nothing yet. It appears once a
+                layout is picked (branch 1 above, and the classic-render
+                branch below), which is also the earliest point the block
+                itself renders anything on the front end. */}
             {/* Same reasoning as the branch above, at the other end of the
                 block's life: nothing has been chosen yet, so this block renders
                 nothing on the page and every panel but the switcher is a
@@ -332,13 +382,26 @@ const Edit = (props) => {
         setActiveIndex={setActiveIndex}
         clientId={clientId}
         currentBlockName={name}
+        badgePlatform={badgePlatform}
+        liveReview={liveReview}
       />
 
       <div {...blockProps} id={`btbTestimonialsDir-${clientId}`}>
+        {/* isMainParentBlock too, not just isDisplayCpt: this same shared
+            Edit.js is also every child layout's own edit function (grid-2,
+            slider, ...), and a child reaches this exact return whenever it
+            is not bptmb/b-testimonials itself. Without the extra check, a
+            child picked inside the wrapper on the Testimonials Block CPT
+            screen showed a second copy of the bar -- the wrapper's branch 1
+            above already shows the one that matters. */}
+        {isDisplayCpt && isMainParentBlock && (
+          <FrontShortCode shortCode={`[testimonials_block id=${currentPostId}]`} />
+        )}
+
         {isCpt ? (
           cptItems.length ? (
             <TestimonialsView
-              attributes={{ ...attributes, items: cptItems }}
+              attributes={{ ...previewAttributes, items: cptItems }}
               clientId={clientId}
               isBackend={true}
               previewDevice={previewDevice}
@@ -365,7 +428,7 @@ const Edit = (props) => {
                 MediaUploadCheck={MediaUploadCheck}
                 isBackend={true}
                 previewDevice={previewDevice}
-                attributes={attributes}
+                attributes={previewAttributes}
                 activeIndex={activeIndex}
                 setActiveIndex={setActiveIndex}
                 updateItem={updateItem}

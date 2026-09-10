@@ -74,14 +74,24 @@
 - [ ] **Featured Quote / Comparison**
 
 ## Phase 5 — SEO, Filtering & E-commerce Boosters — 📋 পরিকল্পনা
-- [ ] **Schema.org Structured Data (JSON-LD)** — AggregateRating & Review schema generation for Google Rich Snippets
-- [ ] **Dynamic Category Filter & Live Search** — Category tabs & keyword filter bar for Testimonials Grid/Slider
-- [ ] **WooCommerce Product Reviews Sync** — Display Woo product reviews inside testimonials blocks dynamically
+- [x] **Schema.org Structured Data (JSON-LD)** — AggregateRating & Review schema generation for Google Rich Snippets ✅ 1.0.5
+- [x] **Dynamic Category Filter & Live Search** — Category tabs & keyword filter bar ✅ 1.0.5 (17 collection layouts)
+- [~] **WooCommerce Product Reviews** — one-way import shipped 1.0.5; dynamic live sync still to do
 - [ ] **In-Testimonial CTA Buttons** — Call-to-action link buttons inside testimonial cards (e.g., "View Case Study", "Buy Now")
-- [ ] **CSV / JSON Export & Import Tool** — WP Admin import/export manager for testimonials CPT
+- [x] **CSV Export & Import Tool** — WP Admin import/export manager for testimonials CPT ✅ 1.0.5, plus one-click migration from Strong Testimonials, Real Testimonials, Site Reviews and WooCommerce reviews
 
-## Phase 6 — Social Proof Sync & Automation — 📋 পরিকল্পনা
-- [ ] **Google Places / Maps API Importer** — Auto-sync Google Reviews with CRON & caching
+## Phase 6 — Social Proof Sync & Automation — 🚧 চলমান
+- [x] **Live Platform Ratings** — ৫টা প্ল্যাটফর্ম badge + Review Badge Widget-এ আর হাতে লেখা স্কোর নেই।
+  ক্রেডেনশিয়াল এক জায়গায়: **Testimonials → Review Sources**
+  ([includes/review-sources.php](includes/review-sources.php), [includes/admin-review-sources.php](includes/admin-review-sources.php))
+  - **Google** (Places API New), **Facebook** (Graph API), **Trustpilot** (Business API) — অফিশিয়াল API
+    থেকে আসল rating + review count; option-এ cache, WP-Cron-এ refresh, তাই কোনো page view কখনো
+    HTTP request-এর জন্য অপেক্ষা করে না
+  - **G2 / Capterra** — public API নেই, এবং product page-ও server-side request-এ **HTTP 403** দেয়
+    (৪টা আলাদা user-agent দিয়ে যাচাই করা)। তাই ওদের ফিগার ওই স্ক্রিনে একবার বসানো হয় — প্রতি ব্লকে
+    নয়, পুরো সাইটে একবার। URL দিলে schema.org data-ও পড়ার চেষ্টা হয়
+  - প্রতি ব্লকে `Rating Source` = Live / Manual; API key কখনো block attribute-এ যায় না
+- [ ] **Google Places / Maps API Importer** — individual review *text* CPT-তে import (aggregate score/count উপরে হয়ে গেছে)
 - [ ] **Live Social Proof Toast (FOMO Popup)** — Floating real-time testimonial notifications on screen corners
 - [ ] **Slack / Discord & Email Webhooks** — Real-time notification when a new testimonial is submitted
 - [ ] **QR Code Testimonial Generator** — Generate QR code in Admin for instant mobile testimonial collection
@@ -92,9 +102,16 @@
 - [ ] **Floating Review Collector Widget** — Corner floating tab opening a testimonial reader & review submission modal
 - [ ] **Analytics & Conversion Dashboard** — Track testimonial impressions, CTA clicks, and video play rates
 
+## Security — ✅ 1.0.5
+- [x] Public submission endpoint: honeypot, signed timing token, link cap, per-IP rate limit, duplicate guard, length caps
+- [x] Photo upload gated on the rendered form + size cap + real-image check
+- [x] NPS poll route: nonce required, throttled, vote log no longer autoloaded
+- [x] Stopped storing visitors' IP addresses
+- [x] JSON-LD escapes slashes (no `</script>` breakout)
+
 ## Phase 8 — Polish & WP.org Submission — 📋 পরিকল্পনা
-- [ ] 20+ Gutenberg Block Patterns (Wall of Love, Hero Testimonials, E-commerce Social Proof)
-- [ ] i18n pot build script fix & accessibility (a11y) audit for keyboard navigation
+- [~] Gutenberg Block Patterns — 7 shipped in 1.0.5 (Wall of Love, SaaS Hero, E-commerce Social Proof, Agency Results, Trust Bar, Marquee, Ask for a Review)
+- [~] a11y: ratings, expand toggle, modal focus trap + Escape, form labels, poll, dots, toast ✅ 1.0.5; contrast + reduced-motion still to do. i18n pot script fix still to do
 - [ ] Documentation, `readme.txt` update & WP.org submission
 
 ---

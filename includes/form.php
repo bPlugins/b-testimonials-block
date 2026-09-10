@@ -85,6 +85,29 @@ function bpbtb_handle_form_submit( $request ) {
 		);
 	}
 
+	// Spam, rate and length guards. The nonce above proves the request came
+	// from this site; these decide whether it came from a person. See
+	// includes/form-security.php for what each one is for.
+	if ( class_exists( 'BPBTB_Form_Security' ) ) {
+		$guard = BPBTB_Form_Security::check( $request );
+
+		if ( is_wp_error( $guard ) ) {
+			return new WP_REST_Response(
+				[
+					'success' => false,
+					'message' => $guard->get_error_message(),
+				],
+				// 429 for "slow down", 400 for "this looks wrong" -- the two
+				// mean different things to a client and to a log.
+				'bpbtb_rate_limited' === $guard->get_error_code() ? 429 : 400
+			);
+		}
+
+		$limits = BPBTB_Form_Security::limits();
+		$name   = BPBTB_Form_Security::cap( $name, $limits['name'] );
+		$review = BPBTB_Form_Security::cap( $review, $limits['review'] );
+	}
+
 	$post_id = wp_insert_post(
 		[
 			'post_type'    => 'testimonial',
@@ -108,21 +131,36 @@ function bpbtb_handle_form_submit( $request ) {
 	$rating = isset( $params['rating'] ) ? min( 5, max( 1, absint( $params['rating'] ) ) ) : 5;
 	update_post_meta( $post_id, 'bpbtb_rating', $rating );
 
+	$bpbtb_limits = class_exists( 'BPBTB_Form_Security' ) ? BPBTB_Form_Security::limits() : [];
+	$bpbtb_cap    = static function ( $value, $key ) use ( $bpbtb_limits ) {
+		return isset( $bpbtb_limits[ $key ] ) && class_exists( 'BPBTB_Form_Security' )
+			? BPBTB_Form_Security::cap( $value, $bpbtb_limits[ $key ] )
+			: $value;
+	};
+
 	if ( ! empty( $params['designation'] ) ) {
-		update_post_meta( $post_id, 'bpbtb_designation', sanitize_text_field( $params['designation'] ) );
+		update_post_meta( $post_id, 'bpbtb_designation', $bpbtb_cap( sanitize_text_field( $params['designation'] ), 'designation' ) );
 	}
 
 	if ( ! empty( $params['company'] ) ) {
-		update_post_meta( $post_id, 'bpbtb_company', sanitize_text_field( $params['company'] ) );
+		update_post_meta( $post_id, 'bpbtb_company', $bpbtb_cap( sanitize_text_field( $params['company'] ), 'company' ) );
 	}
 
 	if ( ! empty( $params['email'] ) ) {
-		update_post_meta( $post_id, 'bpbtb_email', sanitize_email( $params['email'] ) );
+		update_post_meta( $post_id, 'bpbtb_email', $bpbtb_cap( sanitize_email( $params['email'] ), 'email' ) );
 	}
 
-	// Optional photo upload — restricted to a small set of image types.
-	$files = $request->get_file_params();
-	if ( ! empty( $files['image'] ) && ! empty( $files['image']['name'] ) ) {
+	/*
+	 * Optional photo upload.
+	 *
+	 * Gated on may_upload(), which reads the signed token to see whether the
+	 * form that was drawn actually offered a photo field -- it defaults to off,
+	 * and until this gate existed a site with the field switched off still
+	 * accepted unauthenticated uploads into its media library. It also enforces
+	 * the size cap and confirms the bytes are an image before anything is
+	 * written to disk.
+	 */
+	if ( class_exists( 'BPBTB_Form_Security' ) && BPBTB_Form_Security::may_upload( $request ) ) {
 		require_once ABSPATH . 'wp-admin/includes/file.php';
 		require_once ABSPATH . 'wp-admin/includes/media.php';
 		require_once ABSPATH . 'wp-admin/includes/image.php';

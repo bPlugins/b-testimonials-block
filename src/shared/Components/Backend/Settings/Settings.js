@@ -23,6 +23,8 @@ import { produce } from "immer";
 import IconSettings from "./IconSettings";
 import BadgeScorePanel from "./BadgeScorePanel";
 import BadgeLogoPanel from "./BadgeLogoPanel";
+import RatingSourcePanel from "./RatingSourcePanel";
+import { GENERIC_BADGE_LAYOUT } from "../../../utils/reviewSources";
 import ColorsPanel from "./ColorsPanel";
 import FaqStylePanel from "./FaqStylePanel";
 import GradientBorderPanel from "./GradientBorderPanel";
@@ -77,6 +79,12 @@ const Settings = ({
   setActiveIndex,
   clientId,
   currentBlockName,
+  // Both come from Edit.js, which already fetches the platform's live figures
+  // for the canvas. Passed down rather than fetched again here: one request per
+  // block, and the sidebar cannot end up quoting a different score from the
+  // preview beside it.
+  badgePlatform = "",
+  liveReview = {},
 }) => {
   const {
     columns = { desktop: 3, tablet: 2, mobile: 1 },
@@ -138,6 +146,10 @@ const Settings = ({
       navigation: true,
     },
     dataSource = "manual",
+    showFilter = false,
+    showSearch = false,
+    filterAllLabel = "",
+    searchPlaceholder = "",
     query = {},
   } = attributes || {};
 
@@ -680,6 +692,70 @@ const Settings = ({
                     </PanelBody>
                   )}
 
+                  {/*
+                    Only the layouts that show a list of testimonials declare
+                    these attributes, so their presence is the test -- a badge or
+                    a stat counter has nothing to filter, and gating on the
+                    block name would need updating every time the list changes.
+                  */}
+                  {"undefined" !== typeof attributes.showFilter && (
+                    <PanelBody
+                      className="bPlPanelBody"
+                      initialOpen={false}
+                      title={__("Filter & Search", "b-testimonials-block")}>
+                      <ToggleControl
+                        label={__("Category filter", "b-testimonials-block")}
+                        checked={!!showFilter}
+                        onChange={(val) => setAttributes({ showFilter: val })}
+                        help={__(
+                          "Show a row of category buttons above the testimonials. Visitors filter without reloading the page.",
+                          "b-testimonials-block",
+                        )}
+                      />
+
+                      {showFilter && (
+                        <TextControl
+                          label={__("\"All\" button text", "b-testimonials-block")}
+                          value={filterAllLabel}
+                          placeholder={__("All", "b-testimonials-block")}
+                          onChange={(val) =>
+                            setAttributes({ filterAllLabel: val })
+                          }
+                        />
+                      )}
+
+                      <ToggleControl
+                        label={__("Search box", "b-testimonials-block")}
+                        checked={!!showSearch}
+                        onChange={(val) => setAttributes({ showSearch: val })}
+                        help={__(
+                          "Search the name, role, company and review text of the testimonials on this block.",
+                          "b-testimonials-block",
+                        )}
+                      />
+
+                      {showSearch && (
+                        <TextControl
+                          label={__("Search placeholder", "b-testimonials-block")}
+                          value={searchPlaceholder}
+                          placeholder={__("Search reviews…", "b-testimonials-block")}
+                          onChange={(val) =>
+                            setAttributes({ searchPlaceholder: val })
+                          }
+                        />
+                      )}
+
+                      {showFilter && "cpt" !== dataSource && (
+                        <p className="description">
+                          {__(
+                            "Categories come from the Testimonials post type. Switch Content Source to Testimonials (CPT) and put your testimonials in categories for the buttons to appear.",
+                            "b-testimonials-block",
+                          )}
+                        </p>
+                      )}
+                    </PanelBody>
+                  )}
+
                   {/* Context-aware Widget / Badge / Custom Block Settings */}
                   {(() => {
                     // Skip top panel for case-study-card (handled inside item cards)
@@ -865,6 +941,25 @@ const Settings = ({
                         className="bPlPanelBody"
                         title={__(labels.panel, "b-testimonials-block")}
                         initialOpen={true}>
+                        {/*
+                          Above the manual fields, not below them, because it
+                          decides whether they are used at all -- a Rating Score
+                          box that the block is currently ignoring is worth
+                          knowing about before it is filled in. Only for the six
+                          badges that have a platform to read; every other layout
+                          sharing this panel (`badgePlatform` is '') gets the
+                          fields on their own, as before.
+                        */}
+                        {!!badgePlatform || GENERIC_BADGE_LAYOUT === layout ? (
+                          <RatingSourcePanel
+                            attributes={attributes}
+                            setAttributes={setAttributes}
+                            layout={layout}
+                            platform={badgePlatform}
+                            liveReview={liveReview}
+                          />
+                        ) : null}
+
                         {labels.title && (
                           <TextControl
                             label={__(labels.title, "b-testimonials-block")}

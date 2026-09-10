@@ -220,6 +220,20 @@
 		],
 		"html": false
 	},
+	"example": {
+		"attributes": {
+			"formTitle": "Share your experience",
+			"buttonText": "Submit testimonial",
+			"fields": {
+				"email": false,
+				"designation": true,
+				"company": false,
+				"rating": true,
+				"image": false
+			}
+		},
+		"viewportWidth": 560
+	},
 	"editorStyle": "file:../index.css",
 	"style": [
 		"file:../index.css",

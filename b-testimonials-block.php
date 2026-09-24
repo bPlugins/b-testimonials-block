@@ -2,11 +2,11 @@
 /**
  * Plugin Name: Testimonials Block
  * Description: Boost your website's credibility with Testimonials Block, effortlessly showcasing customer ratings and reviews.
- * Version: 1.0.5
- * Author: bPlugins
- * Author URI: http://bplugins.com
+ * Stable tag: 1.0.5
+ * Tested up to: 7.1
  * Requires at least: 6.5
  * Requires PHP: 7.4
+ * Author: bPlugins
  * License: GPLv3
  * License URI: https://www.gnu.org/licenses/gpl-3.0.txt
  * Text Domain: b-testimonials-block
@@ -60,7 +60,7 @@ class BPBTB_Testimonials_Block{
             return;
         }
 
-        wp_safe_redirect( admin_url( 'edit.php?post_type=testimonial' ) );
+        wp_safe_redirect( admin_url( 'edit.php?post_type=testimonial&page=bpbtb-dashboard' ) );
         exit;
     }
 
@@ -152,29 +152,7 @@ class BPBTB_Testimonials_Block{
 		}
 	}
 
-	/**
-	 * Load the editor bundle the forty blocks share.
-	 *
-	 * They used to have one `editorScript` each, which compiled the same shared
-	 * code -- the Edit component, every settings panel, bpl-tools and its 3.3 MB
-	 * icon library -- forty times over, and came to 137 MB of build output. They
-	 * now compile to one bundle; see src/blocks/index.js for why.
-	 *
-	 * Enqueued here rather than named in each block.json, because a file named in
-	 * forty of them is registered under forty handles: the editor printed a
-	 * <script> tag for each, the browser ran the same bundle forty times, and
-	 * every run after the first re-registered blocks the first had already
-	 * registered. One handle, one tag, one execution.
-	 *
-	 * Only the script. `editorStyle` stays in block.json: a stylesheet linked
-	 * forty times costs a tag and no behaviour, and it is how the editor gets CSS
-	 * into the iframed canvas -- worth forty duplicate <link>s to keep that path
-	 * exactly as it was.
-	 *
-	 * The blocks are still registered from their own block.json in onInit(), so
-	 * `render.php`, `viewScript` and the front-end styles are untouched -- a
-	 * visitor still loads only what the page actually uses.
-	 */
+	
 	public function enqueue_editor_bundle() {
 		$asset_file = __DIR__ . '/build/blocks/index.asset.php';
 

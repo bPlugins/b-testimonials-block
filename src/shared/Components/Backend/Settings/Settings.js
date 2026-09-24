@@ -24,7 +24,10 @@ import IconSettings from "./IconSettings";
 import BadgeScorePanel from "./BadgeScorePanel";
 import BadgeLogoPanel from "./BadgeLogoPanel";
 import RatingSourcePanel from "./RatingSourcePanel";
-import { GENERIC_BADGE_LAYOUT } from "../../../utils/reviewSources";
+import {
+  GENERIC_BADGE_LAYOUT,
+  platformSupportsQuotes,
+} from "../../../utils/reviewSources";
 import ColorsPanel from "./ColorsPanel";
 import FaqStylePanel from "./FaqStylePanel";
 import GradientBorderPanel from "./GradientBorderPanel";
@@ -237,6 +240,28 @@ const Settings = ({
   // The only layout that plays a per-card media file, so the upload below is
   // scoped to it rather than added to every testimonial card.
   const isAudio = layout === "audio-testimonials";
+  // review-badge-widget and google-review-badge are the only two layouts with
+  // a "Review quotes" display mode (see reviewSources.js's
+  // PLATFORMS_WITH_QUOTES); every other layout leaves displayMode undefined,
+  // so this stays false for them without needing its own layout check.
+  //
+  // Live quotes also require the resolved platform to still support them: on
+  // the generic widget, `displayMode` stays "quotes" if a visitor picks
+  // Google, switches to quotes, then changes Platform to one of the four that
+  // don't have it -- Layout.js already falls back to the badge in that case
+  // (no liveReviews to show), so the sidebar has to fall back with it rather
+  // than keep hiding the Icon panel and renaming Badge Title/Review Count for
+  // a badge that is back on screen.
+  //
+  // Manual quotes need no such platform check: `manualQuotes` is typed in by
+  // hand for whichever platform is picked -- Facebook, Trustpilot, G2 and
+  // Capterra included, none of which ever supports live quotes -- so Manual
+  // mode alone is enough to count as quotes display, same as
+  // RatingSourcePanel's isQuotesMode.
+  const isQuoteDisplay =
+    "quotes" === attributes.displayMode &&
+    ("manual" === (attributes.ratingSource || "live") ||
+      platformSupportsQuotes(badgePlatform));
 
   // Whether this block's card list can be rearranged, and which arrangement is
   // currently in effect (falling back to `layout` for posts saved before the
@@ -254,8 +279,16 @@ const Settings = ({
   // review count -- they are titled for what they actually move. Every other
   // layout falls through to the card's own wording.
   const typoLabels = TYPO_PANEL_LABELS[layout] || {};
-  const nameLabel = typoLabels.name || __("Name", "b-testimonials-block");
-  const degLabel = typoLabels.deg || __("Designation", "b-testimonials-block");
+  // In Review quotes mode these two panels no longer style a badge heading and
+  // a review count -- their Color control (the only part of them that still
+  // does anything, via the shared --btb-title/--btb-muted variables) repaints
+  // the reviewer's name and the review's timestamp on every quote card.
+  const nameLabel = isQuoteDisplay
+    ? __("Reviewer Name", "b-testimonials-block")
+    : typoLabels.name || __("Name", "b-testimonials-block");
+  const degLabel = isQuoteDisplay
+    ? __("Review Time", "b-testimonials-block")
+    : typoLabels.deg || __("Designation", "b-testimonials-block");
 
   // The excerpt cut and the Expand/Less toggle belong to the review text, so
   // they follow whether the layout prints it -- not how many items it shows.
@@ -380,7 +413,15 @@ const Settings = ({
   // always travel together: the timeline, hero and card stack draw their stars
   // inline (so the colour applies) while their review text is styled by the
   // stylesheet (so the typography does not reach it).
-  const hasTextStyle = controls.textStyle && rendersPart("reviewText");
+  // Quote cards print the review's own words as `.btb-quote-text`, which
+  // neither `controls.textStyle` nor `rendersPart("reviewText")` know about --
+  // both describe the classic card's excerpt, not a role a review badge ever
+  // had before "Review quotes" gave it one. `textTypo`/`textColor` already
+  // exist on both blocks' block.json (every layout gets them) and were dead
+  // weight here until now: nothing rendered `.single .reviewText` for a badge
+  // to read them from.
+  const hasTextStyle =
+    (controls.textStyle && rendersPart("reviewText")) || isQuoteDisplay;
   // Of the seven card themes only Theme 4 renders no rating icon, so on that one
   // both the Elements toggle and the star colour have nothing to act on. Checked
   // across all seven components rather than assumed.
@@ -970,9 +1011,14 @@ const Settings = ({
                               })
                             }
                             help={
-                              labels.titleHelp
-                                ? __(labels.titleHelp, "b-testimonials-block")
-                                : ""
+                              isQuoteDisplay
+                                ? __(
+                                    "In Review quotes mode this only appears in the \"See more reviews on…\" link below the quotes.",
+                                    "b-testimonials-block",
+                                  )
+                                : labels.titleHelp
+                                  ? __(labels.titleHelp, "b-testimonials-block")
+                                  : ""
                             }
                           />
                         )}
@@ -992,7 +1038,9 @@ const Settings = ({
                             }
                           />
                         )}
-                        {labels.score && (
+                        {/* Neither renders in Review quotes mode -- quote
+                            cards show no score and no count, live or manual. */}
+                        {labels.score && !isQuoteDisplay && (
                           <TextControl
                             label={__(labels.score, "b-testimonials-block")}
                             value={attributes.badgeScore ?? ""}
@@ -1008,7 +1056,7 @@ const Settings = ({
                             }
                           />
                         )}
-                        {labels.count && (
+                        {labels.count && !isQuoteDisplay && (
                           <TextControl
                             label={__(labels.count, "b-testimonials-block")}
                             value={attributes.badgeCount ?? ""}
@@ -1999,10 +2047,15 @@ const Settings = ({
                     </PanelBody>
                   )}
 
-                  <IconSettings
-                    attributes={attributes}
-                    setAttributes={setAttributes}
-                  />
+                  {/* Quote cards show a reviewer avatar/initial, never this
+                      fallback badge icon, so the picker has nothing to affect
+                      once a widget is in Review quotes mode. */}
+                  {!isQuoteDisplay && (
+                    <IconSettings
+                      attributes={attributes}
+                      setAttributes={setAttributes}
+                    />
+                  )}
 
                   {hasLayoutPanel && (
                     <PanelBody
@@ -2803,6 +2856,7 @@ const Settings = ({
                   <SizeSpacingPanel
                     attributes={attributes}
                     setAttributes={setAttributes}
+                    isQuoteDisplay={isQuoteDisplay}
                   />
 
                   {/* The poll is the layout `layoutControls.js` gives an empty
@@ -2898,7 +2952,10 @@ const Settings = ({
                         <>
                           <RangeControl
                             className="mt10"
-                            label={__("Wash Strength (%)", "b-testimonials-block")}
+                            label={__(
+                              "Wash Strength (%)",
+                              "b-testimonials-block",
+                            )}
                             value={attributes.cardWashStrength}
                             onChange={(val) =>
                               setAttributes({ cardWashStrength: val })
@@ -3021,12 +3078,71 @@ const Settings = ({
                         className="mt10"
                         label={__("Lift (px)", "b-testimonials-block")}
                         value={attributes.cardHoverLift}
-                        onChange={(val) => setAttributes({ cardHoverLift: val })}
+                        onChange={(val) =>
+                          setAttributes({ cardHoverLift: val })
+                        }
                         min={0}
                         max={24}
                         step={1}
                         allowReset
                         resetFallbackValue={3}
+                      />
+
+                      {/* How the hover state above animates, rather than
+                          snapping. Both are empty until set, so an untouched
+                          card keeps its current instant hover. */}
+                      <RangeControl
+                        className="mt10"
+                        label={__(
+                          "Transition Duration (ms)",
+                          "b-testimonials-block",
+                        )}
+                        value={attributes.cardHoverTransitionDuration}
+                        onChange={(val) =>
+                          setAttributes({ cardHoverTransitionDuration: val })
+                        }
+                        min={0}
+                        max={1000}
+                        step={50}
+                        allowReset
+                        resetFallbackValue={200}
+                      />
+
+                      <SelectControl
+                        className="mt10"
+                        label={__(
+                          "Transition Easing",
+                          "b-testimonials-block",
+                        )}
+                        value={attributes.cardHoverTransitionEasing || ""}
+                        options={[
+                          { label: __("Ease", "b-testimonials-block"), value: "" },
+                          {
+                            label: __("Ease In", "b-testimonials-block"),
+                            value: "ease-in",
+                          },
+                          {
+                            label: __("Ease Out", "b-testimonials-block"),
+                            value: "ease-out",
+                          },
+                          {
+                            label: __("Ease In Out", "b-testimonials-block"),
+                            value: "ease-in-out",
+                          },
+                          {
+                            label: __("Linear", "b-testimonials-block"),
+                            value: "linear",
+                          },
+                          {
+                            label: __("Bounce", "b-testimonials-block"),
+                            value: "cubic-bezier(0.34, 1.56, 0.64, 1)",
+                          },
+                        ]}
+                        onChange={(val) =>
+                          setAttributes({
+                            cardHoverTransitionEasing: val || undefined,
+                          })
+                        }
                       />
                     </PanelBody>
                   )}
@@ -3196,7 +3312,7 @@ const Settings = ({
                       {/* The short rule under the designation. Only Theme 1
                             draws one, so showing these anywhere else would be
                             three more controls that move nothing. */}
-                      {"theme_1" === theme && (
+                      {!isQuoteDisplay && "theme_1" === theme && (
                         <>
                           <Label className="mt20">
                             {__("Divider", "b-testimonials-block")}
@@ -3258,8 +3374,11 @@ const Settings = ({
 
                   {/* Straight after Badge Title and Review Count, which are the
                       other two lines of the same widget. Absent on the Verified
-                      Buyer seal, the one badge that renders no score. */}
-                  {SCORED_BADGE_LAYOUTS.includes(layout) && (
+                      Buyer seal, the one badge that renders no score -- and on
+                      a badge currently showing Review quotes instead, which
+                      renders no score either: quote cards have their own,
+                      unrelated star row and no score at all. */}
+                  {SCORED_BADGE_LAYOUTS.includes(layout) && !isQuoteDisplay && (
                     <BadgeScorePanel
                       attributes={attributes}
                       setAttributes={setAttributes}
@@ -3268,8 +3387,10 @@ const Settings = ({
 
                   {/* Only the five whose mark is a fixed trademark. The other
                       two badges draw a real icon slot, so their size is the
-                      Icon panel's Icon Size. */}
-                  {BRAND_LOGO_LAYOUTS.includes(layout) && (
+                      Icon panel's Icon Size. Also absent in Review quotes mode:
+                      quote cards show reviewer avatars, never the platform's
+                      brand mark. */}
+                  {BRAND_LOGO_LAYOUTS.includes(layout) && !isQuoteDisplay && (
                     <BadgeLogoPanel
                       attributes={attributes}
                       setAttributes={setAttributes}
@@ -3368,8 +3489,13 @@ const Settings = ({
 
                   {/* `expandedTypo` was declared here and in Style.js but was
                         only ever used to emit a Google Font link -- nothing
-                        selected the font, and nothing styled the button. */}
-                  {hasExcerpt && elements?.expandBtn && (
+                        selected the font, and nothing styled the button.
+                        Quote cards grow their own Read more/less button once
+                        `quoteTextLength` cuts a review short -- same role,
+                        same three attributes, now newly registered on these
+                        two blocks (see block.json) rather than the
+                        Elements-panel toggle that gates it elsewhere. */}
+                  {(isQuoteDisplay || (hasExcerpt && elements?.expandBtn)) && (
                     <PanelBody
                       className="bPlPanelBody"
                       title={__("Expand / Less Button", "b-testimonials-block")}

@@ -36,7 +36,7 @@ msgstr ""
 
 #. Author URI of the plugin
 #: b-testimonials-block.php
-msgid "http://bplugins.com"
+msgid "https://bplugins.com"
 msgstr ""
 
 #: includes/admin-menu.php:140

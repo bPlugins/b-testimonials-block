@@ -441,7 +441,7 @@ JS;
 		$facebook = isset( $stored['facebook'] ) && is_array( $stored['facebook'] ) ? $stored['facebook'] : [];
 
 		$facebook['page_id']      = sanitize_text_field( $page_id );
-		$facebook['access_token'] = $token;
+		$facebook['access_token'] = sanitize_text_field( $token );
 
 		$stored['facebook'] = $facebook;
 

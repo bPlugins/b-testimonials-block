@@ -1358,6 +1358,7 @@
           <div class="nav-group-items">
             <a href="#testimonials-cpt" data-nav>Managing Testimonials in One Place</a>
             <a href="#submissions" data-nav>Reviewing Customer Submissions</a>
+            <a href="#review-sources" data-nav>Connecting Google and Facebook Reviews</a>
             <a href="#nps-dashboard" data-nav>Feedback & NPS Poll Results</a>
             <a href="#dashboard" data-nav>Demo & Help Dashboard</a>
             <a href="#all-blocks" data-nav>Turning Blocks On and Off</a>
@@ -1425,9 +1426,9 @@
           <article class="doc-article" id="quick-start" data-group="Getting Started" data-title="Quick Start: Your First Section">
             <h1>Quick Start: Your First Section</h1>
             <p class="lead">Start with a blank page and end with a published wall of reviews. That is the whole job, and it takes about five minutes with no code.</p>
-            <figure class="media-slot" data-media="image" data-src="docs-assets/editor-inserter-search.png" data-caption="Step 1: searching for Testimonials in the block inserter. Only the parent block is listed, because every layout is one of its children; the thumbnails under it are the theme’s own testimonial patterns, not part of the plugin."></figure>
+            <figure class="media-slot" data-media="image" data-src="docs-assets/editor-inserter-search.png" data-caption="Step 1: searching for Testimonials in the block inserter. Only the parent block is listed, because every layout is one of its children; pick the actual layout on the canvas after inserting it."></figure>
             <h2 id="qs-insert">Step 1 - Insert the Testimonials Block</h2>
-            <ol class="steps"><li>Go to <strong>Pages &rarr; Add Page</strong>, or open an existing post or page for editing. Older WordPress versions label that menu item <strong>Add New Page</strong>.<figure class="media-slot" data-media="image" data-src="docs-assets/step-pages-addnew.png" data-caption="Pages in the WordPress admin. The arrow marks Add Page, and the same submenu on the left offers it beside All Pages."></figure></li><li>Click the <strong>+</strong> button and search for <strong>Testimonials</strong>, or type <code>/b testimonials</code> in an empty paragraph and press Enter.</li><li>The block lands on the canvas showing a layout picker rather than a finished design.</li></ol>
+            <ol class="steps"><li>Go to <strong>Pages &rarr; Add Page</strong>, or open an existing post or page for editing. Older WordPress versions label that menu item <strong>Add New Page</strong>.<figure class="media-slot" data-media="image" data-src="docs-assets/step-pages-addnew.png" data-caption="Pages in the WordPress admin. The arrow marks Add Page, and the same submenu on the left offers it beside All Pages."></figure></li><li>Click the <strong>+</strong> button and search for <strong>Testimonials</strong>, or type <code>/testimonials</code> in an empty paragraph and press Enter.</li><li>The block lands on the canvas showing a layout picker rather than a finished design.</li></ol>
             <p>The block is filed under the <strong>bPlugins</strong> category in the inserter, alongside the other bPlugins blocks on your site.</p>
             <h2 id="qs-layout">Step 2 - Pick a Layout</h2>
             <p>The picker is headed <strong>Select Your Testimonial Block</strong> and shows the popular layouts as cards. Click one to use it.</p>
@@ -1530,6 +1531,89 @@
             <div class="table-wrap"><table class="doc-table"><tr><th>Form field</th><th>Stored as</th></tr><tr><td>Name</td><td>The testimonial title</td></tr><tr><td>Review</td><td>The testimonial content</td></tr><tr><td>Rating</td><td>The rating meta, clamped to 1 to 5</td></tr><tr><td>Designation and Company</td><td>Their own meta fields</td></tr><tr><td>Email</td><td>A meta field, never shown on the front end</td></tr><tr><td>Photo</td><td>A JPG, PNG, GIF or WebP upload, set as the featured image</td></tr></table></div>
             <div class="callout"><span class="co-label">Note</span><p>Approving a submission is the same as publishing a testimonial, so you can edit it first. Open it from <strong>All Testimonials</strong>, fix a typo or trim the length, then publish.</p></div>
             <div class="callout warn"><span class="co-label">Important</span><p>The form accepts anonymous submissions by design, since it is meant for real customers who are not logged in. Check the queue regularly, and never approve a review without reading it.</p></div>
+          </article>
+
+          <article class="doc-article" id="review-sources" data-group="Settings" data-title="Connecting Google and Facebook Reviews">
+            <h1>Connecting Google and Facebook Reviews</h1>
+            <p class="lead">A badge means more when the number next to it is real. <strong>Testimonials &gt; Review Sources</strong> is the one screen where you connect Google and Facebook. Do it once, and every badge and quote block on the site that uses that platform picks it up on its own. There are no credentials to paste into each block, and nothing gets saved inside a post.</p>
+            <figure class="media-slot" data-media="image" data-src="docs-assets/review-sources-screen.png" data-caption="Testimonials &gt; Review Sources, with the Google and Facebook cards."></figure>
+
+            <h2 id="rs-purpose">What This Screen Does</h2>
+            <p>Every review badge and every "Review quotes" block asks the same question: where should the score, the count and the review text come from? There are two answers, chosen with the <strong>Rating Source</strong> control on the block itself:</p>
+            <div class="table-wrap"><table class="doc-table"><tr><th>Rating Source</th><th>What it shows</th></tr><tr><td><strong>Live from ...</strong> (the default)</td><td>The figure set up here, on this screen. It is fetched from Google's or Facebook's own servers, cached for the whole site, and refreshed automatically.</td></tr><tr><td><strong>Manual (this block only)</strong></td><td>Whatever is typed into that one block. Nothing here is read.</td></tr></table></div>
+            <p>Connecting a platform here is what makes <strong>Live</strong> mean something. Skip this screen, and a block set to Live just falls back to its own demo figures until you connect it.</p>
+
+            <h2 id="rs-open">Where to Find It</h2>
+            <p>Go to <strong>Testimonials &gt; Review Sources</strong> in the WordPress admin menu. Google and Facebook each get their own card, alongside Trustpilot, G2 and Capterra further down the same screen.</p>
+
+            <h2 id="rs-google">Connect Google Reviews</h2>
+            <p>Google's card asks for two fields, <strong>Place ID</strong> and <strong>API key</strong>. Both come from the same place, the Google Cloud Console:</p>
+            <ol class="steps">
+              <li>Go to the <a href="https://console.cloud.google.com/apis/library" target="_blank" rel="noreferrer">Google Cloud Console's API Library</a> and select or create a project for this site, if you do not already have one.</li>
+              <li>Search the library for <strong>Places API</strong>. Two results look almost the same. Pick <strong>Places API (New)</strong>, not the one plainly labelled <strong>Places API</strong>. That one is the old, Legacy version, and it does not work here. Click it, then click <strong>Enable</strong>.
+                <div class="callout warn"><span class="co-label">Billing must be linked first</span><p>Google requires a billing account on the project before an API can be enabled or called, even for usage that stays entirely inside the free monthly allowance below. Cloud Console asks for this the first time you try to enable an API if none is linked yet.</p></div>
+              </li>
+              <li>Open <strong>APIs &amp; Services, then Credentials</strong> in the left-hand menu, click <strong>+ Create Credentials</strong>, and choose <strong>API key</strong>.</li>
+              <li>Copy the key it generates and paste it into the <strong>API key</strong> field on the Google card.</li>
+              <li>Click <strong>Edit API key</strong> (or open it from the Credentials list) and, under <strong>API restrictions</strong>, restrict it to <strong>Places API (New)</strong> only. Leave <strong>Application restrictions</strong> on <strong>None</strong>, or set it to your server's IP address if you know it. Do not set it to <strong>HTTP referrers (websites)</strong>. That restriction is for a key used in a visitor's browser. This key is called from your WordPress server, which sends no referrer at all, so a referrer-restricted key fails on every request.</li>
+              <li>Go to Google's <a href="https://developers.google.com/maps/documentation/javascript/examples/places-placeid-finder" target="_blank" rel="noreferrer">Place ID Finder</a>, search for your business by name, and copy the <strong>Place ID</strong> it shows, for example <code>ChIJN1t_tDeuEmsRUsoyG83frY4</code>. Paste it into the <strong>Place ID</strong> field on the Google card.</li>
+            </ol>
+            <div class="callout"><span class="co-label">About cost</span><p>This is read once for the whole site and cached for up to a day, not once per visitor, so ordinary use stays well inside Google's free monthly allowance for this API. Google changed how Maps Platform pricing works in March 2025, moving to a free tier per API instead of one shared credit. See <a href="https://developers.google.com/maps/billing-and-pricing/pricing" target="_blank" rel="noreferrer">Google's current pricing page</a> for the exact figure, since Google sets it and it can change.</p></div>
+            <p>Fill in both fields on the Google card, click <strong>Save</strong>, then <strong>Test &amp; fetch now</strong>. A working connection shows the live score, the review count, and up to five real reviews with their text. This is read once and reused by every Google badge on the site.</p>
+
+            <h2 id="rs-facebook">Connect Facebook Reviews</h2>
+            <p>Facebook offers two ways in, on the same card:</p>
+            <h3>Connect with Facebook (recommended)</h3>
+            <ol class="steps">
+              <li>Click <strong>Connect with Facebook</strong> on the Facebook card. A popup opens to Facebook's own login.
+                <figure class="media-slot" data-media="image" data-src="docs-assets/facebook-connect-button.png" data-caption="The Connect with Facebook button on the Facebook card."></figure>
+              </li>
+              <li>Log in with a Facebook account that administers the Page, and grant the permission it asks for.</li>
+              <li>Pick the Page when Facebook asks which one to use, if you administer more than one.</li>
+              <li>The popup closes on its own and the screen reloads showing a green <strong>CONNECTED</strong> badge, with the button now reading <strong>Disconnect Facebook</strong>.</li>
+            </ol>
+            <p>That is the whole flow. The plugin handles the token exchange behind it, and the access token never passes through your browser or gets typed in by hand. It cannot be copied wrong, and it does not expire the way a token pasted from Graph API Explorer does.</p>
+            <h3>Paste a Page access token by hand</h3>
+            <p>If you already manage tokens for this Page yourself, the two fields below the button accept them directly:</p>
+            <div class="table-wrap"><table class="doc-table"><tr><th>Field</th><th>What it wants</th></tr><tr><td><strong>Page ID</strong></td><td>The numeric Page ID, or the Page's username.</td></tr><tr><td><strong>Page access token</strong></td><td>A <em>long-lived</em> Page access token. A short-lived one (the default from Facebook's Graph API Explorer) stops working within a couple of hours, and the badge will quietly start showing a stale figure.</td></tr></table></div>
+            <div class="callout tip"><span class="co-label">Tip</span><p><strong>Connect with Facebook</strong> is the easier and more reliable of the two. It always gets a long-lived Page token, where a hand-pasted one is easy to get wrong. The most common mistake is pasting a personal <em>User</em> token instead of a <em>Page</em> token, which looks the same but cannot read a Page's reviews.</p></div>
+            <div class="callout warn"><span class="co-label">Before it will show anything</span><p>The Facebook Page itself needs <strong>Recommendations</strong> switched on, with at least one recommendation on it. A Page with recommendations turned off, or with none yet, has nothing for either connection method to read.</p></div>
+
+            <h2 id="rs-test">Reading the Status Card</h2>
+            <p>Once a platform is set up, its card shows what was actually fetched:</p>
+            <div class="table-wrap"><table class="doc-table"><tr><th>On the card</th><th>Meaning</th></tr><tr><td>Score, stars and count</td><td>The live figures, as of the last successful fetch.</td></tr><tr><td><em>fetched ... ago</em></td><td>How long ago that figure was actually read from the platform. Figures are cached for up to a day, not fetched on every page view.</td></tr><tr><td>A red message</td><td>The last fetch failed, and why. A bad key, a wrong id, or a Page with no recommendations are the usual reasons.</td></tr><tr><td><strong>Test &amp; fetch now</strong></td><td>Forces an immediate read, instead of waiting for the daily refresh. Use this right after changing anything on the card.</td></tr></table></div>
+
+            <h2 id="rs-use">Using a Connected Platform in a Block</h2>
+            <p>With Google or Facebook connected, add any of their badges (or the <strong>Floating Review Badge</strong>, which asks which platform to use), and open its <strong>Rating Source</strong> panel:</p>
+            <ul>
+              <li><strong>Rating Source: Live from Google / Live from Facebook</strong> is the default. It shows the connected figure, with a status box confirming it is connected, when it was last fetched, and a <strong>Refresh now</strong> button.</li>
+              <li><strong>Display as</strong> chooses <strong>Rating badge</strong> (the score, stars and count) or <strong>Review quotes</strong> (real review text, in cards).</li>
+            </ul>
+            <div class="callout"><span class="co-label">Note</span><p>Not connected yet? The block does not break. It shows its own demo figures and a note pointing back to this screen, so a page never shows a blank space while you finish setting things up.</p></div>
+
+            <h2 id="rs-quotes">Showing Individual Reviews (Review Quotes)</h2>
+            <figure class="media-slot" data-media="image" data-src="docs-assets/review-quotes-cards.png" data-caption="Review quotes: real reviews, with a photo, a name, stars and the text itself."></figure>
+            <p>Set <strong>Display as</strong> to <strong>Review quotes</strong> and Google or Facebook hands over the actual words customers left, not just a number. A few controls shape how the cards look:</p>
+            <div class="table-wrap"><table class="doc-table"><tr><th>Control</th><th>What it does</th></tr><tr><td><strong>Show reviewer avatar</strong></td><td>The reviewer's own photo when the platform has one, otherwise their initial in a circle.</td></tr><tr><td><strong>Wrap the text in quotation marks</strong></td><td>Adds quote marks around each review.</td></tr><tr><td><strong>Quote text length</strong></td><td>Cuts longer reviews to this many characters with a <strong>Read more</strong> link, so cards in the same row stay the same height.</td></tr><tr><td><strong>Reviews to show</strong></td><td>How many quotes appear when nothing is picked by hand below.</td></tr><tr><td><strong>Minimum rating to include</strong></td><td>Leaves out anything below this star rating. 0 shows every review.</td></tr><tr><td><strong>Link "See more reviews" to the profile</strong></td><td>Adds a link under the cards to the platform's own review page.</td></tr></table></div>
+            <p>Card width and height are set the normal way, in the block's <strong>Width &amp; Height</strong> panel under the Style tab. A review longer than the card can fit fades out at the bottom with a <strong>Read more</strong> link, instead of being cut off mid-sentence or forcing every other card in the row to stretch to match it.</p>
+
+            <h2 id="rs-picker">Choosing Which Reviews to Show</h2>
+            <p>Below the sliders, <strong>Choose which to show</strong> lists every review the last fetch brought back, with a checkbox against each. Leave nothing checked and the block shows the top few automatically, in the order the platform returned them. Check one or more to hand-pick exactly which reviews appear, in that order.</p>
+            <p>Google returns at most five reviews, so this list is always short. Facebook can return far more, up to a hundred, so past eight reviews a search box appears above the list and the list itself scrolls in place, instead of pushing every setting below it down the page.</p>
+            <div class="callout"><span class="co-label">Note</span><p>A pick is remembered by each review's own id. If a picked review later drops out of what the platform returns, for example if it was deleted or is simply no longer in the fetched batch, the block quietly falls back to the automatic top-few selection instead of showing nothing, and a note says so.</p></div>
+
+            <h2 id="rs-facebook-quotes">A Facebook-only Detail: Recommended, Not Starred</h2>
+            <p>Facebook retired 1 to 5 star Page reviews in 2018. Today a Page only collects a <strong>Recommendation</strong>, a plain yes or no with no star count attached, and Facebook's own Page shows that as a percentage ("100% based on the opinion of 2 people"), not as stars.</p>
+            <p>So a Facebook quote card follows Facebook's own wording instead of inventing a star count it never gave. It shows <strong>Recommended</strong> or <strong>Not Recommended</strong> in place of the star row. A Page that still has genuine star ratings from before 2018 keeps showing real stars for those, unchanged.</p>
+            <div class="callout"><span class="co-label">Note</span><p>The reviewer's name and photo show on a Facebook quote card, but they are not a clickable link to their profile. Facebook only ever hands this integration an id that is scoped to this connection and does not resolve to a real, public profile page. Rather than link to something that would show "This content isn't available," it is left as plain text.</p></div>
+
+            <h2 id="rs-manual">Manual Quotes: Typed In by Hand</h2>
+            <p>Set <strong>Rating Source</strong> to <strong>Manual (this block only)</strong> with <strong>Display as</strong> set to <strong>Review quotes</strong>, and an <strong>Add New Quote</strong> button appears instead of the live picker. This works for every platform, including Google and Facebook, and needs no connection at all:</p>
+            <div class="table-wrap"><table class="doc-table"><tr><th>Field</th><th>Use</th></tr><tr><td><strong>Reviewer Photo</strong> (optional)</td><td>An image URL, or upload one.</td></tr><tr><td><strong>Reviewer Name</strong></td><td>Who left the review.</td></tr><tr><td><strong>Rating</strong></td><td>0 to 5 stars.</td></tr><tr><td><strong>Review Text</strong></td><td>The words themselves.</td></tr><tr><td><strong>When</strong> (optional)</td><td>Free text, shown exactly as typed, for example <em>2 weeks ago</em>, copied from the real review rather than guessed.</td></tr></table></div>
+            <p>This is the practical way to show a handful of real Facebook reviews as quote cards on a Page where a live star count would not mean anything anyway. Copy the name, photo and words across by hand, once.</p>
+
+            <h2 id="rs-troubleshoot">Troubleshooting</h2>
+            <div class="table-wrap"><table class="doc-table"><tr><th>Symptom</th><th>Likely cause</th></tr><tr><td>Google: "request denied" or 403</td><td>Either <strong>Places API (New)</strong> is not enabled for the Cloud project the key belongs to, or that project has no billing account linked. Google requires one to call any Maps Platform API, even within the free monthly allowance.</td></tr><tr><td>Google: works, then suddenly stops with the same error</td><td>The key picked up an <strong>Application restriction</strong> of <strong>HTTP referrers</strong> at some point. This key is called from your server, not a browser, so it needs <strong>API restrictions</strong> only, limited to Places API (New), and no referrer restriction.</td></tr><tr><td>Facebook: 0 reviews, or a "page access token is required" error, despite a token being saved</td><td>The saved token is a personal <em>User</em> token, not a <em>Page</em> token. Use <strong>Connect with Facebook</strong> instead of pasting one from Graph API Explorer.</td></tr><tr><td>Facebook: no star rating at all</td><td>The Page has Recommendations switched off, or has none yet.</td></tr><tr><td>A badge shows an old figure after a real change</td><td>Figures are cached for up to a day. Click <strong>Test &amp; fetch now</strong> on that platform's card to force an immediate re-read.</td></tr></table></div>
           </article>
 
           <article class="doc-article" id="block-library" data-group="How To Use" data-title="All 39 Blocks at a Glance">
@@ -2281,13 +2365,22 @@ foreach ( $reviews as $review ) {
         document.body.classList.remove("nav-open");
       }
 
+      /* A hash may point at a heading rather than a whole page, for example a
+         link straight into DOCUMENTATION.html#rs-google from outside this
+         page. Open the page that heading lives on, then scroll down to it. */
+      function openHash(id) {
+        id = id || "introduction";
+        var target = document.getElementById(id);
+        var host = articleById(id) || (target && target.closest(".doc-article")) || articleById("introduction");
+        show(host.id, host.id === id);
+        if (host.id !== id && target) target.scrollIntoView();
+      }
+
       document.addEventListener("click", function (e) {
         var a = e.target.closest("a[data-nav]");
         if (!a) return;
         var id = a.getAttribute("href").slice(1);
         var target = document.getElementById(id);
-        /* A link may point at a heading rather than a whole page. Open the page
-           that heading lives on, then scroll down to it. */
         var host = articleById(id) || (target && target.closest(".doc-article"));
         if (!host) return;
         e.preventDefault();
@@ -2297,7 +2390,7 @@ foreach ( $reviews as $review ) {
       });
 
       window.addEventListener("popstate", function () {
-        show(location.hash.slice(1) || "introduction", false);
+        openHash(location.hash.slice(1));
       });
 
       document.querySelectorAll(".faq-q").forEach(function (btn) {
@@ -2615,7 +2708,7 @@ foreach ( $reviews as $review ) {
         }
       });
 
-      show(location.hash.slice(1) || "introduction", false);
+      openHash(location.hash.slice(1));
     })();
   </script>
 </body>

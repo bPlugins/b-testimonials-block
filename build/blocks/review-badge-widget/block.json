@@ -207,6 +207,12 @@
     "cardHoverLift": {
       "type": "number"
     },
+    "cardHoverTransitionDuration": {
+      "type": "number"
+    },
+    "cardHoverTransitionEasing": {
+      "type": "string"
+    },
     "imgBorder": {
       "type": "object",
       "default": {
@@ -323,6 +329,18 @@
         "mobile": ""
       }
     },
+    "quoteCardWidth": {
+      "type": "object",
+      "default": {
+        "desktop": "",
+        "tablet": "",
+        "mobile": ""
+      }
+    },
+    "manualQuotes": {
+      "type": "array",
+      "default": []
+    },
     "cId": {
       "type": "string",
       "default": ""
@@ -399,6 +417,43 @@
     },
     "starSize": {
       "type": "number"
+    },
+    "displayMode": {
+      "type": "string",
+      "default": "badge"
+    },
+    "quoteReviewIds": {
+      "type": "array",
+      "default": []
+    },
+    "quoteCount": {
+      "type": "number",
+      "default": 3
+    },
+    "quoteMinRating": {
+      "type": "number",
+      "default": 0
+    },
+    "showQuoteAvatar": {
+      "type": "boolean",
+      "default": true
+    },
+    "showQuoteMarks": {
+      "type": "boolean",
+      "default": true
+    },
+    "quoteTextLength": {
+      "type": "number",
+      "default": 150
+    },
+    "expandedTypo": {
+      "type": "object"
+    },
+    "expandColor": {
+      "type": "string"
+    },
+    "expandHoverColor": {
+      "type": "string"
     }
   },
   "supports": {

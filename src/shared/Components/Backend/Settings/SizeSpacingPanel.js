@@ -48,10 +48,15 @@ import { SHRINK_TO_FIT_LAYOUTS } from "../../../utils/layoutControls";
  * @param {Object}   props.attributes    Block attributes.
  * @param {Function} props.setAttributes Attribute setter.
  */
-const SizeSpacingPanel = ({ attributes = {}, setAttributes }) => {
+const SizeSpacingPanel = ({
+  attributes = {},
+  setAttributes,
+  isQuoteDisplay = false,
+}) => {
   const {
     blockWidth = {},
     cardHeight = {},
+    quoteCardWidth = {},
     cardMargin = {},
     blockMargin = {},
     blockAlign = "",
@@ -108,8 +113,11 @@ const SizeSpacingPanel = ({ attributes = {}, setAttributes }) => {
           )}
         />
 
-        {/* min-height, so a card that needs more room still grows rather than
-            clipping its content. */}
+        {/* min-height everywhere except a quote card, so a card that needs
+            more room still grows rather than clipping its content. A quote
+            card gets an exact height instead (see Style.js) -- its text is
+            already cut to Quote Text Length with its own Read more toggle, so
+            asking for a shorter card here should actually get one. */}
         <UnitControl
           className="mt20"
           label={__("Card Height:", "b-testimonials-block")}
@@ -118,11 +126,42 @@ const SizeSpacingPanel = ({ attributes = {}, setAttributes }) => {
           onChange={(val) => updateObject("cardHeight", device, val)}
           units={[pxUnit(320), emUnit(20), vhUnit(50)]}
           isResetValueOnUnitChange={true}
-          help={__(
-            "Minimum height for each card. Longer content still expands.",
-            "b-testimonials-block",
-          )}
+          help={
+            isQuoteDisplay
+              ? __(
+                  "Exact height for each card's header, stars and text. A fade hints at more -- Read more expands past it.",
+                  "b-testimonials-block",
+                )
+              : __(
+                  "Minimum height for each card. Longer content still expands.",
+                  "b-testimonials-block",
+                )
+          }
         />
+
+        {/* The quote grid has no column count of its own -- it wraps cards
+            with CSS Grid's auto-fit once one no longer fits (frontend.scss
+            defaults that to 220px). This sets an exact width instead of that
+            floor: `auto-fill` at a fixed size, so cards stop growing to fill
+            the row once the width you asked for is reached. Only shown for
+            Review quotes: every other layout picks its columns explicitly
+            instead (Layout panel's Column count), where a fixed width like
+            this one would only fight that setting. */}
+        {isQuoteDisplay && (
+          <UnitControl
+            className="mt20"
+            label={__("Card Width:", "b-testimonials-block")}
+            labelPosition="left"
+            value={quoteCardWidth?.[device] || ""}
+            onChange={(val) => updateObject("quoteCardWidth", device, val)}
+            units={[pxUnit(220), emUnit(15), perUnit(30)]}
+            isResetValueOnUnitChange={true}
+            help={__(
+              "Exact width for each card. Empty uses 220px and lets cards grow to fill the row.",
+              "b-testimonials-block",
+            )}
+          />
+        )}
 
         {/* Not per device. A widget is the same width on a phone as on a
             desktop, so an alignment that changed with the viewport would be a
@@ -144,10 +183,17 @@ const SizeSpacingPanel = ({ attributes = {}, setAttributes }) => {
               { label: __("Center", "b-testimonials-block"), value: "center" },
               { label: __("Right", "b-testimonials-block"), value: "right" },
             ]}
-            help={__(
-              "Where the block sits in its column. Only does something once the block is narrower than the column -- either a Block Width above, or a badge, which is narrower on its own. Default leaves it where it lands: centred when a Block Width is set, left otherwise.",
-              "b-testimonials-block",
-            )}
+            help={
+              isQuoteDisplay
+                ? __(
+                    "Where the block sits in its column. Only does something once a Block Width above makes it narrower than the column -- the quote grid itself is full width. Default leaves it where it lands.",
+                    "b-testimonials-block",
+                  )
+                : __(
+                    "Where the block sits in its column. Only does something once the block is narrower than the column -- either a Block Width above, or a badge, which is narrower on its own. Default leaves it where it lands: centred when a Block Width is set, left otherwise.",
+                    "b-testimonials-block",
+                  )
+            }
           />
         )}
       </PanelBody>
@@ -194,25 +240,31 @@ const SizeSpacingPanel = ({ attributes = {}, setAttributes }) => {
 
         {/* Resets to nothing rather than to a value of ours: the gap between
             cards is already set by Column/Row Gap, so a default margin here
-            would fight it. This is for nudging cards, not spacing them. */}
-        <BoxControl
-          className="mt20"
-          label={__("Card Margin", "b-testimonials-block")}
-          values={boxForDevice(cardMargin, device)}
-          onChange={(val) =>
-            setAttributes({
-              cardMargin: setBoxForDevice(cardMargin, device, val),
-            })
-          }
-          resetValues={{ top: "", right: "", bottom: "", left: "" }}
-          units={[pxUnit(3), emUnit(2), perUnit(2)]}
-        />
-        <p className="description">
-          {__(
-            "Space around each card, added to the gap.",
-            "b-testimonials-block",
-          )}
-        </p>
+            would fight it. This is for nudging cards, not spacing them.
+            Quote cards share Card Height's gap in the selector list above --
+            hidden here for the same reason. */}
+        {!isQuoteDisplay && (
+          <>
+            <BoxControl
+              className="mt20"
+              label={__("Card Margin", "b-testimonials-block")}
+              values={boxForDevice(cardMargin, device)}
+              onChange={(val) =>
+                setAttributes({
+                  cardMargin: setBoxForDevice(cardMargin, device, val),
+                })
+              }
+              resetValues={{ top: "", right: "", bottom: "", left: "" }}
+              units={[pxUnit(3), emUnit(2), perUnit(2)]}
+            />
+            <p className="description">
+              {__(
+                "Space around each card, added to the gap.",
+                "b-testimonials-block",
+              )}
+            </p>
+          </>
+        )}
       </PanelBody>
     </>
   );

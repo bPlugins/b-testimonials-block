@@ -14,15 +14,31 @@ import BeforeAfterSlider from "../BeforeAfterSlider";
 import TestimonialForm from "../TestimonialForm";
 
 import { __, sprintf } from "@wordpress/i18n";
+// Aliased: the Layout component below also receives `__` and `sprintf` as
+// props (for the editor-only strings that need the canvas's own i18n
+// instance), which shadows this module-level import inside its body. Code
+// that runs on the front end -- where no such props are passed -- must use
+// these aliases instead, or calling `__(...)` there throws "not a function".
+import { __ as i18n__, sprintf as i18nSprintf } from "@wordpress/i18n";
 
 import { clickable, editorClickable } from "../../../utils/a11y";
 import BlockIcon from "../BlockIcon";
 import VideoCard from "../VideoCard";
 import AudioPlayer from "../AudioPlayer";
 import { getIcon } from "../../../utils/blockIcons";
-import { TRUST_BADGE_ART, getTrustBadgeArt } from "../../../utils/trustBadgeArt";
-import { ARRANGEMENTS, resolveArrangement } from "../../../utils/layoutFeatures";
-import { isReviewBadge, resolveBadge } from "../../../utils/reviewSources";
+import {
+  TRUST_BADGE_ART,
+  getTrustBadgeArt,
+} from "../../../utils/trustBadgeArt";
+import {
+  ARRANGEMENTS,
+  resolveArrangement,
+} from "../../../utils/layoutFeatures";
+import {
+  isReviewBadge,
+  resolveBadge,
+  resolveQuotes,
+} from "../../../utils/reviewSources";
 
 /**
  * The Feedback & NPS Poll scale, shared by the editor and the front end.
@@ -80,7 +96,10 @@ const FeedbackPoll = ({ attributes = {}, isBackend, bt, bd }) => {
         <div
           className="btb-poll-buttons"
           role="group"
-          aria-label={bt || __("How likely are you to recommend us?", "b-testimonials-block")}>
+          aria-label={
+            bt ||
+            __("How likely are you to recommend us?", "b-testimonials-block")
+          }>
           {pollNumbers.map((n) => (
             <button
               key={n}
@@ -96,7 +115,7 @@ const FeedbackPoll = ({ attributes = {}, isBackend, bt, bd }) => {
                 /* translators: 1: chosen score, 2: highest score on the scale */
                 __("Score %1$s of %2$s", "b-testimonials-block"),
                 String(n),
-                String(pollNumbers[pollNumbers.length - 1])
+                String(pollNumbers[pollNumbers.length - 1]),
               )}
               onClick={isBackend ? () => setPicked(n) : undefined}>
               {n}
@@ -108,7 +127,9 @@ const FeedbackPoll = ({ attributes = {}, isBackend, bt, bd }) => {
       <div
         className="btb-poll-response-msg"
         style={{ display: previewing ? "block" : "none" }}>
-        {previewing ? "Preview only — votes are recorded on the published page." : ""}
+        {previewing
+          ? "Preview only — votes are recorded on the published page."
+          : ""}
       </div>
     </div>
   );
@@ -180,8 +201,8 @@ const SocialProofToast = ({
       ? activeIndex
       : 0
     : currentIndex < items.length
-      ? currentIndex
-      : 0;
+    ? currentIndex
+    : 0;
   const currentItem = items[activeItemIndex] || {};
 
   return (
@@ -222,6 +243,70 @@ const SocialProofToast = ({
         </div>
       </div>
     </div>
+  );
+};
+
+/**
+ * A platform's own official embed snippet (G2 Badge, Trustpilot TrustBox),
+ * pasted once under Testimonials → Review Sources instead of the score being
+ * drawn as our own markup. Its own component for the same reason FeedbackPoll
+ * above is one: Layout returns early per layout, and a hook cannot live
+ * inside one of those branches.
+ *
+ * `dangerouslySetInnerHTML` never executes a `<script>` tag it inserts --
+ * only a tag parsed in with the rest of the document runs -- which would
+ * leave a TrustBox's loader script sitting inert. Each script node found
+ * after mount is cloned into a fresh one and swapped in, which the browser
+ * does execute.
+ *
+ * Front end only -- `isBackend` is true inside the block editor (see Edit.js)
+ * and false for the hydrated front-end mount (see shared/view.js), the same
+ * meaning it has everywhere else in this file. The editor shows a plain note
+ * instead of the live snippet, so opening a post never re-loads a widget
+ * vendor's own bootstrap script on every keystroke.
+ */
+const EmbedWidget = ({ html, isBackend }) => {
+  const ref = useRef(null);
+
+  useEffect(() => {
+    if (isBackend || !ref.current) {
+      return;
+    }
+
+    ref.current.querySelectorAll("script").forEach((old) => {
+      const fresh = document.createElement("script");
+
+      Array.from(old.attributes).forEach((attr) =>
+        fresh.setAttribute(attr.name, attr.value),
+      );
+      fresh.text = old.text;
+
+      old.replaceWith(fresh);
+    });
+  }, [html, isBackend]);
+
+  if (isBackend) {
+    return (
+      <div className="btb-embed-widget btb-embed-widget-preview">
+        <p>
+          {i18n__(
+            "Official embed widget — shown on the published page.",
+            "b-testimonials-block",
+          )}
+        </p>
+      </div>
+    );
+  }
+
+  return (
+    <div
+      ref={ref}
+      className="btb-embed-widget"
+      // eslint-disable-next-line react/no-danger -- the whole point of this
+      // mode: a platform's own widget markup, admin-pasted under Review
+      // Sources and sanitised there, not built from our own JSX.
+      dangerouslySetInnerHTML={{ __html: html }}
+    />
   );
 };
 
@@ -271,8 +356,8 @@ const Layout = ({
     isBackend && "Tablet" === previewDevice
       ? tablet
       : isBackend && "Mobile" === previewDevice
-        ? mobile
-        : desktop;
+      ? mobile
+      : desktop;
 
   const arrangement = resolveArrangement(attributes);
 
@@ -280,6 +365,11 @@ const Layout = ({
   const [cardStackIdx, setCardStackIdx] = useState(0);
   const [activeModalItem, setActiveModalItem] = useState(null);
   const [stackHovered, setStackHovered] = useState(false);
+  // Which Review quotes cards currently show their full text, keyed by
+  // review id. Its own state rather than the items pipeline's ExpandButton /
+  // elements.expandBtn: quote cards are not `items` and are never saved into
+  // post content, so there is nothing there to hook into.
+  const [expandedQuoteIds, setExpandedQuoteIds] = useState({});
 
   // Keyboard handling for the Popup Modal layout.
   //
@@ -321,7 +411,7 @@ const Layout = ({
       }
 
       const focusable = dialog.querySelectorAll(
-        'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'
+        'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])',
       );
 
       if (!focusable.length) {
@@ -387,14 +477,7 @@ const Layout = ({
     }, stackDelay);
 
     return () => clearInterval(timer);
-  }, [
-    layout,
-    isBackend,
-    stackAutoPlay,
-    stackDelay,
-    stackCount,
-    stackHovered,
-  ]);
+  }, [layout, isBackend, stackAutoPlay, stackDelay, stackCount, stackHovered]);
   const itemProps = {
     attributes,
     setActiveIndex,
@@ -514,7 +597,219 @@ const Layout = ({
     );
   };
 
+  /**
+   * The five-star row under a badge's score.
+   *
+   * `badge.ratingValue` is the raw 0-5 number resolveBadge() worked `badge.score`
+   * out of -- this used to be a literal "★★★★★" at each of the six call sites
+   * below, so a Page at 4.4 stars drew the same five filled stars as one at 5.0.
+   * Rounded to the nearest whole star, same as a quote card's own row just below.
+   *
+   * @return {JSX.Element}
+   */
+  const badgeStarsEl = () => {
+    const filled = Math.round(badge?.ratingValue ?? 5);
+
+    return (
+      <span className="stars">
+        {"★".repeat(filled)}
+        {"☆".repeat(Math.max(0, 5 - filled))}
+      </span>
+    );
+  };
+
+  /**
+   * The "Review quotes" display mode's cards, shared by every badge layout
+   * that can show it: every platform badge and the generic
+   * review-badge-widget. Live quotes need a platform in PLATFORMS_WITH_QUOTES;
+   * Manual Quotes work on any of them.
+   *
+   * @param {Array} quotes Resolved reviews from resolveQuotes().
+   * @return {JSX.Element}
+   */
+  const quoteCardsEl = (quotes) => (
+    <div className="btb-quote-widget">
+      <div className="btb-quote-grid">
+        {quotes.map((review) => {
+          const avatarEl = review.avatarUrl ? (
+            <img
+              className="btb-quote-avatar-img"
+              src={review.avatarUrl}
+              alt=""
+              width="32"
+              height="32"
+              loading="lazy"
+            />
+          ) : (
+            <span className="btb-quote-avatar" aria-hidden="true">
+              {(review.author || "?").trim().charAt(0).toUpperCase()}
+            </span>
+          );
+
+          // Google gives no page for the individual review, only for the
+          // person who wrote it -- which does list it. Linked on the front
+          // end only: a target="_blank" inside the editor canvas is a trap
+          // for someone trying to select the block, same reasoning as
+          // badgeTitleEl()'s link above.
+          const canLinkAuthor = !isBackend && !!review.authorUrl;
+
+          // Left uncapped, one long review stretches every card in its grid
+          // row to match it (CSS Grid's default stretch), leaving the short
+          // ones mostly blank space. Cut to quoteTextLength with a Read more
+          // toggle instead, same idea as the items pipeline's Excerpt &
+          // Expand, but tracked in this component's own state -- these cards
+          // are not `items` and nothing about them is ever saved.
+          const text = review.text || "";
+          const limit = Math.max(1, Number(attributes.quoteTextLength) || 150);
+          const isExpanded = !!expandedQuoteIds[review.id];
+          const isLong = text.length > limit;
+          const shownText =
+            isLong && !isExpanded ? `${text.slice(0, limit).trim()}…` : text;
+
+          return (
+            <div className="btb-quote-card" key={review.id}>
+              {/* Everything Card Height's fixed-height clipping can land on
+                  without also taking the Read more toggle down with it -- see
+                  the rule Style.js emits for `.btb-quote-clip` and the
+                  comment above this class in frontend.scss. `is-expanded`
+                  lifts that height cap once there is more text to show. */}
+              <div
+                className={
+                  "btb-quote-clip" + (isExpanded ? " is-expanded" : "")
+                }>
+                <div className="btb-quote-header">
+                  {false !== attributes.showQuoteAvatar &&
+                    (canLinkAuthor ? (
+                      <a
+                        className="btb-quote-avatar-link"
+                        href={review.authorUrl}
+                        target="_blank"
+                        rel="noopener noreferrer">
+                        {avatarEl}
+                      </a>
+                    ) : (
+                      avatarEl
+                    ))}
+                  <div className="btb-quote-who">
+                    {canLinkAuthor ? (
+                      <a
+                        className="btb-quote-name-link"
+                        href={review.authorUrl}
+                        target="_blank"
+                        rel="noopener noreferrer">
+                        <span className="btb-quote-name">{review.author}</span>
+                      </a>
+                    ) : (
+                      <span className="btb-quote-name">{review.author}</span>
+                    )}
+                    {!!review.time && (
+                      <span className="btb-quote-time">{review.time}</span>
+                    )}
+                  </div>
+                </div>
+                {/* Facebook's own Page no longer shows stars at all -- a
+                    recommendation is yes/no, nothing in between -- so a
+                    review carrying `recommendationType` (see
+                    parse_facebook_reviews()) says exactly that instead of a
+                    star count Facebook never gave it. Everything else
+                    (Google, manual quotes) still has a real 1-5 number, so
+                    it keeps the star row below. */}
+                {review.recommendationType ? (
+                  <span
+                    className={
+                      "btb-quote-recommend" +
+                      ("negative" === review.recommendationType
+                        ? " is-negative"
+                        : "")
+                    }>
+                    {"negative" === review.recommendationType
+                      ? i18n__("👎 Not Recommended", "b-testimonials-block")
+                      : i18n__("👍 Recommended", "b-testimonials-block")}
+                  </span>
+                ) : (
+                  !!review.rating && (
+                    <span className="btb-quote-stars" aria-hidden="true">
+                      {"★".repeat(Math.round(review.rating))}
+                      {"☆".repeat(Math.max(0, 5 - Math.round(review.rating)))}
+                    </span>
+                  )
+                )}
+                <p className="btb-quote-text">
+                  {false !== attributes.showQuoteMarks
+                    ? `“${shownText}”`
+                    : shownText}
+                </p>
+              </div>
+              {isLong && (
+                <button
+                  type="button"
+                  className="btb-quote-expand-btn"
+                  aria-expanded={isExpanded ? "true" : "false"}
+                  onClick={() =>
+                    setExpandedQuoteIds((prev) => ({
+                      ...prev,
+                      [review.id]: !prev[review.id],
+                    }))
+                  }>
+                  {isExpanded
+                    ? i18n__("Read less", "b-testimonials-block")
+                    : i18n__("Read more", "b-testimonials-block")}
+                </button>
+              )}
+            </div>
+          );
+        })}
+      </div>
+
+      {/* Same toggle and gating as badgeTitleEl()'s link: front end only, and
+          only once there is a live profile URL to send someone to. Quote
+          cards have no single heading to attach the link to the way the
+          badge's title does, so it gets its own line instead. */}
+      {!isBackend && badge?.url && attributes.showLiveLink !== false && (
+        <a
+          className="btb-quote-more-link"
+          href={badge.url}
+          target="_blank"
+          rel="noopener noreferrer">
+          {i18nSprintf(
+            /* translators: %s: platform title, e.g. "Google Reviews" */
+            i18n__("See more reviews on %s ↗", "b-testimonials-block"),
+            badge.title,
+          )}
+        </a>
+      )}
+    </div>
+  );
+
+  // Shared by every layout that can show quotes: falls through to that
+  // layout's own badge markup below when there is nothing to quote yet --
+  // an unconnected platform, one whose API doesn't hand over review text, or
+  // a curated pick that no longer matches the latest fetch.
+  const quotesEl = (() => {
+    if ("quotes" !== attributes.displayMode) {
+      return null;
+    }
+
+    const quotes = resolveQuotes(attributes);
+
+    return quotes.length ? quoteCardsEl(quotes) : null;
+  })();
+
+  // Same shape as quotesEl just above: falls through to the layout's own
+  // badge markup when there is nothing pasted yet. `liveEmbedCode` is only
+  // ever injected for a platform that supports this mode (see
+  // bpbtb_apply_live_review_data() and withLiveReview()), so no platform
+  // check is needed here either.
+  const embedEl =
+    "embed" === attributes.displayMode && attributes.liveEmbedCode ? (
+      <EmbedWidget html={attributes.liveEmbedCode} isBackend={isBackend} />
+    ) : null;
+
   if (layout === "google-review-badge") {
+    if (quotesEl) {
+      return quotesEl;
+    }
+
     return (
       <div className="btb-badge-card btb-google-badge">
         <div className="btb-badge-header">
@@ -544,7 +839,7 @@ const Layout = ({
             {badgeTitleEl()}
             <div className="btb-badge-rating">
               <span className="score">{badge.score}</span>
-              <span className="stars">★★★★★</span>
+              {badgeStarsEl()}
               {!!badge.count && <span className="count">{badge.count}</span>}
             </div>
           </div>
@@ -554,6 +849,10 @@ const Layout = ({
   }
 
   if (layout === "capterra-review-badge") {
+    if (quotesEl) {
+      return quotesEl;
+    }
+
     return (
       <div className="btb-badge-card btb-capterra-badge">
         <div className="btb-badge-header">
@@ -571,7 +870,7 @@ const Layout = ({
             {badgeTitleEl()}
             <div className="btb-badge-rating">
               <span className="score">{badge.score}</span>
-              <span className="stars">★★★★★</span>
+              {badgeStarsEl()}
               {!!badge.count && <span className="count">{badge.count}</span>}
             </div>
           </div>
@@ -581,6 +880,10 @@ const Layout = ({
   }
 
   if (layout === "facebook-review-badge") {
+    if (quotesEl) {
+      return quotesEl;
+    }
+
     return (
       <div className="btb-badge-card btb-facebook-badge">
         <div className="btb-badge-header">
@@ -598,7 +901,7 @@ const Layout = ({
             {badgeTitleEl()}
             <div className="btb-badge-rating">
               <span className="score">{badge.score}</span>
-              <span className="stars">★★★★★</span>
+              {badgeStarsEl()}
               {!!badge.count && <span className="count">{badge.count}</span>}
             </div>
           </div>
@@ -608,6 +911,14 @@ const Layout = ({
   }
 
   if (layout === "trustpilot-review-badge") {
+    if (quotesEl) {
+      return quotesEl;
+    }
+
+    if (embedEl) {
+      return embedEl;
+    }
+
     return (
       <div className="btb-badge-card btb-trustpilot-badge">
         <div className="btb-badge-header">
@@ -625,7 +936,7 @@ const Layout = ({
             {badgeTitleEl()}
             <div className="btb-badge-rating">
               <span className="score">{badge.score}</span>
-              <span className="stars">★★★★★</span>
+              {badgeStarsEl()}
               {!!badge.count && <span className="count">{badge.count}</span>}
             </div>
           </div>
@@ -635,6 +946,14 @@ const Layout = ({
   }
 
   if (layout === "g2-review-badge") {
+    if (quotesEl) {
+      return quotesEl;
+    }
+
+    if (embedEl) {
+      return embedEl;
+    }
+
     return (
       <div className="btb-badge-card btb-g2-badge">
         <div className="btb-badge-header">
@@ -658,7 +977,7 @@ const Layout = ({
             {badgeTitleEl()}
             <div className="btb-badge-rating">
               <span className="score">{badge.score}</span>
-              <span className="stars">★★★★★</span>
+              {badgeStarsEl()}
               {!!badge.count && <span className="count">{badge.count}</span>}
             </div>
           </div>
@@ -700,6 +1019,14 @@ const Layout = ({
   }
 
   if (layout === "review-badge-widget") {
+    if (quotesEl) {
+      return quotesEl;
+    }
+
+    if (embedEl) {
+      return embedEl;
+    }
+
     return (
       <div className="btb-badge-card btb-review-widget">
         <div className="btb-badge-header">
@@ -724,7 +1051,7 @@ const Layout = ({
             {badgeTitleEl()}
             <div className="btb-badge-rating">
               <span className="score">{badge.score}</span>
-              <span className="stars">★★★★★</span>
+              {badgeStarsEl()}
               {!!badge.count && <span className="count">{badge.count}</span>}
             </div>
           </div>
@@ -808,14 +1135,20 @@ const Layout = ({
                       lockSize
                       defaultColor={slot.color}
                       renderFallback={(color) => (
-                        <svg className="badge-icon" viewBox="0 0 24 24" width={iconBox} height={iconBox}>
+                        <svg
+                          className="badge-icon"
+                          viewBox="0 0 24 24"
+                          width={iconBox}
+                          height={iconBox}>
                           <path fill={color} d={slot.d} />
                         </svg>
                       )}
                     />
                   )}
                   <div className="badge-text">
-                    {item?.title && <h4 className="badge-title">{item.title}</h4>}
+                    {item?.title && (
+                      <h4 className="badge-title">{item.title}</h4>
+                    )}
                     {item?.subtitle && (
                       <p className="badge-subtitle">{item.subtitle}</p>
                     )}
@@ -841,7 +1174,11 @@ const Layout = ({
               lockSize
               defaultColor={it.color}
               renderFallback={(color) => (
-                <svg className="badge-icon" viewBox="0 0 24 24" width={iconBox} height={iconBox}>
+                <svg
+                  className="badge-icon"
+                  viewBox="0 0 24 24"
+                  width={iconBox}
+                  height={iconBox}>
                   <path fill={color} d={it.d} />
                 </svg>
               )}
@@ -892,7 +1229,8 @@ const Layout = ({
     // "calculate when there are items" meant the Rating panel could never win --
     // the block would have kept ignoring it. Choosing the testimonials source is
     // the request to be calculated; anything else means the panel's own figures.
-    const useComputed = "cpt" === attributes.dataSource && computedStats.total > 0;
+    const useComputed =
+      "cpt" === attributes.dataSource && computedStats.total > 0;
 
     const manualScore =
       undefined === rating || null === rating || "" === rating
@@ -916,10 +1254,7 @@ const Layout = ({
     // run of five glyphs, with the filled overlay clipped to the score.
     const starCount = Math.max(1, Math.min(10, Number(outOf) || 5));
     const scoreNum = parseFloat(displayScore) || 0;
-    const fillPct = Math.max(
-      0,
-      Math.min(100, (scoreNum / starCount) * 100),
-    );
+    const fillPct = Math.max(0, Math.min(100, (scoreNum / starCount) * 100));
     const starRow = "★".repeat(starCount);
 
     const defaultPcts = { 5: 78, 4: 15, 3: 4, 2: 2, 1: 1 };
@@ -1038,7 +1373,10 @@ const Layout = ({
     const hasRepeater = statItems.some(
       (it) =>
         it &&
-        (it.number !== undefined || it.label !== undefined || it.suffix || it.prefix),
+        (it.number !== undefined ||
+          it.label !== undefined ||
+          it.suffix ||
+          it.prefix),
     );
 
     if (hasRepeater) {
@@ -1055,16 +1393,16 @@ const Layout = ({
             style={gridVars}>
             {statItems.map((item, index) => {
               const raw = String(item?.number ?? "");
-              const decimals = raw.includes(".")
-                ? raw.split(".")[1].length
-                : 0;
+              const decimals = raw.includes(".") ? raw.split(".")[1].length : 0;
 
               return (
                 <div className="stat-item btb-ts-item" key={index}>
                   <div
                     className="stat-value btb-ts-value"
                     style={{ color: attributes.accentColor }}>
-                    <span className="stat-prefix btb-ts-prefix">{item?.prefix}</span>
+                    <span className="stat-prefix btb-ts-prefix">
+                      {item?.prefix}
+                    </span>
                     {/* The literal stays in the markup so the number is still
                         right with JavaScript off; the view script only takes
                         over to count up to it. */}
@@ -1074,7 +1412,9 @@ const Layout = ({
                       data-decimals={decimals}>
                       {Number(item?.number || 0).toLocaleString()}
                     </span>
-                    <span className="stat-suffix btb-ts-suffix">{item?.suffix}</span>
+                    <span className="stat-suffix btb-ts-suffix">
+                      {item?.suffix}
+                    </span>
                   </div>
                   <div className="stat-label btb-ts-label">{item?.label}</div>
                 </div>
@@ -1097,7 +1437,10 @@ const Layout = ({
         bt || "Happy Customers",
       ],
       [bc || "98%", bd || "Satisfaction Rate"],
-      [attributes.stat3Number || calcAvg, attributes.stat3Label || "Average Rating"],
+      [
+        attributes.stat3Number || calcAvg,
+        attributes.stat3Label || "Average Rating",
+      ],
       [
         attributes.stat4Number || calc5Star,
         attributes.stat4Label || "5-Star Reviews",
@@ -1345,7 +1688,11 @@ const Layout = ({
     // around it. A full grid keeps its box at 100% either way, so this is a
     // no-op whenever there are at least as many videos as columns -- which is
     // every grid that was already working correctly.
-    const videoColCounts = { d: previewCols || 3, t: tablet || 2, m: mobile || 1 };
+    const videoColCounts = {
+      d: previewCols || 3,
+      t: tablet || 2,
+      m: mobile || 1,
+    };
     const videoItemCount = items.length || 1;
     const videoEffCols = {
       d: Math.max(1, Math.min(videoItemCount, videoColCounts.d)),
@@ -1361,7 +1708,8 @@ const Layout = ({
       right: { l: "auto", r: "0" },
     };
     const videoGridAlign =
-      VIDEO_GRID_ALIGN_MARGIN[attributes.blockAlign] || VIDEO_GRID_ALIGN_MARGIN.left;
+      VIDEO_GRID_ALIGN_MARGIN[attributes.blockAlign] ||
+      VIDEO_GRID_ALIGN_MARGIN.left;
 
     const videoGridVars = {
       "--cols-d": videoEffCols.d,
@@ -1481,7 +1829,9 @@ const Layout = ({
     return (
       <div className="bClientLogos">
         <div
-          className={`logos-grid ${attributes.grayscale ? "is-grayscale" : ""} ${
+          className={`logos-grid ${
+            attributes.grayscale ? "is-grayscale" : ""
+          } ${
             attributes.trackColor || attributes.borderColor ? "has-surface" : ""
           }`}
           style={{
@@ -1539,14 +1889,19 @@ const Layout = ({
     // honest at every count -- it can still reduce the columns, it just cannot
     // ask for more tracks than there are cards to fill them.
     const followers = items.slice(1);
-    const gridCols = (value) => Math.max(1, Math.min(Number(value) || 1, followers.length));
+    const gridCols = (value) =>
+      Math.max(1, Math.min(Number(value) || 1, followers.length));
 
     return (
       <div className="btb-hero-layout">
         <div className="btb-hero-card">{themeSelect(heroItem, 0)}</div>
         {followers.length > 0 && (
           <div
-            className={`btb-hero-grid btb-columns-${gridCols(previewCols)} btb-columns-tablet-${gridCols(tablet)} btb-columns-mobile-${gridCols(mobile)}`}>
+            className={`btb-hero-grid btb-columns-${gridCols(
+              previewCols,
+            )} btb-columns-tablet-${gridCols(
+              tablet,
+            )} btb-columns-mobile-${gridCols(mobile)}`}>
             {followers.map((item, index) => themeSelect(item, index + 1))}
           </div>
         )}
@@ -1599,7 +1954,10 @@ const Layout = ({
               tabIndex={-1}
               role="dialog"
               aria-modal="true"
-              aria-label={activeModalItem?.name || __("Testimonial", "b-testimonials-block")}>
+              aria-label={
+                activeModalItem?.name ||
+                __("Testimonial", "b-testimonials-block")
+              }>
               <button
                 type="button"
                 className="btb-modal-close"
@@ -1633,7 +1991,7 @@ const Layout = ({
                     aria-label={sprintf(
                       /* translators: %s: rating out of five */
                       __("Rated %s out of 5", "b-testimonials-block"),
-                      String(activeModalItem.rating || 5)
+                      String(activeModalItem.rating || 5),
                     )}>
                     <span aria-hidden="true">
                       {"★".repeat(activeModalItem.rating || 5)}
@@ -1740,8 +2098,8 @@ const Layout = ({
             const stateClass = isTop
               ? "is-top"
               : pos <= 2
-                ? `is-behind-${pos}`
-                : "is-hidden";
+              ? `is-behind-${pos}`
+              : "is-hidden";
 
             return (
               <div
@@ -1785,7 +2143,7 @@ const Layout = ({
                     /* translators: 1: card number, 2: total cards */
                     __("Go to card %1$s of %2$s", "b-testimonials-block"),
                     String(idx + 1),
-                    String(items.length)
+                    String(items.length),
                   )}
                 />
               ))}
@@ -1842,10 +2200,6 @@ const Layout = ({
             const masonryItems = items.map((item, index) =>
               themeSelect(item, index),
             );
-
-            // In the editor the count comes from the device buttons: this
-            // measures the window, so inside a non-iframed canvas it would
-            // report the desktop width whichever device is selected.
             if (isBackend) {
               return (
                 <Masonry
@@ -1856,8 +2210,6 @@ const Layout = ({
               );
             }
 
-            // Breakpoints are min-width here, so they are the CSS max-widths in
-            // _devices.scss plus one, keeping this in step with the stylesheets.
             return (
               <ResponsiveMasonry
                 columnsCountBreakPoints={{
@@ -1865,7 +2217,9 @@ const Layout = ({
                   641: tablet,
                   1025: desktop,
                 }}>
-                <Masonry columnsCount={desktop} gutter={`${rowGap} ${columnGap}`}>
+                <Masonry
+                  columnsCount={desktop}
+                  gutter={`${rowGap} ${columnGap}`}>
                   {masonryItems}
                 </Masonry>
               </ResponsiveMasonry>
@@ -1896,8 +2250,6 @@ const Layout = ({
                 pauseInEditor={attributes?.pauseInEditor}
               />
             );
-          // All other testimonial-items layouts: quote-box, speech-bubble, compact, list, etc.
-          // The unique visual is produced by the CSS class on the wrapper div
           default:
             return items.map((item, index) => themeSelect(item, index));
         }

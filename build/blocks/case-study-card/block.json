@@ -231,6 +231,12 @@
     "cardHoverLift": {
       "type": "number"
     },
+    "cardHoverTransitionDuration": {
+      "type": "number"
+    },
+    "cardHoverTransitionEasing": {
+      "type": "string"
+    },
     "imgBorder": {
       "type": "object",
       "default": {
@@ -336,6 +342,18 @@
         "tablet": "",
         "mobile": ""
       }
+    },
+    "quoteCardWidth": {
+      "type": "object",
+      "default": {
+        "desktop": "",
+        "tablet": "",
+        "mobile": ""
+      }
+    },
+    "manualQuotes": {
+      "type": "array",
+      "default": []
     },
     "cId": {
       "type": "string",

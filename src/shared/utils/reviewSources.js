@@ -41,6 +41,50 @@ export const BADGE_PLATFORMS = {
 export const GENERIC_BADGE_LAYOUT = "review-badge-widget";
 
 /**
+ * Platforms whose fetch also returns individual review text.
+ *
+ * Mirror of BPBTB_Review_Sources::PLATFORMS_WITH_REVIEWS. Facebook's own
+ * `/ratings` edge hands over real reviews the same way Google does, once the
+ * stored token has been traded for a Page token (PHP's
+ * facebook_page_token()). Trustpilot and G2's badge scope never exposes
+ * review bodies at all, and Capterra is typed in by hand -- those use Manual
+ * Quotes instead of a live pick.
+ */
+export const PLATFORMS_WITH_QUOTES = ["google", "facebook"];
+
+/**
+ * Does this platform support the "Review quotes" display mode?
+ *
+ * @param {string} platform Platform slug.
+ * @return {boolean}
+ */
+export const platformSupportsQuotes = (platform) =>
+  PLATFORMS_WITH_QUOTES.includes(platform);
+
+/**
+ * Platforms that publish their own official embeddable widget (a badge or
+ * TrustBox-style script, pasted once under Testimonials → Review Sources) as
+ * an alternative to reading the score through an API.
+ *
+ * G2's badge and Trustpilot's TrustBox are both documented, self-contained
+ * widgets that need no credentials -- the point of offering this mode at all
+ * is a zero-maintenance option beside the token-based one, for a site that
+ * would rather not manage a G2 API plan or a Trustpilot Business login.
+ *
+ * Mirror of BPBTB_Review_Sources::PLATFORMS_WITH_EMBED.
+ */
+export const PLATFORMS_WITH_EMBED = ["g2", "trustpilot"];
+
+/**
+ * Does this platform offer an official embed widget as an alternative to Live?
+ *
+ * @param {string} platform Platform slug.
+ * @return {boolean}
+ */
+export const platformSupportsEmbed = (platform) =>
+  PLATFORMS_WITH_EMBED.includes(platform);
+
+/**
  * The five platforms, for the inspector's select.
  */
 export const REVIEW_PLATFORM_OPTIONS = [
@@ -285,13 +329,13 @@ export const isReviewBadge = (layout) =>
  * @param {string} layout     Layout key.
  * @param {Object} attributes Block attributes, with any live values merged in.
  * @param {Object} stats      Computed local stats: { total, avg }.
- * @return {Object} { title, score, count, url, isLive }
+ * @return {Object} { title, score, count, url, isLive, ratingValue }
  */
 export const resolveBadge = (layout, attributes = {}, stats = {}) => {
   const preset = BADGE_PRESETS[layout];
 
   if (!preset) {
-    return { title: "", score: "", count: "", url: "", isLive: false };
+    return { title: "", score: "", count: "", url: "", isLive: false, ratingValue: 5 };
   }
 
   const manualTitle = attributes.badgeTitle || "";
@@ -327,16 +371,35 @@ export const resolveBadge = (layout, attributes = {}, stats = {}) => {
         )
       : formatted;
 
+  // The stars drawn under the score, worked out once here rather than at each
+  // of the six call sites -- see badgeStarsEl() in Layout.js. `score` above is
+  // a display string ("4.4", "4.4 / 5", or free text typed into Badge Score),
+  // so this keeps its own numeric line: the raw figure behind whichever branch
+  // `score` took, on the same 0-5 scale every platform here reports on.
   let score;
+  let ratingValue;
   if (isLive) {
     score = withScale(formatScore(liveScore));
+    ratingValue = liveScore;
   } else if (manualScore) {
     score = manualScore;
+    // parseFloat reads the leading number out of "4.5" or "4.5 / 5" alike, and
+    // is NaN for a score typed as words -- caught by the fallback below.
+    ratingValue = parseFloat(manualScore);
   } else if (total > 0 && localAvg) {
     score = withScale(formatScore(localAvg));
+    ratingValue = Number(localAvg);
   } else {
     score = preset.demoScore;
+    ratingValue = parseFloat(preset.demoScore);
   }
+
+  // A manual score with no number in it (or any other surprise) falls back to
+  // a full row rather than an empty or partial one -- the same five stars
+  // this badge always showed before ratingValue existed.
+  ratingValue = Number.isFinite(ratingValue)
+    ? Math.min(5, Math.max(0, ratingValue))
+    : 5;
 
   let count;
   if (isLive && Number.isFinite(liveCount) && liveCount > 0) {
@@ -372,5 +435,78 @@ export const resolveBadge = (layout, attributes = {}, stats = {}) => {
     // at the page the score can be verified on.
     url: isLive ? attributes.liveUrl || "" : "",
     isLive,
+    ratingValue,
   };
+};
+
+/**
+ * Which fetched reviews a "Review quotes" badge should draw.
+ *
+ * Precedence:
+ *
+ *   1. A curated pick (`quoteReviewIds`) wins outright -- exactly those
+ *      reviews, in the order Google returned them, and nothing else.
+ *   2. With nothing curated yet, the platform's own reviews, filtered to
+ *      `quoteMinRating` and capped at `quoteCount`.
+ *
+ * `liveReviews` is injected the same way `liveScore` is -- by render.php on
+ * the front end and by Edit.js in the editor -- so it is never a registered,
+ * saved attribute either; see withLiveReview().
+ *
+ * In Manual mode this reads `manualQuotes` instead -- a real, registered,
+ * saved attribute, since there is no live fetch to inject it on every request.
+ * It is a flat list, typed in by hand for a platform whose API never hands
+ * over review text (Facebook, Trustpilot, G2, Capterra -- see
+ * PLATFORMS_WITH_REVIEWS), so there is nothing to curate or cap: every quote
+ * with text is shown, in the order the author put them in.
+ *
+ * @param {Object} attributes Block attributes, with `liveReviews` merged in.
+ * @return {Array} Review objects with text: { id, author, rating, text, time, avatarUrl }.
+ */
+export const resolveQuotes = (attributes = {}) => {
+  if ("manual" === (attributes.ratingSource || "live")) {
+    return (
+      Array.isArray(attributes.manualQuotes) ? attributes.manualQuotes : []
+    )
+      .filter((quote) => quote && quote.text)
+      .map((quote, index) => ({
+        id: quote.id || `manual-${index}`,
+        author: quote.name || "",
+        rating: Number(quote.rating) || 0,
+        text: quote.text || "",
+        time: quote.time || "",
+        avatarUrl: quote.avatarUrl || "",
+        authorUrl: "",
+      }));
+  }
+
+  const withText = (
+    Array.isArray(attributes.liveReviews) ? attributes.liveReviews : []
+  ).filter((review) => review && review.text);
+
+  const pickedIds = Array.isArray(attributes.quoteReviewIds)
+    ? attributes.quoteReviewIds
+    : [];
+
+  if (pickedIds.length) {
+    const picked = withText.filter((review) => pickedIds.includes(review.id));
+
+    // A picked id is Google's own opaque id for one review at one place. It
+    // stops matching anything the moment the site's Place ID changes to a
+    // different business, or a refetch simply drops a review Google no longer
+    // returns -- and unlike an ordinary "narrowed to zero" filter, there is no
+    // way for a visitor (or the author, until they reopen the picker) to tell
+    // that from a badge that just quietly stopped showing quotes. Falling back
+    // to the automatic pick beats a card that looks like the feature broke.
+    if (picked.length) {
+      return picked;
+    }
+  }
+
+  const minRating = Number(attributes.quoteMinRating) || 0;
+  const count = Math.max(1, Number(attributes.quoteCount) || 3);
+
+  return withText
+    .filter((review) => !minRating || Number(review.rating) >= minRating)
+    .slice(0, count);
 };

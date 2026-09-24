@@ -114,6 +114,18 @@
         "mobile": ""
       }
     },
+    "quoteCardWidth": {
+      "type": "object",
+      "default": {
+        "desktop": "",
+        "tablet": "",
+        "mobile": ""
+      }
+    },
+    "manualQuotes": {
+      "type": "array",
+      "default": []
+    },
     "cId": {
       "type": "string",
       "default": ""
@@ -231,6 +243,12 @@
     },
     "cardHoverLift": {
       "type": "number"
+    },
+    "cardHoverTransitionDuration": {
+      "type": "number"
+    },
+    "cardHoverTransitionEasing": {
+      "type": "string"
     },
     "image": {
       "type": "object",
@@ -373,6 +391,14 @@
       }
     },
     "pauseInEditor": {
+      "type": "boolean",
+      "default": false
+    },
+    "useClassicEditor": {
+      "type": "boolean",
+      "default": false
+    },
+    "isLegacyBlock": {
       "type": "boolean",
       "default": false
     },

@@ -13,10 +13,13 @@ import { getPaletteCSS } from "../../utils/visualControls";
 import { ownBoxForDevice } from "../../utils/responsiveBox";
 import { resolveArrangement } from "../../utils/layoutFeatures";
 import { SHRINK_TO_FIT_LAYOUTS } from "../../utils/layoutControls";
+import { getBadgePlatform, platformSupportsQuotes } from "../../utils/reviewSources";
 
 const Style = ({ attributes = {}, clientId }) => {
   const {
     layout = "default",
+    displayMode = "",
+    ratingSource = "",
     ratingColor = "",
     columnGap = "30px",
     rowGap = "40px",
@@ -42,6 +45,7 @@ const Style = ({ attributes = {}, clientId }) => {
     slider = {},
     blockWidth = {},
     cardHeight = {},
+    quoteCardWidth = {},
     cardMargin = {},
     blockMargin = {},
     blockAlign = "",
@@ -128,6 +132,8 @@ const Style = ({ attributes = {}, clientId }) => {
     cardHoverBorderColor = "",
     cardHoverShadow = {},
     cardHoverLift = "",
+    cardHoverTransitionDuration = "",
+    cardHoverTransitionEasing = "",
     badgeTitleTypo = {},
     badgeSubtitleTypo = {},
     badgeIconSize = "",
@@ -463,6 +469,22 @@ const Style = ({ attributes = {}, clientId }) => {
     .filter(Boolean)
     .join(" ");
 
+  // How the hover state above animates in and out, rather than snapping.
+  //
+  // Absent by default: this file never set `transition` on the card's resting
+  // rule, so nothing changes until the author sets a Duration or an Easing.
+  // Emitted on the resting rule rather than the `:hover` one, so the same
+  // timing plays in both directions -- lifting on the way in, settling on the
+  // way out.
+  const cardHoverTransitionCSS = (() => {
+    const hasDuration = isSet(cardHoverTransitionDuration);
+    const hasEasing = isSet(cardHoverTransitionEasing);
+    if (!hasDuration && !hasEasing) return "";
+    const duration = hasDuration ? `${cardHoverTransitionDuration}ms` : "200ms";
+    const easing = hasEasing ? cardHoverTransitionEasing : "ease";
+    return `transition: background-color ${duration} ${easing}, border-color ${duration} ${easing}, box-shadow ${duration} ${easing}, transform ${duration} ${easing};`;
+  })();
+
   // The Top panel (Style tab) paints the card's header strip -- avatar, name and
   // designation -- and is shown for Theme 2 or the masonry arrangement.
   //
@@ -589,9 +611,26 @@ const Style = ({ attributes = {}, clientId }) => {
   // Alignment was set to Center or Right, while Left and Default (which emit no
   // justify-content) stayed at 600px. The margin rule below is what moves a
   // block that fills its own box, and it needs no flex container.
+  // review-badge-widget and google-review-badge are on SHRINK_TO_FIT_LAYOUTS
+  // for their badge -- a small box with nothing else to centre it -- but in
+  // Review quotes mode they render a full-width grid of quote cards instead,
+  // the same shape as any other grid layout. The flex row above still applied
+  // to that grid: its width became indefinite the moment its parent turned
+  // into a flex container, and `grid-template-columns: repeat(auto-fill,
+  // <fixed size>)` (Card Width) falls back to a single repetition without a
+  // definite width to divide up -- collapsing the whole grid to one column
+  // regardless of how many would actually fit. Excluded here for the same
+  // reason the badges themselves are excluded on every other layout: the
+  // margin rule below already centres a box that fills its own width.
+  const isQuoteDisplay =
+    "quotes" === displayMode &&
+    ("manual" === (ratingSource || "live") ||
+      platformSupportsQuotes(getBadgePlatform(layout, attributes)));
   const BLOCK_ALIGN_JUSTIFY = { center: "center", right: "flex-end" };
   const blockAlignCSS =
-    SHRINK_TO_FIT_LAYOUTS.includes(layout) && BLOCK_ALIGN_JUSTIFY[blockAlign]
+    SHRINK_TO_FIT_LAYOUTS.includes(layout) &&
+    !isQuoteDisplay &&
+    BLOCK_ALIGN_JUSTIFY[blockAlign]
     ? `${widthEl} {\n\t\t\tdisplay: flex;\n\t\t\tjustify-content: ${BLOCK_ALIGN_JUSTIFY[blockAlign]};\n\t\t}`
     : "";
 
@@ -740,6 +779,89 @@ const Style = ({ attributes = {}, clientId }) => {
       .join("\n\t\t\t");
   };
 
+  // Style, Side and Radius for the quote card, which paletteBorderCSS above
+  // cannot be reused for as-is.
+  //
+  // `.btb-quote-card`'s Color and Width already work without this -- they go
+  // through --btb-border/--btb-border-width, the same custom properties every
+  // other layout's Border control writes, and those stay undeclared (so the
+  // stylesheet's own #e2e8f0 fallback shows) until the author actually moves
+  // one of those two fields. Style, Side and Radius have no such custom
+  // property to fall back through: they only ever exist on the `border`
+  // attribute object, and that object's default -- solid, all sides, 3px,
+  // #0575e6 -- is never absent, it is what every untouched badge block already
+  // carries. Emitting paletteBorderCSS(border) verbatim here would apply that
+  // whole default verbatim too, including its own width and color, fighting
+  // the custom-property fallback that already renders correctly and
+  // repainting every existing quote card's border blue on the next load.
+  //
+  // So only the three fields with no property of their own are emitted, and
+  // Color/Width are left to the rule that already handles them.
+  const quoteBorderCSS = (value) => {
+    const { style = "solid", side = "all", radius = "" } = value || {};
+
+    const wanted = (s) => {
+      const bSide = side?.toLowerCase();
+      return bSide?.includes("all") || bSide?.includes(s);
+    };
+
+    const sides = ["top", "right", "bottom", "left"]
+      .map((s) =>
+        wanted(s) ? `border-${s}-style: ${style};` : `border-${s}-width: 0;`,
+      )
+      .join("");
+
+    return [sides, radius ? `border-radius: ${radius};` : ""]
+      .filter(Boolean)
+      .join("\n\t\t\t");
+  };
+
+  // Padding, Shadow, Corner wash and Hover for the quote card -- the rest of
+  // the Card panel, on the same footing as Border above: not folded into
+  // `cardPaintEl`/`CARD_WIDGETS`, because that list's rule also carries
+  // Background and Border verbatim from the same attributes quote cards
+  // already read through their own custom-property route, and adding
+  // `.btb-quote-card` there would emit both at once with no way to keep one
+  // and skip the other.
+  //
+  // Padding has no such property of its own -- like Style/Side/Radius above,
+  // block.json's default (10/15/10/15) is never absent, so wiring it in moves
+  // an untouched card's padding from frontend.scss's 18px/20px to that value,
+  // the same trade the Border fix already made for Radius.
+  //
+  // Shadow and the four Hover fields are different: every one of them
+  // defaults to `{}` or empty, and `getShadowCSS({})` is a real string --
+  // "0px 0px 0px 0px <color>" -- not "none", so reusing `cardBoxShadowCSS`/
+  // `cardHoverCSS` as-is would still emit that string and silently replace
+  // the quote card's own resting shadow (and, on hover, remove it) the
+  // moment either rule reached `.btb-quote-card`. Checked for real content
+  // instead, so an untouched card's shadow stays exactly what frontend.scss
+  // already draws until the author opens Shadow or Hover and sets one.
+  const hasShadow = (value) => !!value && Object.keys(value).length > 0;
+
+  const quotePaddingCSS = `padding:${getBoxValue(
+    ownBoxForDevice(padding, "desktop"),
+  )};`;
+
+  const quoteShadowCSS = hasShadow(shadow)
+    ? `box-shadow: ${getShadowCSS(shadow)};`
+    : "";
+
+  // quoteWashCSS/quoteWashHoverCSS (Corner wash on the quote card) are defined
+  // further down, once cardWashTint/cardWashPct exist -- both reused from
+  // there rather than duplicated here.
+
+  const quoteHoverCSS = [
+    cardHoverBg ? `background-color: ${cardHoverBg};` : "",
+    cardHoverBorderColor ? `border-color: ${cardHoverBorderColor};` : "",
+    hasShadow(cardHoverShadow)
+      ? `box-shadow: ${getShadowCSS(cardHoverShadow)};`
+      : "",
+    isSet(cardHoverLift) ? `transform: translateY(-${cardHoverLift}px);` : "",
+  ]
+    .filter(Boolean)
+    .join(" ");
+
   // Every class each card part is rendered with, across all the layouts.
   //
   // The bespoke layouts name their parts themselves -- `.btb-cs-name` for a case
@@ -771,6 +893,11 @@ const Style = ({ attributes = {}, clientId }) => {
     // play. Their `nameTypo` defaults now carry that value, so an untouched
     // badge renders exactly as it did and the control owns it from there.
     ".btb-badge-title",
+    // The reviewer's name on a "Review quotes" card. Same attribute, same
+    // panel (renamed "Reviewer Name" in that mode -- see Settings.js), just a
+    // second class it now reaches: frontend.scss's own 13px/700 becomes this
+    // control's starting point instead of a value nothing could move.
+    ".btb-quote-name",
   ];
 
   const DEG_PARTS = [
@@ -788,6 +915,10 @@ const Style = ({ attributes = {}, clientId }) => {
     // share one control rather than growing two that would always be set alike.
     ".btb-badge-desc",
     ".btb-badge-rating .count",
+    // The relative timestamp on a "Review quotes" card ("2 months ago"). Same
+    // reasoning as .btb-quote-name above -- this panel is "Review Time" in
+    // that mode, and frontend.scss's 11px becomes the starting point.
+    ".btb-quote-time",
   ];
 
   const TEXT_PARTS = [
@@ -798,6 +929,9 @@ const Style = ({ attributes = {}, clientId }) => {
     ".btb-faq-answer",
     ".btb-ct-table td",
     ".btb-srb-label",
+    // The review's own words on a "Review quotes" card -- see hasTextStyle's
+    // comment in Settings.js for why this role reaches a review badge at all.
+    ".btb-quote-text",
   ];
 
   // A floating bubble's name is painted with the accent colour rather than the
@@ -872,6 +1006,7 @@ const Style = ({ attributes = {}, clientId }) => {
   const sizeCSS = (device) => {
     const width = blockWidth?.[device];
     const height = cardHeight?.[device];
+    const quoteWidth = quoteCardWidth?.[device];
     // The desktop boxes are already written by the base rules further down, so
     // only the two breakpoints add anything here.
     const isBase = "desktop" === device;
@@ -892,6 +1027,31 @@ const Style = ({ attributes = {}, clientId }) => {
       // their card out of something else, so Card Height silently did nothing on
       // timeline, hero, audio, logos, badges, stats and the rest.
       height ? `${cardHeightEl} {\n\t\t\tmin-height: ${height};\n\t\t}` : "",
+      // Quote cards read the same Card Height value, but as an exact height
+      // rather than a floor: unlike every other layout's card, a quote card's
+      // text is already cut to quoteTextLength with its own Read more toggle,
+      // so there is no "longer content" for a minimum to defer to here --
+      // asking for a shorter card should actually get one.
+      //
+      // Lands on `.btb-quote-clip` (header, stars and text) rather than the
+      // card itself, so the Read more toggle stays in normal flow below it --
+      // never the thing a short height clips away with no route back. No
+      // scrollbar either: a fade hints that the clip cuts off before the end,
+      // and Read more is the way past it, same as every other layout that
+      // truncates its text. `.is-expanded` (added once that toggle is
+      // clicked) lifts the cap so the fade and the clipping both stand down.
+      height
+        ? `${mainEl} .btb-quote-clip {\n\t\t\theight: ${height};\n\t\t\toverflow: hidden;\n\t\t\tposition: relative;\n\t\t}\n\t\t${mainEl} .btb-quote-clip::after {\n\t\t\tcontent: "";\n\t\t\tposition: absolute;\n\t\t\tleft: 0;\n\t\t\tright: 0;\n\t\t\tbottom: 0;\n\t\t\theight: 28px;\n\t\t\tbackground: linear-gradient(to bottom, transparent, var(--btb-surface, #fff));\n\t\t\tpointer-events: none;\n\t\t}\n\t\t${mainEl} .btb-quote-clip.is-expanded {\n\t\t\theight: auto;\n\t\t}\n\t\t${mainEl} .btb-quote-clip.is-expanded::after {\n\t\t\tdisplay: none;\n\t\t}`
+        : "",
+      // Quote Card Width is likewise exact, not the floor `repeat(auto-fit,
+      // minmax(...))` gives every other value -- `auto-fill` with a single
+      // fixed size lays out that many columns at exactly that width and
+      // leaves any remainder empty, rather than stretching each one to fill
+      // the row. frontend.scss's own `auto-fit, minmax(220px, 1fr)` is what
+      // an untouched grid keeps using.
+      quoteWidth
+        ? `${mainEl} .btb-quote-grid {\n\t\t\tgrid-template-columns: repeat(auto-fill, ${quoteWidth});\n\t\t}`
+        : "",
       // Padding, Card Margin and Block Margin, for the devices that set one of
       // their own. `ownBoxForDevice` returns nothing when a device inherits, so
       // a media query is only written where there is something to override --
@@ -1489,6 +1649,21 @@ const Style = ({ attributes = {}, clientId }) => {
 		}`
       : "";
 
+  // Off by default (`cardWash: false`), so -- unlike the shared rule above --
+  // this can skip straight to "nothing when off" rather than writing `none`
+  // over a wash the quote card never had.
+  const quoteWashCSS = cardWash
+    ? `background-image: radial-gradient(115% 90% at 0% 0%, ${cardWashTint(
+        cardWashPct(8),
+      )} 0%, transparent 58%);`
+    : "";
+
+  const quoteWashHoverCSS = cardWash
+    ? `background-image: radial-gradient(115% 90% at 0% 0%, ${cardWashTint(
+        cardWashPct(16),
+      )} 0%, transparent 62%);`
+    : "";
+
   // The avatar's tinted ring.
   //
   // frontend.scss draws it as `box-shadow: 0 0 0 3px var(--btb-ring)` on
@@ -1686,7 +1861,12 @@ const Style = ({ attributes = {}, clientId }) => {
     }
 		${getTypoCSS(selectorList(DEG_PARTS), degTypo)?.styles || ""}
 		${getTypoCSS(selectorList(TEXT_PARTS), textTypo)?.styles || ""}
-		${getTypoCSS(`${mainEl} .btb-expand-btn`, expandedTypo)?.styles || ""}
+		${
+      getTypoCSS(
+        `${mainEl} .btb-expand-btn, ${mainEl} .btb-quote-expand-btn`,
+        expandedTypo,
+      )?.styles || ""
+    }
 
 		${/* The badge's score, and the star row beside it.
 		     Neither maps onto a shared role: the score is a bold number the
@@ -1798,6 +1978,20 @@ const Style = ({ attributes = {}, clientId }) => {
 			padding:${getBoxValue(ownBoxForDevice(padding, "desktop"))};
 			${paletteBorderCSS(border)};
 			${cardBoxShadowCSS}
+			${cardHoverTransitionCSS}
+		}
+
+		${/* Quote cards read Background, Color and Width from --btb-surface/
+		     --btb-border/--btb-border-width already (see the Colors rule above);
+		     this adds Padding, Style, Side, Radius, Shadow and Corner wash, none
+		     of which have such a property -- see quoteBorderCSS's comment, which
+		     the same reasoning follows for each. */ ""}
+		${mainEl} .btb-quote-card {
+			${quotePaddingCSS}
+			${quoteBorderCSS(border)}
+			${quoteShadowCSS}
+			${quoteWashCSS}
+			${cardHoverTransitionCSS}
 		}
 
 		${/* Hover, straight after the resting rule it has to beat. Same ID, same
@@ -1805,6 +1999,11 @@ const Style = ({ attributes = {}, clientId }) => {
 		     own hover rule could not manage. */ ""}
 		${cardHoverCSS ? `${cardPaintHoverEl} {
 			${cardHoverCSS}
+		}` : ""}
+
+		${quoteHoverCSS || quoteWashHoverCSS ? `${mainEl} .btb-quote-card:hover {
+			${quoteHoverCSS}
+			${quoteWashHoverCSS}
 		}` : ""}
 
 		${cardMarginCSS ? `${cardMarginEl} {\n\t\t\tmargin: ${cardMarginCSS};\n\t\t}` : ""}
@@ -1865,11 +2064,15 @@ const Style = ({ attributes = {}, clientId }) => {
 			color: ${withRole("--btb-muted", degColor || "#334155")};
 		}
 
-		${expandColor ? `${mainEl} .btb-expand-btn { color: ${expandColor}; }` : ""}
+		${
+      expandColor
+        ? `${mainEl} .btb-expand-btn, ${mainEl} .btb-quote-expand-btn { color: ${expandColor}; }`
+        : ""
+    }
 
 		${
       expandHoverColor
-        ? `${mainEl} .btb-expand-btn:hover, ${mainEl} .btb-expand-btn:focus-visible { color: ${expandHoverColor}; }`
+        ? `${mainEl} .btb-expand-btn:hover, ${mainEl} .btb-expand-btn:focus-visible, ${mainEl} .btb-quote-expand-btn:hover, ${mainEl} .btb-quote-expand-btn:focus-visible { color: ${expandHoverColor}; }`
         : ""
     }
 

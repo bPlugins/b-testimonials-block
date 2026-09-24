@@ -615,10 +615,16 @@ class BPBTB_Review_Import {
 			return new WP_Error( 'bpbtb_not_connected', __( 'Facebook is not connected.', 'b-testimonials-block' ) );
 		}
 
+		// A pasted USER token gets `(#210) A page access token is required`
+		// from /ratings; this trades it for the Page's own token first.
+		if ( class_exists( 'BPBTB_Review_Sources' ) ) {
+			$token = BPBTB_Review_Sources::facebook_page_token( $config );
+		}
+
 		$response = wp_remote_get(
 			add_query_arg(
 				[
-					'fields'       => 'reviewer{name,picture.width(120).height(120)},created_time,rating,recommendation_type,review_text',
+					'fields'       => 'reviewer{id,name,picture.width(120).height(120)},created_time,rating,recommendation_type,review_text',
 					'limit'        => 100,
 					'access_token' => $token,
 				],
@@ -681,7 +687,7 @@ class BPBTB_Review_Import {
 
 			$rows[] = [
 				'source_id' => (string) ( $entry['open_graph_story']['id'] ?? md5( $text . ( $reviewer['name'] ?? '' ) ) ),
-				'name'      => sanitize_text_field( (string) ( $reviewer['name'] ?? '' ) ),
+				'name'      => sanitize_text_field( (string) ( $reviewer['name'] ?? __( 'Facebook user', 'b-testimonials-block' ) ) ),
 				'content'   => wp_kses_post( $text ),
 				'job'       => '',
 				'company'   => '',

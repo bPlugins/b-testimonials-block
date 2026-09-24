@@ -25,6 +25,66 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
+ * Tags and attributes allowed in a platform's embed-code field.
+ *
+ * The one field on this screen not run through sanitize_text_field(). G2's
+ * Badge and Trustpilot's TrustBox are official third-party snippets that need
+ * a live `<script>` tag to render -- wp_kses_post() strips that outright
+ * (it is meant for post content, not a site owner's own trusted markup), and
+ * sanitize_text_field() would strip every tag, mangling the snippet into
+ * plain text. This is therefore a deliberate, capability-gated exception --
+ * see the `unfiltered_html` check around its one call site, in
+ * bpbtb_handle_review_sources_actions() -- and what it saves is later echoed
+ * to every visitor of every page carrying that badge, the same trust level as
+ * a "Custom HTML" block or a header/footer-scripts field, not a lower one.
+ *
+ * @param bool $scripts Whether to allow `<script>`/`<iframe>`. False for a
+ *                       saving user who lacks `unfiltered_html` -- manage_options
+ *                       alone is not that capability (e.g. a Multisite site
+ *                       admin can have one without the other), and the badge
+ *                       still renders without them: only the "own script tag
+ *                       loads a widget's live data" half of the snippet is
+ *                       lost, not the whole field.
+ * @return array
+ */
+if ( ! function_exists( 'bpbtb_embed_code_allowed_html' ) ) {
+function bpbtb_embed_code_allowed_html( $scripts = true ) {
+	$common = [
+		'class' => true,
+		'id'    => true,
+		'style' => true,
+		'title' => true,
+		'data-*' => true,
+	];
+
+	$allowed = [
+		'div'      => $common,
+		'span'     => $common,
+		'p'        => $common,
+		'a'        => array_merge( $common, [ 'href' => true, 'target' => true, 'rel' => true ] ),
+		'img'      => array_merge( $common, [ 'src' => true, 'alt' => true, 'width' => true, 'height' => true, 'loading' => true ] ),
+	];
+
+	if ( ! $scripts ) {
+		return $allowed;
+	}
+
+	$allowed['iframe']   = array_merge( $common, [ 'src' => true, 'width' => true, 'height' => true, 'frameborder' => true, 'scrolling' => true, 'allow' => true, 'allowtransparency' => true ] );
+	$allowed['noscript'] = [];
+	$allowed['script']   = [
+		'src'   => true,
+		'async' => true,
+		'defer' => true,
+		'type'  => true,
+		'id'    => true,
+		'class' => true,
+	];
+
+	return $allowed;
+}
+}
+
+/**
  * Register the submenu page.
  */
 if ( ! function_exists( 'bpbtb_register_review_sources_menu' ) ) {
@@ -106,7 +166,15 @@ function bpbtb_handle_review_sources_actions() {
 
 			$type = isset( $field['type'] ) ? $field['type'] : 'text';
 
-			if ( 'url' === $type ) {
+			if ( 'textarea' === $type ) {
+				// The one field on this screen not run through
+				// sanitize_text_field() -- see bpbtb_embed_code_allowed_html().
+				// manage_options (this whole screen's gate) is not the same
+				// capability as unfiltered_html -- a Multisite site admin can
+				// have the first without the second -- so a script/iframe tag
+				// only survives for a saving user who actually holds it.
+				$saved[ $slug ][ $key ] = wp_kses( $raw, bpbtb_embed_code_allowed_html( current_user_can( 'unfiltered_html' ) ) );
+			} elseif ( 'url' === $type ) {
 				$saved[ $slug ][ $key ] = esc_url_raw( $raw );
 			} elseif ( 'number' === $type ) {
 				// Empty stays empty -- that is how "no rating entered" is
@@ -292,12 +360,13 @@ function bpbtb_render_review_sources_page() {
 							<div class="bpbtb-source-fields">
 								<?php foreach ( $platform['fields'] as $key => $field ) : ?>
 									<?php
-									$input_name = $slug . '_' . $key;
-									$is_secret  = ! empty( $field['secret'] );
-									$stored     = (string) $settings[ $slug ][ $key ];
-									$has_stored = '' !== $stored;
+									$input_name  = $slug . '_' . $key;
+									$is_secret   = ! empty( $field['secret'] );
+									$stored      = (string) $settings[ $slug ][ $key ];
+									$has_stored  = '' !== $stored;
+									$is_textarea = 'textarea' === ( isset( $field['type'] ) ? $field['type'] : 'text' );
 									?>
-									<label class="bpbtb-source-field">
+									<label class="bpbtb-source-field<?php echo $is_textarea ? ' bpbtb-source-field-wide' : ''; ?>">
 										<span class="bpbtb-source-label"><?php echo esc_html( $field['label'] ); ?></span>
 
 										<?php if ( $is_secret ) : ?>
@@ -311,6 +380,14 @@ function bpbtb_render_review_sources_page() {
 													? esc_attr__( '•••••••• saved — leave blank to keep', 'b-testimonials-block' )
 													: esc_attr__( 'Paste the key here', 'b-testimonials-block' ); ?>"
 											/>
+										<?php elseif ( $is_textarea ) : ?>
+											<textarea
+												name="<?php echo esc_attr( $input_name ); ?>"
+												rows="5"
+												spellcheck="false"
+												class="bpbtb-source-embed-code"
+												placeholder="<?php esc_attr_e( 'Paste the widget snippet here', 'b-testimonials-block' ); ?>"
+											><?php echo esc_textarea( $stored ); ?></textarea>
 										<?php else : ?>
 											<?php
 											$type = isset( $field['type'] ) ? $field['type'] : 'text';

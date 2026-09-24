@@ -1564,6 +1564,23 @@ svg.btb-inserter-icon[fill="none"] * {
 	}
 }
 
+// The "Choose which to show" picker's own list. Capped and scrollable rather
+// than left to grow with the sidebar: Google never had more than 5 reviews to
+// offer, but Facebook's /ratings can hand back up to 100, and a hundred
+// checkboxes stretching the panel far past the screen is a worse experience
+// than a short scroll -- see ReviewPicker.js's SEARCH_THRESHOLD for the search
+// box that appears alongside it past the same point.
+.btbReviewPickerList {
+	max-height: 280px;
+	overflow-y: auto;
+	// A hairline seam only where there is something to scroll past, not
+	// wrapped around a five-review Google list that never needs it.
+	border-top: 1px solid #e2e8f0;
+	border-bottom: 1px solid #e2e8f0;
+	padding: 4px 0;
+	margin-top: 8px;
+}
+
 .btbLiveNote {
 	display: flex;
 	align-items: center;

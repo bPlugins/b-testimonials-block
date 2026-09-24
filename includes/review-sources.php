@@ -121,6 +121,75 @@ class BPBTB_Review_Sources {
 	const GENERIC_LAYOUT = 'review-badge-widget';
 
 	/**
+	 * Platforms whose fetch also returns individual review text.
+	 *
+	 * Google's Places API (New) hands over up to 5 reviews per place on the
+	 * same call that gets the score -- no extra request, just a wider field
+	 * mask. Facebook can too, via the `/ratings` edge, with one extra call to
+	 * turn whatever token was stored into a Page token (see
+	 * facebook_page_token()). Trustpilot and G2's badge scope don't expose
+	 * individual review bodies at all, and Capterra is typed in by hand --
+	 * those three fall back to Manual Quotes instead; see
+	 * RatingSourcePanel.js's isManualQuotesCapable.
+	 */
+	const PLATFORMS_WITH_REVIEWS = [ 'google', 'facebook' ];
+
+	/**
+	 * Does this platform's fetch also return individual review text?
+	 *
+	 * @param string $platform Platform slug.
+	 * @return bool
+	 */
+	public static function supports_reviews( $platform ) {
+		return in_array( $platform, self::PLATFORMS_WITH_REVIEWS, true );
+	}
+
+	/**
+	 * Platforms that publish their own official embeddable widget as an
+	 * alternative to reading a score through an API.
+	 *
+	 * G2's Badge and Trustpilot's TrustBox are both a self-contained snippet a
+	 * site pastes in once, needing no credentials at all -- a zero-maintenance
+	 * option beside the token-based one, for a site that would rather not run
+	 * a G2 API plan or a Trustpilot Business login. See the `embed_code` field
+	 * on each in platforms().
+	 *
+	 * Mirror of PLATFORMS_WITH_EMBED in src/shared/utils/reviewSources.js.
+	 */
+	const PLATFORMS_WITH_EMBED = [ 'g2', 'trustpilot' ];
+
+	/**
+	 * Does this platform offer an official embed widget?
+	 *
+	 * @param string $platform Platform slug.
+	 * @return bool
+	 */
+	public static function supports_embed( $platform ) {
+		return in_array( $platform, self::PLATFORMS_WITH_EMBED, true );
+	}
+
+	/**
+	 * The embed snippet entered for a platform that supports one.
+	 *
+	 * Independent of is_connected()/is_live_source() on purpose: the whole
+	 * point of this mode is that it needs no API credentials, so a site using
+	 * only the embed code should never be told the platform is "not
+	 * connected".
+	 *
+	 * @param string $platform Platform slug.
+	 * @return string
+	 */
+	public static function get_embed_code( $platform ) {
+		if ( ! self::supports_embed( $platform ) ) {
+			return '';
+		}
+
+		$settings = self::get_settings()[ $platform ];
+
+		return trim( (string) ( $settings['embed_code'] ?? '' ) );
+	}
+
+	/**
 	 * Every platform, its credential fields and where to get them.
 	 *
 	 * `secret` fields are never sent back out of this class -- not to the
@@ -133,7 +202,7 @@ class BPBTB_Review_Sources {
 			'google'     => [
 				'label'  => __( 'Google', 'b-testimonials-block' ),
 				'note'   => __( 'Official Places API (New). The rating and review count come straight from your Google Business Profile listing.', 'b-testimonials-block' ),
-				'doc'      => 'https://developers.google.com/maps/documentation/places/web-service/place-details',
+				'doc'      => BPBTB_DIR . 'DOCUMENTATION.html#rs-google',
 				'requires' => [ [ 'place_id', 'api_key' ] ],
 				'fields'   => [
 					'place_id' => [
@@ -150,7 +219,7 @@ class BPBTB_Review_Sources {
 			'facebook'   => [
 				'label'  => __( 'Facebook', 'b-testimonials-block' ),
 				'note'   => __( 'Official Graph API. Needs a Page access token with pages_read_engagement — a Page must have recommendations switched on to report a star rating at all.', 'b-testimonials-block' ),
-				'doc'      => 'https://developers.facebook.com/docs/graph-api/reference/page/',
+				'doc'      => BPBTB_DIR . 'DOCUMENTATION.html#rs-facebook',
 				'requires' => [ [ 'page_id', 'access_token' ] ],
 				'fields'   => [
 					'page_id'      => [
@@ -178,6 +247,11 @@ class BPBTB_Review_Sources {
 						'label'    => __( 'API key', 'b-testimonials-block' ),
 						'help'     => __( 'The API key from your Trustpilot Business account.', 'b-testimonials-block' ),
 						'secret'   => true,
+					],
+					'embed_code' => [
+						'label' => __( 'TrustBox embed code (optional)', 'b-testimonials-block' ),
+						'help'  => __( 'Paste a TrustBox snippet from your Trustpilot Business account (Widgets → TrustBox). A block set to "Official embed widget" shows this instead of the badge above, and needs no API key. The standard TrustBox snippet — a <div> plus a <script src="..."> that loads Trustpilot\'s own bootstrap file — works as-is; a snippet with JavaScript written directly between <script> tags may be altered on save.', 'b-testimonials-block' ),
+						'type'  => 'textarea',
 					],
 				],
 			],
@@ -215,6 +289,11 @@ class BPBTB_Review_Sources {
 						'label' => __( 'G2 product page URL', 'b-testimonials-block' ),
 						'help'  => __( 'Optional. The badge title links here so a visitor can check the rating. Also read for schema.org data, on the off-chance the page serves any — the figure above is used when it does not.', 'b-testimonials-block' ),
 						'type'  => 'url',
+					],
+					'embed_code' => [
+						'label' => __( 'G2 Badge embed code (optional)', 'b-testimonials-block' ),
+						'help'  => __( 'Paste the embed code from your G2 profile (Manage → Badges → Embed). A block set to "Official embed widget" shows this instead of the badge above, and needs no API token. G2\'s standard badge — a linked image, with no inline JavaScript — works as-is.', 'b-testimonials-block' ),
+						'type'  => 'textarea',
 					],
 				],
 			],
@@ -327,10 +406,15 @@ class BPBTB_Review_Sources {
 	}
 
 	/**
-	 * Is this platform reading a real API, as opposed to a figure typed in?
+	 * Is this platform reading a real live source, as opposed to only a figure
+	 * typed in?
 	 *
-	 * Only G2 can be either. It is the first group in its `requires` list that
-	 * decides -- the API token and slug -- so that is what is checked.
+	 * G2 and Capterra are the two `manual` platforms, and each has its own
+	 * live path: G2 by an API token + product slug (see fetch_g2()), Capterra
+	 * (and G2 without a token) by scraping a given profile URL for structured
+	 * data (see resolve_entered()). Checking `api_token`/`product_slug` for
+	 * both used to leave Capterra permanently reporting `false` -- it has
+	 * neither field -- even with a profile URL that was reading live.
 	 *
 	 * @param string $platform Platform slug.
 	 * @return bool
@@ -346,8 +430,12 @@ class BPBTB_Review_Sources {
 
 		$settings = self::get_settings()[ $platform ];
 
-		return '' !== trim( (string) ( $settings['api_token'] ?? '' ) )
-			&& '' !== trim( (string) ( $settings['product_slug'] ?? '' ) );
+		if ( isset( $settings['api_token'] ) ) {
+			return '' !== trim( (string) $settings['api_token'] )
+				&& '' !== trim( (string) ( $settings['product_slug'] ?? '' ) );
+		}
+
+		return '' !== trim( (string) ( $settings['profile_url'] ?? '' ) );
 	}
 
 	/**
@@ -406,6 +494,10 @@ class BPBTB_Review_Sources {
 			// is not the same question as whether it could have been.
 			'live'    => false,
 			'stale'   => false,
+			// Individual review text, where the platform hands it over (Google
+			// only for now -- see PLATFORMS_WITH_REVIEWS). Each entry:
+			// { id, author, rating, text, time, avatarUrl }.
+			'reviews' => [],
 		];
 	}
 
@@ -637,11 +729,47 @@ class BPBTB_Review_Sources {
 	}
 
 	/**
+	 * Is any published Google badge actually set to "Review quotes"?
+	 *
+	 * Checked with a direct LIKE scan of post content rather than a WP_Query +
+	 * has_block() loop, which would mean loading and parsing every post that
+	 * merely contains the block, quotes mode or not. Runs at most once per
+	 * fetch_google() call, which is itself already throttled to the cache
+	 * window (get_data()), so an occasional table scan costs far less than
+	 * the Places API tier it decides between.
+	 *
+	 * @return bool
+	 */
+	private static function site_wants_google_reviews() {
+		global $wpdb;
+
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- runs once per cache window, see above.
+		$found = $wpdb->get_var(
+			"SELECT 1 FROM {$wpdb->posts}
+			 WHERE post_status IN ( 'publish', 'draft', 'pending', 'future', 'private' )
+			 AND (
+			     ( post_content LIKE '%wp:bptmb/google-review-badge%' AND post_content LIKE '%\"displayMode\":\"quotes\"%' )
+			     OR (
+			         post_content LIKE '%wp:bptmb/review-badge-widget%'
+			         AND post_content LIKE '%\"ratingPlatform\":\"google\"%'
+			         AND post_content LIKE '%\"displayMode\":\"quotes\"%'
+			     )
+			 )
+			 LIMIT 1"
+		);
+
+		return (bool) $found;
+	}
+
+	/**
 	 * Google Business Profile rating, via the Places API (New).
 	 *
-	 * The field mask is required by that API and is also why this costs an
-	 * Essentials-tier request rather than a Pro one: only the four fields the
-	 * badge draws are asked for.
+	 * The field mask is required by that API. Asking for `reviews` alongside
+	 * the score moves this from the Essentials tier to the Enterprise +
+	 * Atmosphere tier -- a real cost difference per Google's price sheet, so
+	 * it is only added when `site_wants_google_reviews()` finds a published
+	 * "Review quotes" badge that would actually use it. Every other site pays
+	 * the cheaper tier for the same rating and count.
 	 *
 	 * @param array $config Platform settings.
 	 * @return array|WP_Error
@@ -653,13 +781,19 @@ class BPBTB_Review_Sources {
 		// `places/ChIJ...`; the URL below adds that prefix itself.
 		$place = preg_replace( '#^places/#', '', $place );
 
+		$field_mask = 'id,displayName,rating,userRatingCount,googleMapsUri';
+
+		if ( self::site_wants_google_reviews() ) {
+			$field_mask .= ',reviews';
+		}
+
 		$response = wp_remote_get(
 			'https://places.googleapis.com/v1/places/' . rawurlencode( $place ),
 			[
 				'timeout' => 12,
 				'headers' => [
 					'X-Goog-Api-Key'   => trim( $config['api_key'] ),
-					'X-Goog-FieldMask' => 'id,displayName,rating,userRatingCount,googleMapsUri',
+					'X-Goog-FieldMask' => $field_mask,
 				],
 			]
 		);
@@ -675,34 +809,283 @@ class BPBTB_Review_Sources {
 		}
 
 		return [
-			'score' => (float) $body['rating'],
-			'count' => isset( $body['userRatingCount'] ) ? (int) $body['userRatingCount'] : null,
-			'title' => isset( $body['displayName']['text'] ) ? (string) $body['displayName']['text'] : '',
-			'url'   => isset( $body['googleMapsUri'] ) ? (string) $body['googleMapsUri'] : '',
-			'live'  => true,
+			'score'   => (float) $body['rating'],
+			'count'   => isset( $body['userRatingCount'] ) ? (int) $body['userRatingCount'] : null,
+			'reviews' => self::parse_google_reviews( $body ),
+			'title'   => isset( $body['displayName']['text'] ) ? (string) $body['displayName']['text'] : '',
+			'url'     => isset( $body['googleMapsUri'] ) ? (string) $body['googleMapsUri'] : '',
+			'live'    => true,
 		];
 	}
 
 	/**
-	 * Facebook Page star rating, via the Graph API.
+	 * Normalise the Places API (New) `reviews` array for the editor and front end.
 	 *
-	 * `overall_star_rating` is absent -- not zero -- on a Page that has
-	 * recommendations switched off or no recommendations yet, which is a
-	 * different problem from a bad token and is reported as such.
+	 * `name` (e.g. "places/ChIJ.../reviews/xyz") is Google's own opaque id for
+	 * the review, kept as-is so a curated pick (`quoteReviewIds`) still matches
+	 * after a refetch that returns the same review in a different position.
+	 *
+	 * @param array $body Decoded Place Details response.
+	 * @return array
+	 */
+	private static function parse_google_reviews( $body ) {
+		if ( empty( $body['reviews'] ) || ! is_array( $body['reviews'] ) ) {
+			return [];
+		}
+
+		$reviews = [];
+
+		foreach ( $body['reviews'] as $review ) {
+			$text = isset( $review['text']['text'] ) ? (string) $review['text']['text'] : '';
+
+			// A rating with no text is nothing a "Review quotes" card can show,
+			// and the badge above already has the score this review fed into.
+			if ( '' === trim( $text ) ) {
+				continue;
+			}
+
+			$reviews[] = [
+				'id'         => isset( $review['name'] ) ? (string) $review['name'] : '',
+				'author'     => isset( $review['authorAttribution']['displayName'] ) ? (string) $review['authorAttribution']['displayName'] : '',
+				'rating'     => isset( $review['rating'] ) ? (float) $review['rating'] : null,
+				'text'       => $text,
+				'time'       => isset( $review['relativePublishTimeDescription'] ) ? (string) $review['relativePublishTimeDescription'] : '',
+				'avatarUrl'  => isset( $review['authorAttribution']['photoUri'] ) ? (string) $review['authorAttribution']['photoUri'] : '',
+				// The reviewer's own Google Maps contributor profile -- Google
+				// doesn't hand out a URL to the individual review itself, only
+				// to the person who wrote it (which does list it).
+				'authorUrl'  => isset( $review['authorAttribution']['uri'] ) ? (string) $review['authorAttribution']['uri'] : '',
+			];
+		}
+
+		return $reviews;
+	}
+
+	/**
+	 * Facebook Page star rating and reviews, via the Graph API.
+	 *
+	 * Two sources, and which of them a token can read depends on the Facebook
+	 * app behind it -- measured, not guessed:
+	 *
+	 *   - The Page's own fields (overall_star_rating, rating_count, name,
+	 *     link). A token from a personal app with pages_read_engagement reads
+	 *     them. A token from the bPlugins app behind "Connect with Facebook"
+	 *     is refused every one of them, even `id`, with `(#100) ... requires
+	 *     the 'pages_read_engagement' permission or the 'Page Public Content
+	 *     Access' feature`.
+	 *   - The `/ratings` edge -- the recommendations themselves. The bPlugins
+	 *     token reads it, reviewer names and all; this is the only call
+	 *     Business Reviews makes, which is why it works there.
+	 *
+	 * So neither is allowed to sink the other. Whichever answers is used; the
+	 * Page fields win for the score when both do, and when only `/ratings`
+	 * answers, the score and count are worked out from the recommendations.
+	 * Only when both fail is there an error, and it is the Page-fields one,
+	 * since that is the more specific of the two.
 	 *
 	 * @param array $config Platform settings.
 	 * @return array|WP_Error
 	 */
 	private static function fetch_facebook( $config ) {
+		$token   = self::facebook_page_token( $config );
+		$page_id = trim( (string) $config['page_id'] );
+
 		$response = wp_remote_get(
 			add_query_arg(
 				[
 					'fields'       => 'name,overall_star_rating,rating_count,link',
-					'access_token' => trim( $config['access_token'] ),
+					'access_token' => $token,
 				],
-				'https://graph.facebook.com/v21.0/' . rawurlencode( trim( $config['page_id'] ) )
+				'https://graph.facebook.com/v21.0/' . rawurlencode( $page_id )
 			),
 			[ 'timeout' => 12 ]
+		);
+
+		$body    = self::decode_json( $response, __( 'Facebook', 'b-testimonials-block' ) );
+		$entries = self::fetch_facebook_ratings( $page_id, $token );
+
+		if ( is_wp_error( $body ) && is_wp_error( $entries ) ) {
+			return $body;
+		}
+
+		$entries = is_wp_error( $entries ) ? [] : $entries;
+		$page    = is_wp_error( $body ) ? [] : $body;
+
+		$score = isset( $page['overall_star_rating'] ) ? (float) $page['overall_star_rating'] : null;
+
+		if ( null === $score && $entries ) {
+			$score = self::facebook_average( $entries );
+		}
+
+		if ( null === $score ) {
+			return new WP_Error( 'bpbtb_no_rating', __( 'Facebook returned no star rating. The Page needs recommendations switched on, and at least one recommendation.', 'b-testimonials-block' ) );
+		}
+
+		// `rating_count` only counts the old 1-5 star ratings. A Page that
+		// has only had thumbs-up Recommendations since 2018 reports 0 there
+		// while /ratings lists them all -- which read as "0 reviews" under
+		// five stars. The recommendations are the real count on such a Page.
+		$count = isset( $page['rating_count'] ) ? (int) $page['rating_count'] : null;
+
+		if ( ! $count && $entries ) {
+			$count = count( $entries );
+		}
+
+		return [
+			'score'   => $score,
+			'count'   => $count,
+			'title'   => isset( $page['name'] ) ? (string) $page['name'] : '',
+			'url'     => isset( $page['link'] ) ? (string) $page['link'] : 'https://www.facebook.com/' . rawurlencode( $page_id ) . '/reviews',
+			'live'    => true,
+			'reviews' => self::parse_facebook_reviews( $entries ),
+		];
+	}
+
+	/**
+	 * The star figure a set of recommendations works out to.
+	 *
+	 * Used only when the Page's own overall_star_rating cannot be read. Each
+	 * entry counts as its `rating` if it has one (the pre-2018 stars), else 5
+	 * for a recommendation and 1 for a "does not recommend" -- the same
+	 * mapping parse_facebook_reviews() puts on the cards, so the score and
+	 * the quotes under it agree.
+	 *
+	 * @param array[] $entries Raw entries from fetch_facebook_ratings().
+	 * @return float|null Null when no entry carries a rating either way.
+	 */
+	private static function facebook_average( $entries ) {
+		$sum = 0;
+		$n   = 0;
+
+		foreach ( $entries as $entry ) {
+			$rating = self::facebook_entry_rating( $entry );
+
+			if ( $rating > 0 ) {
+				$sum += $rating;
+				++$n;
+			}
+		}
+
+		return $n ? round( $sum / $n, 1 ) : null;
+	}
+
+	/**
+	 * One recommendation's stars: its `rating`, else 5 / 1 for positive /
+	 * negative, else 0.
+	 *
+	 * @param array $entry Raw /ratings entry.
+	 * @return int
+	 */
+	private static function facebook_entry_rating( $entry ) {
+		if ( isset( $entry['rating'] ) ) {
+			return (int) $entry['rating'];
+		}
+
+		if ( 'positive' === ( $entry['recommendation_type'] ?? '' ) ) {
+			return 5;
+		}
+
+		if ( 'negative' === ( $entry['recommendation_type'] ?? '' ) ) {
+			return 1;
+		}
+
+		return 0;
+	}
+
+	/**
+	 * The Page access token for the configured Page, whatever was stored.
+	 *
+	 * `/ratings` answers `(#210) A page access token is required` to anything
+	 * else -- and what gets stored is often a USER token: Graph API Explorer
+	 * hands one out by default, and it looks exactly like a Page token when
+	 * pasted into the field. Business Reviews gets around this the same way:
+	 * it trades the token at `/me/accounts` for the token of the Page with
+	 * the matching id. A token that is already a Page token has no accounts
+	 * edge, Facebook says so, and it is used as it is.
+	 *
+	 * Remembered for twelve hours, keyed on the stored token, so the exchange
+	 * is not repeated on every refresh and reconnecting starts afresh. A
+	 * transport failure is not remembered -- that would pin the wrong token
+	 * for half a day over one dropped request.
+	 *
+	 * @param array $config Facebook settings: page_id, access_token.
+	 * @return string
+	 */
+	public static function facebook_page_token( $config ) {
+		$page_id = trim( (string) ( $config['page_id'] ?? '' ) );
+		$token   = trim( (string) ( $config['access_token'] ?? '' ) );
+
+		if ( '' === $page_id || '' === $token ) {
+			return $token;
+		}
+
+		$key    = 'bpbtb_fb_page_token_' . md5( $page_id . '|' . $token );
+		$cached = get_transient( $key );
+
+		if ( is_string( $cached ) && '' !== $cached ) {
+			return $cached;
+		}
+
+		$response = wp_remote_get(
+			add_query_arg(
+				[
+					'fields'       => 'id,access_token',
+					'limit'        => 250,
+					'access_token' => $token,
+				],
+				'https://graph.facebook.com/v21.0/me/accounts'
+			),
+			[ 'timeout' => 12 ]
+		);
+
+		if ( is_wp_error( $response ) ) {
+			return $token;
+		}
+
+		$body = json_decode( wp_remote_retrieve_body( $response ), true );
+
+		if ( ! is_array( $body ) ) {
+			return $token;
+		}
+
+		$resolved = $token;
+
+		foreach ( ( isset( $body['data'] ) && is_array( $body['data'] ) ) ? $body['data'] : [] as $account ) {
+			if ( $page_id === (string) ( $account['id'] ?? '' ) && ! empty( $account['access_token'] ) ) {
+				$resolved = (string) $account['access_token'];
+				break;
+			}
+		}
+
+		set_transient( $key, $resolved, 12 * HOUR_IN_SECONDS );
+
+		return $resolved;
+	}
+
+	/**
+	 * Raw entries from a Page's `/ratings` edge -- its recommendations.
+	 *
+	 * Needs a Page access token; see facebook_page_token(). `reviewer` (name
+	 * and photo) is only included when the Facebook app behind the token is
+	 * allowed to show it: the bPlugins app behind "Connect with Facebook" is,
+	 * a personal app in development mode is not, and its entries arrive with
+	 * the text and date but no reviewer.
+	 *
+	 * @param string $page_id Page id.
+	 * @param string $token   Page access token.
+	 * @return array[]|WP_Error Empty array for a Page with no recommendations.
+	 */
+	private static function fetch_facebook_ratings( $page_id, $token ) {
+		$response = wp_remote_get(
+			add_query_arg(
+				[
+					'fields'       => 'reviewer{id,name,picture.width(120).height(120)},created_time,rating,recommendation_type,review_text',
+					'limit'        => 100,
+					'access_token' => $token,
+				],
+				'https://graph.facebook.com/v21.0/' . rawurlencode( trim( (string) $page_id ) ) . '/ratings'
+			),
+			[ 'timeout' => 15 ]
 		);
 
 		$body = self::decode_json( $response, __( 'Facebook', 'b-testimonials-block' ) );
@@ -711,17 +1094,79 @@ class BPBTB_Review_Sources {
 			return $body;
 		}
 
-		if ( ! isset( $body['overall_star_rating'] ) ) {
-			return new WP_Error( 'bpbtb_no_rating', __( 'Facebook returned no star rating. The Page needs recommendations switched on, and at least one recommendation.', 'b-testimonials-block' ) );
+		return isset( $body['data'] ) && is_array( $body['data'] ) ? $body['data'] : [];
+	}
+
+	/**
+	 * Individual Facebook reviews, for "Review quotes".
+	 *
+	 * `recommendation_type` ("positive"/"negative") is what a Page using
+	 * Facebook's newer thumbs-up Recommendations feature returns instead of a
+	 * numeric `rating`. That mapping (5 / 1) still rides along as `rating` for
+	 * anything that needs a plain number -- quoteMinRating's filter, sorting --
+	 * but a recommendation was never actually a star count, and Facebook's own
+	 * Page no longer shows one either: since the 2018 change it reports a
+	 * percentage ("100% based on the opinion of 2 people"), not stars. So each
+	 * such entry also carries `recommendationType`, and Layout.js's quote card
+	 * shows Facebook's own words -- Recommended / Not Recommended -- instead of
+	 * a star row it never gave, for exactly these entries. An entry with a real
+	 * numeric `rating` (a Page still using the old star system) has no
+	 * `recommendationType` and keeps its actual stars.
+	 *
+	 * @param array[] $entries Raw entries from fetch_facebook_ratings().
+	 * @return array Review objects: { id, author, rating, recommendationType, text, time, avatarUrl, authorUrl }.
+	 */
+	private static function parse_facebook_reviews( $entries ) {
+		$reviews = [];
+
+		foreach ( $entries as $index => $entry ) {
+			$text = trim( (string) ( $entry['review_text'] ?? '' ) );
+
+			// Same rule as Google's parse_google_reviews(): a rating with no
+			// written words is not a quote, so it is left out rather than
+			// shown as an empty card.
+			if ( '' === $text ) {
+				continue;
+			}
+
+			$rating = self::facebook_entry_rating( $entry );
+
+			$reviews[] = [
+				'id'                 => 'fb-' . $index . '-' . substr( md5( $text ), 0, 8 ),
+				// No reviewer at all when the token's app may not show one --
+				// see fetch_facebook_ratings(). A named placeholder reads better
+				// on the card than a blank line and a "?" avatar.
+				// Private-use code points are stripped: Facebook lets people put
+				// its own glyphs in a name (seen here as U+F188F), and no font on
+				// a visitor's machine has them, so they only ever draw as a box.
+				'author'             => trim( (string) preg_replace( '/[\x{E000}-\x{F8FF}\x{F0000}-\x{FFFFD}\x{100000}-\x{10FFFD}]/u', '', (string) ( $entry['reviewer']['name'] ?? __( 'Facebook user', 'b-testimonials-block' ) ) ) ),
+				'rating'             => $rating,
+				// '' for a Page still on the old star system -- isset( $entry['rating'] )
+				// there, so this stays empty and the card falls back to real stars.
+				'recommendationType' => isset( $entry['rating'] ) ? '' : (string) ( $entry['recommendation_type'] ?? '' ),
+				'text'               => $text,
+				'time'               => isset( $entry['created_time'] )
+					? sprintf(
+						/* translators: %s: time since the review, e.g. "3 days" */
+						__( '%s ago', 'b-testimonials-block' ),
+						human_time_diff( strtotime( $entry['created_time'] ) )
+					)
+					: '',
+				'avatarUrl'          => (string) ( $entry['reviewer']['picture']['data']['url'] ?? '' ),
+				// No profile link, unlike Google's parse_google_reviews() -- tried
+				// once, reverted. The `id` this edge hands back is app-scoped: Meta
+				// assigns each person a different, meaningless-outside-this-app id
+				// per Facebook App specifically so the app that received it can't
+				// use it to find or link to their real profile without their
+				// consent. facebook.com/{that id} is not a working profile URL --
+				// verified against a real one, which loads Facebook's own "This
+				// content isn't available right now" -- so the name and avatar stay
+				// plain text/an image rather than a link nothing can follow.
+				'authorUrl'          => '',
+			];
 		}
 
-		return [
-			'score' => (float) $body['overall_star_rating'],
-			'count' => isset( $body['rating_count'] ) ? (int) $body['rating_count'] : null,
-			'title' => isset( $body['name'] ) ? (string) $body['name'] : '',
-			'url'   => isset( $body['link'] ) ? (string) $body['link'] : '',
-			'live'  => true,
-		];
+		return $reviews;
 	}
 
 	/**
@@ -1299,6 +1744,23 @@ class BPBTB_Review_Sources {
 	public static function get_public_state( $platform, $force = false ) {
 		$data = self::get_data( $platform, $force );
 
+		// `error`/`detail` can contain a platform's own diagnostic text --
+		// "G2: Bad Credentials", a Facebook token failure, and similar --
+		// which says something about a *site owner's* account, not the post
+		// being edited. `edit_posts` is deliberately as low as Contributor,
+		// so anyone who can open the block editor could otherwise read it.
+		// Only the capability that owns the settings screen sees the detail;
+		// everyone else gets a generic line, still enough to know the badge
+		// is showing a fallback figure.
+		$can_manage = current_user_can( 'manage_options' );
+		$error      = (string) $data['error'];
+		$detail     = (string) $data['detail'];
+
+		if ( ! $can_manage ) {
+			$error  = '' === $error ? '' : __( 'This platform is not connected properly. An administrator can check Testimonials → Review Sources.', 'b-testimonials-block' );
+			$detail = '' === $detail ? '' : __( 'See Testimonials → Review Sources for details.', 'b-testimonials-block' );
+		}
+
 		return [
 			'platform'  => $platform,
 			'label'     => self::is_platform( $platform ) ? self::platforms()[ $platform ]['label'] : '',
@@ -1308,9 +1770,9 @@ class BPBTB_Review_Sources {
 			'title'     => (string) $data['title'],
 			'url'       => (string) $data['url'],
 			'fetched'   => (int) $data['fetched'],
-			'error'     => (string) $data['error'],
+			'error'     => $error,
 			'note'      => (string) $data['note'],
-			'detail'    => (string) $data['detail'],
+			'detail'    => $detail,
 			// Whether the figure on show was actually fetched.
 			'live'      => (bool) $data['live'],
 			// Whether this platform is set up to use an API at all, which is a
@@ -1324,6 +1786,13 @@ class BPBTB_Review_Sources {
 			// a real live source once an API token and slug are set, and a typed
 			// figure only until then. See is_live_source().
 			'manual'    => ! self::is_live_source( $platform ),
+			// Individual review text, for the "Review quotes" display mode's
+			// picker. Always '' for a platform outside PLATFORMS_WITH_REVIEWS,
+			// same as every other field here when there is nothing to report.
+			'reviews'   => is_array( $data['reviews'] ?? null ) ? $data['reviews'] : [],
+			// The pasted embed snippet, for the "Official embed widget" display
+			// mode. Deliberately not gated on `connected` -- see get_embed_code().
+			'embedCode' => self::supports_embed( $platform ) ? self::get_embed_code( $platform ) : '',
 		];
 	}
 }
@@ -1384,6 +1853,21 @@ function bpbtb_apply_live_review_data( $attributes ) {
 		return $attributes;
 	}
 
+	// None of the six `live*` keys this function writes is a registered block
+	// attribute (deliberately -- see the docblock below), and WordPress only
+	// validates an attribute found in a block's own comment JSON against a
+	// registered schema; an unregistered one is passed to render_callback()
+	// untouched. `liveEmbedCode` is the one of the six actually rendered as
+	// raw HTML (EmbedWidget's dangerouslySetInnerHTML in Layout.js), so a
+	// hand-crafted `{"liveEmbedCode":"<img src=x onerror=...>"}` in a block's
+	// markup would otherwise reach the page verbatim. Clearing all six before
+	// any early return below means every path out of this function either
+	// re-populates one from data this site's own admin actually saved, or
+	// leaves it absent -- never carries through whatever the caller handed in.
+	foreach ( [ 'liveScore', 'liveCount', 'liveTitle', 'liveUrl', 'liveReviews', 'liveEmbedCode' ] as $live_key ) {
+		unset( $attributes[ $live_key ] );
+	}
+
 	$source = isset( $attributes['ratingSource'] ) ? (string) $attributes['ratingSource'] : 'live';
 
 	if ( 'live' !== $source ) {
@@ -1392,7 +1876,22 @@ function bpbtb_apply_live_review_data( $attributes ) {
 
 	$platform = BPBTB_Review_Sources::platform_for_attributes( $attributes );
 
-	if ( ! $platform || ! BPBTB_Review_Sources::is_connected( $platform ) ) {
+	if ( ! $platform ) {
+		return $attributes;
+	}
+
+	// Independent of is_connected() below: the embed code needs no API
+	// credentials at all, so a site using only that mode must not be treated
+	// as "not connected" just because it never set up an API token.
+	if ( BPBTB_Review_Sources::supports_embed( $platform ) ) {
+		$embed_code = BPBTB_Review_Sources::get_embed_code( $platform );
+
+		if ( '' !== $embed_code ) {
+			$attributes['liveEmbedCode'] = $embed_code;
+		}
+	}
+
+	if ( ! BPBTB_Review_Sources::is_connected( $platform ) ) {
 		return $attributes;
 	}
 
@@ -1408,6 +1907,10 @@ function bpbtb_apply_live_review_data( $attributes ) {
 
 	if ( null !== $data['count'] ) {
 		$attributes['liveCount'] = (int) $data['count'];
+	}
+
+	if ( ! empty( $data['reviews'] ) && is_array( $data['reviews'] ) ) {
+		$attributes['liveReviews'] = $data['reviews'];
 	}
 
 	return $attributes;

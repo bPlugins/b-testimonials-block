@@ -1243,6 +1243,178 @@ $brandColor: #146ef5;
 .btb-verified-badge { border-left: 4px solid var(--btb-accent, #{$brandColor}); }
 .btb-review-widget { border-left: 4px solid var(--btb-accent, #6366f1); }
 
+/* --- Review Widget: embed display mode ---
+   Deliberately not .btb-badge-card: that rule's own padding, border and
+   background would sit around a widget (a TrustBox iframe, a G2 badge image)
+   that already draws its own box, giving every embed a card-inside-a-card
+   look. This wrapper only sizes and centres it. */
+.btb-embed-widget {
+	display: inline-flex;
+	max-width: 100%;
+	margin: 10px 0;
+}
+
+.btb-embed-widget-preview {
+	padding: 16px 20px;
+	border-radius: 14px;
+	border: 1px dashed var(--btb-border, #e2e8f0);
+
+	p {
+		margin: 0;
+		font-size: 13px;
+		color: var(--btb-muted, #64748b);
+	}
+}
+
+/* --- Review Widget: quotes display mode --- */
+.btb-quote-grid {
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+	// Grid's default stretch makes every card in a row match the tallest one
+	// -- with text capped by quoteTextLength this rarely bites hard, but a
+	// short one-line review next to a five-line one still shouldn't be
+	// stretched to match it.
+	align-items: start;
+	gap: 16px;
+	margin: 10px 0;
+}
+
+.btb-quote-more-link {
+	display: inline-block;
+	margin-top: 4px;
+	font-size: 13px;
+	font-weight: 600;
+	color: var(--btb-accent, #6366f1);
+	text-decoration: none;
+
+	&:hover,
+	&:focus-visible {
+		text-decoration: underline;
+	}
+}
+
+.btb-quote-card {
+	display: flex;
+	flex-direction: column;
+	gap: 10px;
+	padding: 18px 20px;
+	border-radius: 14px;
+	background: var(--btb-surface, #ffffff);
+	border: var(--btb-border-width, 1px) solid var(--btb-border, #e2e8f0);
+	box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+
+	// Wraps the header, stars and text -- everything but the Read more toggle.
+	// Card Height's fixed-height clipping (see Style.js) lands on this instead
+	// of the card itself, so the toggle always stays in normal flow below it
+	// and is never the thing that gets clipped away with no way back.
+	.btb-quote-clip {
+		display: flex;
+		flex-direction: column;
+		gap: 10px;
+	}
+
+	.btb-quote-header {
+		display: flex;
+		align-items: center;
+		gap: 10px;
+		min-width: 0;
+	}
+
+	.btb-quote-avatar {
+		flex-shrink: 0;
+		width: 32px;
+		height: 32px;
+		border-radius: 50%;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		font-weight: 700;
+		font-size: 13px;
+		color: var(--btb-accent, #6366f1);
+		background: color-mix(in srgb, var(--btb-accent, #6366f1) 15%, transparent);
+	}
+
+	.btb-quote-avatar-img {
+		flex-shrink: 0;
+		width: 32px;
+		height: 32px;
+		border-radius: 50%;
+		object-fit: cover;
+	}
+
+	.btb-quote-who {
+		min-width: 0;
+		display: flex;
+		flex-direction: column;
+	}
+
+	.btb-quote-name {
+		font-size: 13px;
+		font-weight: 700;
+		color: var(--btb-title, #1e293b);
+	}
+
+	.btb-quote-avatar-link,
+	.btb-quote-name-link {
+		text-decoration: none;
+		color: inherit;
+
+		&:hover .btb-quote-name,
+		&:focus-visible .btb-quote-name {
+			text-decoration: underline;
+		}
+	}
+
+	.btb-quote-time {
+		font-size: 11px;
+		color: var(--btb-muted, #64748b);
+	}
+
+	.btb-quote-stars {
+		color: var(--btb-star, #f59e0b);
+		letter-spacing: 2px;
+		font-size: 13px;
+	}
+
+	// Facebook recommendations in place of a star row -- see the comment above
+	// this element in Layout.js. Green/red rather than the star row's amber:
+	// this is a yes/no verdict, not a point on a 1-5 scale, and borrowing the
+	// star colour would read as a rating that never existed.
+	.btb-quote-recommend {
+		display: inline-block;
+		font-size: 13px;
+		font-weight: 600;
+		color: #16a34a;
+
+		&.is-negative { color: #dc2626; }
+	}
+
+	.btb-quote-text {
+		margin: 0;
+		font-size: 14px;
+		line-height: 1.55;
+		color: var(--btb-body, #334155);
+	}
+
+	.btb-quote-expand-btn {
+		align-self: flex-start;
+		margin-top: -4px;
+		padding: 0;
+		border: none;
+		background: none;
+		font: inherit;
+		font-size: 13px;
+		font-weight: 600;
+		color: var(--btb-accent, #6366f1);
+		cursor: pointer;
+
+		&:hover,
+		&:focus-visible {
+			text-decoration: underline;
+		}
+	}
+}
+
 /* --- Trust Badges Grid --- */
 .btb-trust-badges-grid {
 	display: grid;

@@ -384,7 +384,8 @@
 .bpbtb-admin-page input[type="number"],
 .bpbtb-admin-page input[type="search"],
 .bpbtb-admin-page input[type="password"],
-.bpbtb-admin-page input[type="url"] {
+.bpbtb-admin-page input[type="url"],
+.bpbtb-admin-page textarea {
 	min-height: 36px;
 	padding: 7px 12px;
 	font-size: 14px;
@@ -402,11 +403,20 @@
 .bpbtb-admin-page input[type="number"]:focus,
 .bpbtb-admin-page input[type="search"]:focus,
 .bpbtb-admin-page input[type="password"]:focus,
-.bpbtb-admin-page input[type="url"]:focus {
+.bpbtb-admin-page input[type="url"]:focus,
+.bpbtb-admin-page textarea:focus {
 	outline: none;
 	background: var(--bpbtb-surface);
 	border-color: rgba(var(--bpbtb-primary-rgb), 0.45);
 	box-shadow: 0 0 0 3px rgba(var(--bpbtb-primary-rgb), 0.1);
+}
+
+.bpbtb-source-embed-code {
+	width: 100%;
+	font-family: ui-monospace, "SFMono-Regular", Consolas, monospace;
+	font-size: 12px;
+	line-height: 1.5;
+	resize: vertical;
 }
 
 .bpbtb-admin-page input[type="color"] {
@@ -1171,6 +1181,10 @@
 
 .bpbtb-source-field-narrow {
 	max-width: 220px;
+}
+
+.bpbtb-source-field-wide {
+	grid-column: 1 / -1;
 }
 
 .bpbtb-source-label {

@@ -22,8 +22,14 @@ import { ColorControl } from "../../../../../../bpl-tools/Components/ColorContro
  *                                       normally holds it) is not shown.
  * @param {Function} props.setAttributes Attribute setter.
  */
-const SearchBoxPanel = ({ filterStyle = {}, showSpacing = false, setAttributes }) => {
-  const style = filterStyle && "object" === typeof filterStyle ? filterStyle : {};
+
+const SearchBoxPanel = ({
+  filterStyle = {},
+  showSpacing = false,
+  setAttributes,
+}) => {
+  const style =
+    filterStyle && "object" === typeof filterStyle ? filterStyle : {};
 
   const update = (key, val) =>
     setAttributes({ filterStyle: { ...style, [key]: val } });
@@ -72,17 +78,34 @@ const SearchBoxPanel = ({ filterStyle = {}, showSpacing = false, setAttributes }
           <div className="btbStateTabBody">
             {"normal" === tab.name && (
               <>
-                {color(__("Text Color:", "b-testimonials-block"), "searchColor", "")}
-                {color(__("Placeholder Color:", "b-testimonials-block"), "searchPlaceholder")}
+                {color(
+                  __("Text Color:", "b-testimonials-block"),
+                  "searchColor",
+                  "",
+                )}
+                {color(
+                  __("Placeholder Color:", "b-testimonials-block"),
+                  "searchPlaceholder",
+                )}
                 {color(__("Background:", "b-testimonials-block"), "searchBg")}
-                {color(__("Border Color:", "b-testimonials-block"), "searchBorder")}
+                {color(
+                  __("Border Color:", "b-testimonials-block"),
+                  "searchBorder",
+                )}
               </>
             )}
 
             {"focus" === tab.name && (
               <>
-                {color(__("Background:", "b-testimonials-block"), "searchFocusBg", "")}
-                {color(__("Border Color:", "b-testimonials-block"), "searchFocusBorder")}
+                {color(
+                  __("Background:", "b-testimonials-block"),
+                  "searchFocusBg",
+                  "",
+                )}
+                {color(
+                  __("Border Color:", "b-testimonials-block"),
+                  "searchFocusBorder",
+                )}
                 <p className="btbHint">
                   {__(
                     "Applies once someone clicks into the box. Skip it and the border turns your accent color.",
@@ -156,7 +179,10 @@ const SearchBoxPanel = ({ filterStyle = {}, showSpacing = false, setAttributes }
             "searchWidth",
             120,
             600,
-            __("Not set? The box uses a comfortable default width.", "b-testimonials-block"),
+            __(
+              "Not set? The box uses a comfortable default width.",
+              "b-testimonials-block",
+            ),
           )}
 
           <SelectControl
@@ -165,12 +191,24 @@ const SearchBoxPanel = ({ filterStyle = {}, showSpacing = false, setAttributes }
             onChange={(val) => update("searchAlign", val)}
             options={[
               {
-                label: __("Default (next to the buttons)", "b-testimonials-block"),
+                label: __(
+                  "Default (next to the buttons)",
+                  "b-testimonials-block",
+                ),
                 value: "",
               },
-              { label: __("Own row, left", "b-testimonials-block"), value: "left" },
-              { label: __("Own row, center", "b-testimonials-block"), value: "center" },
-              { label: __("Own row, right", "b-testimonials-block"), value: "right" },
+              {
+                label: __("Own row, left", "b-testimonials-block"),
+                value: "left",
+              },
+              {
+                label: __("Own row, center", "b-testimonials-block"),
+                value: "center",
+              },
+              {
+                label: __("Own row, right", "b-testimonials-block"),
+                value: "right",
+              },
             ]}
           />
         </>

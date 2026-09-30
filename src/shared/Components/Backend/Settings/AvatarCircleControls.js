@@ -18,6 +18,7 @@ import { AVATAR_CIRCLE_LAYOUTS } from "../../../utils/avatarCircle";
  * @param {Object}   props.avatarCircle  The block's avatarCircle attribute.
  * @param {Function} props.setAttributes Attribute setter.
  */
+
 const AvatarCircleControls = ({ layout, avatarCircle = {}, setAttributes }) => {
   const value =
     avatarCircle && "object" === typeof avatarCircle && !Array.isArray(avatarCircle)

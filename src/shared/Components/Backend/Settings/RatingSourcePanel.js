@@ -9,7 +9,6 @@ import {
   ToggleControl,
 } from "@wordpress/components";
 import { useSelect } from "@wordpress/data";
-
 import Label from "../../../../../../bpl-tools/Components/Label/Label";
 import { InlineDetailMediaUpload } from "../../../../../../bpl-tools/Components/MediaControl/MediaControl";
 import {
@@ -29,6 +28,7 @@ import ReviewPicker from "./ReviewPicker";
  * @param {number} timestamp Unix seconds. 0 means never.
  * @return {string}
  */
+
 const timeAgo = (timestamp) => {
   if (!timestamp) {
     return __("never", "b-testimonials-block");

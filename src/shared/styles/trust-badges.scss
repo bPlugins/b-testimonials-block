@@ -1,24 +1,64 @@
+@use './devices' as *;
+// This block registers its own editor, so it does not get frontend.scss the way
+// the shared Edit does -- without this a picked icon has no sizing, fill or
+// stroke in the editor preview while looking right on the published page.
+@use './custom-icon' as *;
 .bTrustBadges {
+	// minmax(0, 1fr): a bare `1fr` will not shrink past its content's min-content
+	// width, and a 44px icon beside its text is wider than a third of a phone.
+	// At 3 columns on mobile this ran 116px past a 420px viewport.
 	.badges-grid {
 		display: grid;
 		gap: var(--row-gap, 30px) var(--col-gap, 30px);
-		grid-template-columns: repeat(var(--cols-d, 3), 1fr);
+		grid-template-columns: repeat(var(--cols-d, 3), minmax(0, 1fr));
 	}
 
+	// Every value here was pinned: an 18px by 20px box at radius 10 with the
+	// icon locked beside the text at a 14px gap, and no shadow. The block
+	// registers its own editor and renders neither the Card panel nor anything
+	// else that reaches `.badge-item`, so none of it could be changed -- the
+	// Style tab was the Colors panel and Width & Height, and that was all.
+	//
+	// Each now reads a custom property Style.js only declares once the matching
+	// control is set, so an untouched block renders exactly as it did.
 	.badge-item {
 		display: flex;
 		align-items: center;
-		gap: 14px;
-		padding: 18px 20px;
-		border: 1px solid #ececec;
-		border-radius: 10px;
-		background: #fff;
+		gap: var(--btb-badge-gap, 14px);
+		padding: var(--btb-badge-padding, 18px 20px);
+		border: var(--btb-border-width, 1px) solid var(--btb-border, #ececec);
+		border-radius: var(--btb-badge-radius, 10px);
+		background: var(--btb-surface, #fff);
+
+		// Body Text is offered for this layout: the old front-end item read it,
+		// this one did not, so the control painted nothing.
+		color: var(--btb-body, inherit);
+	}
+
+	// Icon above the text rather than beside it. The fallback rendering that
+	// shows before any badge is added stacks and centres, so the repeater could
+	// not be made to match the layout it replaces.
+	.badge-item.is-icon-top {
+		flex-direction: column;
+		align-items: center;
+		text-align: center;
 	}
 
 	.badge-icon {
-		width: 44px;
-		height: 44px;
+		width: var(--btb-badge-icon, 44px);
+		height: var(--btb-badge-icon, 44px);
 		object-fit: contain;
+		flex: 0 0 auto;
+	}
+
+	// A picked icon renders its own wrapper, which BlockIcon sizes inline from
+	// the same control -- so it needs no width here, only the same refusal to be
+	// squeezed. Without it the icon is a flex item with the default
+	// `flex-shrink: 1`, and a badge whose title runs long shrinks the icon
+	// instead of wrapping the text: the size control moved a number that the row
+	// then took straight back.
+	.badge-item > .btb-custom-icon,
+	.badge-item > .btb-icon-stroke {
 		flex: 0 0 auto;
 	}
 
@@ -31,18 +71,18 @@
 	.badge-subtitle {
 		margin: 2px 0 0;
 		font-size: 14px;
-		color: #7b7b7b;
+		color: var(--btb-muted, #7b7b7b);
 	}
 
-	@media ( max-width: 768px ) {
+	@media ( max-width: $tablet-max ) {
 		.badges-grid {
-			grid-template-columns: repeat(var(--cols-t, 3), 1fr);
+			grid-template-columns: repeat(var(--cols-t, 3), minmax(0, 1fr));
 		}
 	}
 
-	@media ( max-width: 576px ) {
+	@media ( max-width: $mobile-max ) {
 		.badges-grid {
-			grid-template-columns: repeat(var(--cols-m, 1), 1fr);
+			grid-template-columns: repeat(var(--cols-m, 1), minmax(0, 1fr));
 		}
 	}
 }

@@ -3,19 +3,62 @@
 =====================================================
 
 [HIGH PRIORITY / IMMEDIATE]
-[ ] Schema.org JSON-LD Review & AggregateRating SEO output for Google Search snippets
-[ ] Dynamic Category Filter & Search Bar in Testimonial Grid & Slider blocks
+[x] Schema.org JSON-LD Review & AggregateRating SEO output for Google Search snippets  (1.0.5 — includes/schema.php)
+[x] Dynamic Category Filter & Search Bar in Testimonial Grid & Slider blocks (1.0.5 — TestimonialFilter.js + testimonial_category taxonomy)
 [ ] In-Testimonial CTA (Call To Action) Button & Link option per testimonial
-[ ] CSV / JSON Export & Import tool for Testimonial CPT in WP Admin
-[ ] Sanitization & Security: Apply strict striptags / wp_kses across all submission forms
+[x] CSV Export & Import tool for Testimonial CPT in WP Admin (1.0.5 — includes/admin-import-export.php)
+[x] Sanitization & Security on public endpoints: honeypot, signed timing token, link cap, rate limit, duplicate guard, length caps, upload gate, NPS nonce + throttle, no IP storage (1.0.5 — includes/form-security.php)
 
 [MEDIUM PRIORITY / CORE ENHANCEMENTS]
-[ ] Google Places / Maps Reviews API Auto-Sync & Cache
-[ ] WooCommerce Product Reviews Sync Integration (Filter by Product ID/Category)
+[x] Live platform ratings for the 5 review badges + Review Badge Widget — Testimonials > Review Sources
+    (includes/review-sources.php, includes/admin-review-sources.php). Google Places API (New),
+    Facebook Graph API and Trustpilot Business API fetch the real score + review count, cached in an
+    option and refreshed by WP-Cron so no page view ever waits on an HTTP request. G2 and Capterra
+    have no public API AND answer every server-side request with 403 (verified against 4 user-agents),
+    so their figure is entered once on that screen instead of once per block; a page URL is still read
+    if it happens to serve schema.org data. Per-block Rating Source = Live | Manual.
+[x] Google Places Reviews import (1.0.5 — includes/review-import.php, max 5 per listing)
+    Reads either endpoint: legacy maps.googleapis.com Place Details or Places API (New).
+    Mode is auto | legacy | new, set on the import screen or via the
+    bpbtb_google_reviews_endpoint filter. Auto tries legacy first and falls back only on
+    an access refusal (REQUEST_DENIED etc.), never on NOT_FOUND or an empty listing —
+    those would cost a second billable call to be told the same thing.
+    Dedupe keys are content-derived so the two endpoints agree and switching re-imports nothing.
+    The legacy endpoint cannot be enabled on a Cloud project created after 1 March 2025.
+[x] Facebook Page recommendations import (1.0.5 — Graph v21 /ratings)
+[x] Surface a failing review platform (1.0.5 — includes/admin-source-health.php)
+    Admin notice + Site Health test. Reads BPBTB_Review_Sources::CACHE only, never fetches:
+    get_data() fetches inline under is_admin(), so calling it from admin_notices would put
+    an HTTP request to Google and Facebook on every wp-admin page load.
+    Only reports platforms that are connected AND live-source — "not connected" is a choice,
+    and a typed figure has no credential to expire.
+    Classifies the fallback as stale | typed | local and words itself accordingly; only
+    "local" is misleading under a platform logo.
+    Dismissal is keyed on an md5 of platform+message, so a new failure re-notifies.
+[ ] Google/Facebook auto-sync on a schedule (import is manual today)
+[x] Facebook one-click OAuth (1.0.5 — includes/admin-facebook-connect.php)
+    Popup to api.bplugins.com/facebook-auth/, result collected server-side from
+    /wp-json/facebook/v1/get-token. No app id or secret ships with the plugin.
+    Two deliberate departures from the business-review implementation:
+      - the state is minted server-side, kept in a transient bound to the user, single-use,
+        15 min. business-review lets the browser pick it and accepts whatever comes back,
+        so any authenticated request can ask the bridge for whatever is under that key.
+      - the token never reaches the browser. business-review echoes the bridge response
+        straight to JS, putting the Page token through the DOM and the network panel.
+    A failing connection offers Reconnect, not just Disconnect — an expired token still
+    fills both fields, so the card used to read as "connected" and offer nothing useful.
+    Hooks a new do_action( 'bpbtb_review_source_actions', $slug, $platform ) in
+    admin-review-sources.php — the one line touched in that file.
+    The inline script has its own footer-registered handle: attached to jquery it would
+    print in the admin <head> and getElementById would find nothing.
+    TEXT into the CPT. Only the aggregate score/count is done (see above).
+[~] WooCommerce Product Reviews — one-way import shipped in 1.0.5; live sync/filter still to do
 [ ] Live Social Proof Toast / Activity Popup Notification on Frontend
 [ ] Direct Video & Audio Microphone Recording in Testimonial Submission Form
 [ ] Email Notifications & Slack / Discord Webhooks on new submission
-[ ] 20+ Ready-made Gutenberg Block Patterns (Wall of Love, SaaS Hero, E-commerce Grid)
+[~] Ready-made Gutenberg Block Patterns — 7 shipped in 1.0.5 (includes/patterns.php); more to come
+
+[x] Migration importers: Strong Testimonials, Real Testimonials, Site Reviews (1.0.5 — includes/import-sources.php)
 
 [ADVANCED & PRO FEATURES]
 [ ] Trustpilot, Twitter/X, & Facebook Reviews API Importer
@@ -26,6 +69,8 @@
 [ ] A/B Testing for Testimonial Layouts & Conversion tracking
 
 [CLEANUP & POLISH]
-[ ] Accessibility (a11y) audit for keyboard navigation & ARIA attributes across all 40 blocks
+[x] One-time WP.org review request notice, usage-gated & permanently dismissible (1.0.5 — includes/admin-review-request.php)
+[x] Accessibility pass: ratings, expand toggle, modal focus trap/Escape, form labels, poll, dots, toast (1.0.5)
+[ ] Remaining a11y: colour-contrast audit of the 21 themes; reduced-motion for marquee/autoplay
 [ ] Fix i18n POT file generation script name in package.json
 [ ] Comprehensive WP.org plugin guidelines review & submission prep

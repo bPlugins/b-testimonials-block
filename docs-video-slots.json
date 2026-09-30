@@ -1,0 +1,82 @@
+[
+    {
+        "after":  "docs-assets/admin-plugins-active.png",
+        "gap":  "\n            ",
+        "html":  "\u003cfigure class=\"media-slot\" data-media=\"video\" data-src=\"\" data-caption=\"Video walkthrough - searching for B Testimonials Block in Plugins \u0026gt; Add New Plugin, installing it, activating it, and landing on the Testimonials screen the plugin opens after activation\"\u003e\u003c/figure\u003e"
+    },
+    {
+        "after":  "docs-assets/editor-inserter-search.png",
+        "gap":  "\n            ",
+        "html":  "\u003cfigure class=\"media-slot\" data-media=\"video\" data-src=\"\" data-caption=\"Video walkthrough - inserting the Testimonials block on a page, picking Centered Cards Grid from the placeholder, editing the three demo cards, and publishing the page\"\u003e\u003c/figure\u003e"
+    },
+    {
+        "after":  "docs-assets/editor-switch-block.png",
+        "gap":  "\n            ",
+        "html":  "\u003cfigure class=\"media-slot\" data-media=\"video\" data-src=\"\" data-caption=\"Video walkthrough - opening Change Block / Layout, searching the switcher modal, filtering by the four category chips, and switching a live grid to Speech Bubble Cards without losing its reviews\"\u003e\u003c/figure\u003e"
+    },
+    {
+        "after":  "docs-assets/admin-add-new.png",
+        "gap":  "\n            ",
+        "html":  "\u003cfigure class=\"media-slot\" data-media=\"video\" data-src=\"\" data-caption=\"Video walkthrough - adding a testimonial under Testimonials \u0026gt; Add New, filling the title, review, rating, designation and company, setting the featured image, and seeing it in the All Testimonials list\"\u003e\u003c/figure\u003e"
+    },
+    {
+        "after":  "docs-assets/editor-content-source.png",
+        "gap":  "\n            ",
+        "html":  "\u003cfigure class=\"media-slot\" data-media=\"video\" data-src=\"\" data-caption=\"Video walkthrough - switching a block from Manual to Testimonials (CPT) and setting Number, Order By and Order so the block fills itself from the post type\"\u003e\u003c/figure\u003e"
+    },
+    {
+        "after":  "docs-assets/editor-card-editor.png",
+        "gap":  "\n            ",
+        "html":  "\u003cfigure class=\"media-slot\" data-media=\"video\" data-src=\"\" data-caption=\"Video walkthrough - adding, duplicating, reordering and removing review cards in the Add New Item panel, including uploading a photo and setting a rating\"\u003e\u003c/figure\u003e"
+    },
+    {
+        "after":  "docs-assets/testimonial-form.png",
+        "gap":  "\n            ",
+        "html":  "\u003cfigure class=\"media-slot\" data-media=\"video\" data-src=\"\" data-caption=\"Video walkthrough - a visitor submitting the Testimonial Form on the front end, then an administrator approving it under Testimonials \u0026gt; Submissions and seeing it appear in a block\"\u003e\u003c/figure\u003e"
+    },
+    {
+        "after":  "docs-assets/google-review-badge.png",
+        "gap":  "\n            ",
+        "html":  "\u003cfigure class=\"media-slot\" data-media=\"video\" data-src=\"\" data-caption=\"Video walkthrough - inserting the Google Reviews Badge, filling Badge Title, Rating Score and Review Count, sizing the logo and stars, and centring the badge in its column\"\u003e\u003c/figure\u003e"
+    },
+    {
+        "after":  "docs-assets/video-testimonials.png",
+        "gap":  "\n            ",
+        "html":  "\u003cfigure class=\"media-slot\" data-media=\"video\" data-src=\"\" data-caption=\"Video walkthrough - adding a YouTube URL to Video Testimonials, an MP3 to Audio Testimonials, and two images to the Before / After slider, then testing all three on the front end\"\u003e\u003c/figure\u003e"
+    },
+    {
+        "after":  "docs-assets/form-front-end.png",
+        "gap":  "\n            ",
+        "html":  "\u003cfigure class=\"media-slot\" data-media=\"video\" data-src=\"\" data-caption=\"Video walkthrough - placing the Testimonial Form block, turning the Email and Company fields on, renaming the labels and button, and submitting a test review\"\u003e\u003c/figure\u003e"
+    },
+    {
+        "after":  "docs-assets/user-feedback-poll.png",
+        "gap":  "\n            ",
+        "html":  "\u003cfigure class=\"media-slot\" data-media=\"video\" data-src=\"\" data-caption=\"Video walkthrough - setting up the Feedback \u0026amp; NPS Poll block with a question, a 0 to 10 scale and its two end labels, voting once on the front end, and reading the result on the admin screen\"\u003e\u003c/figure\u003e"
+    },
+    {
+        "after":  "docs-assets/testimonials-slider.gif",
+        "gap":  "\n            ",
+        "html":  "\u003cfigure class=\"media-slot\" data-media=\"video\" data-src=\"\" data-caption=\"Video walkthrough - moving one set of reviews through Default, Slider, Masonry, List and Marquee arrangements, then through the six card themes\"\u003e\u003c/figure\u003e"
+    },
+    {
+        "after":  "docs-assets/testimonials-carousel-2.gif",
+        "gap":  "\n            ",
+        "html":  "\u003cfigure class=\"media-slot\" data-media=\"video\" data-src=\"\" data-caption=\"Video walkthrough - turning on AutoPlay and Loop, styling the navigation arrows, and tuning 3D Depth, Card Spread and Card Width on the Coverflow Carousel\"\u003e\u003c/figure\u003e"
+    },
+    {
+        "after":  "docs-assets/editor-card-panel.png",
+        "gap":  "\n            ",
+        "html":  "\u003cfigure class=\"media-slot\" data-media=\"video\" data-src=\"\" data-caption=\"Video walkthrough - styling one card from the Card panel: background, corner wash, padding, border, shadow, and the hover background and lift\"\u003e\u003c/figure\u003e"
+    },
+    {
+        "after":  "docs-assets/admin-demo-help.png",
+        "gap":  "\n            ",
+        "html":  "\u003cfigure class=\"media-slot\" data-media=\"video\" data-src=\"\" data-caption=\"Video walkthrough - a tour of Testimonials \u0026gt; Demo \u0026amp; Help: the Welcome tabs, the Demos grid opening a live block preview, All Blocks, and Settings\"\u003e\u003c/figure\u003e"
+    },
+    {
+        "after":  "docs-assets/admin-demos.png",
+        "gap":  "\n            ",
+        "html":  "\u003cfigure class=\"media-slot\" data-media=\"video\" data-src=\"\" data-caption=\"Video walkthrough - switching blocks off on the All Blocks screen, confirming they disappear from the inserter and the switcher modal, then switching them all back on\"\u003e\u003c/figure\u003e"
+    }
+]

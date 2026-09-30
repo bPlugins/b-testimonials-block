@@ -9,8 +9,15 @@ export const upload = <svg xmlns="http://www.w3.org/2000/svg" fill="#000000" wid
 
 export const star = (color) => <svg xmlns="http://www.w3.org/2000/svg" fill={color} width="15px" height="15px" viewBox="0 -32 576 576"><path d="M259.3 17.8L194 150.2 47.9 171.5c-26.2 3.8-36.7 36.1-17.7 54.6l105.7 103-25 145.5c-4.5 26.3 23.2 46 46.4 33.7L288 439.6l130.7 68.7c23.2 12.2 50.9-7.4 46.4-33.7l-25-145.5 105.7-103c19-18.5 8.5-50.8-17.7-54.6L382 150.2 316.7 17.8c-11.7-23.6-45.6-23.9-57.4 0z" /></svg>
 
-export const blockIcon = <svg xmlns="http://www.w3.org/2000/svg" width="800px" height="800px" viewBox="0 0 20 20">
+// bPlugins brand colour, used for the block icons and editor UI accents.
+export const BRAND_COLOR = '#146EF5';
+
+const blockIconSvg = <svg xmlns="http://www.w3.org/2000/svg" width="800px" height="800px" viewBox="0 0 20 20">
 	<rect x="0" fill="none" width="20" height="20" /><g><path d="M4 3h12c.55 0 1.02.2 1.41.59S18 4.45 18 5v7c0 .55-.2 1.02-.59 1.41S16.55 14 16 14h-1l-5 5v-5H4c-.55 0-1.02-.2-1.41-.59S2 12.55 2 12V5c0-.55.2-1.02.59-1.41S3.45 3 4 3zm11 2H4v1h11V5zm1 3H4v1h12V8zm-3 3H4v1h9v-1z" /></g></svg>;
+
+// Generic fallback icon, and the icon for the parent container block.
+// `foreground` is the block API's own way to tint an icon.
+export const blockIcon = { src: blockIconSvg, foreground: BRAND_COLOR };
 
 export const verticalLineIcon = <svg xmlns='http://www.w3.org/2000/svg' width={24} height={24} viewBox='0 0 14.707 14.707'>
 	<rect x='6.275' y='0' width='2.158' height='14.707' />
@@ -217,12 +224,76 @@ export const getLayoutSvgIcon = (iconName, size = 22, color = 'currentColor') =>
 				</svg>
 			);
 		case 'awards':
-		case 'capterra':
 		case 'g2':
 			return (
 				<svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
 					<circle cx="12" cy="8" r="7" />
 					<polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88" />
+				</svg>
+			);
+		// Capterra's own mark is a set of quadrants -- distinct from the G2 medal.
+		case 'capterra':
+			return (
+				<svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+					<path d="M3 3h8v8H3z" />
+					<path d="M13 3h8v8h-8z" />
+					<path d="M3 13h8v8H3z" />
+					<path d="M13 13l8 8h-8z" />
+				</svg>
+			);
+		// Horizontal ticker tape, so the marquee reads differently from a refresh.
+		case 'marquee-scroll':
+			return (
+				<svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+					<rect x="2" y="7" width="9" height="10" rx="2" />
+					<path d="M14 9h7" />
+					<path d="M14 12h5" />
+					<path d="M14 15h7" />
+				</svg>
+			);
+		// Ranked bars of differing length -- a rating distribution, not a bar chart.
+		case 'progress-bars':
+			return (
+				<svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+					<path d="M3 6h18" />
+					<path d="M3 12h12" />
+					<path d="M3 18h7" />
+				</svg>
+			);
+		// Rosette seal with a tick, distinct from the plain trust shield.
+		case 'verified-seal':
+			return (
+				<svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+					<circle cx="12" cy="9" r="6" />
+					<polyline points="9.5 9 11.5 11 14.5 7.5" />
+					<polyline points="8 14.5 6.5 21 12 18.5 17.5 21 16 14.5" />
+				</svg>
+			);
+		// Overlapping avatars, distinct from the client-logos group icon.
+		case 'avatar-list':
+			return (
+				<svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+					<circle cx="8" cy="12" r="4" />
+					<path d="M14 8.5a4 4 0 0 1 0 7" />
+					<path d="M18 9.5a3 3 0 0 1 0 5" />
+				</svg>
+			);
+		// A single centred card, for the centred-cards grid.
+		case 'grid-centered':
+			return (
+				<svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+					<rect x="7" y="4" width="10" height="16" rx="2" />
+					<path d="M3 8v8" />
+					<path d="M21 8v8" />
+				</svg>
+			);
+		// Bordered card with an accent edge, for the gradient-border grid.
+		case 'grid-gradient':
+			return (
+				<svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+					<rect x="3" y="4" width="18" height="16" rx="3" />
+					<path d="M3 9h18" />
+					<path d="M7 14h6" />
 				</svg>
 			);
 		case 'sticky':

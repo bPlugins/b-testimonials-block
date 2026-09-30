@@ -26,7 +26,7 @@
 	}
 
 	.rs-stars-base {
-		color: #dcdcdc;
+		color: var(--btb-track, #dcdcdc);
 	}
 
 	.rs-stars-fill {
@@ -35,11 +35,11 @@
 		left: 0;
 		overflow: hidden;
 		white-space: nowrap;
-		color: #ff8c02;
+		color: var(--btb-star, #ff8c02);
 	}
 
 	.rs-count {
 		font-size: 15px;
-		color: #7b7b7b;
+		color: var(--btb-muted, #7b7b7b);
 	}
 }

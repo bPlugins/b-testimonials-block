@@ -1,260 +1,774 @@
-const gridIcon = <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="3" width="7" height="7" /><rect x="14" y="3" width="7" height="7" /><rect x="3" y="14" width="7" height="7" /><rect x="14" y="14" width="7" height="7" /></svg>;
-const sliderIcon = <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="2" y="6" width="20" height="12" rx="2" /><polyline points="15 12 19 12" /><polyline points="5 12 9 12" /></svg>;
-const masonryIcon = <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="3" width="7" height="9" /><rect x="14" y="3" width="7" height="5" /><rect x="14" y="12" width="7" height="9" /><rect x="3" y="16" width="7" height="5" /></svg>;
-const tickerIcon = <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="3" y1="12" x2="21" y2="12" /><polyline points="16 7 21 12 16 17" /></svg>;
+const gridIcon = (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    width="20"
+    height="20"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2">
+    <rect x="3" y="3" width="7" height="7" />
+    <rect x="14" y="3" width="7" height="7" />
+    <rect x="3" y="14" width="7" height="7" />
+    <rect x="14" y="14" width="7" height="7" />
+  </svg>
+);
+const sliderIcon = (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    width="20"
+    height="20"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2">
+    <rect x="2" y="6" width="20" height="12" rx="2" />
+    <polyline points="15 12 19 12" />
+    <polyline points="5 12 9 12" />
+  </svg>
+);
+const masonryIcon = (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    width="20"
+    height="20"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2">
+    <rect x="3" y="3" width="7" height="9" />
+    <rect x="14" y="3" width="7" height="5" />
+    <rect x="14" y="12" width="7" height="9" />
+    <rect x="3" y="16" width="7" height="5" />
+  </svg>
+);
+const tickerIcon = (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    width="20"
+    height="20"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2">
+    <line x1="3" y1="12" x2="21" y2="12" />
+    <polyline points="16 7 21 12 16 17" />
+  </svg>
+);
+const quoteIcon = (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    width="20"
+    height="20"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2">
+    <path d="M9 7H5a2 2 0 0 0-2 2v3a2 2 0 0 0 2 2h2v3H4" />
+    <path d="M19 7h-4a2 2 0 0 0-2 2v3a2 2 0 0 0 2 2h2v3h-3" />
+  </svg>
+);
+const mediaIcon = (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    width="20"
+    height="20"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2">
+    <circle cx="12" cy="12" r="9" />
+    <polygon points="10 8 16 12 10 16" />
+  </svg>
+);
+const chartIcon = (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    width="20"
+    height="20"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2">
+    <line x1="4" y1="20" x2="4" y2="12" />
+    <line x1="10" y1="20" x2="10" y2="4" />
+    <line x1="16" y1="20" x2="16" y2="9" />
+    <line x1="22" y1="20" x2="22" y2="15" />
+  </svg>
+);
+const shieldIcon = (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    width="20"
+    height="20"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2">
+    <path d="M12 3l7 3v5c0 4.4-3 8.4-7 10-4-1.6-7-5.6-7-10V6z" />
+    <polyline points="9 12 11 14 15 10" />
+  </svg>
+);
+const feedbackIcon = (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    width="20"
+    height="20"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2">
+    <path d="M21 15a2 2 0 0 1-2 2H8l-5 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+    <line x1="8" y1="9" x2="16" y2="9" />
+    <line x1="8" y1="13" x2="13" y2="13" />
+  </svg>
+);
 
 // Getting Started Tab Icons (same as b-slider)
-const gutenbergTabIcon = <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' strokeWidth={2} strokeLinecap='round' strokeLinejoin='round'><rect x='3' y='3' width='7' height='7' rx='1' /><rect x='14' y='3' width='7' height='7' rx='1' /><rect x='3' y='14' width='7' height='7' rx='1' /><rect x='14' y='14' width='7' height='7' rx='1' /></svg>;
-const shortcodeTabIcon = <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' width={16} height={16} fill='none' stroke='currentColor' strokeWidth={2} strokeLinecap='round' strokeLinejoin='round'><polyline points='16 18 22 12 16 6' /><polyline points='8 6 2 12 8 18' /></svg>;
-const elementorTabIcon = <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' width={16} height={16} fill='none' stroke='currentColor' strokeWidth={2} strokeLinecap='round' strokeLinejoin='round'><rect x='3' y='3' width='18' height='18' rx='2' /><line x1='9' y1='3' x2='9' y2='21' /></svg>;
-const phpTabIcon = <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' width={16} height={16} fill='none' stroke='currentColor' strokeWidth={2} strokeLinecap='round' strokeLinejoin='round'><path d='M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z' /><polyline points='14 2 14 8 20 8' /><line x1='9' y1='15' x2='15' y2='15' /></svg>;
+const gutenbergTabIcon = (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth={2}
+    strokeLinecap="round"
+    strokeLinejoin="round">
+    <rect x="3" y="3" width="7" height="7" rx="1" />
+    <rect x="14" y="3" width="7" height="7" rx="1" />
+    <rect x="3" y="14" width="7" height="7" rx="1" />
+    <rect x="14" y="14" width="7" height="7" rx="1" />
+  </svg>
+);
+const shortcodeTabIcon = (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    viewBox="0 0 24 24"
+    width={16}
+    height={16}
+    fill="none"
+    stroke="currentColor"
+    strokeWidth={2}
+    strokeLinecap="round"
+    strokeLinejoin="round">
+    <polyline points="16 18 22 12 16 6" />
+    <polyline points="8 6 2 12 8 18" />
+  </svg>
+);
+const elementorTabIcon = (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    viewBox="0 0 24 24"
+    width={16}
+    height={16}
+    fill="none"
+    stroke="currentColor"
+    strokeWidth={2}
+    strokeLinecap="round"
+    strokeLinejoin="round">
+    <rect x="3" y="3" width="18" height="18" rx="2" />
+    <line x1="9" y1="3" x2="9" y2="21" />
+  </svg>
+);
+const phpTabIcon = (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    viewBox="0 0 24 24"
+    width={16}
+    height={16}
+    fill="none"
+    stroke="currentColor"
+    strokeWidth={2}
+    strokeLinecap="round"
+    strokeLinejoin="round">
+    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+    <polyline points="14 2 14 8 20 8" />
+    <line x1="9" y1="15" x2="15" y2="15" />
+  </svg>
+);
 
+import welcomeBanner from "../assets/welcomeBanner";
+import { CHILD_BLOCKS_LIST } from "../../shared/utils/childBlocks";
+import { blockIcon, getLayoutSvgIcon } from "../../shared/utils/icons";
 
-const slug = 'b-testimonial';
+const slug = "b-testimonials-block";
+
+/**
+ * The icon for one demo card, by preview slug.
+ *
+ * Each card used to draw its category's icon, so all seven Grids & Lists demos
+ * carried the same four-square glyph and the tile told you nothing the category
+ * chip underneath it did not already say. These come from CHILD_BLOCKS_LIST --
+ * the same list the block inserter and the canvas picker draw from -- so a block
+ * looks like itself everywhere it appears.
+ *
+ * `b-testimonials` is the parent container and has no entry in that list, so it
+ * takes the icon the block API already gives it in the inserter. Left to the
+ * component's fallback it drew its category's four-square glyph -- the same icon
+ * as the Minimalist Reviews Grid card two along from it.
+ *
+ * @param {string} demoSlug Preview slug, i.e. the block name after `bptmb/`.
+ * @return {JSX.Element} Icon element.
+ */
+const demoBlockIcon = (demoSlug) => {
+  const child = CHILD_BLOCKS_LIST.find(
+    (block) => block.name === `bptmb/${demoSlug}`,
+  );
+
+  // 20px to match the category icons this replaces, which the card's own CSS
+  // then sizes to 22px alongside them.
+  return child ? getLayoutSvgIcon(child.icon, 20) : blockIcon.src;
+};
 
 export const dashboardInfo = (info) => {
-	const { version, isPremium, hasPro, adminUrl, licenseActiveNonce, deleteDataOnUninstall = false, uninstallNonce = '' } = info;
-	const proSuffix = isPremium ? ' Pro' : '';
+  const {
+    version,
+    isPremium,
+    hasPro,
+    adminUrl,
+    demoBase = "/",
+    demoUrls = {},
+    demoIndex = "",
+    licenseActiveNonce,
+    deleteDataOnUninstall = false,
+    uninstallNonce = "",
+    disabledBlocks = [],
+  } = info;
+  const proSuffix = isPremium ? " Pro" : "";
 
-	return {
-		name: `B Testimonials Block${proSuffix}`,
-		displayName: `B Testimonials Block${proSuffix} - Show Customer Reviews, Ratings, Badges & Video Testimonials`,
-		description: 'B Testimonials Block is a WordPress plugin that lets you showcase customer reviews, star ratings, video testimonials, trust badges, and interactive feedback forms.',
-		slug,
-		version,
-		isPremium,
-		hasPro,
-		displayOurPlugins: true,
-		media: {
-			logo: `https://ps.w.org/b-testimonial/assets/icon-128x128.png`,
-			banner: `https://ps.w.org/b-testimonial/assets/banner-772x250.png`,
-			thumbnail: `https://bplugins.com/wp-content/themes/b-technologies/assets/images/products/${slug}.png`,
-			// video: 'https://www.youtube.com/watch?v=DOvUG5ArWHE&t=3s',
-			isYoutube: true,
-		},
-		pages: {
-			org: `https://wordpress.org/plugins/${slug}/`,
-			docs: `https://bplugins.com/docs/${slug}/`,
-			pricing: `https://bplugins.com/products/${slug}/pricing`,
-		},
-		adminUrl,
-		licenseActiveNonce,
-		deleteDataOnUninstall,
-		uninstallNonce,
-		startButton: {
-			label: 'Add Testimonial Block',
-			url: `${adminUrl}post-new.php?post_type=page`,
-		},
-	};
+  return {
+    /*
+     * "Testimonials", not the plugin's registered "B Testimonials Block".
+     *
+     * This is the name the dashboard prints in three places -- the header
+     * wordmark, "Welcome to {name}" on the Welcome page, and "See the {name} in
+     * action" on Demos -- and next to the bPlugins mark in every one of them the
+     * "B" and the "Block" are saying what the surrounding chrome already says.
+     * The plugin's real name is untouched everywhere it identifies the plugin
+     * rather than decorates a heading: the Plugin Name header, the readme title,
+     * the block titles and `slug` below.
+     */
+    name: `Testimonials${proSuffix}`,
+    displayName: `B Testimonials Block${proSuffix} - Show Customer Reviews, Ratings, Badges & Video Testimonials`,
+    description:
+      "Testimonials is a WordPress plugin that lets you showcase customer reviews, star ratings, video testimonials, trust badges, and interactive feedback forms.",
+    slug,
+    version,
+    isPremium,
+    hasPro,
+    // Drives the Header's own "Our Plugins" button in the top-right corner.
+    // It links to `#our-plugins`, so the matching route in App.js has to stay
+    // even though the page is deliberately absent from the nav.
+    displayOurPlugins: true,
+    media: {
+      // No `?rev=` pin: the pinned revision kept serving the icon as it was at
+      // that upload, so replacing the artwork on wp.org never reached the
+      // dashboard. Unpinned, the listing's current icon is always what shows.
+      logo: `https://ps.w.org/${slug}/assets/icon.svg`,
+      banner: `https://ps.w.org/${slug}/assets/banner-1544x500.png`,
+      // The Welcome hero's artwork. Vector and bundled -- see the module
+      // for why it is a string rather than an imported .svg.
+      thumbnail: welcomeBanner,
+      // video: 'https://www.youtube.com/watch?v=DOvUG5ArWHE&t=3s',
+      isYoutube: true,
+    },
+    pages: {
+      org: `https://wordpress.org/plugins/${slug}/`,
+      docs: `https://bplugins.com/docs/${slug}/`,
+      pricing: `https://bplugins.com/products/${slug}/pricing`,
+    },
+    adminUrl,
+    demoBase,
+    // Reach App, which hands them to demoInfo() and allBlocksInfo().
+    // Resolved in PHP by bpbtb_demo_url() rather than assembled here: that is
+    // the one place that decides where a demo lives, so pointing the plugin at
+    // a hosted demo site later is a filter rather than an edit in every screen
+    // that links to one -- and a filter may change the shape of the URL, not
+    // only its host, which a base plus a pattern in JS could not follow.
+    demoUrls,
+    demoIndex,
+    licenseActiveNonce,
+    deleteDataOnUninstall,
+    uninstallNonce,
+    // The All Blocks page's starting state, straight from the option.
+    disabledBlocks,
+    startButton: {
+      label: "Add Testimonial Block",
+      url: `${adminUrl}post-new.php?post_type=page`,
+    },
+  };
 };
 
-export const demoInfo = {
-	allInOneLabel: 'See All Demos',
-	allInOneLink: 'https://bplugins.com/products/b-testimonials-block/#demos',
-	demos: [
-		{
-			icon: gridIcon,
-			title: 'Grid Layouts',
-			children: [
-				{
-					title: 'Default Grid',
-					type: 'iframe',
-					url: 'https://b-testimonials.bplugins.com/demo/grid-default/',
-				},
-				{
-					title: 'Centered Grid',
-					type: 'iframe',
-					url: 'https://b-testimonials.bplugins.com/demo/grid-centered/',
-				},
-				{
-					title: 'Gradient Border Grid',
-					type: 'iframe',
-					url: 'https://b-testimonials.bplugins.com/demo/grid-gradient/',
-				},
-			],
-		},
-		{
-			icon: sliderIcon,
-			title: 'Sliders & Carousels',
-			children: [
-				{
-					title: 'Default Slider',
-					type: 'iframe',
-					url: 'https://b-testimonials.bplugins.com/demo/slider-default/',
-				},
-				{
-					title: '3D Coverflow',
-					type: 'iframe',
-					url: 'https://b-testimonials.bplugins.com/demo/slider-coverflow/',
-				},
-			],
-		},
-		{
-			icon: masonryIcon,
-			title: 'Masonry & Lists',
-			children: [
-				{
-					title: 'Masonry Grid',
-					type: 'iframe',
-					url: 'https://b-testimonials.bplugins.com/demo/masonry/',
-				},
-				{
-					title: 'Avatar List',
-					type: 'iframe',
-					url: 'https://b-testimonials.bplugins.com/demo/avatar-list/',
-				},
-			],
-		},
-		{
-			icon: tickerIcon,
-			title: 'Marquee & Widgets',
-			children: [
-				{
-					title: 'Marquee Ticker',
-					type: 'iframe',
-					url: 'https://b-testimonials.bplugins.com/demo/marquee/',
-				},
-				{
-					title: 'Rating Summary',
-					type: 'iframe',
-					url: 'https://b-testimonials.bplugins.com/demo/rating-summary/',
-				},
-			],
-		},
-	],
+/**
+ * Live demos, one per block.
+ *
+ * Every block the plugin registers is listed here -- the page previously showed
+ * 9 hand-picked demos out of 40, so most blocks had no entry at all.
+ *
+ * The previews are rendered by this install, not fetched from a demo site:
+ * `includes/demo-preview.php` answers `?bpbtb_demo=<slug>` with the real block.
+ * The external host these used to point at (b-testimonials.bplugins.com) has no
+ * DNS record, so every one of them opened an unreachable page -- and a working
+ * external site would still drift out of step with the blocks over time. Local
+ * previews are live, interactive, and cannot go stale.
+ *
+ * Each slug is the block name after the `bptmb/` prefix, which is what
+ * demo-preview.php looks up in the block registry. That is usually the
+ * directory name under src/blocks/, but not always: `src/blocks/testimonials`
+ * registers `bptmb/b-testimonials`.
+ */
+const demoGroups = [
+  {
+    icon: gridIcon,
+    title: "Grids & Lists",
+    blocks: [
+      // `bptmb/b-testimonials`, not `bptmb/testimonials` -- the one block
+      // whose registered name differs from its directory.
+      //
+      // "Testimonials" rather than the registered "B Testimonials Block", for
+      // the reason the dashboard's own `name` gives: beside the plugin's
+      // wordmark and inside a page listing this plugin's blocks, the "B" and the
+      // "Block" repeat what the surrounding chrome already says. The block's
+      // registered title is untouched -- this is the label these two screens
+      // print, not the name it identifies itself by.
+      ["b-testimonials", "Testimonials"],
+      ["testimonials-grid-2", "Centered Cards Grid"],
+      ["testimonials-grid-3", "Gradient Border Grid"],
+      ["testimonials-grid-minimal", "Minimalist Reviews Grid"],
+      ["testimonials-list", "Testimonials List"],
+      ["testimonials-compact", "Compact Reviews List"],
+      ["testimonials-avatar-list", "Avatar Reviews List"],
+    ],
+  },
+  {
+    icon: masonryIcon,
+    title: "Masonry & Stacks",
+    blocks: [
+      ["testimonials-masonry", "Testimonials Masonry"],
+      ["testimonials-card-stack", "Stacked Review Cards"],
+      ["testimonials-floating-bubble", "Floating Avatar Bubbles"],
+    ],
+  },
+  {
+    icon: sliderIcon,
+    title: "Sliders & Carousels",
+    blocks: [
+      ["testimonials-slider", "Testimonials Slider"],
+      ["testimonials-carousel-2", "Coverflow Carousel"],
+      ["testimonials-slider-3d", "3D Flip Perspective Carousel"],
+    ],
+  },
+  {
+    icon: tickerIcon,
+    title: "Marquee & Toasts",
+    blocks: [
+      ["testimonials-marquee", "Testimonials Marquee"],
+      ["social-proof-toast", "Social Proof Toast"],
+    ],
+  },
+  {
+    icon: quoteIcon,
+    title: "Spotlight & Story",
+    blocks: [
+      ["testimonials-hero", "Hero Testimonial Spotlight"],
+      ["testimonials-quote-box", "Quote Box Showcase"],
+      ["testimonials-speech-bubble", "Speech Bubble Cards"],
+      ["testimonials-timeline", "Customer Journey Timeline"],
+      ["case-study-card", "Customer Case Study"],
+    ],
+  },
+  {
+    icon: mediaIcon,
+    title: "Video & Audio",
+    blocks: [
+      ["video-testimonials", "Video Testimonials"],
+      ["audio-testimonials", "Audio Testimonials"],
+      ["before-after", "Before / After"],
+    ],
+  },
+  {
+    icon: chartIcon,
+    title: "Ratings & Stats",
+    blocks: [
+      ["rating-summary", "Rating Summary"],
+      ["star-rating-bars", "Star Rating Progress Bars"],
+      ["testimonial-stats", "Testimonial Stats"],
+      ["comparison-testimonial-table", "Comparison Review Table"],
+    ],
+  },
+  {
+    icon: shieldIcon,
+    title: "Badges & Trust",
+    blocks: [
+      ["google-review-badge", "Google Reviews Badge"],
+      ["facebook-review-badge", "Facebook Recommendation Badge"],
+      ["g2-review-badge", "G2 Review Badge"],
+      ["capterra-review-badge", "Capterra Score Badge"],
+      ["trustpilot-review-badge", "Trustpilot Score Badge"],
+      ["review-badge-widget", "Floating Review Badge"],
+      ["verified-buyer-badge", "Verified Buyer Trust Seal"],
+      ["trust-badges", "Trust Badges"],
+      ["client-logos", "Client Logos"],
+    ],
+  },
+  {
+    icon: feedbackIcon,
+    title: "Feedback & Forms",
+    blocks: [
+      ["testimonial-form", "Testimonial Form"],
+      ["user-feedback-poll", "Feedback & NPS Poll"],
+      ["faq-testimonial-accordion", "FAQ Review Accordion"],
+      ["testimonials-popup-modal", "Popup Modal Review Trigger"],
+    ],
+  },
+];
+
+/**
+ * Where one block's demo lives.
+ *
+ * The map comes from PHP's bpbtb_demo_url(), which is the single place that
+ * decides that -- this install's preview page today, a hosted demo site once one
+ * exists. The old `demoBase + "?bpbtb_demo=" + slug` is kept only as the answer
+ * for a block the map does not carry, which is any block switched off on the All
+ * Blocks screen. Those previews 404, and always did; the card is what should
+ * stop being offered, not the URL that should be invented.
+ *
+ * @param {Object} demoUrls Preview slug => URL.
+ * @param {string} demoBase Site home URL, the fallback's base.
+ * @param {string} slug     Preview slug.
+ * @return {string} Absolute URL.
+ */
+const blockDemoUrl = (demoUrls, demoBase, slug) =>
+  demoUrls?.[slug] || `${demoBase}?bpbtb_demo=${slug}`;
+
+/**
+ * @param {string} demoBase Site home URL, passed through from home_url( '/' ).
+ * @param {Object} demoUrls Preview slug => URL, resolved in PHP.
+ */
+/**
+ * A demo group whose `icon` answers with the icon of the child being read.
+ *
+ * The Demos screen draws one glyph per card, and it takes it from the group
+ * rather than the card: `processCard` sets `categoryIcon: demo.icon` for every
+ * child, and the card renders `categoryIcon`. The child's own `icon` -- the one
+ * `demoInfo` sets below, the one the block shows in the inserter -- is spread
+ * onto the card and then never read. So all seven Grids & Lists cards drew the
+ * same four-square glyph, and the tile said nothing the category chip under it
+ * did not already say.
+ *
+ * The fix belongs in that component (`categoryIcon: cardData.icon || demo.icon`,
+ * one line, and every bPlugins dashboard gets it at once). Until that lands this
+ * does it from our side, without touching bpl-tools.
+ *
+ * `children` is a Proxy: reading an index records which child it handed over,
+ * and `icon` is a getter that answers with that child's icon. The screen reads
+ * them in exactly that order --
+ *
+ *     demo.children.forEach( child => cards.push( processCard( child ) ) )
+ *
+ * -- so `children[i]` is always read immediately before the `demo.icon` that
+ * describes it. The answer is keyed to the child that was handed over, not to a
+ * running count, so a second read of `icon` for the same card repeats that
+ * card's icon instead of shuffling the group out of step. Anything reading
+ * `icon` before touching a child at all gets the group icon, which is what the
+ * screen drew before this existed.
+ *
+ * The group is built here and returned whole rather than spread into a literal
+ * at the call site: spreading an object reads its getters, which would freeze
+ * `icon` at the fallback before the screen ever saw a card.
+ *
+ * @param {string}      title     The category name, printed on the card's chip.
+ * @param {JSX.Element} groupIcon The group's own glyph, and the fallback.
+ * @param {Array}       children  Demo cards, each carrying its own `icon`.
+ * @return {Object} One entry for `demoInfo().demos`.
+ */
+const perCardIcons = (title, groupIcon, children) => {
+  let current = null;
+
+  const group = {
+    title,
+    children: new Proxy(children, {
+      get(target, prop, receiver) {
+        const value = Reflect.get(target, prop, receiver);
+        // Array indices arrive as strings; `length`, `forEach` and the iterator
+        // symbol must not count as handing over a card.
+        if ("string" === typeof prop && String(Number(prop)) === prop) {
+          current = value;
+        }
+        return value;
+      },
+    }),
+  };
+
+  Object.defineProperty(group, "icon", {
+    enumerable: true,
+    get: () => current?.icon || groupIcon,
+  });
+
+  return group;
 };
 
-
-export const welcomeInfo = (adminUrl) => ({
-	keywords: ['Grid', 'Slider', 'Video', 'Form', 'Badges'],
-	keywordsLabel: 'Select Testimonial Layout',
-	gettingStarted: {
-		tabs: [
-			{
-				key: 'gutenberg',
-				label: 'Gutenberg',
-				icon: gutenbergTabIcon,
-				steps: [
-					{
-						num: 1,
-						title: 'Add the B Testimonials Block',
-						body: 'Open the block editor on any post or page. Click the <strong>+</strong> icon in the top-left corner or type <strong>/b testimonials</strong> to find and insert the B Testimonials block.',
-						link: { url: `${adminUrl}post-new.php?post_type=page`, label: 'Open Editor' },
-					},
-					{
-						num: 2,
-						title: 'Choose Layout & Child Block',
-						body: 'Select from <strong>40+ modern layouts</strong> (Grid, Slider, Video, Marquee, Rating Summary, Feedback Form) on the canvas or via the Popup Modal.',
-					},
-					{
-						num: 3,
-						title: 'Configure Content Source',
-						body: 'Choose between <strong>Manual Items</strong> or <strong>Testimonials CPT</strong> (reusable testimonials managed under Testimonials menu).',
-					},
-					{
-						num: 4,
-						title: 'Publish',
-						body: 'Once everything is configured, click Publish. Make sure you have entered the <strong>Name</strong>, <strong>Designation</strong>, <strong>Review Text</strong>, and <strong>Rating</strong>.',
-					},
-				],
-			},
-			{
-				key: 'shortcode',
-				label: 'ShortCode',
-				icon: shortcodeTabIcon,
-				steps: [
-					{
-						num: 1,
-						title: 'Open Testimonials CPT',
-						body: 'Go to <strong>Testimonials &rsaquo; All Testimonials</strong> in your WordPress admin and click <strong>Add New</strong>.',
-						link: { url: `${adminUrl}edit.php?post_type=testimonial`, label: 'All Testimonials' },
-					},
-					{
-						num: 2,
-						title: 'Add Testimonial Details',
-						body: 'Fill in the <strong>Name</strong> (title), <strong>Review Text</strong> (content), <strong>Rating</strong>, <strong>Designation</strong>, and <strong>Company</strong> fields. Set a featured image for the avatar photo.',
-					},
-					{
-						num: 3,
-						title: 'Add the Gutenberg Block',
-						body: 'Open any page in the block editor. Insert the <strong>B Testimonials</strong> block, pick your layout, and set the data source to <strong>Testimonials CPT</strong>.',
-					},
-					{
-						num: 4,
-						title: 'Publish & Preview',
-						body: 'Click <strong>Publish</strong>. Your testimonials from the CPT will be rendered automatically using the chosen layout.',
-					},
-				],
-			},
-			{
-				key: 'elementor',
-				label: 'Elementor',
-				icon: elementorTabIcon,
-				steps: [
-					{
-						num: 1,
-						title: 'Create Testimonials',
-						body: 'Go to <strong>Testimonials &rsaquo; All Testimonials</strong>, click <strong>Add New</strong>, fill in the details (name, rating, review, designation), and publish.',
-						link: { url: `${adminUrl}edit.php?post_type=testimonial`, label: 'All Testimonials' },
-					},
-					{
-						num: 2,
-						title: 'Add a Shortcode Widget',
-						body: 'Open the Elementor editor on any page. Search for the <strong>Shortcode</strong> widget and drag it to your desired location on the canvas.',
-					},
-					{
-						num: 3,
-						title: 'Enter & Preview',
-						body: 'Paste the block shortcode or use the <strong>Gutenberg Block</strong> widget in Elementor to embed the B Testimonials block directly.',
-					},
-				],
-			},
-			{
-				key: 'php',
-				label: 'Theme / PHP',
-				icon: phpTabIcon,
-				steps: [
-					{
-						num: 1,
-						title: 'Create Testimonials',
-						body: 'Go to <strong>Testimonials &rsaquo; All Testimonials</strong>, click <strong>Add New</strong>, configure your testimonial details, then publish.',
-						link: { url: `${adminUrl}edit.php?post_type=testimonial`, label: 'All Testimonials' },
-					},
-					{
-						num: 2,
-						title: 'Open Your Template',
-						body: 'Open the theme template file where you want to display testimonials — for example <code>single.php</code>, <code>page.php</code>, or a custom template part.',
-					},
-					{
-						num: 3,
-						title: 'Use WP_Query',
-						body: 'Query testimonials with <code>&lt;?php $testimonials = get_posts([\'post_type\' =&gt; \'testimonial\', \'posts_per_page\' =&gt; 6]); ?&gt;</code> and loop through them to render in your custom HTML template.',
-					},
-				],
-			},
-		],
-	},
-	changelogs: [
-		{
-			version: '1.0.2 - 24 July 2026',
-			type: 'new',
-			list: [
-				'<strong>New</strong> Added modern React Admin Dashboard.',
-				'<strong>New</strong> Added 28 new child blocks (40 total child blocks).',
-				'<strong>New</strong> Added Customer Submissions Management System.',
-			],
-		},
-	],
-	changelogsLimit: 5,
-	changelogsReadMoreLabel: 'View More Changelogs',
-	proFeatures: [
-		'40+ Modern Child Block Layouts & Widgets',
-		'Full Testimonials CPT & Reusable Content Source',
-		'Customer Submissions & Review Management Dashboard',
-		'Video Lightbox Playback (YouTube, Vimeo, MP4)',
-		'Continuous Marquee Scrolling Ticker',
-		'Star Rating Progress Bar Breakdown',
-		'Google, Trustpilot & G2 Review Badges',
-	],
+export const demoInfo = (demoBase = "/", demoUrls = {}) => ({
+  allInOneLabel: "Browse All Blocks",
+  // The plugin's own block list, rather than an off-site demo index.
+  allInOneLink: `${demoBase}wp-admin/edit.php?post_type=testimonial&page=bpbtb-dashboard#/welcome`,
+  demos: demoGroups.map(({ icon, title, blocks }) =>
+    perCardIcons(
+      title,
+      icon,
+      blocks.map(([slug, label]) => ({
+        title: label,
+        type: "iframe",
+        url: blockDemoUrl(demoUrls, demoBase, slug),
+        // The block's own icon rather than this group's -- see demoBlockIcon().
+        icon: demoBlockIcon(slug),
+      })),
+    ),
+  ),
 });
 
+/**
+ * Every block, grouped, in the shape bpl-tools' Admin/Blocks expects.
+ *
+ * Built from the same `demoGroups` the Demos route uses, so the two screens
+ * cannot disagree about what exists or what it is called, and each block carries
+ * the icon it shows in the inserter rather than its category's.
+ *
+ * `name` is the registered block name -- `bptmb/` plus the preview slug for all
+ * but the parent, whose directory and registered name differ, which is why the
+ * list stores the slug and the name is derived here in one place.
+ *
+ * `demo` is the live preview this install serves; the component renders it as
+ * the card's demo button and opens it in a new tab.
+ *
+ * The parent block is marked `required`: every other block is its child, so
+ * switching it off would take all forty with it and leave this page unable to
+ * switch any of them back on. The component locks a required block's toggle on
+ * and badges it, and Deactivate All skips it.
+ *
+ * @param {string} demoBase Site home URL, for the live preview links.
+ * @param {Object} demoUrls Preview slug => URL, resolved in PHP.
+ * @return {Array} Groups with `title` and `children`.
+ */
+export const allBlocksInfo = (demoBase = "/", demoUrls = {}) =>
+  demoGroups.map(({ title, blocks }) => ({
+    title,
+    children: blocks.map(([slug, label]) => ({
+      name: `bptmb/${slug}`,
+      title: label,
+      icon: demoBlockIcon(slug),
+      demo: blockDemoUrl(demoUrls, demoBase, slug),
+      required: "b-testimonials" === slug,
+    })),
+  }));
+
+export const welcomeInfo = (adminUrl) => ({
+  keywords: ["Grid", "Slider", "Video", "Form", "Badges"],
+  keywordsLabel: "Select Testimonial Layout",
+  gettingStarted: {
+    tabs: [
+      {
+        key: "gutenberg",
+        label: "Gutenberg",
+        icon: gutenbergTabIcon,
+        steps: [
+          {
+            num: 1,
+            title: "Add the Testimonials",
+            body: "Open the block editor on any post or page. Click the <strong>+</strong> icon in the top-left corner or type <strong>/b testimonials</strong> to find and insert the B Testimonials block.",
+            link: {
+              url: `${adminUrl}post-new.php?post_type=page`,
+              label: "Open Editor",
+            },
+          },
+          {
+            num: 2,
+            title: "Choose Layout & Child Block",
+            body: "Select from <strong>40+ modern layouts</strong> (Grid, Slider, Video, Marquee, Rating Summary, Feedback Form) on the canvas or via the Popup Modal.",
+          },
+          {
+            num: 3,
+            title: "Configure Content Source",
+            body: "Choose between <strong>Manual Items</strong> or <strong>Testimonials CPT</strong> (reusable testimonials managed under Testimonials menu).",
+          },
+          {
+            num: 4,
+            title: "Publish",
+            body: "Once everything is configured, click Publish. Make sure you have entered the <strong>Name</strong>, <strong>Designation</strong>, <strong>Review Text</strong>, and <strong>Rating</strong>.",
+          },
+        ],
+      },
+      {
+        key: "shortcode",
+        label: "ShortCode",
+        icon: shortcodeTabIcon,
+        steps: [
+          {
+            num: 1,
+            title: "Create & Publish a Testimonial",
+            body: "Go to <strong>Testimonials &rsaquo; All Testimonials</strong>, click <strong>Add New</strong>, fill in the review details, and publish.",
+            link: {
+              url: `${adminUrl}edit.php?post_type=testimonial`,
+              label: "All Testimonials",
+            },
+          },
+          {
+            num: 2,
+            title: "Copy the Classic Shortcode",
+            body: "In the <strong>All Testimonials</strong> list, click the shortcode in the <strong>Classic Shortcode</strong> column to copy it (e.g. <code>[testimonial id=123]</code>) — it renders that single review.",
+          },
+          {
+            num: 3,
+            title: "Or Copy a Block Shortcode",
+            body: "Go to <strong>Testimonials &rsaquo; Shortcode</strong>, pick a layout (grid, slider, video, and more), publish it, then copy the <strong>Block Shortcode</strong> shown above the block (e.g. <code>[testimonials_block id=456]</code>) — it renders that whole saved layout.",
+            link: {
+              url: `${adminUrl}edit.php?post_type=testimonials-block`,
+              label: "Testimonials Shortcode",
+            },
+          },
+          {
+            num: 4,
+            title: "Paste It Anywhere",
+            body: "Drop either shortcode into any post, page, widget, or page-builder row. Edit the source once and every copy updates.",
+          },
+        ],
+      },
+      {
+        key: "elementor",
+        label: "Elementor",
+        icon: elementorTabIcon,
+        steps: [
+          {
+            num: 1,
+            title: "Create Testimonials",
+            body: "Go to <strong>Testimonials &rsaquo; All Testimonials</strong>, click <strong>Add New</strong>, fill in the details (name, rating, review, designation), and publish.",
+            link: {
+              url: `${adminUrl}edit.php?post_type=testimonial`,
+              label: "All Testimonials",
+            },
+          },
+          {
+            num: 2,
+            title: "Add a Shortcode Widget",
+            body: "Open the Elementor editor on any page. Search for the <strong>Shortcode</strong> widget and drag it to your desired location on the canvas.",
+          },
+          {
+            num: 3,
+            title: "Enter & Preview",
+            body: "Paste the block shortcode or use the <strong>Gutenberg Block</strong> widget in Elementor to embed the B Testimonials block directly.",
+          },
+        ],
+      },
+      {
+        key: "php",
+        label: "Theme / PHP",
+        icon: phpTabIcon,
+        steps: [
+          {
+            num: 1,
+            title: "Create Testimonials",
+            body: "Go to <strong>Testimonials &rsaquo; All Testimonials</strong>, click <strong>Add New</strong>, configure your testimonial details, then publish.",
+            link: {
+              url: `${adminUrl}edit.php?post_type=testimonial`,
+              label: "All Testimonials",
+            },
+          },
+          {
+            num: 2,
+            title: "Open Your Template",
+            body: "Open the theme template file where you want to display testimonials — for example <code>single.php</code>, <code>page.php</code>, or a custom template part.",
+          },
+          {
+            num: 3,
+            title: "Use WP_Query",
+            body: "Query testimonials with <code>&lt;?php $testimonials = get_posts(['post_type' =&gt; 'testimonial', 'posts_per_page' =&gt; 6]); ?&gt;</code> and loop through them to render in your custom HTML template.",
+          },
+        ],
+      },
+    ],
+  },
+  changelogs: [
+    {
+      version: "1.0.6 - 30 September 2026",
+      type: "new",
+      list: [
+        "<strong>New</strong> Category dropdown under Content Source. You can now pin a block to one category. 1.0.5 said it could do this but the setting was missing.",
+        "<strong>New</strong> Show More button for the grid, list, masonry, timeline, audio and video layouts. It shows the first few testimonials and each click adds more. It works with the filter and the search.",
+        "<strong>New</strong> Show More Button style panel: colors, hover colors, font size, roundness, border, width, spacing and alignment.",
+        "<strong>New</strong> Filter bar buttons now have 20 style options instead of 6. This includes Normal, Hover and Selected colors, text, shape, layout and spacing.",
+        "<strong>New</strong> Search box has its own Style panel: colors, placeholder color, font size, padding, border, roundness, width and position.",
+        "<strong>New</strong> A testimonial with no photo now shows a circle with the first letter of the name, instead of a broken image.",
+        "<strong>Fix</strong> The editor always showed five stars on every testimonial. It now shows the real rating, and the designation and company as well.",
+        "<strong>Fix</strong> The black outline around the search box when you click it is gone. The border turns the accent color instead.",
+        "<strong>Improvement</strong> Changing Category, Number, Order By or Order in the editor now shows an \"Updating preview\" label and a status line, so you can tell it is working.",
+        "<strong>Improvement</strong> The Number slider waits until you stop dragging before it loads testimonials.",
+        "<strong>Improvement</strong> The Slug and Custom Fields boxes are removed from the testimonial screen. Nothing used them.",
+        "<strong>Improvement</strong> Trustpilot, G2 and Capterra are hidden from the Review Sources page for now, because their data cannot be read on a free plan. Those blocks still work with the figures you type in.",
+        "<strong>Improvement</strong> The \"How to get these details\" link now opens the Google or Facebook steps directly.",
+      ],
+    },
+    {
+      version: "1.0.5 - 10 September 2026",
+      type: "new",
+      list: [
+        "<strong>New</strong> Schema.org structured data. Every testimonial block now feeds Review and AggregateRating JSON-LD, which is what Google reads to show star ratings in search results. It is on by default and needs no setup.",
+        "<strong>New</strong> One consolidated document per page rather than one per block, so a page carrying a grid and a slider no longer publishes two competing aggregate ratings — which search engines treat as a markup error rather than as two ratings.",
+        "<strong>New</strong> A Rating Summary block carrying a real average and review count declares the page's aggregate rating outright, in preference to averaging whichever testimonials happen to be on screen.",
+        "<strong>New</strong> Six filters for developers — see the Developers section.",
+        "<strong>Performance</strong> The editor bundle is 81% smaller — 3.89 MB down to 723 KB. The icon picker's three icon sets (Font Awesome, Bootstrap and Lucid) come to 3.35 MB of JSON, and they were compiled into the bundle every one of the forty blocks shares. Opening the editor downloaded and parsed all of it before a single block was on the canvas, whether or not anyone went near an icon. They are now fetched on demand, when the Icon panel is actually opened.",
+        "<strong>Performance</strong> No change to what the picker does or how icons are stored — the same three sets, still saved as inline SVG.",
+        "<strong>Block patterns</strong> Seven ready-made sections, under \"Testimonials & Social Proof\" in the inserter: Wall of Love, SaaS Hero with Rating, E-commerce Social Proof, Agency Results & Testimonials, Review Platform Trust Bar, Scrolling Testimonial Marquee and Ask for a Review.",
+        "<strong>Block patterns</strong> Each arrives as a finished section — heading, layout, spacing and sample testimonials — rather than as a single default block to build out by hand.",
+      ],
+    },
+    {
+      version: "1.0.4 - 19 August 2026",
+      type: "new",
+      list: [
+        "<strong>New</strong> Popup panel for the Popup Modal Review Trigger — the modal was inline styles no panel could reach.",
+        "<strong>New</strong> Poll Style, Badge Score, FAQ row box and Trust Badges box/icon/text panels.",
+        "<strong>New</strong> Field label, placeholder and input styling controls for the Testimonial Form and NPS Poll.",
+        "<strong>New</strong> Badge Logo size control for the Google, Capterra, Facebook, Trustpilot and G2 marks.",
+        "<strong>New</strong> Alignment control for the review badges and Social Proof Toast.",
+        "<strong>New</strong> Corner wash, card hover, header strip, avatar ring and card corner tint controls.",
+        "<strong>Improvement</strong> Gradient Border Grid now draws the gradient border and star badges it is named for.",
+        "<strong>Improvement</strong> Trust Badges Icon panel follows the Badges repeater, one slot per badge.",
+        "<strong>Improvement</strong> Speech Bubble tail colour pickers show the colour actually in use.",
+        "<strong>Fix</strong> Trust Badges editor preview now draws the same icon and colour per badge as the page.",
+        "<strong>Fix</strong> Corner wash and card hover now reach every card the Card panel paints.",
+        "<strong>Fix</strong> Client Logos hover restores colour inside the editor.",
+        "<strong>Fix</strong> Before / After slider releases from the pointer when the drag ends.",
+      ],
+    },
+    {
+      version: "1.0.3",
+      type: "new",
+      list: [
+        "<strong>New</strong> Expanded to 40+ child block layouts, plus social proof and rating badges.",
+        "<strong>New</strong> Testimonials CPT, Customer Submissions dashboard and NPS Poll dashboard.",
+        "<strong>New</strong> Block Switcher — change layout from the sidebar without losing content.",
+        "<strong>Fix</strong> Security hardening: output escaping, input sanitization and nonce verification.",
+      ],
+    },
+    {
+      version: "1.0.2 - 24 July 2026",
+      type: "new",
+      list: [
+        "<strong>New</strong> Added modern React Admin Dashboard.",
+        "<strong>New</strong> Added 28 new child blocks (40 total child blocks).",
+        "<strong>New</strong> Added Customer Submissions Management System.",
+      ],
+    },
+  ],
+  changelogsLimit: 5,
+  changelogsReadMoreLabel: "View More Changelogs",
+  proFeatures: [
+    "40+ Modern Child Block Layouts & Widgets",
+    "Full Testimonials CPT & Reusable Content Source",
+    "Customer Submissions & Review Management Dashboard",
+    "Video Lightbox Playback (YouTube, Vimeo, MP4)",
+    "Continuous Marquee Scrolling Ticker",
+    "Star Rating Progress Bar Breakdown",
+    "Google, Trustpilot & G2 Review Badges",
+  ],
+});

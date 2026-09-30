@@ -3,7 +3,7 @@ import { InnerBlocks, useBlockProps } from '@wordpress/block-editor';
 
 import metadata from './block.json';
 import Edit from '../../shared/Components/Backend/Edit';
-import { blockIcon } from '../../shared/utils/icons';
+import { getBlockIcon } from '../../shared/utils/getBlockIcon';
 
 const deprecated = [
 	{
@@ -27,7 +27,7 @@ const deprecated = [
 ];
 
 registerBlockType( metadata, {
-	icon: blockIcon,
+	icon: getBlockIcon( metadata.name ),
 	edit: Edit,
 	save: () => {
 		const blockProps = useBlockProps.save();

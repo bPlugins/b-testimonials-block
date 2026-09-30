@@ -1,3 +1,4 @@
+@use './devices' as *;
 .bClientLogos {
 	.logos-grid {
 		display: grid;
@@ -6,10 +7,16 @@
 		align-items: center;
 	}
 
+	// Border Color, Border Width and Bars & Tracks are offered for this layout,
+	// and until now they painted the old front-end markup only -- this grid had
+	// no declaration to read them. Transparent and zero defaults keep an
+	// untouched strip looking exactly as it did.
 	.logo-item {
 		display: flex;
 		align-items: center;
 		justify-content: center;
+		background: var(--btb-track, transparent);
+		border: var(--btb-border-width, 0px) solid var(--btb-border, transparent);
 
 		img {
 			height: var(--logo-h, 60px);
@@ -19,24 +26,42 @@
 		}
 	}
 
+	// A background or an outline needs room to read as one; added only once the
+	// author sets one, so the default strip keeps its bare logos.
+	.logos-grid.has-surface .logo-item {
+		padding: 20px;
+		border-radius: 10px;
+	}
+
+	// Hovering the cell, not the logo itself.
+	//
+	// `img:hover` needed the pointer to land on the picture, which on the editor
+	// canvas it often never does: a linked logo puts an `<a>` over it and the
+	// editor takes links out of the pointer's way so a click selects the block
+	// instead of following them. The colour came back on the published page and
+	// stayed grey while editing.
+	//
+	// The cell is also the better target on the page. It carries the padding
+	// once a surface is set, so a pointer just inside the tile now counts as
+	// being on that logo rather than on nothing.
 	.is-grayscale .logo-item img {
 		filter: grayscale(1);
 		opacity: 0.7;
 		transition: filter 0.25s ease, opacity 0.25s ease;
-
-		&:hover {
-			filter: grayscale(0);
-			opacity: 1;
-		}
 	}
 
-	@media ( max-width: 768px ) {
+	.is-grayscale .logo-item:hover img {
+		filter: grayscale(0);
+		opacity: 1;
+	}
+
+	@media ( max-width: $tablet-max ) {
 		.logos-grid {
 			grid-template-columns: repeat(var(--cols-t, 3), 1fr);
 		}
 	}
 
-	@media ( max-width: 576px ) {
+	@media ( max-width: $mobile-max ) {
 		.logos-grid {
 			grid-template-columns: repeat(var(--cols-m, 2), 1fr);
 		}

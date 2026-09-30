@@ -7,10 +7,50 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 $is_classic = ! empty( $attributes['useClassicEditor'] ) || ! empty( $attributes['isLegacyBlock'] );
 
-if ( ! $is_classic && ! empty( $content ) ) {
-	$inner_content = trim( preg_replace( '/^<div[^>]*>(.*)<\/div>$/ss', '$1', trim( $content ) ) );
-	if ( ! empty( $inner_content ) ) {
+/*
+ * A real child layout block renders as a data-attributes container for its
+ * own JS to hydrate (see view.js), so it has no HTML between its own opening
+ * and closing tags -- stripping the outer tag and checking what is left
+ * inside it, as this used to do, reads every real child as "no child chosen"
+ * and falls through to the legacy single-testimonial default below. Whether
+ * $content exists at all already answers "was a child block rendered".
+ */
+$btb_inner_content = trim( (string) $content );
+
+if ( ! $is_classic ) {
+	// A child block was chosen -- render it and nothing else.
+	if ( '' !== $btb_inner_content ) {
 		echo wp_kses_post( $content ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+		return;
+	}
+
+	/*
+	 * No child block, and this is still the untouched block.json default: the
+	 * fresh "John Doe" example item, on the default theme, layout and data
+	 * source. This is the state where the editor shows the "Select Your
+	 * Testimonial Block" picker, an authoring affordance with nothing to
+	 * publish behind it -- without this guard the block falls through below
+	 * and the front end renders that placeholder demo testimonial.
+	 *
+	 * A block that has moved past this -- real manual items, or a data source
+	 * other than "manual" such as the `[testimonial id=N]` shortcode's `cpt`
+	 * query, which renders through this same wrapper with no child block at
+	 * all -- is not fresh, so it falls through to render its real content.
+	 */
+	$btb_items = ( isset( $attributes['items'] ) && is_array( $attributes['items'] ) ) ? $attributes['items'] : array();
+	$btb_item  = ( 1 === count( $btb_items ) && is_array( $btb_items[0] ) ) ? $btb_items[0] : null;
+
+	$btb_is_fresh_item = null !== $btb_item
+		&& 'John Doe' === ( $btb_item['name'] ?? '' )
+		&& 'Developer' === ( $btb_item['deg'] ?? '' )
+		&& 'It is a long-established fact that a reader will be distracted by the readable content of a page when looking at its layout' === ( $btb_item['reviewText'] ?? '' );
+
+	$btb_is_fresh_block = $btb_is_fresh_item
+		&& in_array( $attributes['theme'] ?? 'default', array( '', 'default' ), true )
+		&& in_array( $attributes['layout'] ?? 'default', array( '', 'default' ), true )
+		&& in_array( $attributes['dataSource'] ?? 'manual', array( '', 'manual' ), true );
+
+	if ( $btb_is_fresh_block ) {
 		return;
 	}
 }

@@ -13,12 +13,20 @@
     ],
     "html": false
   },
-  "editorScript": [
-    "file:./index.js"
-  ],
-  "editorStyle": "file:./index.css",
+  "example": {
+    "attributes": {
+      "beforeImg": {
+        "url": "data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='800' height='500'%3E%3Crect width='800' height='500' fill='%23b8bcc0'/%3E%3Ccircle cx='620' cy='120' r='58' fill='%23d4d6d8'/%3E%3Cpath d='M0 500 L260 250 L470 500 Z' fill='%238b9095'/%3E%3Cpath d='M300 500 L560 210 L800 500 Z' fill='%236f757a'/%3E%3C/svg%3E"
+      },
+      "afterImg": {
+        "url": "data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='800' height='500'%3E%3Crect width='800' height='500' fill='%237cc6e8'/%3E%3Ccircle cx='620' cy='120' r='58' fill='%23ffd166'/%3E%3Cpath d='M0 500 L260 250 L470 500 Z' fill='%234a8f5b'/%3E%3Cpath d='M300 500 L560 210 L800 500 Z' fill='%232f6b46'/%3E%3C/svg%3E"
+      }
+    },
+    "viewportWidth": 700
+  },
+  "editorStyle": "file:../index.css",
   "style": [
-    "file:./index.css",
+    "file:../index.css",
     "file:./view.css"
   ],
   "viewScript": [
@@ -36,9 +44,62 @@
     "image"
   ],
   "attributes": {
+    "brandColor": {
+      "type": "string"
+    },
+    "surfaceColor": {
+      "type": "string"
+    },
+    "borderColor": {
+      "type": "string"
+    },
+    "titleColor": {
+      "type": "string"
+    },
+    "bodyColor": {
+      "type": "string"
+    },
+    "mutedColor": {
+      "type": "string"
+    },
+    "ratingColor": {
+      "type": "string"
+    },
+    "trackColor": {
+      "type": "string"
+    },
+    "labelBgColor": {
+      "type": "string"
+    },
+    "labelTextColor": {
+      "type": "string"
+    },
+    "gripIconColor": {
+      "type": "string"
+    },
     "align": {
       "type": "string",
       "default": "wide"
+    },
+    "blockWidth": {
+      "type": "object",
+      "default": {
+        "desktop": "",
+        "tablet": "",
+        "mobile": ""
+      }
+    },
+    "blockAlign": {
+      "type": "string",
+      "default": ""
+    },
+    "cardHeight": {
+      "type": "object",
+      "default": {
+        "desktop": "",
+        "tablet": "",
+        "mobile": ""
+      }
     },
     "cId": {
       "type": "string",
@@ -75,6 +136,54 @@
     "layout": {
       "type": "string",
       "default": "before-after"
+    },
+    "blockMargin": {
+      "type": "object",
+      "default": {}
+    },
+    "cardMargin": {
+      "type": "object",
+      "default": {}
+    },
+    "degDivider": {
+      "type": "object",
+      "default": {}
+    },
+    "orientation": {
+      "type": "string",
+      "default": "horizontal"
+    },
+    "interaction": {
+      "type": "string",
+      "default": "drag"
+    },
+    "aspectRatio": {
+      "type": "string",
+      "default": "auto"
+    },
+    "mediaRadius": {
+      "type": "string",
+      "default": "8px"
+    },
+    "dividerWidth": {
+      "type": "number",
+      "default": 3
+    },
+    "gripSize": {
+      "type": "number",
+      "default": 38
+    },
+    "showLabels": {
+      "type": "boolean",
+      "default": true
+    },
+    "labelPosition": {
+      "type": "string",
+      "default": "bottom"
+    },
+    "labelFontSize": {
+      "type": "number",
+      "default": 13
     }
   }
 }

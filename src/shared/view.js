@@ -1,6 +1,5 @@
-import { createRoot, render } from '@wordpress/element';
-
-import TestimonialsView from './Components/Common/TestimonialsView';
+import { createRoot } from "@wordpress/element";
+import TestimonialsView from "./Components/Common/TestimonialsView";
 
 /**
  * Shared frontend renderer for every testimonials block.
@@ -10,27 +9,23 @@ import TestimonialsView from './Components/Common/TestimonialsView';
  * The attribute is removed after mount, so if more than one block's view script
  * runs on the same page the second pass safely skips initialised elements.
  */
-export const initTestimonials = ( selector = '.bTestimonials' ) => {
-	document.querySelectorAll( selector ).forEach( ( el ) => {
-		if ( ! el.dataset.attributes ) {
-			return;
-		}
+export const initTestimonials = (selector = ".bTestimonials") => {
+  document.querySelectorAll(selector).forEach((el) => {
+    if (!el.dataset.attributes) {
+      return;
+    }
 
-		const attributes = JSON.parse( el.dataset.attributes );
+    const attributes = JSON.parse(el.dataset.attributes);
 
-		if ( createRoot ) {
-			createRoot( el ).render( <TestimonialsView attributes={ attributes } /> );
-		} else if ( render ) {
-			render( <TestimonialsView attributes={ attributes } />, el );
-		}
+    createRoot(el).render(<TestimonialsView attributes={attributes} />);
 
-		el.removeAttribute( 'data-attributes' );
-	} );
+    el.removeAttribute("data-attributes");
+  });
 };
 
 // Auto-initialise once the DOM is ready.
-if ( document.readyState === 'loading' ) {
-	document.addEventListener( 'DOMContentLoaded', () => initTestimonials() );
+if (document.readyState === "loading") {
+  document.addEventListener("DOMContentLoaded", () => initTestimonials());
 } else {
-	initTestimonials();
+  initTestimonials();
 }

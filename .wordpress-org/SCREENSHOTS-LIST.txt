@@ -1,0 +1,52 @@
+1. Activate Testimonials from the Plugins screen.
+2. Go to Pages -> Add New to start a new page.
+3. Search "Testimonials" in the block inserter and add the block.
+4. Pick one of the 40+ layouts from the placeholder.
+5. Type your reviews and open the sidebar to customise.
+6. Open the Testimonial Block Switcher to browse every layout.
+7. Switching layouts replaces the block with that layout's own default content.
+8. Keep editing your content, then Publish.
+9. Centered Cards Grid — Layout panel (arrangement, columns, gaps) and Elements panel (toggle image, name, designation, review text, rating).
+10. Centered Cards Grid — Card style (background, corner wash, padding, border, shadow) and Name typography & colour.
+11. Video Testimonials — Videos panel (add, reorder, manage entries) and Width & height.
+12. Google Reviews Badge — Width, height & alignment, and Badge logo sizing.
+13. Default testimonial cards with the Excerpt & Expand feature.
+14. Testimonials Slider — interactive carousel with navigation dots.
+15. Testimonials List — clean vertical list of reviews.
+16. Testimonials Masonry — staggered grid for variable-height cards.
+17. Testimonials Marquee — smooth infinite scrolling ticker.
+18. Rating Summary — overall score and star rating distribution.
+19. Testimonial Stats — key statistics and satisfaction percentages.
+20. Trust Badges — security, guarantee and award badges.
+21. Client Logos — brand and client logos in a grid or carousel.
+22. Video Testimonials — video reviews with lightbox popup playback.
+23. Before & After — comparison showcase for results and transformation.
+24. Testimonial Form — front-end form for collecting customer reviews.
+25. Centered Cards Grid — sleek centered profile and testimonial card grid.
+26. Gradient Border Grid — testimonial grid with a gradient card border.
+27. Coverflow Carousel — 3D coverflow-style testimonial carousel.
+28. Compact Reviews List — space-saving list of short reviews.
+29. Avatar Reviews List — reviewer avatars paired with short quotes.
+30. Quote Box Showcase — large pull-quote style testimonial display.
+31. Speech Bubble Cards — reviews styled as chat speech bubbles.
+32. Customer Journey Timeline — reviews laid out along a timeline.
+33. Stacked Review Cards — overlapping stacked review cards.
+34. Customer Case Study — in-depth case study style testimonial.
+35. Google Reviews Badge — official-style Google Business score badge.
+36. Trustpilot Score Badge — official-style Trustpilot score badge.
+37. G2 Review Badge — official-style G2 review score badge.
+38. Floating Review Badge — a floating, fixed-position review badge widget.
+39. Star Rating Progress Bars — rating breakdown shown as progress bars.
+40. Social Proof Toast — recent-activity popup notifications.
+41. Audio Testimonials — voice reviews with a waveform audio player.
+42. Feedback & NPS Poll — Net Promoter Score survey widget.
+43. Comparison Review Table — side-by-side comparison of reviews.
+44. FAQ Review Accordion — reviews presented as an FAQ-style accordion.
+45. Hero Testimonial Spotlight — a single large, featured testimonial.
+46. Minimalist Reviews Grid — clean, minimal grid of reviews.
+47. 3D Flip Perspective Carousel — carousel with a 3D flip transition.
+48. Floating Avatar Bubbles — animated floating reviewer avatar bubbles.
+49. Facebook Recommendation Badge — official-style Facebook recommendation badge.
+50. Capterra Score Badge — official-style Capterra score badge.
+51. Verified Buyer Trust Seal — a verified-purchase trust seal badge.
+52. Popup Modal Review Trigger — a review shown inside a popup modal.

@@ -52,7 +52,28 @@ function bpbtb_register_admin_submissions_menu() {
 add_action( 'admin_menu', 'bpbtb_register_admin_submissions_menu' );
 
 /**
+ * User meta key holding the pending count this user last dismissed the
+ * notice at.
+ */
+if ( ! defined( 'BPBTB_SUBMISSIONS_NOTICE_DISMISSED_META' ) ) {
+	define( 'BPBTB_SUBMISSIONS_NOTICE_DISMISSED_META', 'bpbtb_submissions_notice_dismissed_count' );
+}
+
+/**
  * Display top dashboard notice when there are pending customer submissions.
+ *
+ * `is-dismissible` only ever removed the notice from that one page's DOM --
+ * WordPress's own dismiss button has no server-side memory of its own, so the
+ * next admin page load ran this function again, saw the same pending count,
+ * and printed it right back. Measured: the button promised a dismissal it
+ * never delivered.
+ *
+ * Fixed the way persistent WP admin notices normally are: the pending count
+ * at the moment of dismissal is stored per-user (`bpbtb_ajax_dismiss_
+ * submissions_notice()` below), and the notice stays hidden as long as the
+ * current count has not grown past that. A newly arrived submission -- a
+ * count higher than what was dismissed -- is different information and
+ * surfaces again; the count dropping from someone being reviewed is not.
  */
 if ( ! function_exists( 'bpbtb_pending_submissions_notice' ) ) {
 function bpbtb_pending_submissions_notice() {
@@ -66,31 +87,81 @@ function bpbtb_pending_submissions_notice() {
 	}
 
 	$pending_count = bpbtb_get_pending_submissions_count();
-	if ( $pending_count > 0 ) {
-		$url = admin_url( 'edit.php?post_type=testimonial&page=bpbtb-submissions' );
-		?>
-		<div class="notice notice-warning is-dismissible" style="border-left-color: #5b34c9; padding: 12px 16px; border-radius: 8px;">
-			<p style="margin: 0; font-size: 14px; display: flex; align-items: center; justify-content: space-between;">
-				<span>
-					<strong style="color: #4527a4;"><?php esc_html_e( 'B Testimonials Block:', 'b-testimonials-block' ); ?></strong>
-					<?php
-					printf(
-						/* translators: %d: number of pending submissions */
-						esc_html( _n( 'You have %d pending customer submission awaiting review.', 'You have %d pending customer submissions awaiting review.', $pending_count, 'b-testimonials-block' ) ),
-						(int) $pending_count
-					);
-					?>
-				</span>
-				<a href="<?php echo esc_url( $url ); ?>" class="button button-primary" style="background: linear-gradient(135deg, #5b34c9, #4527a4); border: none; border-radius: 6px; font-weight: 600;">
-					<?php esc_html_e( 'View Submissions', 'b-testimonials-block' ); ?> &rarr;
-				</a>
-			</p>
-		</div>
-		<?php
+	if ( $pending_count <= 0 ) {
+		return;
 	}
+
+	$dismissed_count = (int) get_user_meta( get_current_user_id(), BPBTB_SUBMISSIONS_NOTICE_DISMISSED_META, true );
+	if ( $pending_count <= $dismissed_count ) {
+		return;
+	}
+
+	$url   = admin_url( 'edit.php?post_type=testimonial&page=bpbtb-submissions' );
+	$nonce = wp_create_nonce( 'bpbtb_dismiss_submissions_notice' );
+	?>
+	<?php // Square and flat: the plugin's own screens are, and wp-admin's notices are too, so the rounded corners this used to carry only ever singled it out. ?>
+	<div id="bpbtb-pending-submissions-notice" class="notice notice-warning is-dismissible" data-nonce="<?php echo esc_attr( $nonce ); ?>" data-count="<?php echo esc_attr( $pending_count ); ?>" style="border-left-color: #0b81ee; padding: 12px 16px;">
+		<p style="margin: 0; font-size: 14px; display: flex; align-items: center; justify-content: space-between;">
+			<span>
+				<strong style="color: #0f57c4;"><?php esc_html_e( 'B Testimonials Block:', 'b-testimonials-block' ); ?></strong>
+				<?php
+				printf(
+					/* translators: %d: number of pending submissions */
+					esc_html( _n( 'You have %d pending customer submission awaiting review.', 'You have %d pending customer submissions awaiting review.', $pending_count, 'b-testimonials-block' ) ),
+					(int) $pending_count
+				);
+				?>
+			</span>
+			<a href="<?php echo esc_url( $url ); ?>" class="button button-primary" style="background: #0b81ee; border-color: #0b81ee; border-radius: 0; font-weight: 600;">
+				<?php esc_html_e( 'View Submissions', 'b-testimonials-block' ); ?> &rarr;
+			</a>
+		</p>
+	</div>
+	<script>
+	document.addEventListener( 'click', function ( e ) {
+		var btn = e.target.closest && e.target.closest( '.notice-dismiss' );
+		if ( ! btn ) {
+			return;
+		}
+		var notice = btn.closest( '#bpbtb-pending-submissions-notice' );
+		if ( ! notice ) {
+			return;
+		}
+		var body = new URLSearchParams();
+		body.set( 'action', 'bpbtb_dismiss_submissions_notice' );
+		body.set( 'nonce', notice.getAttribute( 'data-nonce' ) );
+		body.set( 'count', notice.getAttribute( 'data-count' ) );
+		fetch( ajaxurl, { method: 'POST', credentials: 'same-origin', body: body } );
+	} );
+	</script>
+	<?php
 }
 }
 add_action( 'admin_notices', 'bpbtb_pending_submissions_notice' );
+
+/**
+ * Persist the pending-submissions notice dismissal for the current user.
+ */
+if ( ! function_exists( 'bpbtb_ajax_dismiss_submissions_notice' ) ) {
+function bpbtb_ajax_dismiss_submissions_notice() {
+	$nonce = isset( $_POST['nonce'] ) ? sanitize_text_field( wp_unslash( $_POST['nonce'] ) ) : '';
+
+	if ( ! wp_verify_nonce( $nonce, 'bpbtb_dismiss_submissions_notice' ) ) {
+		wp_send_json_error( [ 'message' => __( 'Invalid security token.', 'b-testimonials-block' ) ] );
+	}
+
+	if ( ! current_user_can( 'manage_options' ) ) {
+		wp_send_json_error( [ 'message' => __( 'You do not have permission to perform this action.', 'b-testimonials-block' ) ] );
+	}
+
+	$count = isset( $_POST['count'] ) ? absint( wp_unslash( $_POST['count'] ) ) : 0;
+
+	update_user_meta( get_current_user_id(), BPBTB_SUBMISSIONS_NOTICE_DISMISSED_META, $count );
+
+	wp_send_json_success();
+}
+}
+add_action( 'wp_ajax_bpbtb_dismiss_submissions_notice', 'bpbtb_ajax_dismiss_submissions_notice' );
 
 /**
  * Handle submission action GET requests (Approve, Trash, Delete).
@@ -193,520 +264,244 @@ function bpbtb_render_admin_submissions_page() {
 	$approved_num  = isset( $counts->publish ) ? (int) $counts->publish : 0;
 	$trash_num     = isset( $counts->trash ) ? (int) $counts->trash : 0;
 	$total_num     = $pending_num + $approved_num;
+	/*
+	 * The page's own labels, so the hero, the count line and the empty state all
+	 * name the same filter rather than each inventing a phrase for it.
+	 */
+	$btb_tabs = [
+		'pending' => [
+			'label'  => __( 'Pending Review', 'b-testimonials-block' ),
+			'count'  => $pending_num,
+			'accent' => '#d97706',
+		],
+		'publish' => [
+			'label'  => __( 'Approved', 'b-testimonials-block' ),
+			'count'  => $approved_num,
+			'accent' => '#10b981',
+		],
+		'all'     => [
+			'label'  => __( 'All Submissions', 'b-testimonials-block' ),
+			'count'  => $total_num,
+			'accent' => '#3b82f6',
+		],
+		'trash'   => [
+			'label'  => __( 'Trash', 'b-testimonials-block' ),
+			'count'  => $trash_num,
+			'accent' => '#e11d48',
+		],
+	];
+
+	$btb_shown = $query->post_count;
 	?>
 
-	<!-- Custom Modern Dashboard Styles -->
-	<style>
-		.bpbtb-admin-wrap {
-			max-width: 1280px;
-			margin: 24px 20px 40px 0;
-			font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
-		}
+	<div class="bpbtb-admin-page">
 
-		/* Modern Hero Header Banner */
-		.bpbtb-hero-banner {
-			background: linear-gradient(135deg, #1e1b4b 0%, #312e81 40%, #4338ca 100%);
-			border-radius: 16px;
-			padding: 28px 32px;
-			color: #ffffff;
-			display: flex;
-			align-items: center;
-			justify-content: space-between;
-			box-shadow: 0 10px 25px -5px rgba(49, 46, 129, 0.25);
-			margin-bottom: 24px;
-			position: relative;
-			overflow: hidden;
-		}
+		<?php // The dashboard's header, so these screens read as part of it.
+		BPBTB_Admin_Menu::render_header(); ?>
 
-		.bpbtb-hero-banner::before {
-			content: '';
-			position: absolute;
-			top: -50%;
-			right: -10%;
-			width: 300px;
-			height: 300px;
-			background: radial-gradient(circle, rgba(255,255,255,0.12) 0%, transparent 70%);
-			border-radius: 50%;
-		}
+		<div class="bpbtb-admin-main">
+			<div class="bpbtb-admin-wrap">
+				<?php
+				// phpcs:ignore WordPress.Security.NonceVerification.Recommended
+				if ( isset( $_GET['msg'] ) ) :
+					?>
+					<div class="notice notice-success is-dismissible">
+						<p>
+							<?php
+							// phpcs:ignore WordPress.Security.NonceVerification.Recommended
+							$msg = sanitize_key( wp_unslash( $_GET['msg'] ) );
+							if ( 'approved' === $msg ) {
+								esc_html_e( 'Testimonial submission approved and published successfully!', 'b-testimonials-block' );
+							} elseif ( 'rejected' === $msg ) {
+								esc_html_e( 'Submission moved to trash.', 'b-testimonials-block' );
+							} elseif ( 'deleted' === $msg ) {
+								esc_html_e( 'Submission permanently deleted.', 'b-testimonials-block' );
+							} elseif ( 'bulk_updated' === $msg ) {
+								esc_html_e( 'Bulk action completed successfully.', 'b-testimonials-block' );
+							}
+							?>
+						</p>
+					</div>
+				<?php endif; ?>
 
-		.bpbtb-hero-title {
-			margin: 0 0 6px 0;
-			font-size: 24px;
-			font-weight: 800;
-			color: #ffffff;
-			letter-spacing: -0.5px;
-			display: flex;
-			align-items: center;
-			gap: 10px;
-		}
+				<header class="bpbtb-hero">
+					<span class="bpbtb-eyebrow"><?php esc_html_e( 'Submissions', 'b-testimonials-block' ); ?></span>
+					<h1><?php esc_html_e( 'Customer submissions & feedback', 'b-testimonials-block' ); ?></h1>
+					<p><?php esc_html_e( 'Review, approve, and manage customer reviews submitted from your website frontend.', 'b-testimonials-block' ); ?></p>
+				</header>
 
-		.bpbtb-hero-desc {
-			margin: 0;
-			font-size: 14px;
-			color: rgba(255, 255, 255, 0.8);
-		}
-
-		/* Stat Counter Pills */
-		.bpbtb-hero-stats {
-			display: flex;
-			gap: 12px;
-		}
-
-		.bpbtb-stat-box {
-			background: rgba(255, 255, 255, 0.12);
-			backdrop-filter: blur(10px);
-			border: 1px solid rgba(255, 255, 255, 0.18);
-			border-radius: 12px;
-			padding: 12px 20px;
-			text-align: center;
-			min-width: 90px;
-		}
-
-		.bpbtb-stat-num {
-			font-size: 22px;
-			font-weight: 800;
-			color: #ffffff;
-			line-height: 1.1;
-		}
-
-		.bpbtb-stat-label {
-			font-size: 11px;
-			text-transform: uppercase;
-			letter-spacing: 0.5px;
-			color: rgba(255, 255, 255, 0.75);
-			margin-top: 2px;
-		}
-
-		/* Navigation Tabs */
-		.bpbtb-nav-toolbar {
-			display: flex;
-			align-items: center;
-			justify-content: space-between;
-			background: #ffffff;
-			padding: 8px;
-			border-radius: 12px;
-			border: 1px solid #e2e8f0;
-			box-shadow: 0 1px 3px rgba(0,0,0,0.04);
-			margin-bottom: 20px;
-			flex-wrap: wrap;
-			gap: 12px;
-		}
-
-		.bpbtb-tabs {
-			display: flex;
-			gap: 6px;
-		}
-
-		.bpbtb-tab-link {
-			padding: 8px 16px;
-			border-radius: 8px;
-			font-size: 13px;
-			font-weight: 600;
-			color: #64748b;
-			text-decoration: none;
-			transition: all 0.2s ease;
-			display: flex;
-			align-items: center;
-			gap: 6px;
-		}
-
-		.bpbtb-tab-link:hover {
-			color: #1e1b4b;
-			background: #f1f5f9;
-		}
-
-		.bpbtb-tab-link.is-active {
-			background: #4338ca;
-			color: #ffffff;
-		}
-
-		.bpbtb-tab-count {
-			background: rgba(0, 0, 0, 0.08);
-			padding: 2px 7px;
-			border-radius: 10px;
-			font-size: 11px;
-		}
-
-		.bpbtb-tab-link.is-active .bpbtb-tab-count {
-			background: rgba(255, 255, 255, 0.25);
-			color: #ffffff;
-		}
-
-		/* Bulk Action Controls */
-		.bpbtb-bulk-wrap {
-			display: flex;
-			align-items: center;
-			gap: 8px;
-		}
-
-		.bpbtb-bulk-select {
-			border-radius: 8px !important;
-			border: 1px solid #cbd5e1 !important;
-			padding: 4px 10px !important;
-			font-size: 13px !important;
-		}
-
-		.bpbtb-apply-btn {
-			border-radius: 8px !important;
-			background: #f1f5f9 !important;
-			border: 1px solid #cbd5e1 !important;
-			color: #334155 !important;
-			font-weight: 600 !important;
-			padding: 4px 14px !important;
-		}
-
-		.bpbtb-apply-btn:hover {
-			background: #e2e8f0 !important;
-			color: #0f172a !important;
-		}
-
-		/* Modern Submissions Table */
-		.bpbtb-modern-table-card {
-			background: #ffffff;
-			border-radius: 14px;
-			border: 1px solid #e2e8f0;
-			box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
-			overflow: hidden;
-		}
-
-		.bpbtb-modern-table {
-			width: 100%;
-			border-collapse: collapse;
-			text-align: left;
-		}
-
-		.bpbtb-modern-table th {
-			background: #f8fafc;
-			padding: 14px 16px;
-			font-size: 12px;
-			font-weight: 700;
-			text-transform: uppercase;
-			letter-spacing: 0.5px;
-			color: #475569;
-			border-bottom: 1px solid #e2e8f0;
-		}
-
-		.bpbtb-modern-table td {
-			padding: 16px;
-			border-bottom: 1px solid #f1f5f9;
-			vertical-align: top;
-			font-size: 13px;
-			color: #334155;
-		}
-
-		.bpbtb-modern-table tr:last-child td {
-			border-bottom: none;
-		}
-
-		.bpbtb-modern-table tr:hover td {
-			background: #f8fafc;
-		}
-
-		/* User Avatar Photo */
-		.bpbtb-avatar-box {
-			width: 46px;
-			height: 46px;
-			border-radius: 50%;
-			object-fit: cover;
-			border: 2px solid #e2e8f0;
-			box-shadow: 0 2px 4px rgba(0,0,0,0.06);
-		}
-
-		.bpbtb-avatar-placeholder {
-			width: 46px;
-			height: 46px;
-			border-radius: 50%;
-			background: linear-gradient(135deg, #6366f1, #4f46e5);
-			color: #ffffff;
-			display: flex;
-			align-items: center;
-			justify-content: center;
-			font-weight: 800;
-			font-size: 17px;
-			box-shadow: 0 2px 4px rgba(99, 102, 241, 0.25);
-		}
-
-		/* Status Badges */
-		.bpbtb-badge-pending {
-			background: #fef3c7;
-			color: #d97706;
-			font-size: 10px;
-			font-weight: 700;
-			padding: 2px 8px;
-			border-radius: 12px;
-			text-transform: uppercase;
-			letter-spacing: 0.3px;
-			display: inline-block;
-			margin-left: 6px;
-		}
-
-		.bpbtb-badge-approved {
-			background: #dcfce7;
-			color: #15803d;
-			font-size: 10px;
-			font-weight: 700;
-			padding: 2px 8px;
-			border-radius: 12px;
-			text-transform: uppercase;
-			letter-spacing: 0.3px;
-			display: inline-block;
-		}
-
-		/* Star Rating Stars */
-		.bpbtb-stars-wrap {
-			color: #f59e0b;
-			font-size: 15px;
-			letter-spacing: 2px;
-		}
-
-		/* Action Buttons */
-		.bpbtb-action-approve {
-			display: inline-flex;
-			align-items: center;
-			gap: 4px;
-			background: #16a34a;
-			color: #ffffff !important;
-			font-weight: 600;
-			font-size: 12px;
-			padding: 6px 14px;
-			border-radius: 6px;
-			text-decoration: none;
-			transition: all 0.2s ease;
-			border: none;
-		}
-
-		.bpbtb-action-approve:hover {
-			background: #15803d;
-			transform: translateY(-1px);
-			box-shadow: 0 4px 10px rgba(22, 163, 74, 0.25);
-		}
-
-		.bpbtb-action-reject {
-			display: inline-flex;
-			align-items: center;
-			gap: 4px;
-			background: #fee2e2;
-			color: #dc2626 !important;
-			font-weight: 600;
-			font-size: 12px;
-			padding: 6px 12px;
-			border-radius: 6px;
-			text-decoration: none;
-			transition: all 0.2s ease;
-			margin-left: 4px;
-		}
-
-		.bpbtb-action-reject:hover {
-			background: #fca5a5;
-			color: #991b1b !important;
-		}
-
-		.bpbtb-action-delete {
-			color: #dc2626 !important;
-			font-weight: 600;
-			font-size: 12px;
-			text-decoration: none;
-		}
-
-		.bpbtb-action-delete:hover {
-			text-decoration: underline;
-		}
-	</style>
-
-	<div class="bpbtb-admin-wrap">
-		<!-- Hero Header Banner -->
-		<div class="bpbtb-hero-banner">
-			<div>
-				<h2 class="bpbtb-hero-title">
-					<span class="dashicons dashicons-feedback" style="font-size: 26px; width: 26px; height: 26px;"></span>
-					<?php esc_html_e( 'Customer Submissions & Feedback', 'b-testimonials-block' ); ?>
-				</h2>
-				<p class="bpbtb-hero-desc">
-					<?php esc_html_e( 'Review, approve, and manage customer reviews submitted from your website frontend.', 'b-testimonials-block' ); ?>
-				</p>
-			</div>
-
-			<div class="bpbtb-hero-stats">
-				<div class="bpbtb-stat-box">
-					<div class="bpbtb-stat-num"><?php echo (int) $pending_num; ?></div>
-					<div class="bpbtb-stat-label"><?php esc_html_e( 'Pending', 'b-testimonials-block' ); ?></div>
+				<div class="bpbtb-stats-row">
+					<div class="bpbtb-stat-box">
+						<div class="bpbtb-stat-num"><?php echo (int) $pending_num; ?></div>
+						<div class="bpbtb-stat-label"><?php esc_html_e( 'Pending', 'b-testimonials-block' ); ?></div>
+					</div>
+					<div class="bpbtb-stat-box">
+						<div class="bpbtb-stat-num"><?php echo (int) $approved_num; ?></div>
+						<div class="bpbtb-stat-label"><?php esc_html_e( 'Approved', 'b-testimonials-block' ); ?></div>
+					</div>
+					<div class="bpbtb-stat-box">
+						<div class="bpbtb-stat-num"><?php echo (int) $trash_num; ?></div>
+						<div class="bpbtb-stat-label"><?php esc_html_e( 'In Trash', 'b-testimonials-block' ); ?></div>
+					</div>
+					<div class="bpbtb-stat-box">
+						<div class="bpbtb-stat-num"><?php echo (int) $total_num; ?></div>
+						<div class="bpbtb-stat-label"><?php esc_html_e( 'Total', 'b-testimonials-block' ); ?></div>
+					</div>
 				</div>
-				<div class="bpbtb-stat-box">
-					<div class="bpbtb-stat-num"><?php echo (int) $approved_num; ?></div>
-					<div class="bpbtb-stat-label"><?php esc_html_e( 'Approved', 'b-testimonials-block' ); ?></div>
-				</div>
-				<div class="bpbtb-stat-box">
-					<div class="bpbtb-stat-num"><?php echo (int) $total_num; ?></div>
-					<div class="bpbtb-stat-label"><?php esc_html_e( 'Total', 'b-testimonials-block' ); ?></div>
-				</div>
+
+				<form method="post" action="">
+					<?php wp_nonce_field( 'bpbtb_bulk_submissions_action', 'bpbtb_bulk_nonce' ); ?>
+
+					<div class="bpbtb-nav-toolbar">
+						<div class="bpbtb-tabs">
+							<?php foreach ( $btb_tabs as $btb_slug => $btb_tab ) : ?>
+								<a
+									href="<?php echo esc_url( admin_url( 'edit.php?post_type=testimonial&page=bpbtb-submissions&status=' . $btb_slug ) ); ?>"
+									class="bpbtb-tab-link<?php echo $btb_slug === $status_filter ? ' is-active' : ''; ?>"
+									style="--accent: <?php echo esc_attr( $btb_tab['accent'] ); ?>;"
+								>
+									<?php echo esc_html( $btb_tab['label'] ); ?>
+									<span class="bpbtb-tab-count"><?php echo (int) $btb_tab['count']; ?></span>
+								</a>
+							<?php endforeach; ?>
+						</div>
+
+						<div class="bpbtb-bulk-wrap">
+							<select name="bpbtb_bulk_action">
+								<option value=""><?php esc_html_e( 'Bulk Actions', 'b-testimonials-block' ); ?></option>
+								<?php if ( 'trash' !== $status_filter ) : ?>
+									<option value="approve"><?php esc_html_e( 'Approve & Publish', 'b-testimonials-block' ); ?></option>
+									<option value="trash"><?php esc_html_e( 'Move to Trash', 'b-testimonials-block' ); ?></option>
+								<?php else : ?>
+									<option value="delete"><?php esc_html_e( 'Delete Permanently', 'b-testimonials-block' ); ?></option>
+								<?php endif; ?>
+							</select>
+							<button type="submit" class="bpbtb-btn is-ghost"><?php esc_html_e( 'Apply', 'b-testimonials-block' ); ?></button>
+						</div>
+					</div>
+
+					<?php // Mirrors the Demos page's line under its toolbar: what the filter above currently adds up to. ?>
+					<p class="bpbtb-count">
+						<?php
+						printf(
+							/* translators: 1: number of submissions on this page, 2: name of the active filter. */
+							esc_html( _n( '%1$s submission in %2$s', '%1$s submissions in %2$s', $btb_shown, 'b-testimonials-block' ) ),
+							'<strong>' . esc_html( number_format_i18n( $btb_shown ) ) . '</strong>',
+							esc_html( $btb_tabs[ $status_filter ]['label'] )
+						);
+						?>
+					</p>
+
+					<div class="bpbtb-modern-table-card">
+						<table class="bpbtb-modern-table">
+							<thead>
+								<tr>
+									<th style="width: 36px;"><input type="checkbox" id="cb-select-all-1"></th>
+									<th style="width: 64px;"><?php esc_html_e( 'Photo', 'b-testimonials-block' ); ?></th>
+									<th><?php esc_html_e( 'Customer', 'b-testimonials-block' ); ?></th>
+									<th style="width: 120px;"><?php esc_html_e( 'Rating', 'b-testimonials-block' ); ?></th>
+									<th><?php esc_html_e( 'Designation / Email', 'b-testimonials-block' ); ?></th>
+									<th><?php esc_html_e( 'Feedback Content', 'b-testimonials-block' ); ?></th>
+									<th style="width: 140px;"><?php esc_html_e( 'Date', 'b-testimonials-block' ); ?></th>
+									<th style="width: 190px; text-align: right;"><?php esc_html_e( 'Actions', 'b-testimonials-block' ); ?></th>
+								</tr>
+							</thead>
+							<tbody>
+								<?php if ( $query->have_posts() ) : ?>
+									<?php
+									while ( $query->have_posts() ) :
+										$query->the_post();
+										$pid          = get_the_ID();
+										$rating       = (float) get_post_meta( $pid, 'bpbtb_rating', true ) ?: 5;
+										$designation  = (string) get_post_meta( $pid, 'bpbtb_designation', true );
+										$company      = (string) get_post_meta( $pid, 'bpbtb_company', true );
+										$email        = (string) get_post_meta( $pid, 'bpbtb_email', true );
+										$thumb_url    = get_the_post_thumbnail_url( $pid, 'thumbnail' );
+										$p_status     = get_post_status( $pid );
+										$action_nonce = wp_create_nonce( 'bpbtb_submission_action_' . $pid );
+										?>
+										<tr>
+											<td class="bpbtb-cell-check">
+												<input type="checkbox" name="post_ids[]" value="<?php echo esc_attr( $pid ); ?>">
+											</td>
+											<td class="bpbtb-cell-photo">
+												<?php if ( $thumb_url ) : ?>
+													<img src="<?php echo esc_url( $thumb_url ); ?>" class="bpbtb-avatar-box" alt="">
+												<?php else : ?>
+													<div class="bpbtb-avatar-placeholder">
+														<?php echo esc_html( strtoupper( substr( get_the_title(), 0, 1 ) ) ); ?>
+													</div>
+												<?php endif; ?>
+											</td>
+											<td class="bpbtb-cell-name">
+												<div class="bpbtb-cell-title">
+													<a href="<?php echo esc_url( get_edit_post_link( $pid ) ); ?>"><?php the_title(); ?></a>
+												</div>
+												<?php if ( 'pending' === $p_status ) : ?>
+													<span class="bpbtb-badge bpbtb-badge-pending"><?php esc_html_e( 'Pending Review', 'b-testimonials-block' ); ?></span>
+												<?php elseif ( 'publish' === $p_status ) : ?>
+													<span class="bpbtb-badge bpbtb-badge-approved"><?php esc_html_e( 'Approved', 'b-testimonials-block' ); ?></span>
+												<?php endif; ?>
+											</td>
+											<td data-label="<?php esc_attr_e( 'Rating', 'b-testimonials-block' ); ?>">
+												<div class="bpbtb-stars-wrap">
+													<?php echo esc_html( str_repeat( '★', max( 1, min( 5, $rating ) ) ) ); ?>
+												</div>
+											</td>
+											<?php // No label when the row has neither, so the stacked card skips the cell entirely. ?>
+											<td <?php echo ( $designation || $company || $email ) ? 'data-label="' . esc_attr__( 'Designation / Email', 'b-testimonials-block' ) . '"' : ''; ?>>
+												<?php if ( $designation || $company ) : ?>
+													<div class="bpbtb-cell-strong"><?php echo esc_html( trim( $designation . ( $company ? ' (' . $company . ')' : '' ) ) ); ?></div>
+												<?php endif; ?>
+												<?php if ( $email ) : ?>
+													<div class="bpbtb-cell-sub"><?php echo esc_html( $email ); ?></div>
+												<?php endif; ?>
+											</td>
+											<td data-label="<?php esc_attr_e( 'Feedback Content', 'b-testimonials-block' ); ?>">
+												<div class="bpbtb-cell-body">
+													<?php the_content(); ?>
+												</div>
+											</td>
+											<td data-label="<?php esc_attr_e( 'Date', 'b-testimonials-block' ); ?>" class="bpbtb-cell-meta">
+												<?php echo esc_html( get_the_date( 'M j, Y' ) ); ?>
+												<div class="bpbtb-cell-sub"><?php echo esc_html( get_the_date( 'g:i a' ) ); ?></div>
+											</td>
+											<td data-label="<?php esc_attr_e( 'Actions', 'b-testimonials-block' ); ?>" class="bpbtb-cell-actions">
+												<?php if ( 'publish' !== $p_status && 'trash' !== $p_status ) : ?>
+													<a href="<?php echo esc_url( admin_url( 'edit.php?post_type=testimonial&page=bpbtb-submissions&action=approve&post_id=' . $pid . '&_wpnonce=' . $action_nonce ) ); ?>" class="bpbtb-row-action is-approve">
+														<?php esc_html_e( 'Approve', 'b-testimonials-block' ); ?>
+													</a>
+													<a href="<?php echo esc_url( admin_url( 'edit.php?post_type=testimonial&page=bpbtb-submissions&action=reject&post_id=' . $pid . '&_wpnonce=' . $action_nonce ) ); ?>" class="bpbtb-row-action is-reject">
+														<?php esc_html_e( 'Reject', 'b-testimonials-block' ); ?>
+													</a>
+												<?php elseif ( 'trash' === $p_status ) : ?>
+													<a href="<?php echo esc_url( admin_url( 'edit.php?post_type=testimonial&page=bpbtb-submissions&action=delete&post_id=' . $pid . '&_wpnonce=' . $action_nonce ) ); ?>" class="bpbtb-row-action is-delete">
+														<?php esc_html_e( 'Delete Permanently', 'b-testimonials-block' ); ?>
+													</a>
+												<?php else : ?>
+													<span class="bpbtb-badge bpbtb-badge-approved"><?php esc_html_e( 'Published', 'b-testimonials-block' ); ?></span>
+												<?php endif; ?>
+											</td>
+										</tr>
+									<?php endwhile; ?>
+									<?php wp_reset_postdata(); ?>
+								<?php else : ?>
+									<tr>
+										<td colspan="8">
+											<div class="bpbtb-empty">
+												<span class="dashicons dashicons-testimonial"></span>
+												<h3><?php esc_html_e( 'No customer submissions found.', 'b-testimonials-block' ); ?></h3>
+												<p><?php esc_html_e( 'Submissions received from frontend form blocks will show up here.', 'b-testimonials-block' ); ?></p>
+											</div>
+										</td>
+									</tr>
+								<?php endif; ?>
+							</tbody>
+						</table>
+					</div>
+				</form>
 			</div>
 		</div>
-
-		<?php
-		// phpcs:ignore WordPress.Security.NonceVerification.Recommended
-		if ( isset( $_GET['msg'] ) ) :
-		?>
-			<div class="notice notice-success is-dismissible" style="border-radius: 8px; margin-bottom: 20px;">
-				<p>
-					<?php
-					// phpcs:ignore WordPress.Security.NonceVerification.Recommended
-					$msg = sanitize_key( wp_unslash( $_GET['msg'] ) );
-					if ( 'approved' === $msg ) {
-						esc_html_e( 'Testimonial submission approved and published successfully!', 'b-testimonials-block' );
-					} elseif ( 'rejected' === $msg ) {
-						esc_html_e( 'Submission moved to trash.', 'b-testimonials-block' );
-					} elseif ( 'deleted' === $msg ) {
-						esc_html_e( 'Submission permanently deleted.', 'b-testimonials-block' );
-					} elseif ( 'bulk_updated' === $msg ) {
-						esc_html_e( 'Bulk action completed successfully.', 'b-testimonials-block' );
-					}
-					?>
-				</p>
-			</div>
-		<?php endif; ?>
-
-		<form method="post" action="">
-			<?php wp_nonce_field( 'bpbtb_bulk_submissions_action', 'bpbtb_bulk_nonce' ); ?>
-
-			<!-- Navigation Toolbar -->
-			<div class="bpbtb-nav-toolbar">
-				<div class="bpbtb-tabs">
-					<a href="<?php echo esc_url( admin_url( 'edit.php?post_type=testimonial&page=bpbtb-submissions&status=pending' ) ); ?>" class="bpbtb-tab-link <?php echo 'pending' === $status_filter ? 'is-active' : ''; ?>">
-						<?php esc_html_e( 'Pending Review', 'b-testimonials-block' ); ?>
-						<span class="bpbtb-tab-count"><?php echo (int) $pending_num; ?></span>
-					</a>
-					<a href="<?php echo esc_url( admin_url( 'edit.php?post_type=testimonial&page=bpbtb-submissions&status=publish' ) ); ?>" class="bpbtb-tab-link <?php echo 'publish' === $status_filter ? 'is-active' : ''; ?>">
-						<?php esc_html_e( 'Approved', 'b-testimonials-block' ); ?>
-						<span class="bpbtb-tab-count"><?php echo (int) $approved_num; ?></span>
-					</a>
-					<a href="<?php echo esc_url( admin_url( 'edit.php?post_type=testimonial&page=bpbtb-submissions&status=all' ) ); ?>" class="bpbtb-tab-link <?php echo 'all' === $status_filter ? 'is-active' : ''; ?>">
-						<?php esc_html_e( 'All Submissions', 'b-testimonials-block' ); ?>
-						<span class="bpbtb-tab-count"><?php echo (int) $total_num; ?></span>
-					</a>
-					<a href="<?php echo esc_url( admin_url( 'edit.php?post_type=testimonial&page=bpbtb-submissions&status=trash' ) ); ?>" class="bpbtb-tab-link <?php echo 'trash' === $status_filter ? 'is-active' : ''; ?>">
-						<?php esc_html_e( 'Trash', 'b-testimonials-block' ); ?>
-						<span class="bpbtb-tab-count"><?php echo (int) $trash_num; ?></span>
-					</a>
-				</div>
-
-				<div class="bpbtb-bulk-wrap">
-					<select name="bpbtb_bulk_action" class="bpbtb-bulk-select">
-						<option value=""><?php esc_html_e( 'Bulk Actions', 'b-testimonials-block' ); ?></option>
-						<?php if ( 'trash' !== $status_filter ) : ?>
-							<option value="approve"><?php esc_html_e( 'Approve & Publish', 'b-testimonials-block' ); ?></option>
-							<option value="trash"><?php esc_html_e( 'Move to Trash', 'b-testimonials-block' ); ?></option>
-						<?php else : ?>
-							<option value="delete"><?php esc_html_e( 'Delete Permanently', 'b-testimonials-block' ); ?></option>
-						<?php endif; ?>
-					</select>
-					<button type="submit" class="button bpbtb-apply-btn"><?php esc_html_e( 'Apply', 'b-testimonials-block' ); ?></button>
-				</div>
-			</div>
-
-			<!-- Modern Table Card Container -->
-			<div class="bpbtb-modern-table-card">
-				<table class="bpbtb-modern-table">
-					<thead>
-						<tr>
-							<th style="width: 36px;"><input type="checkbox" id="cb-select-all-1"></th>
-							<th style="width: 64px;"><?php esc_html_e( 'Photo', 'b-testimonials-block' ); ?></th>
-							<th><?php esc_html_e( 'Customer', 'b-testimonials-block' ); ?></th>
-							<th style="width: 120px;"><?php esc_html_e( 'Rating', 'b-testimonials-block' ); ?></th>
-							<th><?php esc_html_e( 'Designation / Email', 'b-testimonials-block' ); ?></th>
-							<th><?php esc_html_e( 'Feedback Content', 'b-testimonials-block' ); ?></th>
-							<th style="width: 140px;"><?php esc_html_e( 'Date', 'b-testimonials-block' ); ?></th>
-							<th style="width: 170px; text-align: right;"><?php esc_html_e( 'Actions', 'b-testimonials-block' ); ?></th>
-						</tr>
-					</thead>
-					<tbody>
-						<?php if ( $query->have_posts() ) : ?>
-							<?php while ( $query->have_posts() ) : $query->the_post();
-								$pid          = get_the_ID();
-								$rating       = (int) get_post_meta( $pid, 'bpbtb_rating', true ) ?: 5;
-								$designation  = (string) get_post_meta( $pid, 'bpbtb_designation', true );
-								$company      = (string) get_post_meta( $pid, 'bpbtb_company', true );
-								$email        = (string) get_post_meta( $pid, 'bpbtb_email', true );
-								$thumb_url    = get_the_post_thumbnail_url( $pid, 'thumbnail' );
-								$p_status     = get_post_status( $pid );
-								$action_nonce = wp_create_nonce( 'bpbtb_submission_action_' . $pid );
-								?>
-								<tr>
-									<td>
-										<input type="checkbox" name="post_ids[]" value="<?php echo esc_attr( $pid ); ?>">
-									</td>
-									<td>
-										<?php if ( $thumb_url ) : ?>
-											<img src="<?php echo esc_url( $thumb_url ); ?>" class="bpbtb-avatar-box" alt="">
-										<?php else : ?>
-											<div class="bpbtb-avatar-placeholder">
-												<?php echo esc_html( strtoupper( substr( get_the_title(), 0, 1 ) ) ); ?>
-											</div>
-										<?php endif; ?>
-									</td>
-									<td>
-										<div style="font-weight: 700; color: #0f172a; font-size: 14px;">
-											<a href="<?php echo esc_url( get_edit_post_link( $pid ) ); ?>" style="text-decoration: none; color: #0f172a;"><?php the_title(); ?></a>
-										</div>
-										<?php if ( 'pending' === $p_status ) : ?>
-											<span class="bpbtb-badge-pending"><?php esc_html_e( 'Pending Review', 'b-testimonials-block' ); ?></span>
-										<?php elseif ( 'publish' === $p_status ) : ?>
-											<span class="bpbtb-badge-approved"><?php esc_html_e( 'Approved', 'b-testimonials-block' ); ?></span>
-										<?php endif; ?>
-									</td>
-									<td>
-										<div class="bpbtb-stars-wrap">
-											<?php echo esc_html( str_repeat( '★', max( 1, min( 5, $rating ) ) ) ); ?>
-										</div>
-									</td>
-									<td>
-										<?php if ( $designation || $company ) : ?>
-											<div style="font-weight: 600; color: #334155;"><?php echo esc_html( trim( $designation . ( $company ? ' (' . $company . ')' : '' ) ) ); ?></div>
-										<?php endif; ?>
-										<?php if ( $email ) : ?>
-											<div style="font-size: 12px; color: #64748b; margin-top: 2px;"><?php echo esc_html( $email ); ?></div>
-										<?php endif; ?>
-									</td>
-									<td>
-										<div style="max-height: 75px; overflow: hidden; color: #475569; line-height: 1.45;">
-											<?php the_content(); ?>
-										</div>
-									</td>
-									<td style="color: #64748b; font-size: 12px;">
-										<?php echo esc_html( get_the_date( 'M j, Y' ) ); ?>
-										<div style="font-size: 11px; color: #94a3b8;"><?php echo esc_html( get_the_date( 'g:i a' ) ); ?></div>
-									</td>
-									<td style="text-align: right;">
-										<?php if ( 'publish' !== $p_status && 'trash' !== $p_status ) : ?>
-											<a href="<?php echo esc_url( admin_url( 'edit.php?post_type=testimonial&page=bpbtb-submissions&action=approve&post_id=' . $pid . '&_wpnonce=' . $action_nonce ) ); ?>" class="bpbtb-action-approve">
-												✓ <?php esc_html_e( 'Approve', 'b-testimonials-block' ); ?>
-											</a>
-											<a href="<?php echo esc_url( admin_url( 'edit.php?post_type=testimonial&page=bpbtb-submissions&action=reject&post_id=' . $pid . '&_wpnonce=' . $action_nonce ) ); ?>" class="bpbtb-action-reject">
-												&times; <?php esc_html_e( 'Reject', 'b-testimonials-block' ); ?>
-											</a>
-										<?php elseif ( 'trash' === $p_status ) : ?>
-											<a href="<?php echo esc_url( admin_url( 'edit.php?post_type=testimonial&page=bpbtb-submissions&action=delete&post_id=' . $pid . '&_wpnonce=' . $action_nonce ) ); ?>" class="bpbtb-action-delete">
-												<?php esc_html_e( 'Delete Permanently', 'b-testimonials-block' ); ?>
-											</a>
-										<?php else : ?>
-											<span class="bpbtb-badge-approved"><?php esc_html_e( '✓ Published', 'b-testimonials-block' ); ?></span>
-										<?php endif; ?>
-									</td>
-								</tr>
-							<?php endwhile; ?>
-							<?php wp_reset_postdata(); ?>
-						<?php else : ?>
-							<tr>
-								<td colspan="8" style="padding: 40px; text-align: center; color: #64748b;">
-									<div className="dashicons dashicons-testimonial" style="font-size: 36px; width: 36px; height: 36px; color: #cbd5e1; margin-bottom: 8px;"></div>
-									<div style="font-size: 15px; font-weight: 600; color: #334155;"><?php esc_html_e( 'No customer submissions found.', 'b-testimonials-block' ); ?></div>
-									<div style="font-size: 13px; color: #94a3b8; margin-top: 4px;"><?php esc_html_e( 'Submissions received from frontend form blocks will show up here.', 'b-testimonials-block' ); ?></div>
-								</td>
-							</tr>
-						<?php endif; ?>
-					</tbody>
-				</table>
-			</div>
-		</form>
 	</div>
 	<?php
 }

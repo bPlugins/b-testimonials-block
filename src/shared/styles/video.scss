@@ -1,3 +1,8 @@
+@use './devices' as *;
+// This block registers its own editor, so it does not get frontend.scss the way
+// the shared Edit does -- without this a picked icon has no sizing, fill or
+// stroke in the editor preview while looking right on the published page.
+@use './custom-icon' as *;
 .bVideoTestimonials {
 	* {
 		box-sizing: border-box;
@@ -7,6 +12,12 @@
 		display: grid;
 		gap: var(--row-gap, 30px) var(--col-gap, 30px);
 		grid-template-columns: repeat(var(--cols-d, 3), 1fr);
+		// Full width, and flush left, until fewer videos than columns leaves a
+		// gap for these to close and Layout.js hands the alignment a box worth
+		// moving -- see the comment on videoGridVars there.
+		width: var(--grid-width-d, 100%);
+		margin-left: var(--grid-margin-left, 0);
+		margin-right: var(--grid-margin-right, auto);
 	}
 
 	.video-frame {
@@ -57,7 +68,7 @@
 		width: 62px;
 		height: 62px;
 		border-radius: 50%;
-		background: #fff;
+		background: var(--btb-surface, #fff);
 		display: flex;
 		align-items: center;
 		justify-content: center;
@@ -81,19 +92,21 @@
 		.deg {
 			margin: 2px 0 0;
 			font-size: 14px;
-			color: #7b7b7b;
+			color: var(--btb-muted, #7b7b7b);
 		}
 	}
 
-	@media ( max-width: 768px ) {
+	@media ( max-width: $tablet-max ) {
 		.videos-grid {
 			grid-template-columns: repeat(var(--cols-t, 2), 1fr);
+			width: var(--grid-width-t, 100%);
 		}
 	}
 
-	@media ( max-width: 576px ) {
+	@media ( max-width: $mobile-max ) {
 		.videos-grid {
 			grid-template-columns: repeat(var(--cols-m, 1), 1fr);
+			width: var(--grid-width-m, 100%);
 		}
 	}
 }

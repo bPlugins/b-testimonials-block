@@ -85,6 +85,36 @@ export const ARRANGEABLE_LAYOUTS = [
 export const supportsArrangement = (layout) =>
   ARRANGEABLE_LAYOUTS.includes(layout);
 
+// Arrangements that stack cards down the page. A slider or marquee already
+// moves through its cards, so a "Show more" button has nothing to add there.
+const SHOW_MORE_ARRANGEMENTS = ["default", "list", "masonry"];
+
+// Layouts with their own renderer that still draw every item in a stack.
+const SHOW_MORE_LAYOUTS = [
+  "testimonials-timeline",
+  "audio-testimonials",
+  "video-testimonials",
+];
+
+/**
+ * Can this block show its first few cards with a "Show more" button?
+ *
+ * @param {Object} attributes Block attributes.
+ * @return {boolean}
+ */
+export const supportsShowMore = (attributes = {}) => {
+  const layout = attributes.layout || "default";
+
+  if (SHOW_MORE_LAYOUTS.includes(layout)) {
+    return true;
+  }
+
+  return (
+    supportsArrangement(layout) &&
+    SHOW_MORE_ARRANGEMENTS.includes(resolveArrangement(attributes))
+  );
+};
+
 /**
  * The arrangement to render.
  *

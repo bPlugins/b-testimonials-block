@@ -77,7 +77,7 @@ class BPBTB_Source_Health {
 
 		$out = [];
 
-		foreach ( BPBTB_Review_Sources::platforms() as $slug => $platform ) {
+		foreach ( BPBTB_Review_Sources::active_platforms() as $slug => $platform ) {
 			// Not set up is not a fault. See the note at the top.
 			if ( ! BPBTB_Review_Sources::is_connected( $slug ) ) {
 				continue;
@@ -394,7 +394,7 @@ class BPBTB_Source_Health {
 			}
 
 			$any = false;
-			foreach ( array_keys( BPBTB_Review_Sources::platforms() ) as $slug ) {
+			foreach ( array_keys( BPBTB_Review_Sources::active_platforms() ) as $slug ) {
 				if ( BPBTB_Review_Sources::is_connected( $slug ) && BPBTB_Review_Sources::is_live_source( $slug ) ) {
 					$any = true;
 					break;

@@ -252,6 +252,10 @@
 		"avatarRingColor": {
 			"type": "string"
 		},
+		"avatarCircle": {
+			"type": "object",
+			"default": {}
+		},
 		"image": {
 			"type": "object",
 			"default": {

@@ -10,10 +10,10 @@ const Default = ({ item = {}, index, itemEls = {}, attributes = {}, activeIndex,
     const { starIconColor } = attributes || {};
     const { img = {}, reviewText = '', rating = 5 } = item || {};
 
-    return <div className={`single ${isBackend && index === activeIndex ? "btbNowEditing" : ""}`} {...editorClickable(isBackend, () => setActiveIndex(index))}>
+    return <div className={`single ${isBackend && index === activeIndex ? "btbNowEditing" : ""}`} {...editorClickable(isBackend, () => setActiveIndex?.(index))}>
 
         <div className="top">
-            <Image attributes={attributes} img={img}>{itemEls?.img}</Image>
+            <Image attributes={attributes} img={img} name={item?.name}>{itemEls?.img}</Image>
 
             <div className='info'>
                 {itemEls?.name}

@@ -7,10 +7,15 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 $is_classic = ! empty( $attributes['useClassicEditor'] ) || ! empty( $attributes['isLegacyBlock'] );
 
-$btb_inner_content = '';
-if ( ! empty( $content ) ) {
-	$btb_inner_content = trim( preg_replace( '/^<div[^>]*>(.*)<\/div>$/ss', '$1', trim( $content ) ) );
-}
+/*
+ * A real child layout block renders as a data-attributes container for its
+ * own JS to hydrate (see view.js), so it has no HTML between its own opening
+ * and closing tags -- stripping the outer tag and checking what is left
+ * inside it, as this used to do, reads every real child as "no child chosen"
+ * and falls through to the legacy single-testimonial default below. Whether
+ * $content exists at all already answers "was a child block rendered".
+ */
+$btb_inner_content = trim( (string) $content );
 
 if ( ! $is_classic ) {
 	// A child block was chosen -- render it and nothing else.
@@ -20,19 +25,18 @@ if ( ! $is_classic ) {
 	}
 
 	/*
-	 * No child block, and classic mode was never chosen. This is the state where
-	 * the editor shows the "Select Your Testimonial Block" picker, which is an
-	 * authoring affordance with nothing to publish behind it. Without this guard
-	 * the block falls through below and the front end renders the placeholder
-	 * demo testimonial ("John Doe") that the user never asked for.
+	 * No child block, and this is still the untouched block.json default: the
+	 * fresh "John Doe" example item, on the default theme, layout and data
+	 * source. This is the state where the editor shows the "Select Your
+	 * Testimonial Block" picker, an authoring affordance with nothing to
+	 * publish behind it -- without this guard the block falls through below
+	 * and the front end renders that placeholder demo testimonial.
 	 *
-	 * The test mirrors Edit.js exactly so that anything showing the picker in the
-	 * editor renders nothing publicly -- and, just as important, so a legacy block
-	 * that predates the child-block system and holds real testimonials still
-	 * renders.
+	 * A block that has moved past this -- real manual items, or a data source
+	 * other than "manual" such as the `[testimonial id=N]` shortcode's `cpt`
+	 * query, which renders through this same wrapper with no child block at
+	 * all -- is not fresh, so it falls through to render its real content.
 	 */
-	$btb_classic_off = isset( $attributes['useClassicEditor'] ) && false === $attributes['useClassicEditor'];
-
 	$btb_items = ( isset( $attributes['items'] ) && is_array( $attributes['items'] ) ) ? $attributes['items'] : array();
 	$btb_item  = ( 1 === count( $btb_items ) && is_array( $btb_items[0] ) ) ? $btb_items[0] : null;
 
@@ -46,7 +50,7 @@ if ( ! $is_classic ) {
 		&& in_array( $attributes['layout'] ?? 'default', array( '', 'default' ), true )
 		&& in_array( $attributes['dataSource'] ?? 'manual', array( '', 'manual' ), true );
 
-	if ( $btb_classic_off || $btb_is_fresh_block ) {
+	if ( $btb_is_fresh_block ) {
 		return;
 	}
 }

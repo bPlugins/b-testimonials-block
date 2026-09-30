@@ -169,6 +169,39 @@ class BPBTB_Review_Sources {
 	}
 
 	/**
+	 * Platforms currently offered on the Review Sources screen.
+	 *
+	 * Trustpilot, G2 and Capterra are hidden for now: Trustpilot and G2 gate
+	 * their API behind a paid plan or add-on, and Capterra has no rating API at
+	 * all, so none of them can be read live. Their badges still work from the
+	 * figures typed into each block's own inspector (Manual). Their definitions
+	 * and any stored settings are kept, so adding a slug back here is all it
+	 * takes to bring one back.
+	 *
+	 * Mirror of LIVE_PLATFORMS in src/shared/utils/reviewSources.js.
+	 */
+	const ACTIVE_PLATFORMS = [ 'google', 'facebook' ];
+
+	/**
+	 * Is this platform offered on the Review Sources screen right now?
+	 *
+	 * @param string $platform Platform slug.
+	 * @return bool
+	 */
+	public static function is_active( $platform ) {
+		return in_array( $platform, self::ACTIVE_PLATFORMS, true ) && self::is_platform( $platform );
+	}
+
+	/**
+	 * The platforms() subset that is currently offered.
+	 *
+	 * @return array
+	 */
+	public static function active_platforms() {
+		return array_intersect_key( self::platforms(), array_flip( self::ACTIVE_PLATFORMS ) );
+	}
+
+	/**
 	 * The embed snippet entered for a platform that supports one.
 	 *
 	 * Independent of is_connected()/is_live_source() on purpose: the whole
@@ -250,7 +283,7 @@ class BPBTB_Review_Sources {
 					],
 					'embed_code' => [
 						'label' => __( 'TrustBox embed code (optional)', 'b-testimonials-block' ),
-						'help'  => __( 'Paste a TrustBox snippet from your Trustpilot Business account (Widgets → TrustBox). A block set to "Official embed widget" shows this instead of the badge above, and needs no API key. The standard TrustBox snippet — a <div> plus a <script src="..."> that loads Trustpilot\'s own bootstrap file — works as-is; a snippet with JavaScript written directly between <script> tags may be altered on save.', 'b-testimonials-block' ),
+						'help'  => __( 'Paste a TrustBox snippet from your Trustpilot Business account (Share and promote, then All Widgets, then Get Code on any widget). A block set to "Official embed widget" shows this instead of the badge above, and needs no API key. The standard TrustBox snippet, a div plus a script tag that loads Trustpilot\'s own bootstrap file, works as-is. A snippet with JavaScript written directly between script tags may be altered on save.', 'b-testimonials-block' ),
 						'type'  => 'textarea',
 					],
 				],
@@ -292,7 +325,7 @@ class BPBTB_Review_Sources {
 					],
 					'embed_code' => [
 						'label' => __( 'G2 Badge embed code (optional)', 'b-testimonials-block' ),
-						'help'  => __( 'Paste the embed code from your G2 profile (Manage → Badges → Embed). A block set to "Official embed widget" shows this instead of the badge above, and needs no API token. G2\'s standard badge — a linked image, with no inline JavaScript — works as-is.', 'b-testimonials-block' ),
+						'help'  => __( 'Paste the embed code from your G2 profile (my.G2, then Marketing Content, then G2 Badges). A block set to "Official embed widget" shows this instead of the badge above, and needs no API token. G2\'s standard badge, a linked image with no inline JavaScript, works as-is.', 'b-testimonials-block' ),
 						'type'  => 'textarea',
 					],
 				],
@@ -546,7 +579,9 @@ class BPBTB_Review_Sources {
 	 * }
 	 */
 	public static function get_data( $platform, $force = false ) {
-		if ( ! self::is_platform( $platform ) ) {
+		// A hidden platform is never fetched, so a token still stored for it
+		// does not keep spending API calls nobody can see the result of.
+		if ( ! self::is_active( $platform ) ) {
 			return self::blank();
 		}
 
@@ -1689,7 +1724,7 @@ class BPBTB_Review_Sources {
 	 * heartbeat rather than a fetch rate.
 	 */
 	public static function refresh_stale() {
-		foreach ( array_keys( self::platforms() ) as $platform ) {
+		foreach ( array_keys( self::active_platforms() ) as $platform ) {
 			if ( self::is_connected( $platform ) ) {
 				// Not forced -- get_data() decides whether this one is due, and
 				// wp_doing_cron() is what puts it on the blocking path.
@@ -1703,7 +1738,7 @@ class BPBTB_Review_Sources {
 	 */
 	public static function maybe_schedule() {
 		$connected = false;
-		foreach ( array_keys( self::platforms() ) as $platform ) {
+		foreach ( array_keys( self::active_platforms() ) as $platform ) {
 			if ( self::is_connected( $platform ) ) {
 				$connected = true;
 				break;
@@ -1880,6 +1915,19 @@ function bpbtb_apply_live_review_data( $attributes ) {
 		return $attributes;
 	}
 
+	// A platform hidden from Review Sources has no site-wide figure to read, so
+	// the block runs on its own inspector fields. Mirror of withEffectiveSource()
+	// in src/shared/utils/reviewSources.js, so the page matches the canvas.
+	if ( ! BPBTB_Review_Sources::is_active( $platform ) ) {
+		if ( BPBTB_Review_Sources::GENERIC_LAYOUT === ( $attributes['layout'] ?? '' ) ) {
+			$attributes['ratingPlatform'] = '';
+		} else {
+			$attributes['ratingSource'] = 'manual';
+		}
+
+		return $attributes;
+	}
+
 	// Independent of is_connected() below: the embed code needs no API
 	// credentials at all, so a site using only that mode must not be treated
 	// as "not connected" just because it never set up an API token.
@@ -1969,7 +2017,7 @@ if ( ! function_exists( 'bpbtb_rest_review_sources' ) ) {
 function bpbtb_rest_review_sources() {
 	$out = [];
 
-	foreach ( array_keys( BPBTB_Review_Sources::platforms() ) as $platform ) {
+	foreach ( array_keys( BPBTB_Review_Sources::active_platforms() ) as $platform ) {
 		$out[ $platform ] = BPBTB_Review_Sources::get_public_state( $platform );
 	}
 
@@ -1990,11 +2038,11 @@ if ( ! function_exists( 'bpbtb_rest_review_source' ) ) {
 function bpbtb_rest_review_source( $request ) {
 	$platform = sanitize_key( $request['platform'] );
 
-	if ( ! BPBTB_Review_Sources::is_platform( $platform ) ) {
+	if ( ! BPBTB_Review_Sources::is_active( $platform ) ) {
 		return new WP_Error( 'bpbtb_unknown_platform', __( 'Unknown review platform.', 'b-testimonials-block' ), [ 'status' => 404 ] );
 	}
 
-	$force = (bool) $request->get_param( 'refresh' ) && current_user_can( 'manage_options' );
+	$force =(bool) $request->get_param( 'refresh' ) && current_user_can( 'manage_options' );
 
 	return rest_ensure_response( BPBTB_Review_Sources::get_public_state( $platform, $force ) );
 }

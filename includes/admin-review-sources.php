@@ -144,6 +144,13 @@ function bpbtb_handle_review_sources_actions() {
 	];
 
 	foreach ( $platforms as $slug => $platform ) {
+		// A hidden platform has no fields in the form, so an empty POST would
+		// wipe what is stored for it. Carry it over untouched instead.
+		if ( ! BPBTB_Review_Sources::is_active( $slug ) ) {
+			$saved[ $slug ] = $existing[ $slug ];
+			continue;
+		}
+
 		$saved[ $slug ] = [];
 
 		foreach ( $platform['fields'] as $key => $field ) {
@@ -215,7 +222,7 @@ function bpbtb_handle_review_sources_actions() {
 	if ( isset( $_POST['bpbtb_test_review_source'] ) ) {
 		$platform = sanitize_key( wp_unslash( $_POST['bpbtb_test_review_source'] ) );
 
-		if ( BPBTB_Review_Sources::is_platform( $platform ) ) {
+		if ( BPBTB_Review_Sources::is_active( $platform ) ) {
 			$result = BPBTB_Review_Sources::get_data( $platform, true );
 
 			/*
@@ -272,11 +279,11 @@ function bpbtb_render_review_sources_page() {
 		return;
 	}
 
-	$platforms = BPBTB_Review_Sources::platforms();
+	$platforms = BPBTB_Review_Sources::active_platforms();
 	$settings  = BPBTB_Review_Sources::get_settings();
 
 	// phpcs:ignore WordPress.Security.NonceVerification.Recommended
-	$msg = isset( $_GET['msg'] ) ? sanitize_key( wp_unslash( $_GET['msg'] ) ) : '';
+	$msg =isset( $_GET['msg'] ) ? sanitize_key( wp_unslash( $_GET['msg'] ) ) : '';
 	// phpcs:ignore WordPress.Security.NonceVerification.Recommended
 	$tested = isset( $_GET['tested'] ) ? sanitize_key( wp_unslash( $_GET['tested'] ) ) : '';
 	?>
@@ -301,7 +308,7 @@ function bpbtb_render_review_sources_page() {
 					<span class="bpbtb-eyebrow"><?php esc_html_e( 'Live Data', 'b-testimonials-block' ); ?></span>
 					<h1><?php esc_html_e( 'Review Sources', 'b-testimonials-block' ); ?></h1>
 					<p>
-						<?php esc_html_e( 'Set a platform up once here and every badge for it on the site shows that figure, instead of a number typed into each block. Google, Facebook, Trustpilot and G2 are read from their official APIs and refresh themselves. Capterra has no public API and blocks automated reads, so its rating is entered below — still once for the whole site. A badge whose platform is not set up keeps showing exactly what it shows today.', 'b-testimonials-block' ); ?>
+						<?php esc_html_e( 'Set a platform up once here and every badge for it on the site shows that figure, instead of a number typed into each block. Google and Facebook are read from their official APIs and refresh themselves. Trustpilot, G2 and Capterra badges use the rating and reviews typed into each block. A badge whose platform is not set up keeps showing exactly what it shows today.', 'b-testimonials-block' ); ?>
 					</p>
 				</header>
 
@@ -539,7 +546,7 @@ function bpbtb_render_review_sources_page() {
 				<div class="bpbtb-card">
 					<div class="bpbtb-section-head">
 						<h3><?php esc_html_e( 'Using this in a block', 'b-testimonials-block' ); ?></h3>
-						<p><?php esc_html_e( 'Each badge block has a Rating Source setting in its inspector, set to Live by default. Live uses the figure above for that badge’s platform; Manual uses the score and count typed into that one block. The Review Badge Widget is not tied to one platform, so it also asks which of the five to read.', 'b-testimonials-block' ); ?></p>
+						<p><?php esc_html_e( 'Google and Facebook badges have a Rating Source setting in their inspector, set to Live by default. Live uses the figure above; Manual uses the score and count typed into that one block. Trustpilot, G2 and Capterra badges always use what is typed into the block. The Floating Review Badge is not tied to one platform, so it also asks which one to use.', 'b-testimonials-block' ); ?></p>
 					</div>
 				</div>
 

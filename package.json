@@ -1,6 +1,6 @@
 {
 	"name": "b-testimonials",
-	"version": "1.0.0",
+	"version": "1.0.6",
 	"description": "Boost your website's credibility with B Testimonials Block, effortlessly showcasing customer ratings and reviews.",
 	"license": "GPL-2.0-or-later",
 	"main": "build/index.js",

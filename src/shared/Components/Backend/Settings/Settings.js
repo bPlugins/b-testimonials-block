@@ -1,5 +1,7 @@
-import { __ } from "@wordpress/i18n";
+import { __, _n, sprintf } from "@wordpress/i18n";
 import { InspectorControls, BlockControls } from "@wordpress/block-editor";
+import { useSelect } from "@wordpress/data";
+import { decodeEntities } from "@wordpress/html-entities";
 import {
   PanelBody,
   PanelRow,
@@ -16,6 +18,7 @@ import {
   TextareaControl,
   __experimentalBoxControl as BoxControl,
   ToggleControl,
+  Spinner,
 } from "@wordpress/components";
 import { produce } from "immer";
 
@@ -36,6 +39,12 @@ import PollStylePanel from "./PollStylePanel";
 import PopupModalPanel from "./PopupModalPanel";
 import SizeSpacingPanel from "./SizeSpacingPanel";
 import SpeechBubblePanel from "./SpeechBubblePanel";
+import FilterBarPanel from "./FilterBarPanel";
+import SearchBoxPanel from "./SearchBoxPanel";
+import AvatarCircleControls from "./AvatarCircleControls";
+import { AVATAR_CIRCLE_LAYOUTS } from "../../../utils/avatarCircle";
+import ShowMorePanel from "./ShowMorePanel";
+import ShowMoreStylePanel from "./ShowMoreStylePanel";
 import Label from "../../../../../../bpl-tools/Components/Label/Label";
 import { ColorControl } from "../../../../../../bpl-tools/Components/ColorControl/ColorControl";
 import { InlineDetailMediaUpload } from "../../../../../../bpl-tools/Components/MediaControl/MediaControl";
@@ -58,6 +67,7 @@ import {
   rendersReviewText,
   resolveArrangement,
   supportsArrangement,
+  supportsShowMore,
 } from "../../../utils/layoutFeatures";
 import {
   getLayoutControls,
@@ -88,6 +98,10 @@ const Settings = ({
   // preview beside it.
   badgePlatform = "",
   liveReview = {},
+  // From Edit.js, which runs the CPT preview request: { updating, count }, or
+  // null for manual cards. Shown under Content Source so a change made here
+  // is confirmed here, even when the block itself is scrolled out of view.
+  cptStatus = null,
 }) => {
   const {
     columns = { desktop: 3, tablet: 2, mobile: 1 },
@@ -150,6 +164,7 @@ const Settings = ({
     },
     dataSource = "manual",
     showFilter = false,
+    filterStyle = {},
     showSearch = false,
     filterAllLabel = "",
     searchPlaceholder = "",
@@ -158,6 +173,13 @@ const Settings = ({
 
   // See the note on the destructured name above.
   const degDivider = Array.isArray(degDividerRaw) ? {} : degDividerRaw || {};
+
+  // Same PHP round trip can hand the border back as `[]`; the Avatar Circle
+  // controls spread it, so they need a plain object.
+  const imgBorderValue =
+    imgBorder && "object" === typeof imgBorder && !Array.isArray(imgBorder)
+      ? imgBorder
+      : {};
 
   const elements = {
     img: true,
@@ -174,6 +196,45 @@ const Settings = ({
   // while the preview stayed on Desktop, which meant the control was editing a
   // value the canvas was not showing.
   const device = useDeviceKey();
+
+  // Testimonial categories, for pinning a CPT-sourced block to one of them.
+  // Only requested once the block reads from the CPT.
+  const testimonialCategories = useSelect(
+    (select) =>
+      "cpt" === dataSource
+        ? select("core").getEntityRecords("taxonomy", "testimonial_category", {
+            per_page: -1,
+            hide_empty: false,
+            orderby: "name",
+            order: "asc",
+          })
+        : null,
+    [dataSource],
+  );
+  const pinnedCategory = query?.category || "";
+  const categoryOptions = [
+    { label: __("All categories", "b-testimonials-block"), value: "" },
+    ...(testimonialCategories || []).map((term) => ({
+      label: `${decodeEntities(term.name)} (${term.count})`,
+      value: term.slug,
+    })),
+  ];
+  // A saved category that was since deleted or renamed still shows as picked,
+  // so an empty block is explained instead of the select jumping to "All".
+  if (
+    pinnedCategory &&
+    Array.isArray(testimonialCategories) &&
+    !testimonialCategories.some((term) => term.slug === pinnedCategory)
+  ) {
+    categoryOptions.push({
+      label: sprintf(
+        /* translators: %s: category slug */
+        __("%s (not found)", "b-testimonials-block"),
+        pinnedCategory,
+      ),
+      value: pinnedCategory,
+    });
+  }
   const {
     speed: marqueeSpeed = 30,
     direction: marqueeDirection = "left",
@@ -656,6 +717,32 @@ const Settings = ({
 
                       {"cpt" === dataSource && (
                         <>
+                          <SelectControl
+                            label={__("Category", "b-testimonials-block")}
+                            value={pinnedCategory}
+                            options={categoryOptions}
+                            onChange={(val) =>
+                              setAttributes({
+                                query: {
+                                  ...query,
+                                  category: val,
+                                },
+                              })
+                            }
+                            help={
+                              Array.isArray(testimonialCategories) &&
+                              !testimonialCategories.length
+                                ? __(
+                                    "You have no categories yet. Add some under Testimonials > Categories.",
+                                    "b-testimonials-block",
+                                  )
+                                : __(
+                                    "Pick a category to show only its testimonials. The rest are not even loaded on the page.",
+                                    "b-testimonials-block",
+                                  )
+                            }
+                          />
+
                           <RangeControl
                             label={__("Number", "b-testimonials-block")}
                             value={query?.number || 6}
@@ -668,8 +755,12 @@ const Settings = ({
                               })
                             }
                             min={1}
-                            max={50}
+                            max={100}
                             step={1}
+                            help={__(
+                              "This is a maximum. If you have fewer testimonials than this, you just see all of them.",
+                              "b-testimonials-block",
+                            )}
                           />
 
                           <SelectControl
@@ -722,7 +813,55 @@ const Settings = ({
                             }
                           />
 
-                          <p className="description">
+                          {cptStatus && (
+                            <p
+                              className={
+                                "btbCptStatus" +
+                                (cptStatus.updating ? " is-updating" : "")
+                              }
+                              role="status"
+                              aria-live="polite">
+                              {cptStatus.updating ? (
+                                <>
+                                  <Spinner />
+                                  {__(
+                                    "Updating the preview",
+                                    "b-testimonials-block",
+                                  )}
+                                </>
+                              ) : !cptStatus.count ? (
+                                __(
+                                  "No testimonials match these settings.",
+                                  "b-testimonials-block",
+                                )
+                              ) : cptStatus.count < (query?.number || 6) ? (
+                                sprintf(
+                                  /* translators: 1: testimonials found, 2: the Number setting */
+                                  _n(
+                                    "Found %1$d testimonial, which is all there is. Number allows up to %2$d.",
+                                    "Found %1$d testimonials, which is all there is. Number allows up to %2$d.",
+                                    cptStatus.count,
+                                    "b-testimonials-block",
+                                  ),
+                                  cptStatus.count,
+                                  query?.number || 6,
+                                )
+                              ) : (
+                                sprintf(
+                                  /* translators: %d: testimonials shown */
+                                  _n(
+                                    "Showing %d testimonial.",
+                                    "Showing %d testimonials.",
+                                    cptStatus.count,
+                                    "b-testimonials-block",
+                                  ),
+                                  cptStatus.count,
+                                )
+                              )}
+                            </p>
+                          )}
+
+                          <p className="btbHint">
                             {__(
                               "Manage testimonials under the Testimonials menu.",
                               "b-testimonials-block",
@@ -787,15 +926,24 @@ const Settings = ({
                       )}
 
                       {showFilter && "cpt" !== dataSource && (
-                        <p className="description">
+                        <p className="btbHint">
                           {__(
-                            "Categories come from the Testimonials post type. Switch Content Source to Testimonials (CPT) and put your testimonials in categories for the buttons to appear.",
+                            "No buttons will show until your testimonials are in categories. Switch Content Source to Testimonials (CPT), then assign them first.",
                             "b-testimonials-block",
                           )}
                         </p>
                       )}
                     </PanelBody>
                   )}
+
+                  {"undefined" !== typeof attributes.showMore &&
+                    supportsShowMore(attributes) && (
+                      <ShowMorePanel
+                        showMore={attributes.showMore}
+                        dataSource={dataSource}
+                        setAttributes={setAttributes}
+                      />
+                    )}
 
                   {/* Context-aware Widget / Badge / Custom Block Settings */}
                   {(() => {
@@ -2859,6 +3007,33 @@ const Settings = ({
                     isQuoteDisplay={isQuoteDisplay}
                   />
 
+                  {"undefined" !== typeof attributes.showFilter &&
+                    showFilter && (
+                      <FilterBarPanel
+                        filterStyle={filterStyle}
+                        showFilter={showFilter}
+                        showSearch={showSearch}
+                        setAttributes={setAttributes}
+                      />
+                    )}
+
+                  {"undefined" !== typeof attributes.showSearch &&
+                    showSearch && (
+                      <SearchBoxPanel
+                        filterStyle={filterStyle}
+                        showSpacing={!showFilter}
+                        setAttributes={setAttributes}
+                      />
+                    )}
+
+                  {!!attributes.showMore?.enabled &&
+                    supportsShowMore(attributes) && (
+                      <ShowMoreStylePanel
+                        showMore={attributes.showMore}
+                        setAttributes={setAttributes}
+                      />
+                    )}
+
                   {/* The poll is the layout `layoutControls.js` gives an empty
                       entry -- no shared panel below reaches it -- so every size
                       it renders was fixed in the stylesheet with nothing in the
@@ -3193,17 +3368,89 @@ const Settings = ({
                           would repaint rings those layouts define themselves
                           (the avatar list's `--btb-border` ring, the toast's
                           circle). Hidden there rather than half-working. */}
+                      {!controls.imageBorder &&
+                        AVATAR_CIRCLE_LAYOUTS[layout] &&
+                        "undefined" !== typeof attributes.avatarCircle && (
+                          <AvatarCircleControls
+                            layout={layout}
+                            avatarCircle={attributes.avatarCircle}
+                            setAttributes={setAttributes}
+                          />
+                        )}
+
+                      {/* The circle around the photo is two things: a thin
+                          border line (imgBorder) and a softer ring outside it
+                          (avatarRing). The only way to reach the line used to
+                          be the pencil icon of BorderControl, which people
+                          did not spot, so its width and colour get plain
+                          controls here. Both write the same imgBorder object
+                          the pencil does, so the two always agree. */}
                       {controls.imageBorder && (
-                        <BorderControl
-                          className=""
-                          label={__("Border", "b-testimonials-block")}
-                          value={imgBorder}
-                          onChange={(val) =>
-                            setAttributes({
-                              imgBorder: val,
-                            })
-                          }
-                        />
+                        <>
+                          <p className="btbPanelHeading">
+                            <strong>
+                              {__("Avatar Circle", "b-testimonials-block")}
+                            </strong>
+                          </p>
+
+                          <RangeControl
+                            label={__("Circle Line Width (px)", "b-testimonials-block")}
+                            value={parseInt(imgBorderValue.width, 10) || 0}
+                            onChange={(val) =>
+                              setAttributes({
+                                imgBorder: {
+                                  ...imgBorderValue,
+                                  width: `${val || 0}px`,
+                                  style: imgBorderValue.style || "solid",
+                                },
+                              })
+                            }
+                            min={0}
+                            max={10}
+                            step={1}
+                            help={__(
+                              "The thin line right around the photo. Set it to 0 to hide it.",
+                              "b-testimonials-block",
+                            )}
+                          />
+
+                          <ColorControl
+                            className="mb10"
+                            label={__("Circle Line Color", "b-testimonials-block")}
+                            value={imgBorderValue.color || ""}
+                            onChange={(val) =>
+                              setAttributes({
+                                imgBorder: {
+                                  ...imgBorderValue,
+                                  color: val,
+                                  style: imgBorderValue.style || "solid",
+                                  // A colour with no width draws nothing.
+                                  width:
+                                    parseInt(imgBorderValue.width, 10) > 0
+                                      ? imgBorderValue.width
+                                      : "1px",
+                                },
+                              })
+                            }
+                          />
+
+                          <BorderControl
+                            className=""
+                            label={__("More border options", "b-testimonials-block")}
+                            value={imgBorder}
+                            onChange={(val) =>
+                              setAttributes({
+                                imgBorder: val,
+                              })
+                            }
+                          />
+                          <p className="btbHint">
+                            {__(
+                              "Click the pencil for the line style and the corners. Lower the corner radius for a square photo.",
+                              "b-testimonials-block",
+                            )}
+                          </p>
+                        </>
                       )}
                       {/* The tinted halo outside the border above.
                           It is a `box-shadow`, not a border -- the Border control
@@ -3221,7 +3468,7 @@ const Settings = ({
                               setAttributes({ avatarRing: val })
                             }
                             help={__(
-                              "A soft halo just outside the avatar's border.",
+                              "The wider, softer circle outside the line. Turn it off for a plain photo.",
                               "b-testimonials-block",
                             )}
                           />
@@ -3245,13 +3492,19 @@ const Settings = ({
                               {/* Empty follows the Accent colour at the alpha it
                                   ships with, which is what it has always done. */}
                               <ColorControl
-                                className="mt10 mb10"
+                                className="mt10"
                                 label={__("Ring Color", "b-testimonials-block")}
                                 value={attributes.avatarRingColor}
                                 onChange={(val) =>
                                   setAttributes({ avatarRingColor: val })
                                 }
                               />
+                              <p className="btbHint">
+                                {__(
+                                  "No color picked? The ring uses a light tint of your accent color.",
+                                  "b-testimonials-block",
+                                )}
+                              </p>
                             </>
                           )}
                         </>

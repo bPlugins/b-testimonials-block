@@ -1,9 +1,11 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
+import { __, sprintf } from "@wordpress/i18n";
 
 import Style from "./Style";
 import Layout from "./Layout/Layout";
 import ExpandButton from "./ExpandButton";
 import TestimonialFilter from "./TestimonialFilter";
+import { supportsShowMore } from "../../utils/layoutFeatures";
 
 /**
  * Read-only rendering of a testimonials block, shared by the front end
@@ -138,7 +140,27 @@ const TestimonialsView = ({
     });
   }, [allItems, activeCat, search, showFilter, showSearch]);
 
-  const itemsEls = items.map((item) => {
+  // "Show more": the first few of whatever the filter and search left, then a
+  // batch per click. It trims the list after filtering, so the category
+  // buttons and search still see every testimonial the block holds.
+  const showMore =
+    attributes?.showMore && "object" === typeof attributes.showMore
+      ? attributes.showMore
+      : {};
+  const moreOn = !!showMore.enabled && supportsShowMore(attributes);
+  const firstCount = Math.max(1, parseInt(showMore.initial, 10) || 6);
+  const stepCount = Math.max(1, parseInt(showMore.step, 10) || firstCount);
+  const [visible, setVisible] = useState(firstCount);
+
+  // A new filter, search or setting starts again from the first batch.
+  useEffect(() => {
+    setVisible(firstCount);
+  }, [firstCount, activeCat, search]);
+
+  const shownItems = moreOn ? items.slice(0, visible) : items;
+  const hasMore = moreOn && items.length > shownItems.length;
+
+  const itemsEls = shownItems.map((item) => {
     const { name, deg, reviewText } = item;
 
     return {
@@ -185,11 +207,33 @@ const TestimonialsView = ({
             attributes as well -- passing only itemsEls would draw the filtered
             text into the unfiltered cards. */}
         <Layout
-          attributes={{ ...attributes, items }}
+          attributes={{ ...attributes, items: shownItems }}
           itemsEls={itemsEls}
           isBackend={isBackend}
           previewDevice={previewDevice}
         />
+
+        {hasMore && (
+          <div className="btb-show-more-wrap">
+            <button
+              type="button"
+              className="btb-show-more"
+              onClick={() => setVisible((count) => count + stepCount)}>
+              {showMore.label || __("Show more", "b-testimonials-block")}
+            </button>
+          </div>
+        )}
+
+        {moreOn && (
+          <p className="screen-reader-text" role="status" aria-live="polite">
+            {sprintf(
+              /* translators: 1: testimonials shown, 2: testimonials in total */
+              __("Showing %1$d of %2$d testimonials", "b-testimonials-block"),
+              shownItems.length,
+              items.length,
+            )}
+          </p>
+        )}
       </div>
     </>
   );

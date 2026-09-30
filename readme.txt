@@ -4,7 +4,7 @@ Donate link: https://www.buymeacoffee.com/abuhayat
 Tags: testimonials, reviews, rating, social proof, video testimonials
 Requires at least: 6.5
 Tested up to: 7.1
-Stable tag: 1.0.5
+Stable tag: 1.0.6
 Requires PHP: 7.4
 License: GPLv3 or later
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
@@ -28,7 +28,7 @@ Choose from 40+ testimonial and review layouts, customize the design to match yo
 
 - **Video & Audio Testimonials**: Display video reviews from YouTube, Vimeo, or MP4 files and add audio testimonials with waveform-style players.
 
-- **Social Proof Badges**: Display rating and review badges for Google, Trustpilot, G2, Facebook, Capterra, and verified buyers.
+- **Social Proof Badges**: Show rating badges for Google, Facebook, Trustpilot, G2, Capterra and verified buyers. Google and Facebook can update from your live reviews. The others use the score you type in.
 
 - **Testimonial Form**: Collect customer testimonials directly from your website and review submissions before publishing.
 
@@ -44,13 +44,15 @@ Choose from 40+ testimonial and review layouts, customize the design to match yo
 
 - **SEO Rich Results**: Automatic Schema.org Review and AggregateRating JSON-LD markup, so Google can show star ratings for your pages. No add-on, no configuration.
 
-- **Ready-made Patterns**: Seven full sections — Wall of Love, SaaS hero, e-commerce social proof, agency results, review trust bar, scrolling marquee and a review collection page — insert complete and ready to rewrite.
+- **Ready-made Patterns**: Seven full sections: Wall of Love, SaaS hero, e-commerce social proof, agency results, review trust bar, scrolling marquee and Ask for a Review (a form next to your testimonials). Insert one and rewrite the text.
 
 - **One-Click Migration**: Bring your testimonials across from Strong Testimonials, Real Testimonials, Site Reviews or WooCommerce product reviews. Nothing in the other plugin is changed or removed. CSV import and export too.
 
 - **Import Google & Facebook Reviews**: Pull your real Google reviews and Facebook recommendations in as testimonials and show them in any of the 40+ layouts. Uses the same credentials the rating badges already use.
 
-- **Category Filter & Search**: Let visitors filter testimonials by category or search them by keyword, without reloading the page.
+- **Category Filter & Search**: Let visitors filter testimonials by category or search them by keyword, without reloading the page. You can style the filter buttons and the search box, or pin a block to one category.
+
+- **Show More Button**: Show the first few testimonials and let visitors load more. It works with the filter and the search.
 
 - **Accessible**: Star ratings, filters, toggles and dialogs are keyboard-operable and announced correctly by screen readers.
 
@@ -124,6 +126,14 @@ No. Each imported testimonial remembers where it came from, and rows already imp
 
 The plugin outputs Schema.org Review and AggregateRating JSON-LD automatically, which is what Google reads for rich results. Whether it chooses to show stars is always Google's decision. If another plugin on your site already outputs review markup, turn this one off with `add_filter( 'bpbtb_schema_enabled', '__return_false' );`.
 
+= How do I show only one category in a block? =
+
+Set the block to the Testimonials post type. Under Content Source, pick a category in the Category dropdown. Only testimonials in that category are loaded.
+
+= Can I show a few testimonials and let visitors load more? =
+
+Yes. Open the General tab, find Show More and switch it on. Pick how many show at first and how many each click adds. The button can be styled on the Style tab.
+
 = Is Testimonials Block free to use? =
 
 Yes. Testimonials Block is a free WordPress testimonial plugin with 40+ layouts and blocks for displaying customer testimonials, reviews, ratings, and social proof.
@@ -150,7 +160,7 @@ Yes. You can showcase video testimonials using YouTube, Vimeo, or MP4 videos.
 
 = Can I display customer ratings and review badges? =
 
-Yes. The plugin includes rating summaries and social proof badge blocks for platforms such as Google, Trustpilot, G2, Facebook, and Capterra.
+Yes. There are badge blocks for Google, Facebook, Trustpilot, G2 and Capterra. Google and Facebook can pull live scores. For the others you type in your score.
 
 = Does Testimonials Block work with WordPress themes? =
 
@@ -219,6 +229,8 @@ You can ask questions through the WordPress.org support forum or visit bPlugins 
 
 This plugin's admin screens load two webfonts, Roboto and Lato, from Google Fonts, and the plugin icon shown in its admin header from WordPress.org's own asset host. Both are requested inside wp-admin only, on this plugin's own pages. Neither is used on your public site.
 
+* **Google Places API** (`places.googleapis.com`, `maps.googleapis.com`) - used only if you enter a Google API key and Place ID on the Review Sources screen. Your site sends the key and the Place ID and gets back your public Google rating and reviews. This happens when a Google badge loads its figures, when you press Refresh, and when you import reviews. [Terms](https://cloud.google.com/maps-platform/terms) | [Privacy Policy](https://policies.google.com/privacy)
+* **Facebook Graph API** (`graph.facebook.com`) - used only after you connect a Facebook Page on the Review Sources screen. Your site sends the Page access token and the Page ID and gets back your Page rating and recommendations. This happens when a Facebook badge loads its figures, when you press Refresh, and when you import recommendations. Nothing is sent to Facebook about your visitors. [Privacy Policy](https://www.facebook.com/privacy/policy/)
 * **bPlugins authorisation service** (`api.bplugins.com`) — contacted **only** when you press "Connect with Facebook" on the Review Sources screen, and never otherwise. It performs the Facebook login on your behalf and returns your Page access token to your server. What is sent is a random single-use key generated by your site; what comes back is stored in your own database. No request is made unless you press the button, and removing the connection stops it entirely. [Privacy Policy](https://bplugins.com/privacy-policy/)
 * **Google Fonts** (`fonts.googleapis.com`, `fonts.gstatic.com`) — serves the Roboto and Lato webfonts used by the plugin dashboard, Submissions and Poll screens. The request sends what any web request sends: your IP address, browser and operating system. Nothing about your site, your content or your visitors is sent. [Terms](https://policies.google.com/terms) | [Privacy Policy](https://policies.google.com/privacy)
 * **WordPress.org plugin API** (`api.wordpress.org`) — the **Our Plugins** tab of the plugin dashboard asks WordPress.org for the list of plugins published by bPlugins, so it can show their icons, versions and ratings. The request names bPlugins as the author and sends nothing about your site. [Privacy Policy](https://wordpress.org/about/privacy/)
@@ -287,6 +299,26 @@ Exclude further blocks from contributing reviews:
 `add_filter( 'bpbtb_schema_excluded_blocks', function ( $blocks ) { $blocks[] = 'bptmb/testimonials-hero'; return $blocks; } );`
 
 == Changelog ==
+
+= 1.0.6 - 30 September 2026 =
+**New**
+* Category dropdown under Content Source. You can now pin a block to one category. 1.0.5 said it could do this but the setting was missing.
+* Show More button for the grid, list, masonry, timeline, audio and video layouts. It shows the first few testimonials and each click adds more. It works with the filter and the search.
+* Show More Button style panel: colors, hover colors, font size, roundness, border, width, spacing and alignment.
+* Filter bar buttons now have 20 style options instead of 6. This includes Normal, Hover and Selected colors, text, shape, layout and spacing.
+* Search box has its own Style panel: colors, placeholder color, font size, padding, border, roundness, width and position.
+* A testimonial with no photo now shows a circle with the first letter of the name, instead of a broken image.
+
+**Fixed**
+* The editor always showed five stars on every testimonial. It now shows the real rating, and the designation and company as well.
+* The black outline around the search box when you click it is gone. The border turns the accent color instead.
+
+**Improved**
+* Changing Category, Number, Order By or Order in the editor now shows an "Updating preview" label and a status line, so you can tell it is working.
+* The Number slider waits until you stop dragging before it loads testimonials.
+* The Slug and Custom Fields boxes are removed from the testimonial screen. Nothing used them.
+* Trustpilot, G2 and Capterra are hidden from the Review Sources page for now, because their data cannot be read on a free plan. Those blocks still work with the figures you type in.
+* The "How to get these details" link now opens the Google or Facebook steps directly.
 
 = 1.0.5 - 10 September 2026 =
 **New**

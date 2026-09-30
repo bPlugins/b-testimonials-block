@@ -347,6 +347,10 @@
     "avatarRingColor": {
       "type": "string"
     },
+    "avatarCircle": {
+      "type": "object",
+      "default": {}
+    },
     "nameTypo": {
       "type": "object",
       "default": {

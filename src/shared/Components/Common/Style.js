@@ -12,12 +12,129 @@ import {
 import { getPaletteCSS } from "../../utils/visualControls";
 import { ownBoxForDevice } from "../../utils/responsiveBox";
 import { resolveArrangement } from "../../utils/layoutFeatures";
+import { avatarCircleCSS } from "../../utils/avatarCircle";
 import { SHRINK_TO_FIT_LAYOUTS } from "../../utils/layoutControls";
 import { getBadgePlatform, platformSupportsQuotes } from "../../utils/reviewSources";
+
+const FILTER_ALIGN = { left: "flex-start", center: "center", right: "flex-end" };
+
+// A number the user set, as opposed to one left empty. RangeControl's reset
+// stores undefined, and 0 is a real choice for roundness, border and spacing.
+const isSetNumber = (val) =>
+  val !== undefined && val !== null && val !== "" && Number(val) >= 0;
+
+const px = (val) => `${Number(val)}px`;
+
+const FILTER_WEIGHTS = ["300", "400", "500", "600", "700"];
+const FILTER_CASES = ["uppercase", "lowercase", "capitalize"];
+
+// The Filter Bar panel's values as custom properties on the bar, read by the
+// .btb-filter-* rules in frontend.scss. Only what was actually set is
+// emitted, so each property falls back to the original look.
+const filterBarCSS = (mainEl, filterStyle) => {
+  const fs = filterStyle && "object" === typeof filterStyle ? filterStyle : {};
+  const size = Number(fs.fontSize);
+  const searchWidth = Number(fs.searchWidth);
+  const searchSize = Number(fs.searchSize);
+  const vars = [
+    // Untouched buttons are dimmed so their plain outline stays readable on
+    // any background. Once a colour is picked, it is shown as picked.
+    (fs.color || fs.bg || fs.borderColor) && "--btb-filter-opacity: 1;",
+    fs.color && `--btb-filter-color: ${fs.color};`,
+    fs.bg && `--btb-filter-bg: ${fs.bg};`,
+    fs.borderColor && `--btb-filter-border: ${fs.borderColor};`,
+    fs.hoverColor && `--btb-filter-hover-color: ${fs.hoverColor};`,
+    fs.hoverBg && `--btb-filter-hover-bg: ${fs.hoverBg};`,
+    fs.hoverBorder && `--btb-filter-hover-border: ${fs.hoverBorder};`,
+    fs.activeBg && `--btb-filter-active-bg: ${fs.activeBg};`,
+    fs.activeColor && `--btb-filter-active-color: ${fs.activeColor};`,
+    fs.activeBorder && `--btb-filter-active-border: ${fs.activeBorder};`,
+    size > 0 && `--btb-filter-size: ${size}px;`,
+    FILTER_WEIGHTS.includes(String(fs.fontWeight)) &&
+      `--btb-filter-weight: ${fs.fontWeight};`,
+    FILTER_CASES.includes(fs.textTransform) &&
+      `--btb-filter-transform: ${fs.textTransform};`,
+    isSetNumber(fs.letterSpacing) && `--btb-filter-spacing: ${px(fs.letterSpacing)};`,
+    isSetNumber(fs.padY) && `--btb-filter-pad-y: ${px(fs.padY)};`,
+    isSetNumber(fs.padX) && `--btb-filter-pad-x: ${px(fs.padX)};`,
+    isSetNumber(fs.borderWidth) && `--btb-filter-border-width: ${px(fs.borderWidth)};`,
+    isSetNumber(fs.radius) && `--btb-filter-radius: ${px(fs.radius)};`,
+    FILTER_ALIGN[fs.align] && `--btb-filter-align: ${FILTER_ALIGN[fs.align]};`,
+    isSetNumber(fs.gap) && `--btb-filter-gap: ${px(fs.gap)};`,
+    isSetNumber(fs.spaceBelow) && `--btb-filter-below: ${px(fs.spaceBelow)};`,
+    (fs.searchColor || fs.searchBg || fs.searchBorder) && "--btb-search-opacity: 1;",
+    fs.searchColor && `--btb-search-color: ${fs.searchColor};`,
+    fs.searchBg && `--btb-search-bg: ${fs.searchBg};`,
+    fs.searchBorder && `--btb-search-border: ${fs.searchBorder};`,
+    fs.searchFocusBg && `--btb-search-focus-bg: ${fs.searchFocusBg};`,
+    fs.searchFocusBorder && `--btb-search-focus-border: ${fs.searchFocusBorder};`,
+    searchSize > 0 && `--btb-search-size: ${searchSize}px;`,
+    isSetNumber(fs.searchPadY) && `--btb-search-pad-y: ${px(fs.searchPadY)};`,
+    isSetNumber(fs.searchPadX) && `--btb-search-pad-x: ${px(fs.searchPadX)};`,
+    isSetNumber(fs.searchBorderWidth) &&
+      `--btb-search-border-width: ${px(fs.searchBorderWidth)};`,
+    isSetNumber(fs.searchRadius) && `--btb-search-radius: ${px(fs.searchRadius)};`,
+    // Full width wins over a pixel width and a position: the box takes a row
+    // of its own and fills it.
+    fs.searchFull
+      ? "--btb-search-width: 100%; --btb-search-flex: 1 1 100%;"
+      : [
+          searchWidth > 0 && `--btb-search-width: ${searchWidth}px;`,
+          FILTER_ALIGN[fs.searchAlign] &&
+            `--btb-search-flex: 1 1 100%; --btb-search-align: ${FILTER_ALIGN[fs.searchAlign]};`,
+        ]
+          .filter(Boolean)
+          .join(" "),
+  ].filter(Boolean);
+
+  // The placeholder has no custom property to fall back from: a var()
+  // fallback cannot say "the browser's own grey", so the rule only exists
+  // once a colour is picked.
+  const placeholder = fs.searchPlaceholder
+    ? `${mainEl} .btb-filter-input::placeholder { color: ${fs.searchPlaceholder}; opacity: 1; }`
+    : "";
+
+  return (
+    (vars.length ? `${mainEl} .btb-filter-bar { ${vars.join(" ")} }` : "") +
+    placeholder
+  );
+};
+
+// The Show More Button panel's values as custom properties on the button's
+// wrapper, read by the .btb-show-more rules in frontend.scss.
+const showMoreCSS = (mainEl, showMore) => {
+  const sm = showMore && "object" === typeof showMore ? showMore : {};
+
+  if (!sm.enabled) {
+    return "";
+  }
+
+  const size = Number(sm.fontSize);
+  const width = Number(sm.width);
+  const vars = [
+    sm.color && `--btb-more-color: ${sm.color};`,
+    sm.bg && `--btb-more-bg: ${sm.bg};`,
+    sm.borderColor && `--btb-more-border: ${sm.borderColor};`,
+    sm.hoverColor && `--btb-more-hover-color: ${sm.hoverColor};`,
+    sm.hoverBg && `--btb-more-hover-bg: ${sm.hoverBg};`,
+    size > 0 && `--btb-more-size: ${size}px;`,
+    isSetNumber(sm.radius) && `--btb-more-radius: ${Number(sm.radius)}px;`,
+    isSetNumber(sm.borderWidth) &&
+      `--btb-more-border-width: ${Number(sm.borderWidth)}px;`,
+    width > 0 && `--btb-more-width: ${width}px;`,
+    isSetNumber(sm.gap) && `--btb-more-gap: ${Number(sm.gap)}px;`,
+    FILTER_ALIGN[sm.align] && `--btb-more-align: ${FILTER_ALIGN[sm.align]};`,
+  ].filter(Boolean);
+
+  return vars.length
+    ? `${mainEl} .btb-show-more-wrap { ${vars.join(" ")} }`
+    : "";
+};
 
 const Style = ({ attributes = {}, clientId }) => {
   const {
     layout = "default",
+    filterStyle = {},
     displayMode = "",
     ratingSource = "",
     ratingColor = "",
@@ -1681,9 +1798,35 @@ const Style = ({ attributes = {}, clientId }) => {
   //
   // An empty colour keeps `--btb-ring`, so a ring nobody has recoloured still
   // follows the Accent role the way it always has.
+  // The initial-letter avatar (a testimonial with no photo) follows the ring
+  // colour too, once one is picked, so the letter and the ring never disagree.
+  // Nothing is emitted for an unset colour: the letter keeps the Accent role.
+  const avatarLetterCSS =
+    undefined !== attributes?.avatarRing && avatarRing && avatarRingColor
+      ? `${mainEl} .single .authorImg .img .btbAvatarFallback {
+			--btb-accent: ${avatarRingColor};
+		}`
+      : "";
+
+  // Theme 1 and Theme 4 pull the avatar up over the card's top border. The
+  // backdrop that cuts the border out behind it should be the card's own
+  // colour, but only when that colour is solid: a see-through one would leave
+  // the line showing again, so it falls back to the stylesheet's white.
+  const solidCardBg =
+    "string" === typeof background &&
+    /^(#([0-9a-f]{3}|[0-9a-f]{6})$|rgb\(|hsl\(|var\()/i.test(background.trim());
+  const avatarBackdropCSS = solidCardBg
+    ? `${mainEl} .single .top .authorImg {
+			--btb-avatar-bg: ${background};
+		}`
+    : "";
+
   const avatarRingCSS =
     undefined !== attributes?.avatarRing
-      ? `${mainEl} .single .authorImg .img {
+      ? `${mainEl} .single .authorImg {
+			--btb-ring-w: ${avatarRing ? (isSet(avatarRingWidth) ? avatarRingWidth : 3) : 0}px;
+		}
+		${mainEl} .single .authorImg .img {
 			box-shadow: ${
         avatarRing
           ? `0 0 0 ${isSet(avatarRingWidth) ? avatarRingWidth : 3}px ${
@@ -1915,6 +2058,10 @@ const Style = ({ attributes = {}, clientId }) => {
 			${getPaletteCSS(attributes, layout)}
 		}
 
+		${filterBarCSS(mainEl, filterStyle)}
+
+		${showMoreCSS(mainEl, attributes.showMore)}
+
 		${mainEl} .layoutSection {
 			grid-gap: ${rowGap} ${columnGap};
 		}
@@ -2119,6 +2266,9 @@ const Style = ({ attributes = {}, clientId }) => {
 
 		${/* The avatar ring. */ ""}
 		${avatarRingCSS}
+		${avatarLetterCSS}
+		${avatarBackdropCSS}
+		${avatarCircleCSS(mainEl, layout, attributes.avatarCircle)}
 
 		${/* The card's corner wash, at rest and on hover. */ ""}
 		${cardWashCSS}

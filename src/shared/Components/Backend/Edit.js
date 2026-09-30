@@ -8,7 +8,7 @@ import {
   InnerBlocks,
   InspectorControls,
 } from "@wordpress/block-editor";
-import { ToolbarButton, SandBox } from "@wordpress/components";
+import { ToolbarButton, SandBox, Spinner } from "@wordpress/components";
 import { useSelect } from "@wordpress/data";
 import apiFetch from "@wordpress/api-fetch";
 import { addQueryArgs } from "@wordpress/url";
@@ -38,14 +38,55 @@ import { upload } from "../../utils/icons";
 import { clickable } from "../../utils/a11y";
 import usePreviewDevice from "../../utils/usePreviewDevice";
 import useReviewSource, { withLiveReview } from "../../utils/useReviewSource";
-import { getBadgePlatform } from "../../utils/reviewSources";
+import {
+  getBadgePlatform,
+  withEffectiveSource,
+} from "../../utils/reviewSources";
+
+// Preview results by request path, shared by every block in the editor. Only
+// lives until the page reloads, so a testimonial edited in another tab shows
+// up after a refresh.
+const cptCache = new Map();
+
+// Requests still on their way, by the same path. Switching Order to Ascending
+// and straight back asks for the first result again before it has arrived;
+// this hands back the request already running instead of sending a second.
+const cptPending = new Map();
+
+const loadCptItems = (path) => {
+  if (!cptPending.has(path)) {
+    cptPending.set(
+      path,
+      apiFetch({ path })
+        .then((posts) => {
+          const mapped = posts.map(mapCptPost);
+          cptCache.set(path, mapped);
+
+          return mapped;
+        })
+        .finally(() => cptPending.delete(path)),
+    );
+  }
+
+  return cptPending.get(path);
+};
 
 const mapCptPost = (post) => ({
   img: { url: post?._embedded?.["wp:featuredmedia"]?.[0]?.source_url || "" },
   name: post?.title?.rendered || "",
   deg: post?.meta?.bpbtb_designation || "",
+  company: post?.meta?.bpbtb_company || "",
   reviewText: post?.content?.rendered || "",
+  // Same rule as bpbtb_get_testimonial_items(): an empty or zero rating
+  // shows as 5, so the editor and the page always agree.
   rating: Number(post?.meta?.bpbtb_rating) || 5,
+  // Same { slug, name } shape bpbtb_get_testimonial_items() gives the page, so
+  // the category filter bar has buttons to draw in the editor too. `_embed`
+  // already brings each post's terms along.
+  categories: (post?._embedded?.["wp:term"] || [])
+    .flat()
+    .filter((term) => "testimonial_category" === term?.taxonomy)
+    .map((term) => ({ slug: term.slug, name: term.name })),
 });
 import useIframeAssetSync from "../../../../../bpl-tools/hooks/useIframeAssetSync.js";
 
@@ -135,38 +176,106 @@ const Edit = (props) => {
    * would freeze one afternoon's rating into the page and sit there going
    * stale. See withLiveReview() for the full reasoning.
    */
-  const badgePlatform = getBadgePlatform(attributes.layout, attributes);
+  const sourceAttributes = useMemo(
+    () => withEffectiveSource(attributes),
+    [attributes],
+  );
+  const badgePlatform = getBadgePlatform(
+    sourceAttributes.layout,
+    sourceAttributes,
+  );
   const liveReview = useReviewSource(
     badgePlatform,
-    !!badgePlatform && "manual" !== (attributes.ratingSource || "live"),
+    !!badgePlatform && "manual" !== (sourceAttributes.ratingSource || "live"),
   );
   const previewAttributes = useMemo(
-    () => withLiveReview(attributes, liveReview.data),
-    [attributes, liveReview.data],
+    () => withLiveReview(sourceAttributes, liveReview.data),
+    [sourceAttributes, liveReview.data],
   );
   const [activeIndex, setActiveIndex] = useState(0);
 
   // Fetch testimonials from the CPT for the editor preview when that source is active.
   const [cptItems, setCptItems] = useState([]);
-  const [cptLoading, setCptLoading] = useState(false);
+  // The request path the cards on screen came from. Comparing it with the
+  // path the current settings ask for is what says "updating", so there is
+  // no render in between where a stale preview looks finished.
+  const [cptShownPath, setCptShownPath] = useState(null);
+
+  // Dragging the Number slider from 6 to 28 used to send 22 requests, and the
+  // preview only settled once the last one came back. The slider still moves
+  // at once; the request waits until it has been still for a moment.
+  const wantedNumber = query?.number || 6;
+  const [fetchNumber, setFetchNumber] = useState(wantedNumber);
+
   useEffect(() => {
-    if (!isCpt) {
+    const timer = setTimeout(() => setFetchNumber(wantedNumber), 400);
+
+    return () => clearTimeout(timer);
+  }, [wantedNumber]);
+
+  // The block stores the category's slug (what the server-side query and the
+  // filter bar both match on), but the REST collection filters by term ID.
+  // null while resolving, [] when the slug matches no category.
+  const pinnedCategory = isCpt ? query?.category || "" : "";
+  const pinnedTerms = useSelect(
+    (select) =>
+      pinnedCategory
+        ? select("core").getEntityRecords("taxonomy", "testimonial_category", {
+            slug: pinnedCategory,
+            per_page: 1,
+          })
+        : undefined,
+    [pinnedCategory],
+  );
+  const pinnedTermId = pinnedCategory
+    ? Array.isArray(pinnedTerms)
+      ? pinnedTerms[0]?.id || 0
+      : null
+    : undefined;
+
+  // Only the two embeds mapCptPost reads. A bare `_embed` also pulled in the
+  // author of every post, which the preview never shows. A category that no
+  // longer exists gets its own path with nothing to fetch: the page shows
+  // nothing for it, so the preview does too.
+  const cptPathFor = (number) =>
+    0 === pinnedTermId
+      ? "missing-category"
+      : addQueryArgs("/wp/v2/testimonial", {
+          per_page: number,
+          orderby: query?.orderBy || "date",
+          order: query?.order || "desc",
+          ...(pinnedTermId ? { testimonial_category: pinnedTermId } : {}),
+          _embed: "wp:featuredmedia,wp:term",
+        });
+
+  // null while the category is still being looked up.
+  const fetchPath = isCpt && null !== pinnedTermId ? cptPathFor(fetchNumber) : null;
+  const wantedPath =
+    isCpt && null !== pinnedTermId ? cptPathFor(wantedNumber) : null;
+
+  useEffect(() => {
+    if (!fetchPath) {
+      return;
+    }
+
+    if ("missing-category" === fetchPath) {
+      setCptItems([]);
+      setCptShownPath(fetchPath);
+      return;
+    }
+
+    // Going back to a setting already seen is instant.
+    if (cptCache.has(fetchPath)) {
+      setCptItems(cptCache.get(fetchPath));
+      setCptShownPath(fetchPath);
       return;
     }
 
     let active = true;
-    setCptLoading(true);
-    apiFetch({
-      path: addQueryArgs("/wp/v2/testimonial", {
-        per_page: query?.number || 6,
-        orderby: query?.orderBy || "date",
-        order: query?.order || "desc",
-        _embed: true,
-      }),
-    })
-      .then((posts) => {
+    loadCptItems(fetchPath)
+      .then((mapped) => {
         if (active) {
-          setCptItems(posts.map(mapCptPost));
+          setCptItems(mapped);
         }
       })
       .catch(() => {
@@ -176,14 +285,19 @@ const Edit = (props) => {
       })
       .finally(() => {
         if (active) {
-          setCptLoading(false);
+          setCptShownPath(fetchPath);
         }
       });
 
     return () => {
       active = false;
     };
-  }, [isCpt, query?.number, query?.orderBy, query?.order]);
+  }, [fetchPath]);
+
+  // True from the moment a setting changes, including the short wait before
+  // a Number change is sent, until the cards for exactly these settings are
+  // on screen.
+  const cptUpdating = isCpt && (!wantedPath || cptShownPath !== wantedPath);
 
   const blockProps = useBlockProps({
     className:
@@ -375,7 +489,7 @@ const Edit = (props) => {
   return (
     <>
       <Settings
-        attributes={attributes}
+        attributes={sourceAttributes}
         setAttributes={setAttributes}
         updateItem={updateItem}
         activeIndex={activeIndex}
@@ -384,6 +498,9 @@ const Edit = (props) => {
         currentBlockName={name}
         badgePlatform={badgePlatform}
         liveReview={liveReview}
+        cptStatus={
+          isCpt ? { updating: cptUpdating, count: cptItems.length } : null
+        }
       />
 
       <div {...blockProps} id={`btbTestimonialsDir-${clientId}`}>
@@ -400,17 +517,36 @@ const Edit = (props) => {
 
         {isCpt ? (
           cptItems.length ? (
-            <TestimonialsView
-              attributes={{ ...previewAttributes, items: cptItems }}
-              clientId={clientId}
-              isBackend={true}
-              previewDevice={previewDevice}
-            />
+            // The old cards stay in place while the new ones load, dimmed and
+            // labelled, so a change is visibly in progress without the block
+            // collapsing to a notice and jumping the page.
+            <div
+              className={
+                "btbCptPreview" + (cptUpdating ? " btbCptPreview--updating" : "")
+              }
+              aria-busy={cptUpdating}>
+              {cptUpdating && (
+                <span className="btbCptPreviewBadge">
+                  <Spinner />
+                  {__("Updating preview", "b-testimonials-block")}
+                </span>
+              )}
+
+              <TestimonialsView
+                attributes={{ ...previewAttributes, items: cptItems }}
+                clientId={clientId}
+                isBackend={true}
+                previewDevice={previewDevice}
+              />
+            </div>
           ) : (
             <p className="btbCptNotice">
-              {cptLoading
-                ? __("Loading testimonials…", "b-testimonials-block")
-                : __(
+              {cptUpdating ? (
+                <>
+                  <Spinner />
+                  {__("Loading testimonials", "b-testimonials-block")}
+                </>
+              ) : __(
                     "No testimonials found. Add some under the Testimonials menu, or switch Content Source to Manual.",
                     "b-testimonials-block",
                   )}
@@ -418,7 +554,7 @@ const Edit = (props) => {
           )
         ) : (
           <>
-            <Style attributes={attributes} clientId={clientId} />
+            <Style attributes={sourceAttributes} clientId={clientId} />
 
             <div className="btbTestimonialsDir">
               <Layout

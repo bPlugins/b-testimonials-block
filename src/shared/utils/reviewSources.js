@@ -96,6 +96,30 @@ export const REVIEW_PLATFORM_OPTIONS = [
 ];
 
 /**
+ * Platforms currently offered on the Review Sources screen, and so the only
+ * ones a badge can read Live from. Trustpilot, G2 and Capterra are hidden for
+ * now and run on the figures typed into each block instead.
+ *
+ * Mirror of BPBTB_Review_Sources::ACTIVE_PLATFORMS.
+ */
+export const LIVE_PLATFORMS = ["google", "facebook"];
+
+/**
+ * Can this platform be read Live right now?
+ *
+ * @param {string} platform Platform slug.
+ * @return {boolean}
+ */
+export const platformIsLive = (platform) => LIVE_PLATFORMS.includes(platform);
+
+/**
+ * The platforms the generic badge may pick from in Live mode.
+ */
+export const LIVE_PLATFORM_OPTIONS = REVIEW_PLATFORM_OPTIONS.filter((o) =>
+  platformIsLive(o.value),
+);
+
+/**
  * Which platform a block is asking for, or "" when it is not a review badge.
  *
  * @param {string} layout     The block's layout attribute.
@@ -114,6 +138,37 @@ export const getBadgePlatform = (layout, attributes = {}) => {
   }
 
   return "";
+};
+
+/**
+ * The attributes a badge actually runs on, given which platforms are Live.
+ *
+ * A fixed badge for a hidden platform (Trustpilot, G2, Capterra) has nothing to
+ * read Live, so it runs as Manual. The generic badge keeps its Rating Source
+ * control, but a hidden platform picked while Live counts as nothing picked,
+ * so its Platform select can offer Google or Facebook instead.
+ *
+ * Returns a copy and is never saved: `ratingSource` still defaults to "live" in
+ * block.json. Mirror of the check in bpbtb_apply_live_review_data(), so the
+ * canvas matches the published page.
+ *
+ * @param {Object} attributes Block attributes.
+ * @return {Object}
+ */
+export const withEffectiveSource = (attributes = {}) => {
+  const platform = getBadgePlatform(attributes.layout, attributes);
+
+  if (!platform || platformIsLive(platform)) {
+    return attributes;
+  }
+
+  if ("manual" === (attributes.ratingSource || "live")) {
+    return attributes;
+  }
+
+  return GENERIC_BADGE_LAYOUT === attributes.layout
+    ? { ...attributes, ratingPlatform: "" }
+    : { ...attributes, ratingSource: "manual" };
 };
 
 /**

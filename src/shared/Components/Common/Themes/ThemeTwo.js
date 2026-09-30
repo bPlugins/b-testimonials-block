@@ -32,7 +32,7 @@ const ThemeTwo = ({
       className={`single ${
         isBackend && index === activeIndex ? "btbNowEditing" : ""
       }`}
-      {...editorClickable(isBackend, () => setActiveIndex(index))}>
+      {...editorClickable(isBackend, () => setActiveIndex?.(index))}>
       {showStarBadge && (
         <span className="btb-star-badge">
           <span className="btb-star-badge-icon" aria-hidden="true">
@@ -59,7 +59,7 @@ const ThemeTwo = ({
       </div>
 
       <div className="bottom">
-        <Image attributes={attributes} img={img}>
+        <Image attributes={attributes} img={img} name={item?.name}>
           {itemEls?.img}
         </Image>
         <div className="info">

@@ -58,7 +58,11 @@ function bpbtb_register_testimonial_cpt() {
 			'menu_icon'    => 'dashicons-format-quote',
 			'has_archive'  => false,
 			'rewrite'      => false,
-			'supports'     => [ 'title', 'editor', 'thumbnail' ],
+			// custom-fields is what puts the registered meta below into the REST
+			// response. Without it `show_in_rest` on the meta did nothing, so the
+			// editor preview got no rating and drew five stars on every card.
+			// Its raw Custom Fields box is removed again further down.
+			'supports'     => [ 'title', 'editor', 'thumbnail', 'custom-fields' ],
 			'taxonomies'   => [ 'testimonial_category' ],
 		]
 	);
@@ -180,6 +184,26 @@ function bpbtb_testimonial_meta_box() {
 }
 }
 add_action( 'add_meta_boxes', 'bpbtb_testimonial_meta_box' );
+
+/**
+ * Drop the Slug and Custom Fields boxes from the testimonial screen.
+ *
+ * The post type is not public and has no rewrite rules, so a testimonial never
+ * has an address for the slug to appear in, and nothing in the plugin reads it.
+ * WordPress still fills it in from the title on publish, so removing the box
+ * loses nothing -- it only takes away a field users cannot make sense of.
+ *
+ * Custom Fields comes with the custom-fields support the REST response needs.
+ * It would list rating, designation and company a second time as raw keys,
+ * next to the Testimonial Details box that already edits them properly.
+ */
+if ( ! function_exists( 'bpbtb_testimonial_remove_slug_box' ) ) {
+function bpbtb_testimonial_remove_slug_box() {
+	remove_meta_box( 'slugdiv', 'testimonial', 'normal' );
+	remove_meta_box( 'postcustom', 'testimonial', 'normal' );
+}
+}
+add_action( 'add_meta_boxes_testimonial', 'bpbtb_testimonial_remove_slug_box' );
 
 /**
  * Render the details meta box.

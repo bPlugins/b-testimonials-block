@@ -278,6 +278,10 @@
     "avatarRingColor": {
       "type": "string"
     },
+    "avatarCircle": {
+      "type": "object",
+      "default": {}
+    },
     "nameTypo": {
       "type": "object",
       "default": {
@@ -420,6 +424,14 @@
     "showFilter": {
       "type": "boolean",
       "default": false
+    },
+    "filterStyle": {
+      "type": "object",
+      "default": {}
+    },
+    "showMore": {
+      "type": "object",
+      "default": {}
     },
     "showSearch": {
       "type": "boolean",

@@ -14,7 +14,9 @@ import Label from "../../../../../../bpl-tools/Components/Label/Label";
 import { InlineDetailMediaUpload } from "../../../../../../bpl-tools/Components/MediaControl/MediaControl";
 import {
   GENERIC_BADGE_LAYOUT,
+  LIVE_PLATFORM_OPTIONS,
   REVIEW_PLATFORM_OPTIONS,
+  platformIsLive,
   platformSupportsQuotes,
   platformSupportsEmbed,
 } from "../../../utils/reviewSources";
@@ -103,13 +105,15 @@ const RatingSourcePanel = ({
   // only the Platform select itself (below) is generic-only, since a fixed
   // badge has nothing to pick.
   const supportsQuotes = platformSupportsQuotes(platform);
-  // Live quotes are Google-only (supportsQuotes) -- no other platform's API
-  // hands over review text, and nothing here can change that (see
-  // PLATFORMS_WITH_REVIEWS). Manual quotes need no such API: they are typed
-  // in by hand, so any platform can offer them once Manual is picked --
-  // that's the "Recommended by..." card someone copies off Facebook, G2,
-  // Trustpilot or Capterra themselves and retypes here.
+  // Live quotes come only from Google and Facebook (PLATFORMS_WITH_QUOTES).
+  // Manual quotes need no API: they are typed in by hand, so any platform can
+  // offer them once Manual is picked.
   const isManualQuotesCapable = !isLiveMode;
+  // A fixed Trustpilot, G2 or Capterra badge has no Live source while those
+  // platforms are hidden from Review Sources, so Manual is its only option and
+  // the Rating Source select would offer nothing to choose. Edit.js has
+  // already switched its ratingSource to "manual" (withEffectiveSource()).
+  const isManualOnly = !isGeneric && !!platform && !platformIsLive(platform);
   const isQuotesMode =
     "quotes" === displayMode && (supportsQuotes || isManualQuotesCapable);
   const supportsEmbed = platformSupportsEmbed(platform);
@@ -322,6 +326,7 @@ const RatingSourcePanel = ({
     <>
       <Label>{__("Rating Source", "b-testimonials-block")}</Label>
 
+      {!isManualOnly && (
       <SelectControl
         className="mt10"
         value={ratingSource}
@@ -347,21 +352,31 @@ const RatingSourcePanel = ({
           "b-testimonials-block",
         )}
       />
+      )}
 
-      {isGeneric && isLiveMode && (
+      {/* Live can only read the platforms offered on Review Sources. Manual
+          figures are typed in, so they can belong to any of the five. */}
+      {isGeneric && (
         <SelectControl
           className="mt10"
           label={__("Platform", "b-testimonials-block")}
           value={attributes.ratingPlatform || ""}
           options={[
             { label: __("— Select —", "b-testimonials-block"), value: "" },
-            ...REVIEW_PLATFORM_OPTIONS,
+            ...(isLiveMode ? LIVE_PLATFORM_OPTIONS : REVIEW_PLATFORM_OPTIONS),
           ]}
           onChange={(val) => setAttributes({ ratingPlatform: val })}
-          help={__(
-            "This badge is not tied to one platform, so it asks which of the five to read.",
-            "b-testimonials-block",
-          )}
+          help={
+            isLiveMode
+              ? __(
+                  "This badge is not tied to one platform, so it asks which one to read. For Trustpilot, G2 or Capterra, switch Rating Source to Manual and type the figures in.",
+                  "b-testimonials-block",
+                )
+              : __(
+                  "Which platform the figures and quotes typed below come from.",
+                  "b-testimonials-block",
+                )
+          }
         />
       )}
 

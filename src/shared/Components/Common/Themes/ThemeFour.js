@@ -8,10 +8,10 @@ const ThemeFour = ({ itemEls = {}, item = {}, index, attributes = {}, activeInde
     const { nameColor, quoteIcon } = attributes || {};
     const { img = {}, reviewText = '' } = item || {};
 
-    return <div key={index} className={`single ${isBackend && index === activeIndex ? "btbNowEditing" : ""}`} {...editorClickable(isBackend, () => setActiveIndex(index))}>
+    return <div key={index} className={`single ${isBackend && index === activeIndex ? "btbNowEditing" : ""}`} {...editorClickable(isBackend, () => setActiveIndex?.(index))}>
 
         <div className="top">
-            <Image attributes={attributes} img={img}>{itemEls?.img}</Image>
+            <Image attributes={attributes} img={img} name={item?.name}>{itemEls?.img}</Image>
         </div>
 
         <div className="body">

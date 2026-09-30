@@ -31,8 +31,13 @@ function bpbtb_pattern_block( $name, $attrs = [] ) {
 	// Self-closing block comments: every block here renders from render.php and
 	// stores nothing between its delimiters.
 	$json = $attrs ? ' ' . wp_json_encode( $attrs, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE ) : '';
+	$child = '<!-- wp:bptmb/' . $name . $json . ' /-->';
 
-	return '<!-- wp:bptmb/' . $name . $json . ' /-->';
+	// Every layout here is restricted to a bptmb/b-testimonials parent (see
+	// each layout's block.json), so it needs that wrapper to be a valid,
+	// insertable block at all -- without it the editor silently drops the
+	// whole pattern from the inserter instead of showing it.
+	return '<!-- wp:bptmb/b-testimonials -->' . $child . '<!-- /wp:bptmb/b-testimonials -->';
 }
 }
 

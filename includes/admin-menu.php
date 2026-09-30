@@ -205,7 +205,7 @@ class BPBTB_Admin_Menu {
 					alt="<?php esc_attr_e( 'Testimonials', 'b-testimonials-block' ); ?>"
 				/>
 				<h1><?php esc_html_e( 'Testimonials', 'b-testimonials-block' ); ?></h1>
-				<div class="pluginVersion">v<?php echo esc_html( BPBTB_PLUGIN_VERSION ); ?></div>
+				<div class="pluginVersion">v<?php echo esc_html( BPBTB_DISPLAY_VERSION ); ?></div>
 			</div>
 
 			<?php // Toggled by the inline script in admin_enqueue_scripts(). ?>
@@ -469,7 +469,7 @@ class BPBTB_Admin_Menu {
 		<div
 			id="bpbtbDashboard"
 			data-info="<?php echo esc_attr( wp_json_encode( [
-				'version'               => BPBTB_PLUGIN_VERSION,
+				'version'               => BPBTB_DISPLAY_VERSION,
 				'adminUrl'              => admin_url(),
 				// Base for the dashboard's own links back into wp-admin.
 				// Taken from home_url() rather than assembled in JS so it

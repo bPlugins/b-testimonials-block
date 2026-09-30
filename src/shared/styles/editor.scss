@@ -15,6 +15,116 @@ $brandColor: #146ef5;
   border: 1px dashed #c3c4c7;
   border-radius: 4px;
   color: #757575;
+
+  .components-spinner {
+    margin: 0 8px 0 0;
+    vertical-align: middle;
+  }
+}
+
+// The CPT preview while a new query is loading: the old cards stay, dimmed,
+// with a label pinned to the top so the change is visibly in progress.
+.btbCptPreview {
+  position: relative;
+
+  > .btbTestimonialsDir {
+    transition: opacity 0.2s ease;
+  }
+
+  &--updating > .btbTestimonialsDir {
+    opacity: 0.45;
+    pointer-events: none;
+  }
+}
+
+.btbCptPreviewBadge {
+  position: sticky;
+  top: 12px;
+  z-index: 5;
+  display: flex;
+  align-items: center;
+  width: fit-content;
+  margin: 0 auto 12px;
+  padding: 6px 14px 6px 6px;
+  font-size: 13px;
+  line-height: 1.4;
+  color: #1e1e1e;
+  background: #fff;
+  border: 1px solid #e0e0e0;
+  border-radius: 999px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+
+  .components-spinner {
+    margin: 0 8px 0 0;
+  }
+}
+
+// A note under a control. Same look as the help line WordPress puts under
+// its own controls (12px, soft gray), so a note written by hand and a help
+// prop sit side by side without one looking bigger or darker than the other.
+.btbHint {
+  margin: 8px 0 14px;
+  font-size: 12px;
+  line-height: 18px;
+  color: #757575;
+}
+
+// Section headings and the Normal / Hover / Selected tabs inside the Filter
+// Bar panel.
+.btbPanelHeading {
+  margin: 24px 0 12px;
+  padding-top: 16px;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: #1e1e1e;
+  border-top: 1px solid #e0e0e0;
+
+  .bPlPanelBody &:first-child {
+    margin-top: 4px;
+    padding-top: 0;
+    border-top: 0;
+  }
+}
+
+.btbStateTabs {
+  .components-tab-panel__tabs {
+    margin-bottom: 12px;
+    border-bottom: 1px solid #e0e0e0;
+  }
+
+  .components-tab-panel__tabs-item {
+    flex: 1;
+    justify-content: center;
+    height: 36px;
+    padding: 0 8px;
+  }
+}
+
+// The line under Content Source that confirms what the preview is showing.
+.btbCptStatus {
+  display: flex;
+  align-items: center;
+  min-height: 24px;
+  margin: 4px 0 12px;
+  padding: 8px 10px;
+  font-size: 12px;
+  line-height: 1.5;
+  color: #1e1e1e;
+  background: #f0f6fc;
+  border-left: 3px solid $brandColor;
+  border-radius: 2px;
+
+  &.is-updating {
+    color: #50575e;
+    background: #f6f7f7;
+    border-left-color: #c3c4c7;
+  }
+
+  .components-spinner {
+    flex: none;
+    margin: 0 8px 0 0;
+  }
 }
 
 // The shortcode-copy bar shown above the block on the "Testimonials Block"
@@ -78,6 +188,12 @@ $brandColor: #146ef5;
       }
 
       .btbShortcodeTooltip {
+        // Below the button, not above: this button can be the very first
+        // thing in the block (see FrontShortCode.js), so on a freshly opened
+        // "Testimonials Block" post the bar sits right at the top of the
+        // editor canvas -- a tooltip popping upward here gets clipped by the
+        // canvas's own root container (overflow: hidden on
+        // .block-editor-block-list__layout) and is never actually seen.
         visibility: hidden;
         width: 140px;
         background-color: #1e293b;
@@ -87,25 +203,25 @@ $brandColor: #146ef5;
         padding: 6px 0;
         position: absolute;
         z-index: 10;
-        bottom: 140%;
+        top: 140%;
         left: 50%;
         margin-left: -70px;
         opacity: 0;
         transition: opacity 0.2s ease, transform 0.2s ease;
         font-size: 12px;
         font-weight: 400;
-        transform: translateY(5px);
+        transform: translateY(-5px);
         pointer-events: none;
 
         &::after {
           content: "";
           position: absolute;
-          top: 100%;
+          bottom: 100%;
           left: 50%;
           margin-left: -5px;
           border-width: 5px;
           border-style: solid;
-          border-color: #1e293b transparent transparent transparent;
+          border-color: transparent transparent #1e293b transparent;
         }
       }
 

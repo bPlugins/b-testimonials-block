@@ -301,6 +301,21 @@ $brandColor: #146ef5;
 			}
 		}
 
+		// Shown in place of the photo when a testimonial has none: the
+		// reviewer's initial on a tint of the accent colour, the same look as
+		// the review-quote cards' fallback.
+		.authorImg .img .btbAvatarFallback {
+			display: flex;
+			width: 100%;
+			height: 100%;
+			color: var(--btb-accent, #6366f1);
+			background: color-mix(in srgb, var(--btb-accent, #6366f1) 15%, transparent);
+
+			svg {
+				display: block;
+			}
+		}
+
 		.layoutSection {
 			display: grid;
 			// A card is one flex/grid child holding several stacked pieces
@@ -404,6 +419,16 @@ $brandColor: #146ef5;
 					.top {
 						justify-content: center;
 						margin-top: -33px;
+						// The avatar straddles the card's top border on this theme. Its fill and
+						// ring are see-through, so the border line used to run straight across
+						// them. A solid backdrop cuts the line out behind the avatar. It takes
+						// the card background when one is set (Style.js), white otherwise, and
+						// reaches exactly as far as the ring, so nothing extra shows around it.
+						.authorImg {
+							border-radius: 50%;
+							background: var(--btb-avatar-bg, #fff);
+							box-shadow: 0 0 0 var(--btb-ring-w, 3px) var(--btb-avatar-bg, #fff);
+						}
 					}
 
 					.body {
@@ -622,6 +647,16 @@ $brandColor: #146ef5;
 					.top {
 						justify-content: center;
 						margin-top: -19px;
+						// The avatar straddles the card's top border on this theme. Its fill and
+						// ring are see-through, so the border line used to run straight across
+						// them. A solid backdrop cuts the line out behind the avatar. It takes
+						// the card background when one is set (Style.js), white otherwise, and
+						// reaches exactly as far as the ring, so nothing extra shows around it.
+						.authorImg {
+							border-radius: 50%;
+							background: var(--btb-avatar-bg, #fff);
+							box-shadow: 0 0 0 var(--btb-ring-w, 3px) var(--btb-avatar-bg, #fff);
+						}
 					}
 
 					.body {
@@ -2413,68 +2448,141 @@ $brandColor: #146ef5;
 		align-items: center;
 		justify-content: space-between;
 		gap: 12px;
-		margin-bottom: 24px;
+		margin-bottom: var(--btb-filter-below, 24px);
 
 		&:empty {
 			display: none;
 		}
 	}
 
+	/* The --btb-filter-* properties come from the Filter Bar panel on the
+	   Style tab (Style.js). Each fallback is the look before that panel
+	   existed, so an untouched block is unchanged. */
 	.btb-filter-cats {
 		display: flex;
+		flex: 1 1 auto;
 		flex-wrap: wrap;
-		gap: 8px;
+		justify-content: var(--btb-filter-align, flex-start);
+		gap: var(--btb-filter-gap, 8px);
 	}
 
 	.btb-filter-cat {
-		padding: 7px 16px;
+		padding: var(--btb-filter-pad-y, 7px) var(--btb-filter-pad-x, 16px);
 		font: inherit;
-		font-size: 0.9em;
+		font-size: var(--btb-filter-size, 0.9em);
+		font-weight: var(--btb-filter-weight, inherit);
 		line-height: 1.4;
-		color: inherit;
+		letter-spacing: var(--btb-filter-spacing, normal);
+		text-transform: var(--btb-filter-transform, none);
+		color: var(--btb-filter-color, currentColor);
 		cursor: pointer;
-		background: transparent;
-		border: 1px solid currentColor;
-		border-radius: 999px;
+		background: var(--btb-filter-bg, transparent);
+		border: var(--btb-filter-border-width, 1px) solid var(--btb-filter-border, currentColor);
+		border-radius: var(--btb-filter-radius, 999px);
 		/* The border is the only thing carrying the button's shape, so it is
 		   dimmed rather than recoloured -- that keeps it legible on a dark
-		   background as well as a light one, without a second colour token. */
-		opacity: 0.65;
-		transition: opacity 0.15s ease, background-color 0.15s ease;
+		   background as well as a light one, without a second colour token.
+		   A colour picked in the panel is shown as picked, undimmed. */
+		opacity: var(--btb-filter-opacity, 0.65);
+		transition: opacity 0.15s ease, background-color 0.15s ease, color 0.15s ease, border-color 0.15s ease;
 
+		/* Each hover colour falls back to the normal one, so hover still only
+		   brightens the button until a hover colour is picked. */
 		&:hover,
 		&:focus-visible {
 			opacity: 1;
+			color: var(--btb-filter-hover-color, var(--btb-filter-color, currentColor));
+			background: var(--btb-filter-hover-bg, var(--btb-filter-bg, transparent));
+			border-color: var(--btb-filter-hover-border, var(--btb-filter-border, currentColor));
 		}
 
 		&.is-active,
 		&[aria-pressed="true"] {
 			opacity: 1;
-			color: #fff;
-			background: currentColor;
+			color: var(--btb-filter-active-color, #fff);
+			/* Not `currentColor`: that is this element's own color, which the
+			   line above just set, so the button would fill with its own text
+			   colour and vanish. */
+			background: var(--btb-filter-active-bg, var(--btb-accent, #146ef5));
+			border-color: var(--btb-filter-active-border, var(--btb-filter-active-bg, var(--btb-accent, #146ef5)));
 
 			/* Colour is not the only signal: the active button is also the only
 			   filled one, which survives greyscale and colour blindness. */
 			> * {
-				color: #fff;
+				color: var(--btb-filter-active-color, #fff);
 			}
 		}
 	}
 
-	.btb-filter-input {
-		min-width: 200px;
-		max-width: 100%;
-		padding: 8px 14px;
-		font: inherit;
-		font-size: 0.9em;
-		color: inherit;
-		background: transparent;
-		border: 1px solid currentColor;
-		border-radius: 999px;
-		opacity: 0.75;
+	/* --btb-search-* come from the Search Box panel on the Style tab
+	   (Style.js). Each falls back to the original look.
 
-		&:focus {
+	   The wrapper is what moves: by default it sits beside the buttons, and
+	   a Position or Full width setting gives it a row of its own. */
+	.btb-filter-search {
+		display: flex;
+		flex: var(--btb-search-flex, 0 1 auto);
+		justify-content: var(--btb-search-align, flex-start);
+		max-width: 100%;
+	}
+
+	.btb-filter-input {
+		width: var(--btb-search-width, auto);
+		min-width: var(--btb-search-width, 200px);
+		max-width: 100%;
+		padding: var(--btb-search-pad-y, 8px) var(--btb-search-pad-x, 14px);
+		font: inherit;
+		font-size: var(--btb-search-size, 0.9em);
+		color: var(--btb-search-color, inherit);
+		background: var(--btb-search-bg, transparent);
+		border: var(--btb-search-border-width, 1px) solid var(--btb-search-border, currentColor);
+		border-radius: var(--btb-search-radius, 999px);
+		opacity: var(--btb-search-opacity, 0.75);
+		transition: background-color 0.15s ease, border-color 0.15s ease, opacity 0.15s ease;
+
+		/* The browser's own focus ring sat outside the border as a second,
+		   thicker black one. It is replaced, not just removed: the box's own
+		   border takes the accent colour, so it is still plain which field is
+		   active -- for keyboard users most of all -- without the double line.
+		   The theme may add a ring too, hence the explicit none on both. */
+		&:focus,
+		&:focus-visible {
 			opacity: 1;
+			outline: none;
+			box-shadow: none;
+			background: var(--btb-search-focus-bg, var(--btb-search-bg, transparent));
+			border-color: var(--btb-search-focus-border, var(--btb-accent, #146ef5));
+		}
+	}
+
+	/* "Show more" under a stacked list of cards (TestimonialsView). */
+	/* Every --btb-more-* property comes from the Show More Button panel
+	   (Style.js). Each falls back to the original outline pill. */
+	.btb-show-more-wrap {
+		display: flex;
+		justify-content: var(--btb-more-align, center);
+		margin-top: var(--btb-more-gap, 28px);
+	}
+
+	.btb-show-more {
+		width: var(--btb-more-width, auto);
+		max-width: 100%;
+		padding: 10px 28px;
+		font: inherit;
+		font-size: var(--btb-more-size, 0.95em);
+		line-height: 1.4;
+		color: var(--btb-more-color, inherit);
+		cursor: pointer;
+		background: var(--btb-more-bg, transparent);
+		border: var(--btb-more-border-width, 1px) solid var(--btb-more-border, currentColor);
+		border-radius: var(--btb-more-radius, 999px);
+		transition: background-color 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+
+		&:hover,
+		&:focus-visible {
+			color: var(--btb-more-hover-color, #fff);
+			background: var(--btb-more-hover-bg, var(--btb-accent, #146ef5));
+			border-color: var(--btb-more-hover-bg, var(--btb-accent, #146ef5));
 		}
 	}
 

@@ -421,6 +421,14 @@
       "type": "boolean",
       "default": false
     },
+    "filterStyle": {
+      "type": "object",
+      "default": {}
+    },
+    "showMore": {
+      "type": "object",
+      "default": {}
+    },
     "showSearch": {
       "type": "boolean",
       "default": false

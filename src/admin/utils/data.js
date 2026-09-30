@@ -689,6 +689,25 @@ export const welcomeInfo = (adminUrl) => ({
   },
   changelogs: [
     {
+      version: "1.0.6 - 30 September 2026",
+      type: "new",
+      list: [
+        "<strong>New</strong> Category dropdown under Content Source. You can now pin a block to one category. 1.0.5 said it could do this but the setting was missing.",
+        "<strong>New</strong> Show More button for the grid, list, masonry, timeline, audio and video layouts. It shows the first few testimonials and each click adds more. It works with the filter and the search.",
+        "<strong>New</strong> Show More Button style panel: colors, hover colors, font size, roundness, border, width, spacing and alignment.",
+        "<strong>New</strong> Filter bar buttons now have 20 style options instead of 6. This includes Normal, Hover and Selected colors, text, shape, layout and spacing.",
+        "<strong>New</strong> Search box has its own Style panel: colors, placeholder color, font size, padding, border, roundness, width and position.",
+        "<strong>New</strong> A testimonial with no photo now shows a circle with the first letter of the name, instead of a broken image.",
+        "<strong>Fix</strong> The editor always showed five stars on every testimonial. It now shows the real rating, and the designation and company as well.",
+        "<strong>Fix</strong> The black outline around the search box when you click it is gone. The border turns the accent color instead.",
+        "<strong>Improvement</strong> Changing Category, Number, Order By or Order in the editor now shows an \"Updating preview\" label and a status line, so you can tell it is working.",
+        "<strong>Improvement</strong> The Number slider waits until you stop dragging before it loads testimonials.",
+        "<strong>Improvement</strong> The Slug and Custom Fields boxes are removed from the testimonial screen. Nothing used them.",
+        "<strong>Improvement</strong> Trustpilot, G2 and Capterra are hidden from the Review Sources page for now, because their data cannot be read on a free plan. Those blocks still work with the figures you type in.",
+        "<strong>Improvement</strong> The \"How to get these details\" link now opens the Google or Facebook steps directly.",
+      ],
+    },
+    {
       version: "1.0.5 - 10 September 2026",
       type: "new",
       list: [

@@ -9,14 +9,14 @@ const ThemeSix = ({ itemEls = {}, item = {}, index, attributes = {}, activeIndex
     const { starIconColor } = attributes || {};
     const { img = {}, reviewText = '', rating = 5 } = item || {};
 
-    return <div key={index} className={`single ${isBackend && index === activeIndex ? "btbNowEditing" : ""}`} {...editorClickable(isBackend, () => setActiveIndex(index))}>
+    return <div key={index} className={`single ${isBackend && index === activeIndex ? "btbNowEditing" : ""}`} {...editorClickable(isBackend, () => setActiveIndex?.(index))}>
 
         <div className="top">
             <ReviewText attributes={attributes} itemEls={itemEls} isBackend={isBackend} reviewText={reviewText} />
         </div>
 
         <div className="bottom">
-            <Image attributes={attributes} img={img}>{itemEls?.img}</Image>
+            <Image attributes={attributes} img={img} name={item?.name}>{itemEls?.img}</Image>
             <div className='info'>
                 {itemEls?.name}
                 {itemEls?.deg}
